@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+  
+  <!-- Repository Resource Servlets -->
+  <servlet>
+    <servlet-name>CreateResourceServlet</servlet-name>
+    <servlet-class>org.cnx.repository.resources.CreateResourceServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CreateResourceServlet</servlet-name>
+    <url-pattern>/resourcefactory/create</url-pattern>
+  </servlet-mapping>  
+  
+   <servlet>
+    <servlet-name>UploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.resources.UploadCompletionServlet</servlet-class>
+  </servlet>
+   
+  <servlet-mapping>
+    <servlet-name>UploadCompletionServlet</servlet-name>
+    <url-pattern>/resourcefactory/uploaded/*</url-pattern>
+  </servlet-mapping>   
+  
+   <servlet>
+    <servlet-name>GetResourceServlet</servlet-name>
+    <servlet-class>org.cnx.repository.resources.GetResourceServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetResourceServlet</servlet-name>
+    <url-pattern>/resource/*</url-pattern>
+  </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>GetResourceInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.resources.GetResourceInfoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetResourceInfoServlet</servlet-name>
+    <url-pattern>/resourceinfo/*</url-pattern>
+  </servlet-mapping>  
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>CnxDemo.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>

@@ -33,10 +33,6 @@ import org.cnx.util.Nullable;
 
 /**
  * A JDO representing a resource entity.
- * 
- * IMPORTANT: the persistent data and the externally visible resources ids are
- * derived from this class name so do not rename it unless if you know what you
- * are doing.
  *
  * @author Tal Dayan
  */

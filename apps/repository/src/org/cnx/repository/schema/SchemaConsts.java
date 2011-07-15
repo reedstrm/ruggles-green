@@ -32,4 +32,21 @@ public class SchemaConsts {
      * Resources ids exposed via the repository API always have this prefix.
      */
     public static final String RESOURCE_ID_PREFIX = "R";
+    
+    /**
+     * Module entities are persisted with this entity kind.
+     */
+    public static final String MODULE_KEY_KIND = "Module";
+    
+    /**
+     * Modules ids exposed via the repository API always have this prefix.
+     */
+    public static final String MODULE_ID_PREFIX = "M";
+      
+    /**
+     * Module version entities are persisted with this entity kind.
+     */
+    public static final String MODULE_VERSION_KEY_KIND = "ModuleVer";
 }
+
+

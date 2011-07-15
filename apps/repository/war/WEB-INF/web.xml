@@ -46,6 +46,16 @@
     <url-pattern>/resourceinfo/*</url-pattern>
   </servlet-mapping>  
   
+  <servlet>
+    <servlet-name>CreateModuleServlet</servlet-name>
+    <servlet-class>org.cnx.repository.modules.CreateModuleServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CreateModuleServlet</servlet-name>
+    <url-pattern>/modulefactory/create</url-pattern>
+  </servlet-mapping>  
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>CnxDemo.html</welcome-file>

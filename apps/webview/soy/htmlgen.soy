@@ -1,0 +1,142 @@
+/*
+    Copyright 2011 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+// htmlgen.soy - Build HTML from CNXML
+
+{namespace org.cnx.xml.HTMLGenerator}
+
+/**
+  Primary entry point for HTMLGenerator.  This template takes an arbitrary DOM
+  node and determines how to render it.
+
+  @param node DOM node to render
+*/
+{template .main}
+  {if $node.nodeType == 'text'}
+    {$node.textContent}
+  {elseif $node.nodeType == 'element'}
+    {switch $node.localName}
+      {case 'para'}
+        {call .para data="all"/}
+      {case 'section'}
+        {call .section data="all"/}
+      {case 'list'}
+        {call .list data="all"/}
+      {case 'link'}
+        {call .link data="all"/}
+      {case 'media'}
+        {call .media data="all"/}
+    {/switch}
+  {elseif $node.nodeType == 'document'}
+    {call .document}{param node: findElem($node, 'document')/}{/call}
+  {/if}
+{/template}
+
+/**
+  Render top-level document.
+
+  @param node DOM document node
+*/
+{template .document}
+  {call .children}{param node: findElem($node, 'content')/}{/call}
+{/template}
+
+/**
+  Render a para element.
+
+  @param node DOM element node
+*/
+{template .para}
+  <p id="{$node.attributes.id}">{call .children data="all"/}</p>
+{/template}
+
+/**
+  Render a section element.
+
+  @param node DOM element node
+*/
+{template .section}
+  <section id="{$node.attributes.id}">
+    <h1>{innerText(findElem($node, 'title'))}</h1>
+    {call .children data="all"/}
+  </section>
+{/template}
+
+/**
+  Render a list element.
+
+  @param node DOM element node
+*/
+{template .list}
+<ul id="{$node.attributes.id}">
+    {foreach $child in $node.childNodes}
+      {if $child.localName == 'item'}
+        <li>{call .children}{param node: $child/}{/call}</li>
+      {/if}
+    {/foreach}
+  </ul>
+{/template}
+
+/**
+  Render a link element.
+
+  @param node DOM element node
+*/
+{template .link}
+  {if $node.attributes.url}
+    <a href="{$node.attributes.url}">{call .children data="all"/}</a>
+  {elseif $node.attributes.target_id and not $node.attributes.document}
+    <a href="#{$node.attributes.target_id}">{call .children data="all"/}</a>
+  {else}
+    <span style="color:red;font-weight:bold">UNRECOGNIZED LINK</span>
+  {/if}
+{/template}
+
+/**
+  Dispatch the media element.
+
+  @param node DOM element node
+*/
+{template .media}
+  {if findElem($node, 'image')}
+    {call .image}
+      {param id: $node.attributes.id/}
+      {param alt: $node.attributes.alt/}
+      {param node: findElem($node, 'image')/}
+    {/call}
+  {/if}
+{/template}
+
+
+/**
+  Render an image inside a media tag.
+
+  @param id The id from <media>
+  @param alt The alternate text from <media>
+  @param node The image DOM element node
+*/
+{template .image private="true"}
+  <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}">
+{/template}
+
+/**
+  Render all the children of a parent using .main.
+
+  @param node Parent DOM node
+*/
+{template .children private="true"}
+  {foreach $child in $node.childNodes}{call .main}{param node: $child/}{/call}{/foreach}
+{/template}

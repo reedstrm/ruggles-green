@@ -1,0 +1,89 @@
+/*
+    Copyright 2011 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+{namespace org.cnx.web}
+
+/**
+  Submission form for org.cnx.HTMLRenderServlet.
+*/
+{template .submitForm}
+  {call .page}
+    {param title: 'Submit a CNXML'/}
+    {param content}
+      {call .editForm/}
+      <p>Currently supported tags:</p>
+      <ul>
+        <li><code>&lt;para&gt;</code></li>
+        <li><code>&lt;section&gt;</code></li>
+        <li><code>&lt;list&gt;/&lt;item&gt;</code></li>
+        <li><code>&lt;link&gt;</code></li>
+        <li>
+          <code>&lt;media&gt;</code>
+          <ul>
+            <li><code>&lt;image&gt;</code></li>
+          </ul>
+        </li>
+      </ul>
+    {/param}
+  {/call}
+{/template}
+
+/**
+  Rendered output
+
+  @param source CNXML
+  @param docHtml HTML of CNXML document
+*/
+{template .render}
+  {call .page}
+    {param title: 'Output'/}
+    {param content}
+      <div class="copy">{$docHtml|noAutoescape}</div>
+      <h1>Source</h1>
+      {call .editForm}{param source: $source/}{/call}
+    {/param}
+  {/call}
+{/template}
+
+/**
+  Render failed
+
+  @param source CNXML
+  @param reason Reason why render failed
+*/
+{template .renderFailed}
+  {call .page}
+    {param title: 'Render Failed'/}
+    {param content}
+      <p>Your render failed, the error is as follows:</p>
+      <pre style="color:red">{$reason}</pre>
+      <h1>Source</h1>
+      {call .editForm}{param source: $source/}{/call}
+    {/param}
+  {/call}
+{/template}
+
+/**
+  CNXML editor
+
+  @param? source CNXML
+*/
+{template .editForm private="true"}
+  <form action="/" method="POST">
+    <textarea name="source" rows="40" cols="80">{if $source}{$source}{/if}</textarea><br>
+    <input type="submit" value="Render">
+  </form>
+{/template}

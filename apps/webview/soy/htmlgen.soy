@@ -26,7 +26,7 @@
 */
 {template .main}
   {if $node.nodeType == 'text'}
-    {$node.textContent}
+    {$node.nodeValue}
   {elseif $node.nodeType == 'element'}
     {switch $node.localName}
       {case 'para'}

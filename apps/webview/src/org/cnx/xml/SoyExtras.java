@@ -115,9 +115,23 @@ class SoyExtras extends AbstractModule {
       if (args.get(0) instanceof SoyMapData) {
         elem = (SoyMapData)args.get(0);
       } else {
-        throw new IllegalArgumentException("Argument 1 to findElem() function is not SoyMapData");
+        throw new IllegalArgumentException("Argument 1 to innerText() function is not SoyMapData");
       }
-      return new StringData(elem.getString("textContent"));
+      // Find text nodes in children
+      final SoyListData childNodes = elem.getListData("childNodes");
+      final StringBuilder builder = new StringBuilder();
+      for (SoyData childData : childNodes) {
+        if (!(childData instanceof SoyMapData)) {
+          continue;
+        }
+
+        final SoyMapData child = (SoyMapData)childData;
+        final String nodeType = child.getString("nodeType");
+        if ("text".equals(nodeType) || "cdata".equals(nodeType)) {
+          builder.append(child.getString("nodeValue"));
+        }
+      }
+      return new StringData(builder.toString());
     }
   }
 }

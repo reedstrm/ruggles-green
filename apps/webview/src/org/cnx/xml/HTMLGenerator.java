@@ -84,10 +84,6 @@ public class HTMLGenerator {
     m.put("localName", nullToEmptyString(node.getLocalName()));
     m.put("namespaceURI", nullToEmptyString(node.getNamespaceURI()));
     m.put("prefix", nullToEmptyString(node.getPrefix()));
-    final String textContent = node.getTextContent();
-    if (textContent != null) {
-      m.put("textContent", textContent);
-    }
 
     // Attributes
     final NamedNodeMap attr = node.getAttributes();

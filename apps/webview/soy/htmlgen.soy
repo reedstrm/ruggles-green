@@ -167,7 +167,7 @@
 {template .mathChildren}
   {foreach $child in $node.childNodes}
     {if $child.nodeType == 'text'}
-      {$child.textContent}
+      {$child.nodeValue}
     {elseif $child.nodeType == 'element'}
       <{$child.localName}{call .mathAttributes}{param node: $child/}{/call}>
         {call .mathChildren}{param node: $child/}{/call}

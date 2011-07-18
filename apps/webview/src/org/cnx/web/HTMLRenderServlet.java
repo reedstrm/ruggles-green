@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 */
 public class HTMLRenderServlet extends HttpServlet {
   private SoyTofu tofu;
-  private static final String mimeType = "text/html";
+  private static final String mimeType = "text/html; charset=utf-8";
   private static final String sourceParam = "source";
 
   @Override public void init(ServletConfig config) {

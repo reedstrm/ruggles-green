@@ -57,14 +57,14 @@ public class JdoModuleEntity {
 	@Persistent
 	private Integer versionCount = 0;
 
-    /**
-     * Get the id of this module. 
-     */
-    @Nullable
-    public Long getId() {
-        return id;
-    }
-    
+	/**
+	 * Get the id of this module.
+	 */
+	@Nullable
+	public Long getId() {
+		return id;
+	}
+
 	public int versionCount() {
 		return versionCount;
 	}

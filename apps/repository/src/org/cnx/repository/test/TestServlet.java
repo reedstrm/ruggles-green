@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.resources;
+package org.cnx.repository.test;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,39 +31,20 @@ import org.cnx.util.Assertions;
 import com.google.appengine.api.datastore.Key;
 
 /**
- * An API servlet to create a new resource.
+ * A test servlet for initial development and experimentation.
  * 
- * TODO(tal): describe in more details.
+ * TODO(tal): delete when not needed anymore..
  * 
  * @author Tal Dayan
  */
-public class CreateResourceServlet extends HttpServlet {
+public class TestServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final Long resourceId;
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-
-        try {
-            final JdoResourceEntity entity = new JdoResourceEntity();
-            entity.idleToPendingTransition();
-            // The unique resource id is created the first time the entity is persisted.
-            pm.makePersistent(entity);
-            resourceId = Assertions.checkNotNull(entity.getId(), "Null resource id");;
-        } finally {
-            pm.close();
-        }
-
-        final String resourceIdString = JdoResourceEntity.resoureIdToString(resourceId);
-        final String completionUrl = "/resourcefactory/uploaded/" + resourceIdString;
-        final String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
-
-        // TODO(tal): add global consts for mime types and share with all servlets/apps.
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("resource id: " + resourceIdString);
-        out.println("upload url: " + uploadUrl);
+        out.println("Hello world");
     }
 }

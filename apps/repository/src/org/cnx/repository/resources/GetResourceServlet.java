@@ -17,6 +17,7 @@
 package org.cnx.repository.resources;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,8 @@ import com.google.appengine.api.datastore.Key;
  * @author Tal Dayan
  */
 public class GetResourceServlet extends HttpServlet {
+
+	private static final Logger log = Logger.getLogger(GetResourceServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern.compile("/resource/([a-zA-Z0-9_-]+)");
 

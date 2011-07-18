@@ -69,6 +69,7 @@ public class UploadCompletionServlet extends HttpServlet {
                     "Resource factory completion handler could not match request URI: ["
                             + requestURI + "]");
             return;
+         // TODO(tal): also log an error
         }
         final String resourceIdString = matcher.group(1);
         
@@ -78,6 +79,7 @@ public class UploadCompletionServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
                     + resourceIdString + "]");
             return;
+         // TODO(tal): also log an error
         }
 
         // Get blob id from the request
@@ -87,6 +89,7 @@ public class UploadCompletionServlet extends HttpServlet {
                     "Resource factory completion handler expected to find exactly one blob but found ["
                             + blobs.size() + "]");
             return;
+         // TODO(tal): also log an error
         }
         BlobKey blobKey = (BlobKey) blobs.values().toArray()[0];
 

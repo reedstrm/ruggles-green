@@ -48,5 +48,3 @@ public class SchemaConsts {
      */
     public static final String MODULE_VERSION_KEY_KIND = "ModuleVer";
 }
-
-

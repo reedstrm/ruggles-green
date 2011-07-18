@@ -78,7 +78,9 @@ public class HTMLGenerator {
 
   private static SoyMapData domToSoyData(final Node node) {
     final SoyMapData m = new SoyMapData();
+    // TODO(light): Allow Soy null values
     m.put("nodeType", getNodeTypeName(node.getNodeType()));
+    m.put("nodeValue", nullToEmptyString(node.getNodeValue()));
     m.put("localName", nullToEmptyString(node.getLocalName()));
     m.put("namespaceURI", nullToEmptyString(node.getNamespaceURI()));
     m.put("prefix", nullToEmptyString(node.getPrefix()));
@@ -91,6 +93,13 @@ public class HTMLGenerator {
     final NamedNodeMap attr = node.getAttributes();
     if (attr != null) {
       m.put("attributes", xmlAttributesToSoyMap(attr));
+
+      // Attribute nodes
+      final SoyListData soyAttrList = new SoyListData();
+      for (int i = 0; i < attr.getLength(); i++) {
+        soyAttrList.add(domToSoyData(attr.item(i)));
+      }
+      m.put("attributeNodes", soyAttrList);
     }
 
     // Children

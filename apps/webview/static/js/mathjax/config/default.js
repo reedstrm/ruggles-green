@@ -46,7 +46,7 @@ MathJax.Hub.Config({
   //  Example:    config: ["local/local.js"],
   //  Example:    config: ["local/local.js","MMLtoHTML.js"],
   //
-  config: [],
+  config: ["MMLorHTML.js"],
   
   //
   //  A comma-separated list of CSS stylesheet files to be loaded
@@ -76,7 +76,7 @@ MathJax.Hub.Config({
   //  inefficient to include jax that may not actually be used on the page.  These
   //  are found in the MathJax/jax directory.
   //  
-  jax: ["input/TeX","output/HTML-CSS"],
+  jax: ["input/MathML","output/HTML-CSS", "output/NativeMML"],
   
   //
   //  A comma-separated list of extensions to load at startup.  The default
@@ -84,7 +84,7 @@ MathJax.Hub.Config({
   //  
   //  Example:    extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
   //
-  extensions: ["tex2jax.js"],
+  extensions: ["mml2jax.js", "MathMenu.js", "MathZoom.js"],
   
   //
   //  Patterns to remove from before and after math script tags.  If you are not
@@ -186,102 +186,6 @@ MathJax.Hub.Config({
   
   //============================================================================
   //
-  //  These parameters control the tex2jax preprocessor (when you have included
-  //  "tex2jax.js" in the extensions list above).
-  //
-  tex2jax: {
-
-    //
-    //  The delimiters that surround in-line math expressions.  The first in each
-    //  pair is the initial delimiter and the second is the terminal delimiter.
-    //  Comment out any that you don't want, but be sure there is no extra
-    //  comma at the end of the last item in the list -- some browsers won't
-    //  be able to handle that.
-    //
-    inlineMath: [
-//    ['$','$'],      // uncomment this for standard TeX math delimiters
-      ['\\(','\\)']
-    ],
-
-    //
-    //  The delimiters that surround displayed math expressions.  The first in each
-    //  pair is the initial delimiter and the second is the terminal delimiter.
-    //  Comment out any that you don't want, but be sure there is no extra
-    //  comma at the end of the last item in the list -- some browsers won't
-    //  be able to handle that.
-    //
-    displayMath: [
-      ['$$','$$'],
-      ['\\[','\\]']
-    ],
-
-    //
-    //  This array lists the names of the tags whose contents should not be
-    //  processed by tex2jax (other than to look for ignore/process classes
-    //  as listed below).  You can add to (or remove from) this list to prevent
-    //  MathJax from processing mathematics in specific contexts.
-    //
-    skipTags: ["script","noscript","style","textarea","pre","code"],
-
-    //
-    //  This is the class name used to mark elements whose contents should
-    //  not be processed by tex2jax (other than to look for the
-    //  processClass pattern below).  Note that this is a regular
-    //  expression, and so you need to be sure to quote any regexp special
-    //  characters.  The pattern is automatically preceeded by '(^| )(' and
-    //  followed by ')( |$)', so your pattern will have to match full words
-    //  in the class name.  Assigning an element this class name will
-    //  prevent `tex2jax` from processing its contents.
-    //
-    ignoreClass: "tex2jax_ignore",
-
-    //
-    //  This is the class name used to mark elements whose contents SHOULD
-    //  be processed by tex2jax.  This is used to turn on processing within
-    //  tags that have been marked as ignored or skipped above.  Note that
-    //  this is a regular expression, and so you need to be sure to quote
-    //  any regexp special characters.  The pattern is automatically
-    //  preceeded by '(^| )(' and followed by ')( |$)', so your pattern
-    //  will have to match full words in the class name.  Use this to
-    //  restart processing within an element that has been marked as
-    //  ignored above.
-    //
-    processClass: "tex2jax_process",
-    
-    //
-    //  Set to "true" to allow \$ to produce a dollar without starting in-line
-    //  math mode.  If you uncomment the ['$','$'] line above, you should change
-    //  this to true so that you can insert plain dollar signs into your documents
-    //
-    processEscapes: false,
-
-    //
-    //  Controls whether tex2jax processes LaTeX environments outside of math
-    //  mode.  Set to "false" to prevent processing of environments except within
-    //  math mode.
-    //
-    processEnvironments: true,
-
-    //
-    //  Controls whether tex2jax inserts MathJax_Preview spans to make a
-    //  preview available, and what preview to use, when it locates in-line
-    //  and display mathetics on the page.  The default is "TeX", which
-    //  means use the TeX code as the preview (until it is processed by
-    //  MathJax).  Set to "none" to prevent the previews from being
-    //  inserted (the math will simply disappear until it is typeset).  Set
-    //  to an array containing the description of an HTML snippet in order
-    //  to use the same preview for all equations on the page (e.g., you
-    //  could have it say "[math]" or load an image).
-    //  
-    //  E.g.,     preview: ["[math]"],
-    //  or        preview: [["img",{src: "http://myserver.com/images/mypic.jpg"}]]
-    //  
-    preview: "TeX"
-    
-  },
-  
-  //============================================================================
-  //
   //  These parameters control the mml2jax preprocessor (when you have included
   //  "mml2jax.js" in the extensions list above).
   //
@@ -303,72 +207,6 @@ MathJax.Hub.Config({
     //  or        preview: [["img",{src: "http://myserver.com/images/mypic.jpg"}]]
     //  
     preview: "alttext"
-    
-  },
-  
-  //============================================================================
-  //
-  //  These parameters control the jsMath2jax preprocessor (when you have included
-  //  "jsMath2jax.js" in the extensions list above).
-  //
-  jsMath2jax: {
-    
-    //
-    //  Controls whether jsMath2jax inserts MathJax_Preview spans to make a
-    //  preview available, and what preview to use, when it locates
-    //  mathematics on the page.  The default is "TeX", which means use the
-    //  TeX code as the preview (until it is processed by MathJax).  Set to
-    //  "none" to prevent the previews from being inserted (the math will
-    //  simply disappear until it is typeset).  Set to an array containing
-    //  the description of an HTML snippet in order to use the same preview
-    //  for all equations on the page (e.g., you could have it say "[math]"
-    //  or load an image).
-    //  
-    //  E.g.,     preview: ["[math]"],
-    //  or        preview: [["img",{src: "http://myserver.com/images/mypic.jpg"}]]
-    //  
-    preview: "TeX"
-    
-  },
-
-  //============================================================================
-  //
-  //  These parameters control the TeX input jax.
-  //
-  TeX: {
-
-    //
-    //  This specifies the side on which \tag{} macros will place the tags.
-    //  Set to "left" to place on the left-hand side.
-    //
-    TagSide: "right",
-    
-    //
-    //  This is the amound of indentation (from right or left) for the tags.
-    //
-    TagIndent: ".8em",
-    
-    //
-    //  This is the width to use for the multline environment
-    //
-    MultLineWidth: "85%",
-    
-    //
-    //  List of macros to define.  These are of the form
-    //      name: value
-    //  where 'value' is the replacement text for the macro \name.
-    //  The 'value' can also be [value,n] where 'value' is the replacement
-    //  text and 'n' is the number of parameters for the macro.
-    //  Note that backslashes must be doubled in the replacement string.
-    //  
-    //  E.g.,
-    //  
-    //      Macros: {
-    //        RR: '{\\bf R}',
-    //        bold: ['{\\bf #1}', 1]
-    //      }
-    //
-    Macros: {}
     
   },
 
@@ -442,7 +280,7 @@ MathJax.Hub.Config({
     //  will be required to to download and install either the STIX fonts or the
     //  MathJax TeX fonts.
     //
-    imageFont: "TeX",
+    imageFont: null,
     
     //
     //  This is the font-family CSS value used for characters that are not

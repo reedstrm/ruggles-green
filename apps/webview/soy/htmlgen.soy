@@ -39,6 +39,10 @@
         {call .link data="all"/}
       {case 'media'}
         {call .media data="all"/}
+      {case 'math'}
+        {if $node.namespaceURI == 'http://www.w3.org/1998/Math/MathML'}
+          {call .math data="all"/}
+        {/if}
     {/switch}
   {elseif $node.nodeType == 'document'}
     {call .document}{param node: findElem($node, 'document')/}{/call}
@@ -139,4 +143,46 @@
 */
 {template .children private="true"}
   {foreach $child in $node.childNodes}{call .main}{param node: $child/}{/call}{/foreach}
+{/template}
+
+/**
+  Render m:math XML element and its descendants.
+
+  As per the HTML5 specification, there is no namespacing in the output.
+  http://dev.w3.org/html5/spec/the-map-element.html#mathml
+
+  @param node DOM node matching a <m:math> element.
+*/
+{template .math}
+  <math>{call .mathChildren data="all"/}</math>
+{/template}
+
+/**
+  Copy children of a MathML element.
+
+  Don't use .main for this purpose, because .main is expecting CNXML.
+
+  @param node DOM node for a MathML element
+*/
+{template .mathChildren}
+  {foreach $child in $node.childNodes}
+    {if $child.nodeType == 'text'}
+      {$child.textContent}
+    {elseif $child.nodeType == 'element'}
+      <{$child.localName}{call .mathAttributes}{param node: $child/}{/call}>
+        {call .mathChildren}{param node: $child/}{/call}
+      </{$child.localName}>
+    {/if}
+  {/foreach}
+{/template}
+
+/**
+  Copy attributes of a MathML element.
+
+  @param node DOM node for a MathML element
+*/
+{template .mathAttributes}
+  {foreach $attr in $node.attributeNodes}
+    {sp}{$attr.localName}="{$attr.nodeValue}"
+  {/foreach}
 {/template}

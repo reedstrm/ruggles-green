@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-package org.cnx.xml;
+package org.cnx.html;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;

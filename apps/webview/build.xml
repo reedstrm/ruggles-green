@@ -57,11 +57,18 @@
   </resources>
   <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
 
+  <property name="html.dir" location="../../lib/html"/>
+  <target name="html">
+    <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
+  </target>
+
   <target name="compile"
+          depends="html"
           description="Compile the application servlet code">
     <mkdir dir="${classdir}"/>
     <mkdir dir="${war.dir}/WEB-INF/lib"/>
     <copy file="${soy.path}" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
+    <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
     <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
       <compilerarg line="${javac.flags}"/>
       <classpath>

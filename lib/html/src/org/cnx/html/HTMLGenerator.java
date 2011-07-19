@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-package org.cnx.xml;
+package org.cnx.html;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -40,7 +40,7 @@ import org.w3c.dom.NodeList;
 */
 public class HTMLGenerator {
   private static SoyTofu tofu;
-  private static final String soyNamespace = "org.cnx.xml.HTMLGenerator";
+  private static final String soyNamespace = "org.cnx.html.HTMLGenerator";
 
   /**
     compile creates a tofu for the HTML generation templates.
@@ -58,7 +58,7 @@ public class HTMLGenerator {
 
     // Compile files
     SoyFileSet.Builder builder = injector.getInstance(SoyFileSet.Builder.class);
-    builder.add(new File("htmlgen.soy"));
+    builder.add(HTMLGenerator.class.getResource("html.soy"));
     tofu = builder.build().compileToJavaObj().forNamespace(soyNamespace);
   }
 

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-package org.cnx.xml;
+package org.cnx.html;
 
 import java.io.IOException;
 import java.io.PrintWriter;

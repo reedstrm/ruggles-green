@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-package org.cnx.xml;
+package org.cnx.html;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;

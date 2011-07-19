@@ -1,0 +1,25 @@
+#!/bin/zsh
+
+if [ $# -eq 0 ]
+then
+  echo "usage: ${0:t} PATCH [arg [...]]" > /dev/stderr
+  exit 1
+fi
+
+PATCH="$1"
+msgfile="$(mktemp)"
+
+# Output patch commit message to file
+hg log --template="{desc}" -r "$PATCH" > "$msgfile" || exit 1
+
+# Send patch for review
+cnx-review --rev "${PATCH}^:${PATCH}" -f "$msgfile" -m "$(head -n1 "$msgfile")" $argv[2,$#]
+
+# Clean up temp file
+rm -f "$msgfile"
+
+# Prompt user for CL num
+read "clnum?Enter the CL# here: "
+
+# Rename patch
+hg qrename "$PATCH" "cl${clnum}" || exit 1

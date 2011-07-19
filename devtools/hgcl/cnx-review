@@ -1,0 +1,2 @@
+#!/bin/zsh
+upload.py --base_url=http://ruggles-green.googlecode.com/svn/trunk/ $*

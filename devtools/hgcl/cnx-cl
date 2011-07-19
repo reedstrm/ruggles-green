@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+if [ "$#" -lt 1 ]
+then
+  echo "usage: $0 CLNUM [arg [...]]" > /dev/stderr
+  exit 1
+fi
+cnx-review -i "$1" --rev "cl${1}^:cl${1}" $argv[2,$#]

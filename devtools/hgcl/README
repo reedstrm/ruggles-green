@@ -1,0 +1,41 @@
+This is a collection of scripts used by light to submit CLs using Mercurial's
+patch queue feature.
+
+Setup
+=======
+
+1) Install the hgsubversion plugin at: https://bitbucket.org/durin42/hgsubversion/
+2) Enable the patch queue extension
+3) Place upload.py in your path, or modify cnx-review to match your upload.py script.
+4) Place cnx-* in your path.
+5) Clone the repository: ``hg clone https://ruggles-green.googlecode.com/svn/ ruggles-green``
+
+Creating a CL
+===============
+
+1) Make your changes
+2) Save changes with ``hg qnew PATCHNAME``
+3) Run ``cnx-newcl PATCHNAME``, with any additional arguments that you want to pass to upload.py after PATCHNAME
+
+**Note that your patch must be applied in order to run cnx-newcl.**
+
+Your patch will be renamed to cl#####, where ##### is the number you entered.
+The CL description and subject will be grabbed automatically from the patch's
+commit message.
+
+Updating a CL
+===============
+
+1) Make your changes
+2) Run ``hg qref`` on your cl##### patch
+3) Run ``cnx-cl #####``, with any additional arguments that you want to pass to upload.py after #####
+
+**Note that your patch must be applied in order to run cnx-cl.**
+
+Submitting a CL
+=================
+
+This is a standard Mercurial push.
+
+1) ``hg qfin cl#####``
+2) ``hg push``

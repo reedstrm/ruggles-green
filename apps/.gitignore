@@ -1,0 +1,4 @@
+# Use full directory paths compared to directory names.
+# Auto generated folders for Apps
+repository/war/WEB-INF/classes/
+repository/.settings/

@@ -26,10 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoModuleEntity;
-import org.cnx.repository.schema.JdoResourceEntity;
 import org.cnx.util.Assertions;
-
-import com.google.appengine.api.datastore.Key;
 
 /**
  * An API servlet to create a new module.
@@ -50,7 +47,7 @@ public class CreateModuleServlet extends HttpServlet {
             final JdoModuleEntity entity = new JdoModuleEntity();
             // The unique module id is created the first time the entity is persisted.
             pm.makePersistent(entity);
-            moduleId = Assertions.checkNotNull(entity.getId(), "Null module id");;
+            moduleId = Assertions.checkNotNull(entity.getId(), "Null module id");
         } finally {
             pm.close();
         }

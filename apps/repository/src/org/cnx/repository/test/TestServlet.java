@@ -19,16 +19,9 @@ package org.cnx.repository.test;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoResourceEntity;
-import org.cnx.util.Assertions;
-
-import com.google.appengine.api.datastore.Key;
 
 /**
  * A test servlet for initial development and experimentation.

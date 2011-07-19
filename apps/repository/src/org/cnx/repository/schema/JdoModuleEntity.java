@@ -16,19 +16,13 @@
 
 package org.cnx.repository.schema;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-
-import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.cnx.repository.common.KeyUtil;
-import org.cnx.util.Assertions;
 import org.cnx.util.Nullable;
 
 /**

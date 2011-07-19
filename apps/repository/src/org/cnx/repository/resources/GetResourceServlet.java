@@ -30,7 +30,6 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoResourceEntity;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Key;
 
 /**
  * An API servlet to serve a resource using a GET request.

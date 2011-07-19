@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 import javax.servlet.http.HttpServlet;
@@ -31,11 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoResourceEntity;
-import org.cnx.repository.schema.SchemaConsts;
-
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload

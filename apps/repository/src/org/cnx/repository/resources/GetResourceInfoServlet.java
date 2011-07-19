@@ -31,8 +31,6 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoResourceEntity;
 
 import com.google.appengine.api.blobstore.BlobInfo;
-import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Key;
 
 /**
  * An API servlet to serve metadata of a resource.
@@ -109,7 +107,7 @@ public class GetResourceInfoServlet extends HttpServlet {
               out.println("* content type: " + blobInfo.getContentType());
               out.println("* file name: " + blobInfo.getFilename());
               out.println("* size: " + blobInfo.getSize());
-              out.println("* creation time: " + blobInfo.getCreation());;
+              out.println("* creation time: " + blobInfo.getCreation());
 
           }
         }       

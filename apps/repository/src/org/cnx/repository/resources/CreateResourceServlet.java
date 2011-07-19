@@ -28,8 +28,6 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoResourceEntity;
 import org.cnx.util.Assertions;
 
-import com.google.appengine.api.datastore.Key;
-
 /**
  * An API servlet to create a new resource.
  * 
@@ -50,7 +48,7 @@ public class CreateResourceServlet extends HttpServlet {
             entity.idleToPendingTransition();
             // The unique resource id is created the first time the entity is persisted.
             pm.makePersistent(entity);
-            resourceId = Assertions.checkNotNull(entity.getId(), "Null resource id");;
+            resourceId = Assertions.checkNotNull(entity.getId(), "Null resource id");
         } finally {
             pm.close();
         }

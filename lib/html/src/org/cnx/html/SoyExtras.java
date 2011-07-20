@@ -25,6 +25,7 @@ import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.data.SoyDataException;
+import com.google.template.soy.data.restricted.IntegerData;
 import com.google.template.soy.data.restricted.NullData;
 import com.google.template.soy.data.restricted.StringData;
 import com.google.template.soy.shared.restricted.SoyFunction;
@@ -40,6 +41,7 @@ class SoyExtras extends AbstractModule {
     final Multibinder<SoyFunction> soyFunctionsSetBinder = Multibinder.newSetBinder(binder(), SoyFunction.class);
     soyFunctionsSetBinder.addBinding().to(FindElemFunction.class);
     soyFunctionsSetBinder.addBinding().to(InnerTextFunction.class);
+    soyFunctionsSetBinder.addBinding().to(StrtodFunction.class);
   }
 
   /**
@@ -132,6 +134,44 @@ class SoyExtras extends AbstractModule {
         }
       }
       return new StringData(builder.toString());
+    }
+  }
+
+  /**
+    StrtodFunction provides the <code>strtod()</code> function to Soy.
+    The function takes one argument: a string.  It returns the equivalent
+    integer, or null if the string does not represent an integer.
+  */
+  @Singleton
+  private static class StrtodFunction implements SoyTofuFunction {
+    private static final String NAME = "strtod";
+
+    @Inject public StrtodFunction() {}
+
+    @Override public String getName() {
+      return NAME;
+    }
+
+    @Override public Set<Integer> getValidArgsSizes() {
+      return ImmutableSet.of(1);
+    }
+
+    @Override public SoyData computeForTofu(List<SoyData> args) {
+      String str;
+
+      // TODO(light): Better error messages
+      if (args.get(0) instanceof StringData) {
+        str = ((StringData)args.get(0)).stringValue();
+      } else {
+        throw new IllegalArgumentException("Argument 1 to " + NAME + "() function is not string");
+      }
+
+      try {
+        return new IntegerData(Integer.valueOf(str));
+      } catch (NumberFormatException e) {
+        // If the string does not represent an integer, then return Soy null.
+        return NullData.INSTANCE;
+      }
     }
   }
 }

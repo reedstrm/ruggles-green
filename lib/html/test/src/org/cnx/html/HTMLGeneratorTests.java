@@ -16,6 +16,7 @@
 
 package org.cnx.html;
 
+import com.google.inject.internal.Nullable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -147,5 +148,169 @@ public class HTMLGeneratorTests {
   @Test
   public void cleanAttributeNameShouldRemoveSpecials() {
     assertEquals("xmlnsbib", HTMLGenerator.xmlAttributeNameToSoyIdentifier("xmlns:bib"));
+  }
+
+  /**
+    createSpan will generate a DOM element for a simple CNXML span-style
+    element.  Examples of span elements include <code>foreign</code>,
+    <code>term</code>, etc.
+
+    @param tag The tag to test
+    @param id ID to attach to CNXML element
+    @param text Inner text to place in the element.
+    @return The corresponding XML DOM node.
+  */
+  private Element createSpan(final String tag, @Nullable final String id, final String text) throws Exception {
+    final Element elem = doc.createElementNS(CNXML.NAMESPACE, tag);
+    if (id != null) {
+      elem.setAttribute("id", id);
+    }
+    elem.appendChild(doc.createTextNode(text));
+    return elem;
+  }
+
+  /**
+    createEmphasis will generate a DOM element for a CNXML emphasis element.
+
+    @param effect The effect to test
+    @param id ID to attach to CNXML element
+    @param text Inner text to place in the element.
+    @return The corresponding XML DOM node.
+  */
+  private Element createEmphasis(@Nullable final String effect, @Nullable final String id, final String text) throws Exception {
+    final Element elem = createSpan("emphasis", id, text);
+    if (effect != null) {
+      elem.setAttribute("effect", effect);
+    }
+    return elem;
+  }
+
+  @Test
+  public void defaultEmphasisShouldBeStrong() throws Exception {
+    assertEquals("<strong>Hello</strong>", generate(createEmphasis(null, null, "Hello")));
+    assertEquals("<strong id=\"myid\">Hello</strong>", generate(createEmphasis(null, "myid", "Hello")));
+  }
+
+  @Test
+  public void boldEmphasisShouldBeStrong() throws Exception {
+    assertEquals("<strong>Hello</strong>", generate(createEmphasis("bold", null, "Hello")));
+    assertEquals("<strong id=\"myid\">Hello</strong>", generate(createEmphasis("bold", "myid", "Hello")));
+  }
+
+  @Test
+  public void italicsEmphasisShouldBeEm() throws Exception {
+    assertEquals("<em>Hello</em>", generate(createEmphasis("italics", null, "Hello")));
+    assertEquals("<em id=\"myid\">Hello</em>", generate(createEmphasis("italics", "myid", "Hello")));
+  }
+
+  @Test
+  public void underlineEmphasisShouldBeU() throws Exception {
+    assertEquals("<u>Hello</u>", generate(createEmphasis("underline", null, "Hello")));
+    assertEquals("<u id=\"myid\">Hello</u>", generate(createEmphasis("underline", "myid", "Hello")));
+  }
+
+  @Test
+  public void smallcapsEmphasisShouldBeSpan() throws Exception {
+    assertEquals("<span class=\"smallcaps\">Hello</span>", generate(createEmphasis("smallcaps", null, "Hello")));
+    assertEquals("<span class=\"smallcaps\" id=\"myid\">Hello</span>", generate(createEmphasis("smallcaps", "myid", "Hello")));
+  }
+
+  @Test
+  public void normalEmphasisShouldBeSpan() throws Exception {
+    assertEquals("<span class=\"normal\">Hello</span>", generate(createEmphasis("normal", null, "Hello")));
+    assertEquals("<span class=\"normal\" id=\"myid\">Hello</span>", generate(createEmphasis("normal", "myid", "Hello")));
+  }
+
+  @Test
+  public void foreignShouldRenderAsSpan() throws Exception {
+    assertEquals("<span class=\"foreign\">¡Hola, mundo!</span>", generate(createSpan("foreign", null, "¡Hola, mundo!")));
+    assertEquals("<span class=\"foreign\" id=\"myid\">¡Hola, mundo!</span>", generate(createSpan("foreign", "myid", "¡Hola, mundo!")));
+  }
+
+  @Test
+  public void foreignShouldAllowUrlLinks() throws Exception {
+    final Element elem = createSpan("foreign", null, "¡Hola, mundo!");
+    elem.setAttribute("url", "http://www.example.com/");
+    assertEquals("<span class=\"foreign\"><a href=\"http://www.example.com/\">¡Hola, mundo!</a></span>", generate(elem));
+  }
+
+  @Test
+  public void foreignShouldAllowAnchorLinks() throws Exception {
+    final Element elem = createSpan("foreign", null, "¡Hola, mundo!");
+    elem.setAttribute("target-id", "myRefId");
+    assertEquals("<span class=\"foreign\"><a href=\"#myRefId\">¡Hola, mundo!</a></span>", generate(elem));
+  }
+
+  @Test
+  public void termShouldRenderAsSpan() throws Exception {
+    assertEquals("<span class=\"term\">jargon</span>", generate(createSpan("term", null, "jargon")));
+    assertEquals("<span class=\"term\" id=\"myid\">jargon</span>", generate(createSpan("term", "myid", "jargon")));
+  }
+
+  @Test
+  public void termShouldAllowUrlLinks() throws Exception {
+    final Element elem = createSpan("term", null, "jargon");
+    elem.setAttribute("url", "http://www.example.com/");
+    assertEquals("<span class=\"term\"><a href=\"http://www.example.com/\">jargon</a></span>", generate(elem));
+  }
+
+  @Test
+  public void termShouldAllowAnchorLinks() throws Exception {
+    final Element elem = createSpan("term", null, "jargon");
+    elem.setAttribute("target-id", "myRefId");
+    assertEquals("<span class=\"term\"><a href=\"#myRefId\">jargon</a></span>", generate(elem));
+  }
+
+  @Test
+  public void supShouldRenderAsSup() throws Exception {
+    assertEquals("<sup>exponent</sup>", generate(createSpan("sup", null, "exponent")));
+    assertEquals("<sup id=\"myid\">exponent</sup>", generate(createSpan("sup", "myid", "exponent")));
+  }
+
+  @Test
+  public void subShouldRenderAsSub() throws Exception {
+    assertEquals("<sub>index</sub>", generate(createSpan("sub", null, "index")));
+    assertEquals("<sub id=\"myid\">index</sub>", generate(createSpan("sub", "myid", "index")));
+  }
+
+  @Test
+  public void preformatShouldRenderAsPre() throws Exception {
+    assertEquals("<pre>my\n text</pre>", generate(createSpan("preformat", null, "my\n text")));
+    assertEquals("<pre id=\"myid\">my\n text</pre>", generate(createSpan("preformat", "myid", "my\n text")));
+  }
+
+  @Test
+  public void defaultNewlineShouldRenderBr() throws Exception {
+    final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
+    assertEquals("<br>", generate(elem));
+  }
+
+  @Test
+  public void normalNewlineShouldRenderBr() throws Exception {
+    final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
+    elem.setAttribute("effect", "normal");
+    assertEquals("<br>", generate(elem));
+  }
+
+  @Test
+  public void underlineNewlineShouldRenderHr() throws Exception {
+    final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
+    elem.setAttribute("effect", "underline");
+    assertEquals("<hr>", generate(elem));
+  }
+
+  @Test
+  public void newlineShouldHonorCount() throws Exception {
+    final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
+    elem.setAttribute("count", "3");
+    assertEquals("<br><br><br>", generate(elem));
+  }
+
+  @Test
+  public void underlineNewlineShouldHonorCount() throws Exception {
+    final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
+    elem.setAttribute("effect", "underline");
+    elem.setAttribute("count", "3");
+    assertEquals("<hr><hr><hr>", generate(elem));
   }
 }

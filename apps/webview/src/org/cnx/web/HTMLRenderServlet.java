@@ -33,6 +33,8 @@ import org.xml.sax.SAXException;
 /**
   HTMLRenderServlet is a simple servlet that displays a form for pasting in XML
   and then renders it upon POST.
+
+  This servlet is only for testing, it will not be used in the final viewer.
 */
 public class HTMLRenderServlet extends HttpServlet {
   private SoyTofu tofu;

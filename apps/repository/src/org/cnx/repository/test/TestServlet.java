@@ -32,12 +32,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class TestServlet extends HttpServlet {
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
+		resp.setContentType("text/plain");
+		PrintWriter out = resp.getWriter();
 
-        out.println("Hello world");
-    }
+		out.println("Hello world");
+	}
 }

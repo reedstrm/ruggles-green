@@ -16,10 +16,10 @@
 
 package org.cnx.repository.schema;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-
-import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.cnx.repository.common.KeyUtil;
@@ -39,6 +39,7 @@ public class JdoModuleEntity {
 	 * within the keys of this entity type. The externally exposed module id is
 	 * derived from this key.
 	 */
+	// TODO(tal): consider to use only Key keys for consistency with children.
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long id;
@@ -59,12 +60,13 @@ public class JdoModuleEntity {
 		return id;
 	}
 
-	public int versionCount() {
+	public int getVersionCount() {
 		return versionCount;
 	}
 
 	public int incrementVersionCount() {
 		versionCount++;
+		JDOHelper.makeDirty(this, "versionCount");
 		return versionCount;
 	}
 

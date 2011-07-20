@@ -40,52 +40,59 @@ import com.google.appengine.api.blobstore.BlobKey;
  */
 public class GetResourceServlet extends HttpServlet {
 
-	private static final Logger log = Logger.getLogger(GetResourceServlet.class.getName());
+	private static final Logger log = Logger.getLogger(GetResourceServlet.class
+			.getName());
 
-    private static final Pattern uriPattern = Pattern.compile("/resource/([a-zA-Z0-9_-]+)");
+	private static final Pattern uriPattern = Pattern
+			.compile("/resource/([a-zA-Z0-9_-]+)");
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Parse request resource id from the query.
-        final String requestURI = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(requestURI);
-        if (!matcher.matches()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could parse resource id in request URI [" + requestURI + "]");
-            return;
-        }
-        final String resourceIdString = matcher.group(1);
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
+		// Parse request resource id from the query.
+		final String requestURI = req.getRequestURI();
+		final Matcher matcher = uriPattern.matcher(requestURI);
+		if (!matcher.matches()) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"Could parse resource id in request URI [" + requestURI
+							+ "]");
+			return;
+		}
+		final String resourceIdString = matcher.group(1);
 
-        final Long resourceId = JdoResourceEntity.stringToResourceId(resourceIdString); // KeyFactory.stringToKey(resourceId);
-        if (resourceId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
-                    + resourceIdString + "]");
-            return;
-        }
+		final Long resourceId = JdoResourceEntity
+				.stringToResourceId(resourceIdString); // KeyFactory.stringToKey(resourceId);
+		if (resourceId == null) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"Invalid resource id format: [" + resourceIdString + "]");
+			return;
+		}
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        final BlobKey blobKey;
+		PersistenceManager pm = Services.datastore.getPersistenceManager();
+		final BlobKey blobKey;
 
-        try {
-            JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceId);
-            if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        "Resource servlet expected an entity at state UPLOADED but found ["
-                                + entity.getState() + "]");
-                return;
-            }
-            blobKey = entity.getBlobKey();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_NO_CONTENT,
-                    "Error looking up a resource: " + e.getMessage());
-            return;
-        } finally {
-            pm.close();
-        }
+		try {
+			JdoResourceEntity entity = pm.getObjectById(
+					JdoResourceEntity.class, resourceId);
+			if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						"Resource servlet expected an entity at state UPLOADED but found ["
+								+ entity.getState() + "]");
+				return;
+			}
+			blobKey = entity.getBlobKey();
+		} catch (Throwable e) {
+			// TODO(tal): everywhere, make sure we log all errors.
+			e.printStackTrace();
+			resp.sendError(HttpServletResponse.SC_NO_CONTENT,
+					"Error looking up a resource: " + e.getMessage());
+			return;
+		} finally {
+			pm.close();
+		}
 
-        // Serve the resource from Blobstore.
-        Services.blobstore.serve(blobKey, resp);
-    }
+		// Serve the resource from Blobstore.
+		Services.blobstore.serve(blobKey, resp);
+	}
 
 }

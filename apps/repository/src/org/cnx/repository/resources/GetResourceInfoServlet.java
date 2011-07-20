@@ -41,75 +41,89 @@ import com.google.appengine.api.blobstore.BlobInfo;
  */
 public class GetResourceInfoServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(GetResourceInfoServlet.class.getName());
+	private static final Logger log = Logger
+			.getLogger(GetResourceInfoServlet.class.getName());
 
-    private static final Pattern uriPattern = Pattern.compile("/resourceinfo/([a-zA-Z0-9_-]+)");
+	private static final Pattern uriPattern = Pattern
+			.compile("/resource_info/([a-zA-Z0-9_-]+)");
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Parse request resource id from the query.
-        final String requestURI = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(requestURI);
-        if (!matcher.matches()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could parse resource id in request URI [" + requestURI + "]");
-            return;
-        }
-        final String resourceIdString = matcher.group(1);
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
+		// Parse request resource id from the query.
+		final String requestURI = req.getRequestURI();
+		final Matcher matcher = uriPattern.matcher(requestURI);
+		if (!matcher.matches()) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"Could parse resource id in request URI [" + requestURI
+							+ "]");
+			return;
+		}
+		final String resourceIdString = matcher.group(1);
 
-        final Long resourceId = JdoResourceEntity.stringToResourceId(resourceIdString); // KeyFactory.stringToKey(resourceId);
-        if (resourceId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
-                    + resourceIdString + "]");
-            return;
-        }
-        log.info("Resource id: " + resourceId + ", requestIdString: " + resourceIdString);
+		final Long resourceId = JdoResourceEntity
+				.stringToResourceId(resourceIdString); // KeyFactory.stringToKey(resourceId);
+		if (resourceId == null) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"Invalid resource id format: [" + resourceIdString + "]");
+			return;
+		}
+		log.info("Resource id: " + resourceId + ", requestIdString: "
+				+ resourceIdString);
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        //final BlobKey blobKey;
-        
-        final JdoResourceEntity entity;
+		PersistenceManager pm = Services.datastore.getPersistenceManager();
 
-        try {
-            entity = pm.getObjectById(JdoResourceEntity.class, resourceId);
-            if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        "Resource info servlet expected an entity at state UPLOADED but found ["
-                                + entity.getState() + "]");
-                return;
-            }
-            //blobKey = entity.blobKey;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_NO_CONTENT,
-                    "Error looking up a resource: " + e.getMessage());
-            return;
-        } finally {
-            pm.close();
-        }
+		final JdoResourceEntity entity;
 
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
-        
-        out.println("Resource info:");
+		try {
+			entity = pm.getObjectById(JdoResourceEntity.class, resourceId);
+			
+			// TODO(tal): *** do we need this error or should we report the current
+			// state anyway (makes more sense). Clean here and consolidate with 
+			// the reporting at the end of this method.
+			
+			if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						"Resource info servlet expected an entity at state UPLOADED but found ["
+								+ entity.getState() + "]");
+				return;
+			}
+			// blobKey = entity.blobKey;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			resp.sendError(HttpServletResponse.SC_NO_CONTENT,
+					"Error looking up a resource: " + e.getMessage());
+			return;
+		} finally {
+			pm.close();
+		}
 
-        out.println("* resource state: " + entity.getState());
-        out.println("* resource id: " + entity.getId());
-        
-        if (entity.getState().hasBlobKey()) {
-          out.println("* blob key: " + entity.getBlobKey());
-          // NOTE(tal): if performance is an issue, could cache this in the resource
-          // entity upon blob uploading.
-          BlobInfo blobInfo = Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
-          if (blobInfo == null) {
-              out.println("*** error, could not locate info for blob key " + entity.getBlobKey());
-          } else {
-              out.println("* content type: " + blobInfo.getContentType());
-              out.println("* file name: " + blobInfo.getFilename());
-              out.println("* size: " + blobInfo.getSize());
-              out.println("* creation time: " + blobInfo.getCreation());
+		resp.setContentType("text/plain");
+		PrintWriter out = resp.getWriter();
 
-          }
-        }       
-    }
+		out.println("Resource info:");
+
+		out.println("* resource state: " + entity.getState());
+		out.println("* resource id: " + entity.getId());
+
+		if (entity.getState().hasBlobKey()) {
+			out.println("* blob key: " + entity.getBlobKey());
+			// NOTE(tal): if performance is an issue, could cache this in the
+			// resource
+			// entity upon blob uploading.
+			BlobInfo blobInfo = Services.blobInfoFactory.loadBlobInfo(entity
+					.getBlobKey());
+			if (blobInfo == null) {
+				out.println("*** error, could not locate info for blob key "
+						+ entity.getBlobKey());
+			} else {
+				out.println("* content type: " + blobInfo.getContentType());
+				out.println("* file name: " + blobInfo.getFilename());
+				out.println("* size: " + blobInfo.getSize());
+				out.println("* creation time: " + blobInfo.getCreation());
+				;
+
+			}
+		}
+	}
 }

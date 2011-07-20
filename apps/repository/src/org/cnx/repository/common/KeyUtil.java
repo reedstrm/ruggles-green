@@ -28,55 +28,57 @@ import org.cnx.util.Assertions;
  */
 public class KeyUtil {
 
-    // Charset based on rfc3548. Instead of padding by '=' we extend the
-    // 64 bit long into a 5*13=65 bit value by appending a zero MSB bit.
-    //
-    // TODO(tal): change the string to an array of chars for better efficiency?
-    private static String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz"
-            + "0123456789" + "-_";
+	// Charset based on rfc3548. Instead of padding by '=' we extend the
+	// 64 bit long into a 5*13=65 bit value by appending a zero MSB bit.
+	//
+	// TODO(tal): change the string to an array of chars for better efficiency?
+	private static String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			+ "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "-_";
 
-    public static String idToString(String prefix, long id) {
-        // Java longs are defines as 64 bit values but let's verify it just
-        // in case.
-        Assertions.check(Long.MAX_VALUE == 9223372036854775807L, "%s", Long.MAX_VALUE);
-        Assertions.check(Long.MIN_VALUE == -9223372036854775808L, "%s", Long.MIN_VALUE);
+	public static String idToString(String prefix, long id) {
+		// Java longs are defines as 64 bit values but let's verify it just
+		// in case.
+		Assertions.check(Long.MAX_VALUE == 9223372036854775807L, "%s",
+				Long.MAX_VALUE);
+		Assertions.check(Long.MIN_VALUE == -9223372036854775808L, "%s",
+				Long.MIN_VALUE);
 
-        StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 
-        builder.append(prefix);
+		builder.append(prefix);
 
-        for (int i = 60; i >= 0; i -= 5) {
-            int index = (int) ((id >>> i) & 0x1f);
-            builder.append(chars.charAt(index));
-        }
-        return builder.toString();
-    }
+		for (int i = 60; i >= 0; i -= 5) {
+			int index = (int) ((id >>> i) & 0x1f);
+			builder.append(chars.charAt(index));
+		}
+		return builder.toString();
+	}
 
-    // Return null if error
-    public static Long stringToId(String expectedPrefix, String id) {
+	// Return null if error
+	public static Long stringToId(String expectedPrefix, String id) {
 
-        if (!id.startsWith(expectedPrefix)) {
-            return null;
-        }
+		if (!id.startsWith(expectedPrefix)) {
+			return null;
+		}
 
-        final String subId = id.substring(expectedPrefix.length());
+		final String subId = id.substring(expectedPrefix.length());
 
-        // Expecting exactly ceiling(64/5) chars.
-        if (subId.length() != 13) {
-            return null;
-        }
+		// Expecting exactly ceiling(64/5) chars.
+		if (subId.length() != 13) {
+			return null;
+		}
 
-        long value = 0;
+		long value = 0;
 
-        for (int i = 0; i < id.length(); i++) {
-            final char c = id.charAt(i);
-            int index = chars.indexOf(c);
-            if (index < 0) {
-                return null; // bad char
-            }
-            value = (value << 5) + index;
-        }
+		for (int i = 0; i < id.length(); i++) {
+			final char c = id.charAt(i);
+			int index = chars.indexOf(c);
+			if (index < 0) {
+				return null; // bad char
+			}
+			value = (value << 5) + index;
+		}
 
-        return value;
-    }
+		return value;
+	}
 }

@@ -16,11 +16,15 @@
 
 package org.cnx.repository.schema;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-
-import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PrimaryKey;
+
+import org.cnx.util.Assertions;
+
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 
 /**
  * A JDO representing a module version entity.
@@ -30,10 +34,14 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable(table = SchemaConsts.MODULE_VERSION_KEY_KIND)
 public class JdoModuleVersionEntity {
 
+	/**
+	 * This key is a child key of the module entity. Its child id equals the
+	 * version number of this version (first is 1).
+	 */
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Long id;
-	
+	private Key key;
+
 	/**
 	 * The ID of the module entity to which this version belong.
 	 */
@@ -45,15 +53,31 @@ public class JdoModuleVersionEntity {
 	 */
 	@Persistent
 	private Integer versionNumber;
-	
+
 	@Persistent
-	private String CNXMLDoc;
-	
-	public int versionNumber() {
+	private Text CNXMLDoc;
+
+	@Persistent
+	private Text manifestDoc;
+
+	public JdoModuleVersionEntity(Key key, long moduleId, int versionNumber,
+			String CNXMLDoc, String manifestDoc) {
+		this.key = Assertions.checkNotNull(key);
+		this.moduleId = moduleId;
+		this.versionNumber = versionNumber;
+		this.CNXMLDoc = new Text(Assertions.checkNotNull(CNXMLDoc));
+		this.manifestDoc = new Text(Assertions.checkNotNull(manifestDoc));
+	}
+
+	public int getVersionNumber() {
 		return versionNumber;
 	}
-	
-	public String CNXMLDoc() {
-		return CNXMLDoc;
+
+	public String getCNXMLDoc() {
+		return CNXMLDoc.getValue();
+	}
+
+	public String getManifestDoc() {
+		return manifestDoc.getValue();
 	}
 }

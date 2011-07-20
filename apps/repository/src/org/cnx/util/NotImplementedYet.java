@@ -22,10 +22,10 @@ package org.cnx.util;
  * @author Tal Dayan
  */
 public class NotImplementedYet extends Error {
-    public NotImplementedYet(String format, Object... args) {
-        super(String.format(format, args));
-    }
+	public NotImplementedYet(String format, Object... args) {
+		super(String.format(format, args));
+	}
 
-    public NotImplementedYet() {
-    }
+	public NotImplementedYet() {
+	}
 }

@@ -31,32 +31,39 @@ import org.cnx.util.Assertions;
 /**
  * An API servlet to create a new module.
  * 
+ * The module is created with zero versions. Must add at least one version
+ * before the module becomes useful.
+ * 
  * TODO(tal): describe in more details.
  * 
  * @author Tal Dayan
  */
 public class CreateModuleServlet extends HttpServlet {
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 
-        final Long moduleId;
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+		final Long moduleId;
+		PersistenceManager pm = Services.datastore.getPersistenceManager();
 
-        try {
-            final JdoModuleEntity entity = new JdoModuleEntity();
-            // The unique module id is created the first time the entity is persisted.
-            pm.makePersistent(entity);
-            moduleId = Assertions.checkNotNull(entity.getId(), "Null module id");
-        } finally {
-            pm.close();
-        }
+		try {
+			final JdoModuleEntity entity = new JdoModuleEntity();
+			// The unique module id is created the first time the entity is
+			// persisted.
+			pm.makePersistent(entity);
+			moduleId = Assertions
+					.checkNotNull(entity.getId(), "Null module id");
+		} finally {
+			pm.close();
+		}
 
-        final String moduleIdString = JdoModuleEntity.moduleIdToString(moduleId);
+		final String moduleIdString = JdoModuleEntity
+				.moduleIdToString(moduleId);
 
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
+		resp.setContentType("text/plain");
+		PrintWriter out = resp.getWriter();
 
-        out.println("module id: " + moduleIdString);
-    }
+		out.println("module id: " + moduleIdString);
+	}
 }

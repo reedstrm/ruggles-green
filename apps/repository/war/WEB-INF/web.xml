@@ -5,6 +5,8 @@
 
 <web-app>
 
+    <!--  APP ENGINE STATS -->
+
     <!--  For app engine stats, see URL /appstats -->
     <filter>
         <filter-name>appstats</filter-name>
@@ -37,7 +39,8 @@
         </auth-constraint>
     </security-constraint>
   
-  <!-- Repository Resource Servlets -->
+  <!-- CNX RESOURCES -->
+  
   <servlet>
     <servlet-name>CreateResourceServlet</servlet-name>
     <servlet-class>org.cnx.repository.resources.CreateResourceServlet</servlet-class>
@@ -45,7 +48,7 @@
   
   <servlet-mapping>
     <servlet-name>CreateResourceServlet</servlet-name>
-    <url-pattern>/resourcefactory/create</url-pattern>
+    <url-pattern>/resource_factory/create</url-pattern>
   </servlet-mapping>  
   
    <servlet>
@@ -55,7 +58,7 @@
    
   <servlet-mapping>
     <servlet-name>UploadCompletionServlet</servlet-name>
-    <url-pattern>/resourcefactory/uploaded/*</url-pattern>
+    <url-pattern>/resource_factory/uploaded/*</url-pattern>
   </servlet-mapping>   
   
    <servlet>
@@ -75,8 +78,10 @@
   
   <servlet-mapping>
     <servlet-name>GetResourceInfoServlet</servlet-name>
-    <url-pattern>/resourceinfo/*</url-pattern>
+    <url-pattern>/resource_info/*</url-pattern>
   </servlet-mapping>  
+  
+  <!--  CNX MODULES -->
   
   <servlet>
     <servlet-name>CreateModuleServlet</servlet-name>
@@ -85,9 +90,40 @@
   
   <servlet-mapping>
     <servlet-name>CreateModuleServlet</servlet-name>
-    <url-pattern>/modulefactory/create</url-pattern>
+    <url-pattern>/module_factory/create</url-pattern>
   </servlet-mapping>  
   
+  <servlet>
+    <servlet-name>AddModuleVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.modules.AddModuleVersionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>AddModuleVersionServlet</servlet-name>
+    <url-pattern>/module_factory/add_version</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetModuleVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.modules.GetModuleVersionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetModuleVersionServlet</servlet-name>
+    <url-pattern>/module/*</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>GetModuleInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.modules.GetModuleInfoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetModuleInfoServlet</servlet-name>
+    <url-pattern>/module_info/*</url-pattern>
+  </servlet-mapping>
+   
+  <!--  TEST -->
   
    <servlet>
     <servlet-name>TestServlet</servlet-name>

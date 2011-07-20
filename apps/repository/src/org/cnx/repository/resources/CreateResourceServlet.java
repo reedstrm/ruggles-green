@@ -37,31 +37,42 @@ import org.cnx.util.Assertions;
  */
 public class CreateResourceServlet extends HttpServlet {
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 
-        final Long resourceId;
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+		final Long resourceId;
+		PersistenceManager pm = Services.datastore.getPersistenceManager();
 
-        try {
-            final JdoResourceEntity entity = new JdoResourceEntity();
-            entity.idleToPendingTransition();
-            // The unique resource id is created the first time the entity is persisted.
-            pm.makePersistent(entity);
-            resourceId = Assertions.checkNotNull(entity.getId(), "Null resource id");
-        } finally {
-            pm.close();
-        }
+		try {
+			final JdoResourceEntity entity = new JdoResourceEntity();
+			entity.idleToPendingTransition();
+			// The unique resource id is created the first time the entity is
+			// persisted.
+			pm.makePersistent(entity);
+			resourceId = Assertions.checkNotNull(entity.getId(),
+					"Null resource id");
+			;
+		} finally {
+			pm.close();
+		}
 
-        final String resourceIdString = JdoResourceEntity.resoureIdToString(resourceId);
-        final String completionUrl = "/resourcefactory/uploaded/" + resourceIdString;
-        final String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
+		final String resourceIdString = JdoResourceEntity
+				.resoureIdToString(resourceId);
+		final String completionUrl = "/resource_factory/uploaded/"
+				+ resourceIdString;
+		final String uploadUrl = Services.blobstore
+				.createUploadUrl(completionUrl);
 
-        // TODO(tal): add global consts for mime types and share with all servlets/apps.
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
+		// TODO(tal): add global consts for mime types and share with all
+		// servlets/apps.
+		resp.setContentType("text/plain");
+		PrintWriter out = resp.getWriter();
 
-        out.println("resource id: " + resourceIdString);
-        out.println("upload url: " + uploadUrl);
-    }
+		// TODO(tal): when running locally in eclipse, the returned uploadUrl is
+		// relative and does not include the http/server/port part. Add here
+		// a condition to prepend it if return URL starts with "/".
+		out.println("resource id: " + resourceIdString);
+		out.println("upload url: " + uploadUrl);
+	}
 }

@@ -1,0 +1,80 @@
+--- /dev/null
++++ b/cnx.py
+@@ -0,0 +1,26 @@
++#!/usr/bin/env python
++
++from django.template import RequestContext
++from django.shortcuts import render_to_response
++
++class ForceWhitelistMiddleware(object):
++  """Force user to be one of the whitelisted users."""
++
++  def process_request(self, request):
++    whitelist = [
++      # Google Users
++      'arjuns@google.com',
++      'light@google.com',
++      'tal@google.com',
++      # CNX Users
++      'baraniuk@gmail.com',
++      'ed.woodward1@gmail.com',
++      'jpslav@gmail.com',
++      'kef.htx@gmail.com',
++      'philschatz@gmail.com',
++      'reedstrm@gmail.com',
++    ]
++    if request.user is None or request.user.email() not in whitelist:
++      response = render_to_response('not_whitelisted.html', context_instance=RequestContext(request))
++      response.status_code = 401
++      return response
+--- a/app.yaml
++++ b/app.yaml
+@@ -1,4 +1,4 @@
+-application: codereview
++application: cnx-review
+ version: 61
+ runtime: python
+ api_version: 1
+@@ -28,6 +28,7 @@
+ 
+ - url: .*
+   script: main.py
++  login: required
+ 
+ admin_console:
+   pages:
+--- a/settings.py
++++ b/settings.py
+@@ -27,6 +27,7 @@
+     'django.middleware.common.CommonMiddleware',
+     'django.middleware.http.ConditionalGetMiddleware',
+     'codereview.middleware.AddUserToRequestMiddleware',
++    'cnx.ForceWhitelistMiddleware',
+ )
+ ROOT_URLCONF = 'urls'
+ TEMPLATE_CONTEXT_PROCESSORS = (
+--- /dev/null
++++ b/templates/not_whitelisted.html
+@@ -0,0 +1,3 @@
++<h1>User not allowed</h1>
++
++<p>You are not allowed to access this page.</p>
+--- a/templates/base.html
++++ b/templates/base.html
+@@ -180,14 +180,11 @@
+    href="http://code.google.com/p/rietveld/wiki/CodeReviewHelp">Help</a>
+ |
+ <a class="novisit" target="_blank"
+-   href="http://code.google.com/p/rietveld/issues/list">Bug tracker</a>
++   href="http://code.google.com/p/ruggles-green/issues/list">Bug tracker</a>
+ |
+ <a class="novisit" target="_blank"
+-   href="http://groups.google.com/group/codereview-discuss">Discussion group</a>
++   href="http://code.google.com/p/ruggles-green">Source code</a>
+ |
+-<a class="novisit" target="_blank"
+-   href="http://code.google.com/p/rietveld">Source code</a>
+-|
+ {%if user%}
+ <a class="novisit" href="{{sign_out}}">Sign out</a>
+ {% else %}

@@ -1,180 +1,196 @@
-<!-- This is a template Ant file for a very basic Google AppEngine project -->
+<!--
+    Copyright 2011 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!-- Ant build file for the CNX web view. -->
 
 <project name="webview" default="war">
-  <property file="local.properties" />
-  <property file="build.properties" />
+    <property file="local.properties" />
+    <property file="build.properties" />
 
-  <!-- Check that the SDK value is set and seems sane, so we can give a nicer
-       error if not.  -->
-  <fail message="Please define the appengine.sdk property to point to your SDK directory">
-    <condition>
-      <not> <and>
-          <isset property="appengine.sdk"/>
-          <available file="${appengine.sdk}/config/user/ant-macros.xml"/>
-      </and> </not>
-    </condition>
-  </fail>
-
-  <!-- Pick up the Ant macros and taskdefs for App Engine -->
-  <import file="${appengine.sdk}/config/user/ant-macros.xml"/>
-
-
-  <target name="war" depends="enhance" 
-          description="Assemble the application directory">
-    <mkdir dir="${war.dir}/WEB-INF"/>
-    <copy todir="${war.dir}">
-      <fileset dir="soy">
-        <exclude name="**/.hg/**"/>
-        <exclude name="**/*~"/>
-      </fileset>
-    </copy>
-    <copy todir="${war.dir}/static">
-      <fileset dir="static"/>
-    </copy>
-    <copy todir="${war.dir}/WEB-INF">
-      <fileset dir="src/WEB-INF">
-        <include name="*.xml"/>
-      </fileset>
-    </copy>
-    <enhance_war war="${war.dir}"/>
-  </target>
-
-  <target name="enhance" depends="compile"
-          description="Enhance the classes after compilation">
-    <enhance_war war="${war.dir}"/>
-  </target>
-
-  <resources id="appengine_lib">
-    <fileset dir="${appengine.sdk}/lib/user">
-      <include name="*.jar"/>
-    </fileset>
-    <fileset dir="${appengine.sdk}/lib/shared">
-      <include name="*.jar"/>
-    </fileset>
-    <fileset dir="${war.dir}/WEB-INF/lib">
-      <include name="*.jar"/>
-    </fileset>
-  </resources>
-  <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
-
-  <property name="html.dir" location="../../lib/html"/>
-  <target name="html">
-    <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
-  </target>
-
-  <target name="compile"
-          depends="html"
-          description="Compile the application servlet code">
-    <mkdir dir="${classdir}"/>
-    <mkdir dir="${war.dir}/WEB-INF/lib"/>
-    <copy file="${soy.path}" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
-    <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
-    <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
-      <compilerarg line="${javac.flags}"/>
-      <classpath>
-        <resources refid="appengine_lib"/>
-      </classpath>
-    </javac>
-  </target>
-
-  <target name="test"
-          description="Run unit tests"
-          depends="compile, war">
-    <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
-      <condition>
-        <not> <and>
-            <isset property="junit.path"/>
-            <available file="${junit.path}"/>
-        </and> </not>
-      </condition>
+    <!-- Check that the SDK value is set and seems sane, so we can give a nicer
+             error if not.  -->
+    <fail message="Please define the appengine.sdk property to point to your SDK directory">
+        <condition>
+            <not> <and>
+                    <isset property="appengine.sdk"/>
+                    <available file="${appengine.sdk}/config/user/ant-macros.xml"/>
+            </and> </not>
+        </condition>
     </fail>
 
-    <mkdir dir="${test.dir}"/>
-    <mkdir dir="${test.outdir}"/>
+    <!-- Pick up the Ant macros and taskdefs for App Engine -->
+    <import file="${appengine.sdk}/config/user/ant-macros.xml"/>
 
-    <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
-      <compilerarg line="${javac.flags}"/>
-      <classpath>
-        <resources refid="appengine_lib"/>
-        <pathelement path="${junit.path}"/>
-        <pathelement location="${classdir}"/>
-      </classpath>
-    </javac>
-    <junit fork="yes" printsummary="yes" failureproperty="test.failed" dir="war">
-      <classpath>
-        <resources refid="appengine_lib"/>
-        <pathelement path="${appengine.sdk}/lib/testing/appengine-testing.jar"/>
-        <pathelement path="${junit.path}"/>
-        <pathelement location="${classdir}"/>
-        <pathelement location="${test.dir}"/>
-      </classpath>
-      <formatter type="plain" />
-      <batchtest todir="${test.outdir}">
-        <fileset dir="${test.src}">
-          <include name="**/*.java"/>
+
+    <target name="war" depends="enhance" 
+                    description="Assemble the application directory">
+        <mkdir dir="${war.dir}/WEB-INF"/>
+        <copy todir="${war.dir}">
+            <fileset dir="soy">
+                <exclude name="**/.hg/**"/>
+                <exclude name="**/*~"/>
+            </fileset>
+        </copy>
+        <copy todir="${war.dir}/static">
+            <fileset dir="static"/>
+        </copy>
+        <copy todir="${war.dir}/WEB-INF">
+            <fileset dir="src/WEB-INF">
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+        <enhance_war war="${war.dir}"/>
+    </target>
+
+    <target name="enhance" depends="compile"
+                    description="Enhance the classes after compilation">
+        <enhance_war war="${war.dir}"/>
+    </target>
+
+    <resources id="appengine_lib">
+        <fileset dir="${appengine.sdk}/lib/user">
+            <include name="*.jar"/>
         </fileset>
-      </batchtest>
-    </junit>
+        <fileset dir="${appengine.sdk}/lib/shared">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${war.dir}/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </resources>
+    <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
 
-    <fail message="Tests failed!">
-      <condition>
-        <isset property="test.failed"/>
-      </condition>
-    </fail>
-  </target>
+    <property name="html.dir" location="../../lib/html"/>
+    <target name="html">
+        <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
+    </target>
 
-  <target name="clean"
-          description="Force a clean slate to rebuild">
-    <delete dir="${war.dir}"/>
-    <delete dir="${test.dir}"/>
-    <delete dir="${test.outdir}"/>
-  </target>
+    <target name="compile"
+                    depends="html"
+                    description="Compile the application servlet code">
+        <mkdir dir="${classdir}"/>
+        <mkdir dir="${war.dir}/WEB-INF/lib"/>
+        <copy file="${soy.path}" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
+        <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
+        <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
+            <compilerarg line="${javac.flags}"/>
+            <classpath>
+                <resources refid="appengine_lib"/>
+            </classpath>
+        </javac>
+    </target>
 
-  <target name="runserver" depends="war"
-          description="Run the dev_appserver">
-    <dev_appserver war="${war.dir}" port="${http.port}"/>
-  </target>
+    <target name="test"
+                    description="Run unit tests"
+                    depends="compile, war">
+        <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
+            <condition>
+                <not> <and>
+                        <isset property="junit.path"/>
+                        <available file="${junit.path}"/>
+                </and> </not>
+            </condition>
+        </fail>
 
-  <target name="dev_appserver" depends="runserver"/>
+        <mkdir dir="${test.dir}"/>
+        <mkdir dir="${test.outdir}"/>
 
-  <target name="debug" depends="war" 
-          description="Launches dev_appserver with remote debugging enabled">
-    <echo message="Launching dev_appserver on Web port ${http.port}, Java remote debug port ${debug.port}"/>
-    <dev_appserver war="${war.dir}" port="${http.port}">
-      <options>
-        <arg value="--jvm_flag=-Xdebug"/>
-        <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${debug.port}"/>
-      </options>
-    </dev_appserver>
-  </target>
+        <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
+            <compilerarg line="${javac.flags}"/>
+            <classpath>
+                <resources refid="appengine_lib"/>
+                <pathelement path="${junit.path}"/>
+                <pathelement location="${classdir}"/>
+            </classpath>
+        </javac>
+        <junit fork="yes" printsummary="yes" failureproperty="test.failed" dir="war">
+            <classpath>
+                <resources refid="appengine_lib"/>
+                <pathelement path="${appengine.sdk}/lib/testing/appengine-testing.jar"/>
+                <pathelement path="${junit.path}"/>
+                <pathelement location="${classdir}"/>
+                <pathelement location="${test.dir}"/>
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed"/>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="clean"
+                    description="Force a clean slate to rebuild">
+        <delete dir="${war.dir}"/>
+        <delete dir="${test.dir}"/>
+        <delete dir="${test.outdir}"/>
+    </target>
+
+    <target name="runserver" depends="war"
+                    description="Run the dev_appserver">
+        <dev_appserver war="${war.dir}" port="${http.port}"/>
+    </target>
+
+    <target name="dev_appserver" depends="runserver"/>
+
+    <target name="debug" depends="war" 
+                    description="Launches dev_appserver with remote debugging enabled">
+        <echo message="Launching dev_appserver on Web port ${http.port}, Java remote debug port ${debug.port}"/>
+        <dev_appserver war="${war.dir}" port="${http.port}">
+            <options>
+                <arg value="--jvm_flag=-Xdebug"/>
+                <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${debug.port}"/>
+            </options>
+        </dev_appserver>
+    </target>
 
 
 
-  <target name="update" depends="war" 
-          description="Uploads the application, including indexes">
-    <appcfg action="update" war="${war.dir}"/>
-  </target>
+    <target name="update" depends="war" 
+                    description="Uploads the application, including indexes">
+        <appcfg action="update" war="${war.dir}"/>
+    </target>
 
-  <target name="update_indexes" depends="war" 
-          description="Uploads only the application's indexes">
-    <appcfg action="update_indexes" war="${war.dir}"/>
-  </target>
+    <target name="update_indexes" depends="war" 
+                    description="Uploads only the application's indexes">
+        <appcfg action="update_indexes" war="${war.dir}"/>
+    </target>
 
-  <target name="rollback" depends="war" 
-          description="Rolls back any in-progress application update">
-    <appcfg action="rollback" war="${war.dir}"/>
-  </target>
+    <target name="rollback" depends="war" 
+                    description="Rolls back any in-progress application update">
+        <appcfg action="rollback" war="${war.dir}"/>
+    </target>
 
-  <target name="request_logs" 
-          description="Downloads the application's logs">
-    <appcfg action="request_logs" war="${war.dir}">
-      <options>
-        <arg value="--num_days=${log.days}"/>
-      </options>
-      <args>
-        <arg value="${log.file}"/>
-      </args>
-    </appcfg>
-  </target>
+    <target name="request_logs" 
+                    description="Downloads the application's logs">
+        <appcfg action="request_logs" war="${war.dir}">
+            <options>
+                <arg value="--num_days=${log.days}"/>
+            </options>
+            <args>
+                <arg value="${log.file}"/>
+            </args>
+        </appcfg>
+    </target>
 
 </project>

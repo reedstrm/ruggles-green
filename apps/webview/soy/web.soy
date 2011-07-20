@@ -17,81 +17,81 @@
 {namespace org.cnx.web}
 
 /**
-  Submission form for org.cnx.HTMLRenderServlet.
+    Submission form for org.cnx.HTMLRenderServlet.
 */
 {template .submitForm}
-  {call .page}
-    {param title: 'Submit a CNXML'/}
-    {param content}
-      {call .editForm/}
-      <p>Currently supported tags:</p>
-      <ul>
-        <li><code>&lt;emphasis&gt;</code></li>
-        <li><code>&lt;foreign&gt;</code></li>
-        <li><code>&lt;link&gt;</code></li>
-        <li><code>&lt;list&gt;/&lt;item&gt;</code></li>
-        <li><code>&lt;math&gt;</code> (all valid MathML is supported)</li>
-        <li>
-          <code>&lt;media&gt;</code>
-          <ul>
-            <li><code>&lt;image&gt;</code></li>
-          </ul>
-        </li>
-        <li><code>&lt;newline&gt;</code></li>
-        <li><code>&lt;para&gt;</code></li>
-        <li><code>&lt;preformat&gt;</code></li>
-        <li><code>&lt;section&gt;</code></li>
-        <li><code>&lt;sub&gt;</code></li>
-        <li><code>&lt;sup&gt;</code></li>
-        <li><code>&lt;term&gt;</code></li>
-      </ul>
-    {/param}
-  {/call}
+    {call .page}
+        {param title: 'Submit a CNXML'/}
+        {param content}
+            {call .editForm/}
+            <p>Currently supported tags:</p>
+            <ul>
+                <li><code>&lt;emphasis&gt;</code></li>
+                <li><code>&lt;foreign&gt;</code></li>
+                <li><code>&lt;link&gt;</code></li>
+                <li><code>&lt;list&gt;/&lt;item&gt;</code></li>
+                <li><code>&lt;math&gt;</code> (all valid MathML is supported)</li>
+                <li>
+                    <code>&lt;media&gt;</code>
+                    <ul>
+                        <li><code>&lt;image&gt;</code></li>
+                    </ul>
+                </li>
+                <li><code>&lt;newline&gt;</code></li>
+                <li><code>&lt;para&gt;</code></li>
+                <li><code>&lt;preformat&gt;</code></li>
+                <li><code>&lt;section&gt;</code></li>
+                <li><code>&lt;sub&gt;</code></li>
+                <li><code>&lt;sup&gt;</code></li>
+                <li><code>&lt;term&gt;</code></li>
+            </ul>
+        {/param}
+    {/call}
 {/template}
 
 /**
-  Rendered output
+    Rendered output
 
-  @param source CNXML
-  @param docHtml HTML of CNXML document
+    @param source CNXML
+    @param docHtml HTML of CNXML document
 */
 {template .render}
-  {call .page}
-    {param title: 'Output'/}
-    {param content}
-      <div class="copy">{$docHtml|noAutoescape}</div>
-      <h1>Source</h1>
-      {call .editForm}{param source: $source/}{/call}
-    {/param}
-  {/call}
+    {call .page}
+        {param title: 'Output'/}
+        {param content}
+            <div class="copy">{$docHtml|noAutoescape}</div>
+            <h1>Source</h1>
+            {call .editForm}{param source: $source/}{/call}
+        {/param}
+    {/call}
 {/template}
 
 /**
-  Render failed
+    Render failed
 
-  @param source CNXML
-  @param reason Reason why render failed
+    @param source CNXML
+    @param reason Reason why render failed
 */
 {template .renderFailed}
-  {call .page}
-    {param title: 'Render Failed'/}
-    {param content}
-      <p>Your render failed, the error is as follows:</p>
-      <pre style="color:red">{$reason}</pre>
-      <h1>Source</h1>
-      {call .editForm}{param source: $source/}{/call}
-    {/param}
-  {/call}
+    {call .page}
+        {param title: 'Render Failed'/}
+        {param content}
+            <p>Your render failed, the error is as follows:</p>
+            <pre style="color:red">{$reason}</pre>
+            <h1>Source</h1>
+            {call .editForm}{param source: $source/}{/call}
+        {/param}
+    {/call}
 {/template}
 
 /**
-  CNXML editor
+    CNXML editor
 
-  @param? source CNXML
+    @param? source CNXML
 */
 {template .editForm private="true"}
-  <form action="/" method="POST">
-    <textarea name="source" rows="40" cols="80">{if $source}{$source}{/if}</textarea><br>
-    <input type="submit" value="Render">
-  </form>
+    <form action="/" method="POST">
+        <textarea name="source" rows="40" cols="80">{if $source}{$source}{/if}</textarea><br>
+        <input type="submit" value="Render">
+    </form>
 {/template}

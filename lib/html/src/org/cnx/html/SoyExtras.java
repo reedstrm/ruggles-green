@@ -34,144 +34,145 @@ import java.util.List;
 import java.util.Set;
 
 /**
-  SoyExtras contains functions needed by the Soy templates for HTML generation.
+    SoyExtras contains functions needed by the Soy templates for HTML generation.
 */
 class SoyExtras extends AbstractModule {
-  @Override public void configure() {
-    final Multibinder<SoyFunction> soyFunctionsSetBinder = Multibinder.newSetBinder(binder(), SoyFunction.class);
-    soyFunctionsSetBinder.addBinding().to(FindElemFunction.class);
-    soyFunctionsSetBinder.addBinding().to(InnerTextFunction.class);
-    soyFunctionsSetBinder.addBinding().to(StrtodFunction.class);
-  }
-
-  /**
-    FindElemFunction provides the <code>findElem()</code> function to Soy.
-    The function takes two arguments: the first is a DOM node (transformed into
-    a Soy map), and the second is a string.  It returns the first child node of
-    the DOM node whose tag matches the string.
-  */
-  @Singleton
-  private static class FindElemFunction implements SoyTofuFunction {
-    private static final String NAME = "findElem";
-
-    @Inject public FindElemFunction() {}
-
-    @Override public String getName() {
-      return NAME;
+    @Override public void configure() {
+        final Multibinder<SoyFunction> soyFunctionsSetBinder =
+                Multibinder.newSetBinder(binder(), SoyFunction.class);
+        soyFunctionsSetBinder.addBinding().to(FindElemFunction.class);
+        soyFunctionsSetBinder.addBinding().to(InnerTextFunction.class);
+        soyFunctionsSetBinder.addBinding().to(StrtodFunction.class);
     }
 
-    @Override public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(2);
-    }
+    /**
+        FindElemFunction provides the <code>findElem()</code> function to Soy.
+        The function takes two arguments: the first is a DOM node (transformed into
+        a Soy map), and the second is a string.  It returns the first child node of
+        the DOM node whose tag matches the string.
+    */
+    @Singleton private static class FindElemFunction implements SoyTofuFunction {
+        private static final String NAME = "findElem";
 
-    @Override public SoyData computeForTofu(List<SoyData> args) {
-      SoyMapData elem;
-      String name;
+        @Inject public FindElemFunction() {}
 
-      // TODO(light): Better error messages
-      if (args.get(0) instanceof SoyMapData) {
-        elem = (SoyMapData)args.get(0);
-      } else {
-        throw new IllegalArgumentException("Argument 1 to findElem() function is not SoyMapData");
-      }
-
-      try {
-        name = args.get(1).stringValue();
-      } catch (SoyDataException e) {
-        throw new IllegalArgumentException("Argument 2 to findElem() function is not String");
-      }
-
-      for (SoyData item : elem.getListData("childNodes")) {
-        if (item instanceof SoyMapData) {
-          if (name.equals(((SoyMapData)item).getString("localName"))) {
-            return item;
-          }
-        }
-      }
-      return NullData.INSTANCE;
-    }
-  }
-
-  /**
-    InnerTextFunction provides the <code>innerText()</code> function to Soy.
-    The function takes one argument: a DOM node.  It returns the concatenation
-    of the text nodes inside the node.
-  */
-  @Singleton
-  private static class InnerTextFunction implements SoyTofuFunction {
-    private static final String NAME = "innerText";
-
-    @Inject public InnerTextFunction() {}
-
-    @Override public String getName() {
-      return NAME;
-    }
-
-    @Override public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
-
-    @Override public SoyData computeForTofu(List<SoyData> args) {
-      SoyMapData elem;
-      // TODO(light): Better error messages
-      if (args.get(0) instanceof SoyMapData) {
-        elem = (SoyMapData)args.get(0);
-      } else {
-        throw new IllegalArgumentException("Argument 1 to innerText() function is not SoyMapData");
-      }
-      // Find text nodes in children
-      final SoyListData childNodes = elem.getListData("childNodes");
-      final StringBuilder builder = new StringBuilder();
-      for (SoyData childData : childNodes) {
-        if (!(childData instanceof SoyMapData)) {
-          continue;
+        @Override public String getName() {
+            return NAME;
         }
 
-        final SoyMapData child = (SoyMapData)childData;
-        final String nodeType = child.getString("nodeType");
-        if ("text".equals(nodeType) || "cdata".equals(nodeType)) {
-          builder.append(child.getString("nodeValue"));
+        @Override public Set<Integer> getValidArgsSizes() {
+            return ImmutableSet.of(2);
         }
-      }
-      return new StringData(builder.toString());
+
+        @Override public SoyData computeForTofu(List<SoyData> args) {
+            SoyMapData elem;
+            String name;
+
+            // TODO(light): Better error messages
+            if (args.get(0) instanceof SoyMapData) {
+                elem = (SoyMapData)args.get(0);
+            } else {
+                throw new IllegalArgumentException(
+                        "Argument 1 to findElem() function is not SoyMapData");
+            }
+
+            try {
+                name = args.get(1).stringValue();
+            } catch (SoyDataException e) {
+                throw new IllegalArgumentException(
+                        "Argument 2 to findElem() function is not String");
+            }
+
+            for (SoyData item : elem.getListData("childNodes")) {
+                if (item instanceof SoyMapData) {
+                    if (name.equals(((SoyMapData)item).getString("localName"))) {
+                        return item;
+                    }
+                }
+            }
+            return NullData.INSTANCE;
+        }
     }
-  }
 
-  /**
-    StrtodFunction provides the <code>strtod()</code> function to Soy.
-    The function takes one argument: a string.  It returns the equivalent
-    integer, or null if the string does not represent an integer.
-  */
-  @Singleton
-  private static class StrtodFunction implements SoyTofuFunction {
-    private static final String NAME = "strtod";
+    /**
+        InnerTextFunction provides the <code>innerText()</code> function to Soy.
+        The function takes one argument: a DOM node.    It returns the concatenation
+        of the text nodes inside the node.
+    */
+    @Singleton private static class InnerTextFunction implements SoyTofuFunction {
+        private static final String NAME = "innerText";
 
-    @Inject public StrtodFunction() {}
+        @Inject public InnerTextFunction() {}
 
-    @Override public String getName() {
-      return NAME;
+        @Override public String getName() {
+            return NAME;
+        }
+
+        @Override public Set<Integer> getValidArgsSizes() {
+            return ImmutableSet.of(1);
+        }
+
+        @Override public SoyData computeForTofu(List<SoyData> args) {
+            SoyMapData elem;
+            // TODO(light): Better error messages
+            if (args.get(0) instanceof SoyMapData) {
+                elem = (SoyMapData)args.get(0);
+            } else {
+                throw new IllegalArgumentException(
+                        "Argument 1 to innerText() function is not SoyMapData");
+            }
+            // Find text nodes in children
+            final SoyListData childNodes = elem.getListData("childNodes");
+            final StringBuilder builder = new StringBuilder();
+            for (SoyData childData : childNodes) {
+                if (!(childData instanceof SoyMapData)) {
+                    continue;
+                }
+
+                final SoyMapData child = (SoyMapData)childData;
+                final String nodeType = child.getString("nodeType");
+                if ("text".equals(nodeType) || "cdata".equals(nodeType)) {
+                    builder.append(child.getString("nodeValue"));
+                }
+            }
+            return new StringData(builder.toString());
+        }
     }
 
-    @Override public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
+    /**
+      StrtodFunction provides the <code>strtod()</code> function to Soy.
+      The function takes one argument: a string.  It returns the equivalent
+      integer, or null if the string does not represent an integer.
+    */
+    @Singleton private static class StrtodFunction implements SoyTofuFunction {
+        private static final String NAME = "strtod";
+
+        @Inject public StrtodFunction() {}
+
+        @Override public String getName() {
+            return NAME;
+        }
+
+        @Override public Set<Integer> getValidArgsSizes() {
+            return ImmutableSet.of(1);
+        }
+
+        @Override public SoyData computeForTofu(List<SoyData> args) {
+            String str;
+
+            // TODO(light): Better error messages
+            if (args.get(0) instanceof StringData) {
+                str = ((StringData)args.get(0)).stringValue();
+            } else {
+                throw new IllegalArgumentException("Argument 1 to " + NAME + "() function is not string");
+            }
+
+            try {
+                return new IntegerData(Integer.valueOf(str));
+            } catch (NumberFormatException e) {
+                // If the string does not represent an integer, then return Soy null.
+                return NullData.INSTANCE;
+            }
+        }
     }
-
-    @Override public SoyData computeForTofu(List<SoyData> args) {
-      String str;
-
-      // TODO(light): Better error messages
-      if (args.get(0) instanceof StringData) {
-        str = ((StringData)args.get(0)).stringValue();
-      } else {
-        throw new IllegalArgumentException("Argument 1 to " + NAME + "() function is not string");
-      }
-
-      try {
-        return new IntegerData(Integer.valueOf(str));
-      } catch (NumberFormatException e) {
-        // If the string does not represent an integer, then return Soy null.
-        return NullData.INSTANCE;
-      }
-    }
-  }
 }

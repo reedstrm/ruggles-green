@@ -22,43 +22,46 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
-  CNXML holds functions and constants about the CNXML format.
+    CNXML holds functions and constants about the CNXML format.
 */
 public final class CNXML {
-  private CNXML() {} // all members are static, don't allow instances.
+    private CNXML() {} // all members are static, don't allow instances.
 
-  public static final String NAMESPACE = "http://cnx.rice.edu/cnxml";
-  
-  private static final String XML_EXTERNAL_ENTITIES_ATTR = "http://xml.org/sax/features/external-general-entities";
-  private static final String XML_EXTERNAL_PARAM_ENTITIES_ATTR = "http://xml.org/sax/features/external-parameter-entities";
-  private static final String XML_EXTERNAL_DTD_ATTR = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    public static final String NAMESPACE = "http://cnx.rice.edu/cnxml";
+    
+    private static final String XML_EXTERNAL_ENTITIES_ATTR =
+            "http://xml.org/sax/features/external-general-entities";
+    private static final String XML_EXTERNAL_PARAM_ENTITIES_ATTR =
+            "http://xml.org/sax/features/external-parameter-entities";
+    private static final String XML_EXTERNAL_DTD_ATTR =
+            "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
-  /**
-    getBuilder finds an XML parser that is appropriate for parsing CNXML.
+    /**
+        getBuilder finds an XML parser that is appropriate for parsing CNXML.
 
-    @return An DOM XML parser to use for CNXML.
-  */
-  public static DocumentBuilder getBuilder() throws ParserConfigurationException {
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setValidating(false);
-    try {
-      factory.setXIncludeAware(false);
-    } catch (UnsupportedOperationException e) {
-      // We really don't want XInclude, so if this gives an error, we can ignore it.
+        @return An DOM XML parser to use for CNXML.
+    */
+    public static DocumentBuilder getBuilder() throws ParserConfigurationException {
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        try {
+            factory.setXIncludeAware(false);
+        } catch (UnsupportedOperationException e) {
+            // We really don't want XInclude, so if this gives an error, we can ignore it.
+        }
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setNamespaceAware(true);
+        disableAttr(factory, XML_EXTERNAL_ENTITIES_ATTR);
+        disableAttr(factory, XML_EXTERNAL_PARAM_ENTITIES_ATTR);
+        disableAttr(factory, XML_EXTERNAL_DTD_ATTR);
+        return factory.newDocumentBuilder();
     }
-    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    factory.setNamespaceAware(true);
-    disableAttr(factory, XML_EXTERNAL_ENTITIES_ATTR);
-    disableAttr(factory, XML_EXTERNAL_PARAM_ENTITIES_ATTR);
-    disableAttr(factory, XML_EXTERNAL_DTD_ATTR);
-    return factory.newDocumentBuilder();
-  }
 
-  private static void disableAttr(final DocumentBuilderFactory factory, final String attr) {
-    try {
-      factory.setAttribute(attr, false);
-    } catch (IllegalArgumentException e) {
-      // The factory doesn't support the attribute anyway, so the error can be ignored.
+    private static void disableAttr(final DocumentBuilderFactory factory, final String attr) {
+        try {
+            factory.setAttribute(attr, false);
+        } catch (IllegalArgumentException e) {
+            // The factory doesn't support the attribute anyway, so the error can be ignored.
+        }
     }
-  }
 }

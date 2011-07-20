@@ -16,13 +16,13 @@
 -->
 
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <!-- Replace this with your application id from http://appengine.google.com -->
-  <application>light-cnx-web</application>
+    <!-- Replace this with your application id from http://appengine.google.com -->
+    <application>light-cnx-web</application>
 
-  <version>1</version>
+    <version>1</version>
 
-  <static-files>
-    <include path="/static/**" />
-  </static-files>
+    <static-files>
+        <include path="/static/**" />
+    </static-files>
 
 </appengine-web-app>

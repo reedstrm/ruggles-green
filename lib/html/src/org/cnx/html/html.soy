@@ -19,347 +19,347 @@
 {namespace org.cnx.html.HTMLGenerator}
 
 /**
-  Primary entry point for HTMLGenerator.  This template takes a CNXML DOM
-  node and dispatches the rendering template.
+    Primary entry point for HTMLGenerator.  This template takes a CNXML DOM
+    node and dispatches the rendering template.
 
-  @param node DOM node to render
+    @param node DOM node to render
 */
 {template .main}
-  {if $node.nodeType == 'text'}
-    {$node.nodeValue}
-  {elseif $node.nodeType == 'element'}
-    {switch $node.localName}
-      {case 'para'}
-        {call .para data="all"/}
-      {case 'section'}
-        {call .section data="all"/}
-      {case 'list'}
-        {call .list data="all"/}
-      {case 'link'}
-        {call .link data="all"/}
-      {case 'emphasis'}
-        {call .emphasis data="all"/}
-      {case 'foreign'}
-        {call .foreign data="all"/}
-      {case 'term'}
-        {call .term data="all"/}
-      {case 'sup'}
-        {call .sup data="all"/}
-      {case 'sub'}
-        {call .sub data="all"/}
-      {case 'newline'}
-        {call .newline data="all"/}
-      {case 'preformat'}
-        {call .preformat data="all"/}
-      {case 'media'}
-        {call .media data="all"/}
-      {case 'math'}
-        {if $node.namespaceURI == 'http://www.w3.org/1998/Math/MathML'}
-          {call .math data="all"/}
-        {/if}
-    {/switch}
-  {elseif $node.nodeType == 'document'}
-    {call .document}{param node: findElem($node, 'document')/}{/call}
-  {/if}
+    {if $node.nodeType == 'text'}
+        {$node.nodeValue}
+    {elseif $node.nodeType == 'element'}
+        {switch $node.localName}
+            {case 'para'}
+                {call .para data="all"/}
+            {case 'section'}
+                {call .section data="all"/}
+            {case 'list'}
+                {call .list data="all"/}
+            {case 'link'}
+                {call .link data="all"/}
+            {case 'emphasis'}
+                {call .emphasis data="all"/}
+            {case 'foreign'}
+                {call .foreign data="all"/}
+            {case 'term'}
+                {call .term data="all"/}
+            {case 'sup'}
+                {call .sup data="all"/}
+            {case 'sub'}
+                {call .sub data="all"/}
+            {case 'newline'}
+                {call .newline data="all"/}
+            {case 'preformat'}
+                {call .preformat data="all"/}
+            {case 'media'}
+                {call .media data="all"/}
+            {case 'math'}
+                {if $node.namespaceURI == 'http://www.w3.org/1998/Math/MathML'}
+                    {call .math data="all"/}
+                {/if}
+        {/switch}
+    {elseif $node.nodeType == 'document'}
+        {call .document}{param node: findElem($node, 'document')/}{/call}
+    {/if}
 {/template}
 
 /**
-  Render top-level document.
+    Render top-level document.
 
-  @param node DOM document node
+    @param node DOM document node
 */
 {template .document}
-  {call .children}{param node: findElem($node, 'content')/}{/call}
+    {call .children}{param node: findElem($node, 'content')/}{/call}
 {/template}
 
 /**
-  Render a para element.
+    Render a para element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .para}
-  <p id="{$node.attributes.id}">{call .children data="all"/}</p>
+    <p id="{$node.attributes.id}">{call .children data="all"/}</p>
 {/template}
 
 /**
-  Render a section element.
+    Render a section element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .section}
-  <section id="{$node.attributes.id}">
-    <h1>{innerText(findElem($node, 'title'))}</h1>
-    {call .children data="all"/}
-  </section>
+    <section id="{$node.attributes.id}">
+        <h1>{innerText(findElem($node, 'title'))}</h1>
+        {call .children data="all"/}
+    </section>
 {/template}
 
 /**
-  Render an emphasis element.
+    Render an emphasis element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .emphasis}
-  {switch $node.attributes.effect}
-    {case 'italics'}
-      {call .span}
-        {param node: $node/}
-        {param elemName: 'em'/}
-      {/call}
-    {case 'underline'}
-      {call .span}
-        {param node: $node/}
-        {param elemName: 'u'/}
-      {/call}
-    {case 'smallcaps'}
-      {call .span}
-        {param node: $node/}
-        {param className: 'smallcaps'/}
-      {/call}
-    {case 'normal'}
-      {call .span}
-        {param node: $node/}
-        {param className: 'normal'/}
-      {/call}
-    {default}
-      // Default to bold
-      {call .span}
-        {param node: $node/}
-        {param elemName: 'strong'/}
-      {/call}
-  {/switch}
+    {switch $node.attributes.effect}
+        {case 'italics'}
+            {call .span}
+                {param node: $node/}
+                {param elemName: 'em'/}
+            {/call}
+        {case 'underline'}
+            {call .span}
+                {param node: $node/}
+                {param elemName: 'u'/}
+            {/call}
+        {case 'smallcaps'}
+            {call .span}
+                {param node: $node/}
+                {param className: 'smallcaps'/}
+            {/call}
+        {case 'normal'}
+            {call .span}
+                {param node: $node/}
+                {param className: 'normal'/}
+            {/call}
+        {default}
+            // Default to bold
+            {call .span}
+                {param node: $node/}
+                {param elemName: 'strong'/}
+            {/call}
+    {/switch}
 {/template}
 
 /**
-  Render the CNXML foreign element.
+    Render the CNXML foreign element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .foreign}
-  <span class="foreign"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
-    {call .maybeLink data="all"/}
-  </span>
+    <span class="foreign"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
+        {call .maybeLink data="all"/}
+    </span>
 {/template}
 
 /**
-  Render the CNXML term element.
+    Render the CNXML term element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .term}
-  <span class="term"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
-    {call .maybeLink data="all"/}
-  </span>
+    <span class="term"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
+        {call .maybeLink data="all"/}
+    </span>
 {/template}
 
 /**
-  Render the sup element.
+    Render the sup element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .sup}
-  {call .span}
-    {param node: $node/}
-    {param elemName: 'sup'/}
-  {/call}
+    {call .span}
+        {param node: $node/}
+        {param elemName: 'sup'/}
+    {/call}
 {/template}
 
 /**
-  Render the sub element.
+    Render the sub element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .sub}
-  {call .span}
-    {param node: $node/}
-    {param elemName: 'sub'/}
-  {/call}
+    {call .span}
+        {param node: $node/}
+        {param elemName: 'sub'/}
+    {/call}
 {/template}
 
 /**
-  Render the preformat element.
+    Render the preformat element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .preformat}
-  {call .span}
-    {param node: $node/}
-    {param elemName: 'pre'/}
-  {/call}
+    {call .span}
+        {param node: $node/}
+        {param elemName: 'pre'/}
+    {/call}
 {/template}
 
 /**
-  Generic rendering of an inline element using a span or another element.
+    Generic rendering of an inline element using a span or another element.
 
-  @param node CNXML DOM element node
-  @param elemName? The element name to use (defaults to span)
-  @param className? The class name to use.
+    @param node CNXML DOM element node
+    @param elemName? The element name to use (defaults to span)
+    @param className? The class name to use.
 */
 {template .span private="true"}
-  <{if $elemName}{$elemName}{else}span{/if}
-    {if $className}{sp}class="{$className}"{/if}
-    {if $node.attributes.id}{sp}id="{$node.attributes.id}"{/if}
-    >
-    {call .children data="all"/}
-  </{if $elemName}{$elemName}{else}span{/if}>
+    <{if $elemName}{$elemName}{else}span{/if}
+        {if $className}{sp}class="{$className}"{/if}
+        {if $node.attributes.id}{sp}id="{$node.attributes.id}"{/if}
+        >
+        {call .children data="all"/}
+    </{if $elemName}{$elemName}{else}span{/if}>
 {/template}
 
 /**
-  Render a list element.
+    Render a list element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .list}
 <ul id="{$node.attributes.id}">
-    {foreach $child in $node.childNodes}
-      {if $child.localName == 'item'}
-        <li>{call .children}{param node: $child/}{/call}</li>
-      {/if}
-    {/foreach}
-  </ul>
+        {foreach $child in $node.childNodes}
+            {if $child.localName == 'item'}
+                <li>{call .children}{param node: $child/}{/call}</li>
+            {/if}
+        {/foreach}
+    </ul>
 {/template}
 
 /**
-  Render a newline element.
+    Render a newline element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .newline}
-  // TODO(light): id is ignored
-  {if $node.attributes.count}
-    {call .newline_private}
-      {param n: strtod($node.attributes.count)/}
-      {param effect: $node.attributes.effect/}
-    {/call}
-  {else}
-    {call .newline_private}
-      {param n: 1/}
-      {param effect: $node.attributes.effect/}
-    {/call}
-  {/if}
+    // TODO(light): id is ignored
+    {if $node.attributes.count}
+        {call .newline_private}
+            {param n: strtod($node.attributes.count)/}
+            {param effect: $node.attributes.effect/}
+        {/call}
+    {else}
+        {call .newline_private}
+            {param n: 1/}
+            {param effect: $node.attributes.effect/}
+        {/call}
+    {/if}
 {/template}
 
 /**
-  Render a newline element.
+    Render a newline element.
 
-  @param n Number of newlines
-  @param effect? Style of newline (either 'normal' or 'underline')
+    @param n Number of newlines
+    @param effect? Style of newline (either 'normal' or 'underline')
 */
 {template .newline_private private="true"}
-  {for $i in range($n)}
-    {if $effect == 'underline'}
-      <hr>
-    {else}
-      <br>
-    {/if}
-  {/for}
+    {for $i in range($n)}
+        {if $effect == 'underline'}
+            <hr>
+        {else}
+            <br>
+        {/if}
+    {/for}
 {/template}
 
 /**
-  Render a link element, or any CNXML element that has link attributes
-  (e.g. foreign, term, etc.).  Note that this requires link attributes to be
-  present; if the attributes are optional, then you should use .maybeLink.
+    Render a link element, or any CNXML element that has link attributes
+    (e.g. foreign, term, etc.).  Note that this requires link attributes to be
+    present; if the attributes are optional, then you should use .maybeLink.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .link}
-  {if $node.attributes.url}
-    <a href="{$node.attributes.url}">{call .children data="all"/}</a>
-  {elseif $node.attributes.target_id and not $node.attributes.document}
-    <a href="#{$node.attributes.target_id}">{call .children data="all"/}</a>
-  {else}
-    <span style="color:red;font-weight:bold">UNRECOGNIZED LINK</span>
-  {/if}
+    {if $node.attributes.url}
+        <a href="{$node.attributes.url}">{call .children data="all"/}</a>
+    {elseif $node.attributes.target_id and not $node.attributes.document}
+        <a href="#{$node.attributes.target_id}">{call .children data="all"/}</a>
+    {else}
+        <span style="color:red;font-weight:bold">UNRECOGNIZED LINK</span>
+    {/if}
 {/template}
 
 /**
-  Render a link element, or any CNXML element that has link attributes
-  (e.g. foreign, term, etc.).  If no link attributes are found, then the
-  children of the node are rendered directly.
+    Render a link element, or any CNXML element that has link attributes
+    (e.g. foreign, term, etc.).  If no link attributes are found, then the
+    children of the node are rendered directly.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .maybeLink}
-  {if $node.attributes.url or $node.attributes.document or $node.attributes.target_id or $node.attr.resource or $node.attr.version}
-    {call .link data="all"/}
-  {else}
-    {call .children data="all"/}
-  {/if}
+    {if $node.attributes.url or $node.attributes.document or $node.attributes.target_id or $node.attr.resource or $node.attr.version}
+        {call .link data="all"/}
+    {else}
+        {call .children data="all"/}
+    {/if}
 {/template}
 
 /**
-  Dispatch the media element.
+    Dispatch the media element.
 
-  @param node DOM element node
+    @param node DOM element node
 */
 {template .media}
-  {if findElem($node, 'image')}
-    {call .image}
-      {param id: $node.attributes.id/}
-      {param alt: $node.attributes.alt/}
-      {param node: findElem($node, 'image')/}
-    {/call}
-  {/if}
+    {if findElem($node, 'image')}
+        {call .image}
+            {param id: $node.attributes.id/}
+            {param alt: $node.attributes.alt/}
+            {param node: findElem($node, 'image')/}
+        {/call}
+    {/if}
 {/template}
 
 
 /**
-  Render an image inside a media tag.
+    Render an image inside a media tag.
 
-  @param id The id from <media>
-  @param alt The alternate text from <media>
-  @param node The image DOM element node
+    @param id The id from <media>
+    @param alt The alternate text from <media>
+    @param node The image DOM element node
 */
 {template .image private="true"}
-  <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}">
+    <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}">
 {/template}
 
 /**
-  Render all the children of a parent using .main.
+    Render all the children of a parent using .main.
 
-  @param node Parent DOM node
+    @param node Parent DOM node
 */
 {template .children private="true"}
-  {foreach $child in $node.childNodes}{call .main}{param node: $child/}{/call}{/foreach}
+    {foreach $child in $node.childNodes}{call .main}{param node: $child/}{/call}{/foreach}
 {/template}
 
 /**
-  Render m:math XML element and its descendants.
+    Render m:math XML element and its descendants.
 
-  As per the HTML5 specification, there is no namespacing in the output.
-  http://dev.w3.org/html5/spec/the-map-element.html#mathml
+    As per the HTML5 specification, there is no namespacing in the output.
+    http://dev.w3.org/html5/spec/the-map-element.html#mathml
 
-  @param node DOM node matching a <m:math> element.
+    @param node DOM node matching a <m:math> element.
 */
 {template .math}
-  <math>{call .mathChildren data="all"/}</math>
+    <math>{call .mathChildren data="all"/}</math>
 {/template}
 
 /**
-  Copy children of a MathML element.
+    Copy children of a MathML element.
 
-  Don't use .main for this purpose, because .main is expecting CNXML.
+    Don't use .main for this purpose, because .main is expecting CNXML.
 
-  @param node DOM node for a MathML element
+    @param node DOM node for a MathML element
 */
 {template .mathChildren}
-  {foreach $child in $node.childNodes}
-    {if $child.nodeType == 'text'}
-      {$child.nodeValue}
-    {elseif $child.nodeType == 'element'}
-      <{$child.localName}{call .mathAttributes}{param node: $child/}{/call}>
-        {call .mathChildren}{param node: $child/}{/call}
-      </{$child.localName}>
-    {/if}
-  {/foreach}
+    {foreach $child in $node.childNodes}
+        {if $child.nodeType == 'text'}
+            {$child.nodeValue}
+        {elseif $child.nodeType == 'element'}
+            <{$child.localName}{call .mathAttributes}{param node: $child/}{/call}>
+                {call .mathChildren}{param node: $child/}{/call}
+            </{$child.localName}>
+        {/if}
+    {/foreach}
 {/template}
 
 /**
-  Copy attributes of a MathML element.
+    Copy attributes of a MathML element.
 
-  @param node DOM node for a MathML element
+    @param node DOM node for a MathML element
 */
 {template .mathAttributes}
-  {foreach $attr in $node.attributeNodes}
-    {sp}{$attr.localName}="{$attr.nodeValue}"
-  {/foreach}
+    {foreach $attr in $node.attributeNodes}
+        {sp}{$attr.localName}="{$attr.nodeValue}"
+    {/foreach}
 {/template}

@@ -17,92 +17,92 @@
 <!-- Ant build file for the CNX HTML library. -->
 
 <project name="html" default="jar">
-  <property file="build.properties" />
-  <property file="local.properties" />
+    <property file="build.properties" />
+    <property file="local.properties" />
 
-  <resources id="depend_lib">
-    <path path="${soy.path}" />
-  </resources>
+    <resources id="depend_lib">
+        <path path="${soy.path}" />
+    </resources>
 
-  <target name="compile"
-          description="Compile the classes">
-    <fail message="Please define the soy.path property to point to your Closure Template JAR">
-      <condition>
-        <not> <and>
-            <isset property="soy.path"/>
-            <available file="${soy.path}"/>
-        </and> </not>
-      </condition>
-    </fail>
+    <target name="compile"
+                    description="Compile the classes">
+        <fail message="Please define the soy.path property to point to your Closure Template JAR">
+            <condition>
+                <not> <and>
+                        <isset property="soy.path"/>
+                        <available file="${soy.path}"/>
+                </and> </not>
+            </condition>
+        </fail>
 
-    <mkdir dir="${classdir}"/>
-    <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
-      <compilerarg line="${javac.flags}"/>
-      <classpath>
-        <resources refid="depend_lib" />
-      </classpath>
-    </javac>
-  </target>
+        <mkdir dir="${classdir}"/>
+        <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
+            <compilerarg line="${javac.flags}"/>
+            <classpath>
+                <resources refid="depend_lib" />
+            </classpath>
+        </javac>
+    </target>
 
-  <target name="test"
-          description="Run unit tests"
-          depends="jar">
-    <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
-      <condition>
-        <not> <and>
-            <isset property="junit.path"/>
-            <available file="${junit.path}"/>
-        </and> </not>
-      </condition>
-    </fail>
+    <target name="test"
+                    description="Run unit tests"
+                    depends="jar">
+        <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
+            <condition>
+                <not> <and>
+                        <isset property="junit.path"/>
+                        <available file="${junit.path}"/>
+                </and> </not>
+            </condition>
+        </fail>
 
-    <mkdir dir="${test.dir}"/>
-    <mkdir dir="${test.outdir}"/>
+        <mkdir dir="${test.dir}"/>
+        <mkdir dir="${test.outdir}"/>
 
-    <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
-      <compilerarg line="${javac.flags}"/>
-      <classpath>
-        <resources refid="depend_lib" />
-        <pathelement path="${junit.path}"/>
-        <pathelement location="org.cnx.html.jar"/>
-      </classpath>
-    </javac>
-    <junit fork="yes" printsummary="yes" failureproperty="test.failed">
-      <classpath>
-        <resources refid="depend_lib" />
-        <pathelement path="${junit.path}"/>
-        <pathelement location="org.cnx.html.jar"/>
-        <pathelement location="${test.dir}"/>
-      </classpath>
-      <formatter type="plain" />
-      <batchtest todir="${test.outdir}">
-        <fileset dir="${test.src}">
-          <include name="**/*.java"/>
-        </fileset>
-      </batchtest>
-    </junit>
+        <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
+            <compilerarg line="${javac.flags}"/>
+            <classpath>
+                <resources refid="depend_lib" />
+                <pathelement path="${junit.path}"/>
+                <pathelement location="org.cnx.html.jar"/>
+            </classpath>
+        </javac>
+        <junit fork="yes" printsummary="yes" failureproperty="test.failed">
+            <classpath>
+                <resources refid="depend_lib" />
+                <pathelement path="${junit.path}"/>
+                <pathelement location="org.cnx.html.jar"/>
+                <pathelement location="${test.dir}"/>
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
 
-    <fail message="Tests failed!">
-      <condition>
-        <isset property="test.failed"/>
-      </condition>
-    </fail>
-  </target>
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed"/>
+            </condition>
+        </fail>
+    </target>
 
-  <target name="clean"
-          description="Remove built files">
-    <delete dir="${classdir}" />
-    <delete dir="${test.dir}" />
-    <delete dir="${test.outdir}" />
-    <delete file="org.cnx.html.jar" />
-  </target>
+    <target name="clean"
+                    description="Remove built files">
+        <delete dir="${classdir}" />
+        <delete dir="${test.dir}" />
+        <delete dir="${test.outdir}" />
+        <delete file="org.cnx.html.jar" />
+    </target>
 
-  <target name="jar"
-          description="Build a JAR of the classes"
-          depends="compile">
-    <jar destfile="org.cnx.html.jar">
-      <fileset dir="${classdir}" />
-      <fileset dir="src" includes="**/*.soy" />
-    </jar>
-  </target>
+    <target name="jar"
+                    description="Build a JAR of the classes"
+                    depends="compile">
+        <jar destfile="org.cnx.html.jar">
+            <fileset dir="${classdir}" />
+            <fileset dir="src" includes="**/*.soy" />
+        </jar>
+    </target>
 </project>

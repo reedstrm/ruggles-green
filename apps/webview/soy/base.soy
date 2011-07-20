@@ -17,23 +17,23 @@
 {namespace org.cnx.web}
 
 /**
-  Base page template -- all pages are rendered by passing parameters that will
-  be rendered in the appropriate place.
+    Base page template -- all pages are rendered by passing parameters that will
+    be rendered in the appropriate place.
 
-  @param title Title of page (must not contain markup, just text)
-  @param content Page content
+    @param title Title of page (must not contain markup, just text)
+    @param content Page content
 */
 {template .page}
 <!DOCTYPE html>
 <html>
 <head>
-  <title>{$title}</title>
-  <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <title>{$title}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
-  <h1>{$title}</h1>
-  {$content|noAutoescape}
-  <script type="text/javascript" src="/static/js/mathjax/MathJax.js?config=default"></script>
+    <h1>{$title}</h1>
+    {$content|noAutoescape}
+    <script type="text/javascript" src="/static/js/mathjax/MathJax.js?config=default"></script>
 </body>
 </html>
 {/template}

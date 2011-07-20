@@ -31,61 +31,67 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
-  HTMLRenderServlet is a simple servlet that displays a form for pasting in XML
-  and then renders it upon POST.
+    HTMLRenderServlet is a simple servlet that displays a form for pasting in XML
+    and then renders it upon POST.
 
-  This servlet is only for testing, it will not be used in the final viewer.
+    This servlet is only for testing, it will not be used in the final viewer.
 */
 public class HTMLRenderServlet extends HttpServlet {
-  private SoyTofu tofu;
-  private static final String mimeType = "text/html; charset=utf-8";
-  private static final String sourceParam = "source";
+    private SoyTofu tofu;
+    private static final String mimeType = "text/html; charset=utf-8";
+    private static final String sourceParam = "source";
 
-  @Override public void init(ServletConfig config) {
-    SoyFileSet.Builder builder = new SoyFileSet.Builder();
-    builder.add(new File("base.soy"));
-    builder.add(new File("web.soy"));
-    tofu = builder.build().compileToJavaObj().forNamespace("org.cnx.web");
-  }
-
-  @Override public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.setContentType(mimeType);
-    resp.getWriter().print(tofu.render(".submitForm", new SoyMapData(), null));
-  }
-
-  @Override public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    // Parse source
-    final String source = req.getParameter(sourceParam);
-    DocumentBuilder builder;
-    Document sourceDoc;
-    try {
-      builder = CNXML.getBuilder();
-    } catch (ParserConfigurationException e) {
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "XML parser could not be set up");
-      return;
-    }
-    try {
-      sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
-    } catch (SAXException e) {
-      resp.setContentType(mimeType);
-      resp.getWriter().print(tofu.render(".renderFailed", new SoyMapData("source", source, "reason", e.toString()), null));
-      return;
+    @Override public void init(ServletConfig config) {
+        SoyFileSet.Builder builder = new SoyFileSet.Builder();
+        builder.add(new File("base.soy"));
+        builder.add(new File("web.soy"));
+        tofu = builder.build().compileToJavaObj().forNamespace("org.cnx.web");
     }
 
-    // Generate HTML
-    final StringWriter sw = new StringWriter();
-    final PrintWriter pw = new PrintWriter(sw);
-    try {
-      HTMLGenerator.generate(sourceDoc, pw);
-    } catch (Exception e) {
-      resp.setContentType(mimeType);
-      resp.getWriter().print(tofu.render(".renderFailed", new SoyMapData("source", source, "reason", e.toString()), null));
-      return;
+    @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        resp.setContentType(mimeType);
+        resp.getWriter().print(tofu.render(".submitForm", new SoyMapData(), null));
     }
-    final String docHtml = sw.toString();
 
-    // Render response
-    resp.setContentType(mimeType);
-    resp.getWriter().print(tofu.render(".render", new SoyMapData("source", source, "docHtml", docHtml), null));
-  }
+    @Override public void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        // Parse source
+        final String source = req.getParameter(sourceParam);
+        DocumentBuilder builder;
+        Document sourceDoc;
+        try {
+            builder = CNXML.getBuilder();
+        } catch (ParserConfigurationException e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                           "XML parser could not be set up");
+            return;
+        }
+        try {
+            sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
+        } catch (SAXException e) {
+            final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
+            resp.setContentType(mimeType);
+            resp.getWriter().print(tofu.render(".renderFailed", params, null));
+            return;
+        }
+
+        // Generate HTML
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        try {
+            HTMLGenerator.generate(sourceDoc, pw);
+        } catch (Exception e) {
+            final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
+            resp.setContentType(mimeType);
+            resp.getWriter().print(tofu.render(".renderFailed", params, null));
+            return;
+        }
+        final String docHtml = sw.toString();
+
+        // Render response
+        final SoyMapData params = new SoyMapData("source", source, "docHtml", docHtml);
+        resp.setContentType(mimeType);
+        resp.getWriter().print(tofu.render(".render", params, null));
+    }
 }

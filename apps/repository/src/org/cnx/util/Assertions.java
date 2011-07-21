@@ -23,33 +23,33 @@ package org.cnx.util;
  */
 public class Assertions {
 
-	public static void check(boolean expression) {
-		if (!expression) {
-			checkFailed("Assertion failed");
-		}
-	}
+    public static void check(boolean expression) {
+        if (!expression) {
+            checkFailed("Assertion failed");
+        }
+    }
 
-	public static void check(boolean expression, String format, Object... args) {
-		if (!expression) {
-			checkFailed(String.format(format, args));
-		}
-	}
+    public static void check(boolean expression, String format, Object... args) {
+        if (!expression) {
+            checkFailed(String.format(format, args));
+        }
+    }
 
-	public static <T> T checkNotNull(T object) {
-		if (object == null) {
-			checkFailed("Assertion failed, pointer is null");
-		}
-		return object;
-	}
+    public static <T> T checkNotNull(T object) {
+        if (object == null) {
+            checkFailed("Assertion failed, pointer is null");
+        }
+        return object;
+    }
 
-	public static <T> T checkNotNull(T object, String format, Object... args) {
-		if (object == null) {
-			checkFailed(String.format(format, args));
-		}
-		return object;
-	}
+    public static <T> T checkNotNull(T object, String format, Object... args) {
+        if (object == null) {
+            checkFailed(String.format(format, args));
+        }
+        return object;
+    }
 
-	private static void checkFailed(String message) {
-		throw new IllegalArgumentException(message);
-	}
+    private static void checkFailed(String message) {
+        throw new IllegalArgumentException(message);
+    }
 }

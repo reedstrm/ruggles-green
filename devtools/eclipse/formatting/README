@@ -1,9 +1,26 @@
 
+TODO(tal): rename to cnx-eclipse-java-formatting.xml
+
 cnx-eclipse-galileo-formatting.xml
 ----------------------------------
-An eclipse (Galileo) formatting configuration for CNX style guide. Original copy
+An eclipse formatting configuration for CNX style guide. Original copy
 is from http://openjpa.apache.org/coding-standards.html (as of July 20, 2011,
-license is Apache 2.0).
+license is Apache 2.0, used the 'galileo' version).
 
-To Apply: TBD
+To apply in Eclipse
+1. Window -> Preferences -> Java -> Code Style -> Formatter
+2. Click on Import and select the cnx-eclipse-galileo-formatting.xml file
+3. Press OK importing
 
+To export new version from Eclipse
+1. Window -> Preferences -> Java -> Code Style -> Formatter
+2. Click on Export All and overwrite cnx-eclipse-galileo-formatting.xml
+3. Diff the file against the repository to make sure all changes are desired.
+
+Style changes from Sun Java style
+1. Maximum line length is 100
+2. Use spaces instead of tabs.
+3. Indendation size is 4 spaces.
+4. Do not insert a new line before opening brace. 
+5. Insert a new line before closing brace.
+6. Use fully qualified import statements, i.e. do not use asterisks.

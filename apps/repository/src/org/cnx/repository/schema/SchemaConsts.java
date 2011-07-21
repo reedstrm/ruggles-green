@@ -23,30 +23,30 @@ package org.cnx.repository.schema;
  */
 public class SchemaConsts {
 
-  // TODO(tal): move these definitions to the respective entities?
+    // TODO(tal): move these definitions to the respective entities?
 
-	/**
-	 * Resource entities are persisted with this entity kind.
-	 */
-	public static final String RESOURCE_KEY_KIND = "Resource";
+    /**
+     * Resource entities are persisted with this entity kind.
+     */
+    public static final String RESOURCE_KEY_KIND = "Resource";
 
-	/**
-	 * Resources ids exposed via the repository API always have this prefix.
-	 */
-	public static final String RESOURCE_ID_PREFIX = "R";
+    /**
+     * Resources ids exposed via the repository API always have this prefix.
+     */
+    public static final String RESOURCE_ID_PREFIX = "R";
 
-	/**
-	 * Module entities are persisted with this entity kind.
-	 */
-	public static final String MODULE_KEY_KIND = "Module";
+    /**
+     * Module entities are persisted with this entity kind.
+     */
+    public static final String MODULE_KEY_KIND = "Module";
 
-	/**
-	 * Modules ids exposed via the repository API always have this prefix.
-	 */
-	public static final String MODULE_ID_PREFIX = "M";
+    /**
+     * Modules ids exposed via the repository API always have this prefix.
+     */
+    public static final String MODULE_ID_PREFIX = "M";
 
-	/**
-	 * Module version entities are persisted with this entity kind.
-	 */
-	public static final String MODULE_VERSION_KEY_KIND = "ModuleVer";
+    /**
+     * Module version entities are persisted with this entity kind.
+     */
+    public static final String MODULE_VERSION_KEY_KIND = "ModuleVer";
 }

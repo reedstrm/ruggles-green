@@ -33,56 +33,54 @@ import org.cnx.util.Nullable;
 @PersistenceCapable(table = SchemaConsts.MODULE_KEY_KIND)
 public class JdoModuleEntity {
 
-	/**
-	 * The key of this module in the data store. Assigned automatically by the
-	 * data store when this object is persisted for the first time. Unique only
-	 * within the keys of this entity type. The externally exposed module id is
-	 * derived from this key.
-	 */
-	// TODO(tal): consider to use only Key keys for consistency with children.
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Long id;
+    /**
+     * The key of this module in the data store. Assigned automatically by the data store when this
+     * object is persisted for the first time. Unique only within the keys of this entity type. The
+     * externally exposed module id is derived from this key.
+     */
+    // TODO(tal): consider to use only Key keys for consistency with children.
+    @PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Long id;
 
-	/**
-	 * Number of versions of this module. Value >= 0. If > 0, this is also the
-	 * version of the last version of this module (version numbering is 1, 2,
-	 * ...).
-	 */
-	@Persistent
-	private Integer versionCount = 0;
+    /**
+     * Number of versions of this module. Value >= 0. If > 0, this is also the version of the last
+     * version of this module (version numbering is 1, 2, ...).
+     */
+    @Persistent
+    private Integer versionCount = 0;
 
-	/**
-	 * Get the id of this module.
-	 */
-	@Nullable
-	public Long getId() {
-		return id;
-	}
+    /**
+     * Get the id of this module.
+     */
+    @Nullable
+    public Long getId() {
+        return id;
+    }
 
-	public int getVersionCount() {
-		return versionCount;
-	}
+    public int getVersionCount() {
+        return versionCount;
+    }
 
-	public int incrementVersionCount() {
-		versionCount++;
-		JDOHelper.makeDirty(this, "versionCount");
-		return versionCount;
-	}
+    public int incrementVersionCount() {
+        versionCount++;
+        JDOHelper.makeDirty(this, "versionCount");
+        return versionCount;
+    }
 
-	/**
-	 * Convert an module id to external string representation.
-	 */
-	public static String moduleIdToString(Long moduleId) {
-		return KeyUtil.idToString(SchemaConsts.MODULE_ID_PREFIX, moduleId);
-	}
+    /**
+     * Convert an module id to external string representation.
+     */
+    public static String moduleIdToString(Long moduleId) {
+        return KeyUtil.idToString(SchemaConsts.MODULE_ID_PREFIX, moduleId);
+    }
 
-	/**
-	 * Convert a module id in external string representation to internal module
-	 * id. Return the module id or null of invalid string format.
-	 */
-	@Nullable
-	public static Long stringToModuleId(String idString) {
-		return KeyUtil.stringToId(SchemaConsts.MODULE_ID_PREFIX, idString);
-	}
+    /**
+     * Convert a module id in external string representation to internal module id. Return the
+     * module id or null of invalid string format.
+     */
+    @Nullable
+    public static Long stringToModuleId(String idString) {
+        return KeyUtil.stringToId(SchemaConsts.MODULE_ID_PREFIX, idString);
+    }
 }

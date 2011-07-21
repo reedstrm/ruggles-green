@@ -30,17 +30,16 @@ import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
  */
 public class Services {
 
-	// A single instance used by all queries of all threads.
-	public static final BlobstoreService blobstore = BlobstoreServiceFactory
-			.getBlobstoreService();
+    // A single instance used by all queries of all threads.
+    public static final BlobstoreService blobstore = BlobstoreServiceFactory.getBlobstoreService();
 
-	// A single instance used by all queries of all threads.
-	// Persistence policy string should match the specification in
-	// jdoconfig.xml.
-	public static final PersistenceManagerFactory datastore = JDOHelper
-			.getPersistenceManagerFactory("default");
+    // A single instance used by all queries of all threads.
+    // Persistence policy string should match the specification in
+    // jdoconfig.xml.
+    public static final PersistenceManagerFactory datastore = JDOHelper
+        .getPersistenceManagerFactory("default");
 
-	// TODO(tal): should we create an instance on the fly for each use?
-	public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
+    // TODO(tal): should we create an instance on the fly for each use?
+    public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
 
 }

@@ -45,93 +45,88 @@ import com.google.appengine.api.datastore.KeyFactory;
  */
 public class AddModuleVersionServlet extends HttpServlet {
 
-	private static final Logger log = Logger
-			.getLogger(AddModuleVersionServlet.class.getName());
+    private static final Logger log = Logger.getLogger(AddModuleVersionServlet.class.getName());
 
-	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
-		// TODO(tal): validate parameters.
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // TODO(tal): validate parameters.
 
-		final String cnxml = Assertions.checkNotNull(req.getParameter("cnxml"),
-				"Missing post param \"cnxml\"");
-		final String manifest = Assertions
-				.checkNotNull(req.getParameter("manifest"),
-						"Missing post param \"manifest\"");
-		final String moduleIdParam = Assertions.checkNotNull(
-				req.getParameter("module_id"),
-				"Missing post param \"module_id\"");
+        final String cnxml =
+            Assertions.checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
+        final String manifest =
+            Assertions
+                .checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
+        final String moduleIdParam =
+            Assertions.checkNotNull(req.getParameter("module_id"),
+                "Missing post param \"module_id\"");
 
-		// TODO(tal): switch go Guava Preconditions and discard our own
-		// Assertions.
-		Assertions.check(req.getParameterMap().size() == 3,
-				"Expected 3 post parameters, found %s", req.getParameterMap()
-						.size());
+        // TODO(tal): switch go Guava Preconditions and discard our own
+        // Assertions.
+        Assertions.check(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
+            req.getParameterMap().size());
 
-		final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdParam); 
-		if (moduleId == null) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"Invalid module id format: [" + moduleIdParam + "]");
-			return;
-		}
-		log.info("Module id: " + moduleId);
+        final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdParam);
+        if (moduleId == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid module id format: ["
+                + moduleIdParam + "]");
+            return;
+        }
+        log.info("Module id: " + moduleId);
 
-		PersistenceManager pm = Services.datastore.getPersistenceManager();
-		Transaction tx = pm.currentTransaction();
+        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        Transaction tx = pm.currentTransaction();
 
-		final int versionNumber;
+        final int versionNumber;
 
-		try {
-			tx.begin();
+        try {
+            tx.begin();
 
-			// Read parent entity of this module
-			final JdoModuleEntity moduleEntity;
-			try {
-				moduleEntity = pm
-						.getObjectById(JdoModuleEntity.class, moduleId);
-			} catch (Throwable e) {
-				resp.sendError(
-						HttpServletResponse.SC_NOT_FOUND,
-						"Could not locate module [" + moduleIdParam + "]: "
-								+ e.getMessage());
-				return;
-			}
+            // Read parent entity of this module
+            final JdoModuleEntity moduleEntity;
+            try {
+                moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
+            } catch (Throwable e) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Could not locate module ["
+                    + moduleIdParam + "]: " + e.getMessage());
+                return;
+            }
 
-			// Updated number of versions in the parent
-			versionNumber = moduleEntity.incrementVersionCount();
+            // Updated number of versions in the parent
+            versionNumber = moduleEntity.incrementVersionCount();
 
-			// Create child key
-			final Key parentKey = KeyFactory.createKey(
-					SchemaConsts.MODULE_KEY_KIND, moduleEntity.getId());
-			final Key childKey = KeyFactory.createKey(parentKey,
-					SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
+            // Create child key
+            final Key parentKey =
+                KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND, moduleEntity.getId());
+            final Key childKey =
+                KeyFactory
+                    .createKey(parentKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
 
-			// TODO(tal): If version already exists due to internal
-			// inconsistency, report and error rather than overwriting.
+            // TODO(tal): If version already exists due to internal
+            // inconsistency, report and error rather than overwriting.
 
-			// Create new version entity
-			final JdoModuleVersionEntity versionEntity = new JdoModuleVersionEntity(
-					childKey, moduleId, versionNumber, cnxml, manifest);
-			pm.makePersistent(versionEntity);
+            // Create new version entity
+            final JdoModuleVersionEntity versionEntity =
+                new JdoModuleVersionEntity(childKey, moduleId, versionNumber, cnxml, manifest);
+            pm.makePersistent(versionEntity);
 
-			tx.commit();
-			// TODO(tal): (in all mutating servlets), add a log message about the change.
-		} catch (Throwable e) {
-			log.log(Level.SEVERE, "Exception", e);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"General error: [" + e.getMessage() + "]");
-			return;
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
-			pm.close();
-		}
+            tx.commit();
+            // TODO(tal): (in all mutating servlets), add a log message about the change.
+        } catch (Throwable e) {
+            log.log(Level.SEVERE, "Exception", e);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "General error: [" + e.getMessage() + "]");
+            return;
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            pm.close();
+        }
 
-		// All done OK.
-		resp.setContentType("text/plain");
-		PrintWriter out = resp.getWriter();
+        // All done OK.
+        resp.setContentType("text/plain");
+        PrintWriter out = resp.getWriter();
 
-		out.println("version number: " + versionNumber);
-	}
+        out.println("version number: " + versionNumber);
+    }
 }

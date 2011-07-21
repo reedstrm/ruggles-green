@@ -40,63 +40,57 @@ import org.cnx.repository.schema.JdoModuleEntity;
  */
 public class GetModuleInfoServlet extends HttpServlet {
 
-	private static final Logger log = Logger
-			.getLogger(GetModuleInfoServlet.class.getName());
+    private static final Logger log = Logger.getLogger(GetModuleInfoServlet.class.getName());
 
-	private static final Pattern uriPattern = Pattern
-			.compile("/module_info/([a-zA-Z0-9_-]+)");
+    private static final Pattern uriPattern = Pattern.compile("/module_info/([a-zA-Z0-9_-]+)");
 
-	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
-		// Parse request resource id from the query.
-		// TODO(tal): refactor out module id parsing and share with other
-		// servlets.
-		final String moduleUri = req.getRequestURI();
-		final Matcher matcher = uriPattern.matcher(moduleUri);
-		if (!matcher.matches()) {
-			final String message = "Could not parse module id in request URI ["
-					+ moduleUri + "]";
-			log.log(Level.SEVERE, message);
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-			return;
-		}
-		final String moduleIdString = matcher.group(1);
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // Parse request resource id from the query.
+        // TODO(tal): refactor out module id parsing and share with other
+        // servlets.
+        final String moduleUri = req.getRequestURI();
+        final Matcher matcher = uriPattern.matcher(moduleUri);
+        if (!matcher.matches()) {
+            final String message = "Could not parse module id in request URI [" + moduleUri + "]";
+            log.log(Level.SEVERE, message);
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            return;
+        }
+        final String moduleIdString = matcher.group(1);
 
-		final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdString);
-		if (moduleId == null) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"Invalid module id format: [" + moduleIdString + "]");
-			return;
-		}
-		log.info("Module id: " + moduleId + ", moduleIdString: "
-				+ moduleIdString);
+        final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdString);
+        if (moduleId == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid module id format: ["
+                + moduleIdString + "]");
+            return;
+        }
+        log.info("Module id: " + moduleId + ", moduleIdString: " + moduleIdString);
 
-		PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.datastore.getPersistenceManager();
 
-		final JdoModuleEntity moduleEntity;
+        final JdoModuleEntity moduleEntity;
 
-		try {
-			moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
-		} catch (Throwable e) {
-      // TODO(tal): share a common message between resp and log?
-			log.log(Level.SEVERE, "Could not find module by id "
-					+ moduleIdString, e);
-			resp.sendError(HttpServletResponse.SC_NO_CONTENT,
-					"Error looking up a module: " + e.getMessage());
-			return;
-		} finally {
-			pm.close();
-		}
+        try {
+            moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
+        } catch (Throwable e) {
+            // TODO(tal): share a common message between resp and log?
+            log.log(Level.SEVERE, "Could not find module by id " + moduleIdString, e);
+            resp.sendError(HttpServletResponse.SC_NO_CONTENT,
+                "Error looking up a module: " + e.getMessage());
+            return;
+        } finally {
+            pm.close();
+        }
 
-		// All done OK. Return response.
-		resp.setContentType("text/plain");
-		PrintWriter out = resp.getWriter();
+        // All done OK. Return response.
+        resp.setContentType("text/plain");
+        PrintWriter out = resp.getWriter();
 
-		// out.println();
-		out.println("Module Info");
+        // out.println();
+        out.println("Module Info");
 
-		out.println("* ID = " + moduleIdString);
-		out.println("* Versions = " + moduleEntity.getVersionCount());
-	}
+        out.println("* ID = " + moduleIdString);
+        out.println("* Versions = " + moduleEntity.getVersionCount());
+    }
 }

@@ -21,14 +21,18 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyModule;
+import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.data.restricted.NullData;
+import com.google.template.soy.data.restricted.StringData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -39,18 +43,28 @@ import org.w3c.dom.NodeList;
     HTMLGenerator converts a CNXML file to HTML.
 */
 public class HTMLGenerator {
-    private static SoyTofu tofu;
-    private static final String soyNamespace = "org.cnx.html.HTMLGenerator";
+    private static final String SOY_NAMESPACE = "org.cnx.html.HTMLGenerator";
+
+    private SoyTofu tofu;
+
+    public HTMLGenerator() {
+        tofu = compile(getClass().getResource("html.soy"));
+    }
+
+    public HTMLGenerator(URL templateURL) {
+        tofu = compile(templateURL);
+    }
 
     /**
-        compile creates a tofu for the HTML generation templates.
-    */
-    private static void compile() {
-        if (tofu != null) {
-            return;
-        }
+        The compile method creates a tofu for the HTML generation templates.
 
-        // Inject our functions
+        Subclasses should define the .main template in the tofu to customize the output of
+        generate.
+
+        @see #generate(Node)
+    */
+    protected SoyTofu compile(URL url) {
+        // Inject our custom Soy functions
         ArrayList<Module> modules = new ArrayList<Module>(2);
         modules.add(new SoyModule());
         modules.add(new SoyExtras());
@@ -58,27 +72,26 @@ public class HTMLGenerator {
 
         // Compile files
         SoyFileSet.Builder builder = injector.getInstance(SoyFileSet.Builder.class);
-        builder.add(HTMLGenerator.class.getResource("html.soy"));
-        tofu = builder.build().compileToJavaObj().forNamespace(soyNamespace);
+        builder.add(url);
+        return builder.build().compileToJavaObj().forNamespace(SOY_NAMESPACE);
     }
 
     /**
-        generate outputs HTML to the given writer that corresponds to the given
-        CNXML node.  The node passed into generate is usually the XML document
-        node, but it can be a particular element.
+        The generate method outputs HTML to the given writer that corresponds to the given CNXML
+        node.  The node passed into generate is usually the XML document node, but it can be a
+        particular element.
 
-        @param node The XML node to render
+        @param node The CNXML node to render
         @param p The writer to output to
+        @return The rendered HTML string
     */
-    public static void generate(Node node, PrintWriter p) throws IOException {
+    public String generate(Node node) {
         final SoyMapData params = new SoyMapData("node", domToSoyData(node));
-        compile();
-        p.print(tofu.render(".main", params, null));
+        return tofu.render(".main", params, null);
     }
 
     private static SoyMapData domToSoyData(final Node node) {
         final SoyMapData m = new SoyMapData();
-        // TODO(light): Allow Soy null values
         m.put("nodeType", getNodeTypeName(node.getNodeType()));
         m.put("nodeValue", nullToEmptyString(node.getNodeValue()));
         m.put("localName", nullToEmptyString(node.getLocalName()));

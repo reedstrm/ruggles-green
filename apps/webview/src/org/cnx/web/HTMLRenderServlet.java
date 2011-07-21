@@ -37,11 +37,15 @@ import org.xml.sax.SAXException;
     This servlet is only for testing, it will not be used in the final viewer.
 */
 public class HTMLRenderServlet extends HttpServlet {
-    private SoyTofu tofu;
     private static final String mimeType = "text/html; charset=utf-8";
     private static final String sourceParam = "source";
 
+    private SoyTofu tofu;
+    private HTMLGenerator htmlGenerator;
+
     @Override public void init(ServletConfig config) {
+        htmlGenerator = new HTMLGenerator();
+
         SoyFileSet.Builder builder = new SoyFileSet.Builder();
         builder.add(new File("base.soy"));
         builder.add(new File("web.soy"));
@@ -60,6 +64,7 @@ public class HTMLRenderServlet extends HttpServlet {
         final String source = req.getParameter(sourceParam);
         DocumentBuilder builder;
         Document sourceDoc;
+
         try {
             builder = CNXML.getBuilder();
         } catch (ParserConfigurationException e) {
@@ -77,17 +82,15 @@ public class HTMLRenderServlet extends HttpServlet {
         }
 
         // Generate HTML
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw);
+        String docHtml = null;
         try {
-            HTMLGenerator.generate(sourceDoc, pw);
+            docHtml = htmlGenerator.generate(sourceDoc);
         } catch (Exception e) {
             final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
             resp.setContentType(mimeType);
             resp.getWriter().print(tofu.render(".renderFailed", params, null));
             return;
         }
-        final String docHtml = sw.toString();
 
         // Render response
         final SoyMapData params = new SoyMapData("source", source, "docHtml", docHtml);

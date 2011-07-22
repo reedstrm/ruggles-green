@@ -13,10 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.cnx.repository.common;
 
-import org.cnx.util.Assertions;
+import com.google.common.base.Preconditions;
 
 /**
  * TODO(tal): transformation to/from base64 web safe is naive. Consider to optimize if needed (e.g.
@@ -38,8 +37,8 @@ public class KeyUtil {
     public static String idToString(String prefix, long id) {
         // Java longs are defines as 64 bit values but let's verify it just
         // in case.
-        Assertions.check(Long.MAX_VALUE == 9223372036854775807L, "%s", Long.MAX_VALUE);
-        Assertions.check(Long.MIN_VALUE == -9223372036854775808L, "%s", Long.MIN_VALUE);
+        Preconditions.checkState(Long.MAX_VALUE == 9223372036854775807L, "%s", Long.MAX_VALUE);
+        Preconditions.checkState(Long.MIN_VALUE == -9223372036854775808L, "%s", Long.MIN_VALUE);
 
         StringBuilder builder = new StringBuilder();
 

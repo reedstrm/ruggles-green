@@ -32,10 +32,10 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoModuleEntity;
 import org.cnx.repository.schema.JdoModuleVersionEntity;
 import org.cnx.repository.schema.SchemaConsts;
-import org.cnx.util.Assertions;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to get the xml and manifest of a module version.
@@ -44,6 +44,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class GetModuleVersionServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(GetModuleVersionServlet.class.getName());
@@ -119,7 +120,7 @@ public class GetModuleVersionServlet extends HttpServlet {
                     versionToServe);
             try {
                 versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, childKey);
-                Assertions.check(versionEntity.getVersionNumber() == versionToServe,
+                Preconditions.checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleIdString,
                     versionToServe, versionEntity.getVersionNumber());
             } catch (Throwable e) {

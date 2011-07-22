@@ -21,15 +21,16 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoResourceEntity;
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.ServeResourceResult;
 
-import com.google.appengine.api.blobstore.BlobKey;
+import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to serve a resource using a GET request.
@@ -38,6 +39,7 @@ import com.google.appengine.api.blobstore.BlobKey;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class GetResourceServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(GetResourceServlet.class.getName());
@@ -54,39 +56,31 @@ public class GetResourceServlet extends HttpServlet {
                 "Could parse resource id in request URI [" + requestURI + "]");
             return;
         }
-        final String resourceIdString = matcher.group(1);
+        final String resourceId = matcher.group(1);
 
-        final Long resourceId = JdoResourceEntity.stringToResourceId(resourceIdString); // KeyFactory.stringToKey(resourceId);
-        if (resourceId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
-                + resourceIdString + "]");
-            return;
-        }
+        final RepositoryResponse<ServeResourceResult> repositoryResponse =
+            Services.repository.ServeResouce(new RepositoryRequestContext(null), resourceId, resp);
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        final BlobKey blobKey;
-
-        try {
-            JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceId);
-            if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
-                resp.sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "Resource servlet expected an entity at state UPLOADED but found ["
-                        + entity.getState() + "]");
-                return;
+        // Map repository error to API error.
+        if (repositoryResponse.isError()) {
+            switch (repositoryResponse.getStatus()) {
+                case BAD_REQUEST:
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        repositoryResponse.getDescription());
+                    return;
+                case NOT_FOUND:
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        repositoryResponse.getDescription());
+                    return;
+                default:
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        repositoryResponse.getDescription());
+                    return;
             }
-            blobKey = entity.getBlobKey();
-        } catch (Throwable e) {
-            // TODO(tal): everywhere, make sure we log all errors.
-            e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_NO_CONTENT,
-                "Error looking up a resource: " + e.getMessage());
-            return;
-        } finally {
-            pm.close();
         }
 
-        // Serve the resource from Blobstore.
-        Services.blobstore.serve(blobKey, resp);
+        // When ok, resource has been served so there is nothing to do here.
+        Preconditions.checkState(repositoryResponse.isOk());
+        return;
     }
 }

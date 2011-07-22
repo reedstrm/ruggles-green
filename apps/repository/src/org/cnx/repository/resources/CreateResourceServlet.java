@@ -19,14 +19,13 @@ package org.cnx.repository.resources;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoResourceEntity;
-import org.cnx.util.Assertions;
+import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.RepositoryResponse;
 
 /**
  * An API servlet to create a new resource.
@@ -35,39 +34,30 @@ import org.cnx.util.Assertions;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class CreateResourceServlet extends HttpServlet {
+
+    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final Long resourceId;
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        RepositoryResponse<CreateResourceResult> repositoryResponse =
+            Services.repository.CreateResource(null);
 
-        try {
-            final JdoResourceEntity entity = new JdoResourceEntity();
-            entity.idleToPendingTransition();
-            // The unique resource id is created the first time the entity is
-            // persisted.
-            pm.makePersistent(entity);
-            resourceId = Assertions.checkNotNull(entity.getId(), "Null resource id");
-            ;
-        } finally {
-            pm.close();
+        // Map repository error to API error
+        if (repositoryResponse.isError()) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                repositoryResponse.getDescription());
+            return;
         }
 
-        final String resourceIdString = JdoResourceEntity.resoureIdToString(resourceId);
-        final String completionUrl = "/resource_factory/uploaded/" + resourceIdString;
-        final String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
-
-        // TODO(tal): add global consts for mime types and share with all
-        // servlets/apps.
+        // Map repository OK to API OK
+        final CreateResourceResult result = repositoryResponse.getResult();
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        // TODO(tal): when running locally in eclipse, the returned uploadUrl is
-        // relative and does not include the http/server/port part. Add here
-        // a condition to prepend it if return URL starts with "/".
-        out.println("resource id: " + resourceIdString);
-        out.println("upload url: " + uploadUrl);
+        out.println("resource id: " + result.getResourceId());
+        out.println("upload url: " + result.getResourceUploadUrl());
     }
 }

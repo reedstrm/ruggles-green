@@ -14,19 +14,8 @@
  * the License.
  */
 
-package org.cnx.util;
+package org.cnx.repository.service.api;
 
-/**
- * An exception to mark a yet to be implemented code.
- * 
- * @author Tal Dayan
- */
-@SuppressWarnings("serial")
-public class NotImplementedYet extends Error {
-    public NotImplementedYet(String format, Object... args) {
-        super(String.format(format, args));
-    }
-
-    public NotImplementedYet() {
-    }
+public class ServeResourceResult {
+    // TODO(tal): any attribute to return (size, type, etc)?
 }

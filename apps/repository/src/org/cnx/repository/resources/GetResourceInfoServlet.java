@@ -22,15 +22,16 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoResourceEntity;
+import org.cnx.repository.service.api.GetResourceInfoResult;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.UploadedResourceContentInfo;
 
-import com.google.appengine.api.blobstore.BlobInfo;
+import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to serve metadata of a resource.
@@ -39,11 +40,14 @@ import com.google.appengine.api.blobstore.BlobInfo;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class GetResourceInfoServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(GetResourceInfoServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern.compile("/resource_info/([a-zA-Z0-9_-]+)");
+
+    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -55,67 +59,48 @@ public class GetResourceInfoServlet extends HttpServlet {
                 "Could parse resource id in request URI [" + requestURI + "]");
             return;
         }
-        final String resourceIdString = matcher.group(1);
+        final String resourceId = matcher.group(1);
 
-        final Long resourceId = JdoResourceEntity.stringToResourceId(resourceIdString); // KeyFactory.stringToKey(resourceId);
-        if (resourceId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
-                + resourceIdString + "]");
-            return;
-        }
-        log.info("Resource id: " + resourceId + ", requestIdString: " + resourceIdString);
+        final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
+            Services.repository.GetResourceInfo(null, resourceId);
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-
-        final JdoResourceEntity entity;
-
-        try {
-            entity = pm.getObjectById(JdoResourceEntity.class, resourceId);
-
-            // TODO(tal): *** do we need this error or should we report the current
-            // state anyway (makes more sense). Clean here and consolidate with
-            // the reporting at the end of this method.
-
-            if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Resource info servlet expected an entity at state UPLOADED but found ["
-                        + entity.getState() + "]");
-                return;
+        // Map repository error to API error.
+        if (repositoryResponse.isError()) {
+            switch (repositoryResponse.getStatus()) {
+                case BAD_REQUEST:
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        repositoryResponse.getDescription());
+                    return;
+                case NOT_FOUND:
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        repositoryResponse.getDescription());
+                    return;
+                default:
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        repositoryResponse.getDescription());
+                    return;
             }
-            // blobKey = entity.blobKey;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_NO_CONTENT,
-                "Error looking up a resource: " + e.getMessage());
-            return;
-        } finally {
-            pm.close();
         }
+
+        // Map repository OK to API OK
+        Preconditions.checkState(repositoryResponse.isOk());
+        final GetResourceInfoResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
         out.println("Resource info:");
 
-        out.println("* resource state: " + entity.getState());
-        out.println("* resource id: " + entity.getId());
+        out.println("* resource state: " + result.getResourceState());
+        out.println("* resource id: " + resourceId);
 
-        if (entity.getState().hasBlobKey()) {
-            out.println("* blob key: " + entity.getBlobKey());
-            // NOTE(tal): if performance is an issue, could cache this in the
-            // resource
-            // entity upon blob uploading.
-            BlobInfo blobInfo = Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
-            if (blobInfo == null) {
-                out.println("*** error, could not locate info for blob key " + entity.getBlobKey());
-            } else {
-                out.println("* content type: " + blobInfo.getContentType());
-                out.println("* file name: " + blobInfo.getFilename());
-                out.println("* size: " + blobInfo.getSize());
-                out.println("* creation time: " + blobInfo.getCreation());
-                ;
-
-            }
+        if (result.hasContent()) {
+            out.println("* uploaded content info:");
+            final UploadedResourceContentInfo contentInfo = result.getContentInfo();
+            out.println("  - content type: " + contentInfo.getContentType());
+            out.println("  - file name: " + contentInfo.getContentOriginalFileName());
+            out.println("  - size: " + contentInfo.getContentSize());
+            out.println("  - upload time: " + contentInfo.getContentUploadTime());
         }
     }
 }

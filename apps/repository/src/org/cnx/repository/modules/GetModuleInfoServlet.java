@@ -38,6 +38,7 @@ import org.cnx.repository.schema.JdoModuleEntity;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class GetModuleInfoServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(GetModuleInfoServlet.class.getName());

@@ -39,7 +39,7 @@
         </auth-constraint>
     </security-constraint>
   
-  <!-- CNX RESOURCES -->
+  <!-- CNX RESOURCE API -->
   
   <servlet>
     <servlet-name>CreateResourceServlet</servlet-name>
@@ -49,17 +49,7 @@
   <servlet-mapping>
     <servlet-name>CreateResourceServlet</servlet-name>
     <url-pattern>/resource_factory/create</url-pattern>
-  </servlet-mapping>  
-  
-   <servlet>
-    <servlet-name>UploadCompletionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.resources.UploadCompletionServlet</servlet-class>
-  </servlet>
-   
-  <servlet-mapping>
-    <servlet-name>UploadCompletionServlet</servlet-name>
-    <url-pattern>/resource_factory/uploaded/*</url-pattern>
-  </servlet-mapping>   
+  </servlet-mapping>    
   
    <servlet>
     <servlet-name>GetResourceServlet</servlet-name>
@@ -81,7 +71,7 @@
     <url-pattern>/resource_info/*</url-pattern>
   </servlet-mapping>  
   
-  <!--  CNX MODULES -->
+  <!--  CNX MODULES API -->
   
   <servlet>
     <servlet-name>CreateModuleServlet</servlet-name>
@@ -122,6 +112,18 @@
     <servlet-name>GetModuleInfoServlet</servlet-name>
     <url-pattern>/module_info/*</url-pattern>
   </servlet-mapping>
+  
+  <!-- Repository service -->
+  
+  <servlet>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.ResourceUploadCompletionServlet</servlet-class>
+  </servlet>
+   
+  <servlet-mapping>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <url-pattern>/resource_factory/uploaded/*</url-pattern>
+  </servlet-mapping> 
    
   <!--  TEST -->
   

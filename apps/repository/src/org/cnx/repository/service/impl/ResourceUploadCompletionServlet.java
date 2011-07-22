@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.resources;
+package org.cnx.repository.service.impl;
 
 import java.io.IOException;
 import java.util.Map;
@@ -44,10 +44,15 @@ import com.google.appengine.api.blobstore.BlobKey;
  * 
  */
 
-public class UploadCompletionServlet extends HttpServlet {
+@SuppressWarnings("serial")
+public class ResourceUploadCompletionServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(UploadCompletionServlet.class.getName());
+    private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
+        .getName());
 
+    /**
+     * This path must match the servlet registration in web.xml.
+     */
     private static final Pattern uriPattern = Pattern
         .compile("/resource_factory/uploaded/([a-zA-Z0-9_-]+)");
 

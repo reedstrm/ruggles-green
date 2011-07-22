@@ -21,10 +21,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.cnx.util.Assertions;
-
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.google.common.base.Preconditions;
 
 /**
  * A JDO representing a module version entity.
@@ -62,11 +61,11 @@ public class JdoModuleVersionEntity {
 
     public JdoModuleVersionEntity(Key key, long moduleId, int versionNumber, String CNXMLDoc,
         String manifestDoc) {
-        this.key = Assertions.checkNotNull(key);
+        this.key = Preconditions.checkNotNull(key);
         this.moduleId = moduleId;
         this.versionNumber = versionNumber;
-        this.CNXMLDoc = new Text(Assertions.checkNotNull(CNXMLDoc));
-        this.manifestDoc = new Text(Assertions.checkNotNull(manifestDoc));
+        this.CNXMLDoc = new Text(Preconditions.checkNotNull(CNXMLDoc));
+        this.manifestDoc = new Text(Preconditions.checkNotNull(manifestDoc));
     }
 
     public int getVersionNumber() {
@@ -79,5 +78,9 @@ public class JdoModuleVersionEntity {
 
     public String getManifestDoc() {
         return manifestDoc.getValue();
+    }
+    
+    public long getModuleId() {
+        return moduleId;
     }
 }

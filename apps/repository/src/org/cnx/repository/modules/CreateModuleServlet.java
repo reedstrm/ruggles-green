@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoModuleEntity;
-import org.cnx.util.Assertions;
+
+import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to create a new module.
@@ -38,6 +39,7 @@ import org.cnx.util.Assertions;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class CreateModuleServlet extends HttpServlet {
 
     @Override
@@ -51,7 +53,7 @@ public class CreateModuleServlet extends HttpServlet {
             // The unique module id is created the first time the entity is
             // persisted.
             pm.makePersistent(entity);
-            moduleId = Assertions.checkNotNull(entity.getId(), "Null module id");
+            moduleId = Preconditions.checkNotNull(entity.getId(), "Null module id");
         } finally {
             pm.close();
         }

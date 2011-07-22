@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("serial")
 public class TestServlet extends HttpServlet {
 
     @Override

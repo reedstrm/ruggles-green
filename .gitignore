@@ -1,0 +1,10 @@
+# Use full directory paths compared to directory names.
+# Auto generated folders for Apps
+.metadata/
+apps/repository/war/WEB-INF/classes/
+apps/repository/.settings/
+
+# ignoring jars
+appengine-*.jar
+datanucleus-*.jar
+

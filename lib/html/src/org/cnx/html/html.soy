@@ -57,6 +57,26 @@
                 {if $node.namespaceURI == 'http://www.w3.org/1998/Math/MathML'}
                     {call .math data="all"/}
                 {/if}
+            {case 'rule'}
+                {call .rule data="all"/}
+            {case 'statement'}
+                {call .statement data="all"/}
+            {case 'proof'}
+                {call .proof data="all"/}
+            {case 'example'}
+                {call .example data="all"/}
+            {case 'definition'}
+                {call .definition data="all"/}
+            {case 'exercise'}
+                {call .exercise data="all"/}
+            {case 'commentary'}
+                {call .commentary data="all"/}
+            {case 'problem'}
+                {call .problem data="all"/}
+            {case 'solution'}
+                {call .solution data="all"/}
+            {case 'equation'}
+                {call .equation data="all"/}
         {/switch}
     {elseif $node.nodeType == 'document'}
         {call .document}{param node: findElem($node, 'document')/}{/call}
@@ -209,7 +229,7 @@
     @param node DOM element node
 */
 {template .list}
-<ul id="{$node.attributes.id}">
+    <ul id="{$node.attributes.id}">
         {foreach $child in $node.childNodes}
             {if $child.localName == 'item'}
                 <li>{call .children}{param node: $child/}{/call}</li>
@@ -362,4 +382,200 @@
     {foreach $attr in $node.attributeNodes}
         {sp}{$attr.localName}="{$attr.nodeValue}"
     {/foreach}
+{/template}
+
+/**
+    Render a rule element.
+
+    @param node DOM element node
+*/
+{template .rule}
+    {call .numbered data="all"}
+        {param class: 'rule'/}
+        {param label}
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                {switch $node.attributes.type}
+                    {case 'theorem'}
+                        Theorem
+                    {case 'lemma'}
+                        Lemma
+                    {case 'corollary'}
+                        Corollary
+                    {case 'law'}
+                        Law
+                    {case 'proposition'}
+                        Proposition
+                    {default}
+                        Rule
+                {/switch}
+            {/if}
+        {/param}
+    {/call}
+{/template}
+
+/**
+    Render a statement element.
+
+    @param node DOM element node
+*/
+{template .statement}
+    {call .span data="all"}
+        {param elemName: 'div'/}
+        {param className: 'statement'/}
+    {/call}
+{/template}
+
+/**
+    Render a proof element.
+
+    @param node DOM element node
+*/
+{template .proof}
+    <div class="proof"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
+        // TODO(light): Heading depth
+        <h2>Proof</h2>
+        {call .children data="all"/}
+    </div>
+{/template}
+
+/**
+    Render an example element.
+
+    @param node DOM element node
+*/
+{template .example}
+    {call .numbered data="all"}
+        {param class: 'example'/}
+        {param label}
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                Example
+            {/if}
+        {/param}
+    {/call}
+{/template}
+
+/**
+    Render a definition element.
+
+    @param node DOM element node
+*/
+{template .definition}
+    <div class="definition"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
+        // TODO(light): Use proper heading levels
+        <h2>
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                Definition
+            {/if}
+            {sp}{$node.number}
+            {if findElem($node, 'term')}: {innerText(findElem($node, 'term'))}{/if}
+        </h2>
+        <ol>
+        // TODO(light): Allow interspersed examples with meanings
+        {foreach $child in $node.childNodes}
+            {if $child.localName == 'meaning'}
+                {call .span}
+                    {param node: $child/}
+                    {param elemName: 'li'/}
+                    {param className: 'meaning'/}
+                {/call}
+            {/if}
+        {/foreach}
+        </ol>
+    </div>
+{/template}
+
+/**
+    Render an exercise element.
+
+    @param node DOM element node
+*/
+{template .exercise}
+    {call .numbered data="all"}
+        {param class: 'exercise'/}
+        {param label}
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                Exercise
+            {/if}
+        {/param}
+    {/call}
+{/template}
+
+/**
+    Render a commentary element.
+
+    @param node DOM element node
+*/
+{template .commentary}
+    {call .span data="all"}
+        {param elemName: 'div'/}
+        {param className: 'commentary'/}
+    {/call}
+{/template}
+
+/**
+    Render a problem element.
+
+    @param node DOM element node
+*/
+{template .problem}
+    {call .span data="all"}
+        {param elemName: 'div'/}
+        {param className: 'problem'/}
+    {/call}
+{/template}
+
+/**
+    Render a solution element.
+
+    @param node DOM element node
+*/
+{template .solution}
+    {call .span data="all"}
+        {param elemName: 'div'/}
+        {param className: 'solution'/}
+    {/call}
+{/template}
+
+/**
+    Render an equation element.
+
+    @param node DOM element node
+*/
+{template .equation}
+    {call .numbered data="all"}
+        {param class: 'equation'/}
+        {param label}
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                Equation
+            {/if}
+        {/param}
+    {/call}
+{/template}
+
+/**
+    Render a numbered group.
+
+    @param node DOM node
+    @param class CSS class to apply to the generated div
+    @param label Label for this type
+*/
+{template .numbered private="true"}
+    <div class="{$class}"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
+        // TODO(light): Use proper heading levels
+        <h2>
+            {$label} {$node.number}
+            {if findElem($node, 'title')}: {innerText(findElem($node, 'title'))}{/if}
+        </h2>
+        {call .children data="all"/}
+    </div>
 {/template}

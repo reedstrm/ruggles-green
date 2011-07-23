@@ -16,7 +16,7 @@
 
 package org.cnx.repository.service.api;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CreateResourceResult {
 
@@ -31,8 +31,8 @@ public class CreateResourceResult {
      * @param resourceUploadUrl a full URL to which the resource content should be uploaded.
      */
     public CreateResourceResult(String resourceId, String resourceUploadUrl) {
-        this.resourceId = Preconditions.checkNotNull(resourceId);
-        this.resourceUploadUrl = Preconditions.checkNotNull(resourceUploadUrl);
+        this.resourceId = checkNotNull(resourceId);
+        this.resourceUploadUrl = checkNotNull(resourceUploadUrl);
     }
 
     public String getResourceId() {

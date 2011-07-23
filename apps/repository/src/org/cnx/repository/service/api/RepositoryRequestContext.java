@@ -31,7 +31,7 @@ public class RepositoryRequestContext {
     // TODO(tal): add here more attributes (e.g. debug level, debug logger, etc)
 
     /**
-     * @param authenticatedUserId an optional string with the user id. Null if no use id is
+     * @param authenticatedUserId an optional string with the user id. Null if no user id is
      *            associated with this request. It is the responsibility of the caller to
      *            authenticate the user. The repository service uses this value to authorize the
      *            operation.

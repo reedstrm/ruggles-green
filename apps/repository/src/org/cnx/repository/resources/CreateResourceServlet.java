@@ -43,7 +43,7 @@ public class CreateResourceServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         RepositoryResponse<CreateResourceResult> repositoryResponse =
-            Services.repository.CreateResource(null);
+            Services.repository.createResource(null);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

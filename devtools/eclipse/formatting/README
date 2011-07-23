@@ -1,8 +1,5 @@
 
-TODO(tal): rename cnx-eclipse-galileo-formatting.xml to 
 cnx-eclipse-java-formatting.xml
-
-cnx-eclipse-galileo-formatting.xml
 ----------------------------------
 An eclipse formatting configuration for CNX style guide. Original copy
 is from http://openjpa.apache.org/coding-standards.html (as of July 20, 2011,
@@ -10,13 +7,21 @@ license is Apache 2.0, used the 'galileo' version).
 
 To apply in Eclipse
 1. Window -> Preferences -> Java -> Code Style -> Formatter
-2. Click on Import and select the cnx-eclipse-galileo-formatting.xml file
+2. Click on Import and select the cnx-eclipse-java-formatting.xml file
 3. Press OK importing
+
+Static import preference setting (can be done only manually?)
+1. Window -> Preferences -> Java -> Editor -> Content Assist -> Favorites
+2. Click New Type and add com.google.common.base.Preconditions.*
+3. Ok
 
 To export new version from Eclipse
 1. Window -> Preferences -> Java -> Code Style -> Formatter
-2. Click on Export All and overwrite cnx-eclipse-galileo-formatting.xml
-3. Diff the file against the repository to make sure all changes are desired.
+2. Click on Editi
+3. Click on Export and overwrite cnx-eclipse-java-formatting.xml file
+4. Diff the file against the repository to make sure all changes are desired. If
+   more than one profile has been exported, clean it manually (is there a way
+   to tell Eclipse to export only a single style?)
 
 Style changes from Sun Java style
 1. Maximum line length is 100
@@ -25,3 +30,7 @@ Style changes from Sun Java style
 4. Do not insert a new line before opening brace. 
 5. Insert a new line before closing brace.
 6. Use fully qualified import statements, i.e. do not use asterisks.
+7. Treating acronyms as words in camel case (good: CnxRepository, bad: CNXRepository).
+
+Other style recomendations
+1. Prefer static import for check methods of com.google.common.base.Precondtions.

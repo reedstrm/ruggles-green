@@ -17,16 +17,19 @@
 package org.cnx.util;
 
 /**
- * An exception to mark a yet to be implemented code.
- * 
+ * A place holder exception for code being developed. Typically don't want
+ * to push to production code that refers to this exception.
+ * For longer term and planned unavailability of features use NotSupportedException
+ * or similar.
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class NotImplementedYet extends Error {
-    public NotImplementedYet(String format, Object... args) {
+public class ImplementMeNow extends Error {
+    public ImplementMeNow(String format, Object... args) {
         super(String.format(format, args));
     }
 
-    public NotImplementedYet() {
+    public ImplementMeNow() {
     }
 }

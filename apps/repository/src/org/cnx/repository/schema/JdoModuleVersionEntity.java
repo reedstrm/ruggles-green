@@ -16,6 +16,8 @@
 
 package org.cnx.repository.schema;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -23,7 +25,6 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
-import com.google.common.base.Preconditions;
 
 /**
  * A JDO representing a module version entity.
@@ -61,11 +62,11 @@ public class JdoModuleVersionEntity {
 
     public JdoModuleVersionEntity(Key key, long moduleId, int versionNumber, String CNXMLDoc,
         String manifestDoc) {
-        this.key = Preconditions.checkNotNull(key);
+        this.key = checkNotNull(key);
         this.moduleId = moduleId;
         this.versionNumber = versionNumber;
-        this.CNXMLDoc = new Text(Preconditions.checkNotNull(CNXMLDoc));
-        this.manifestDoc = new Text(Preconditions.checkNotNull(manifestDoc));
+        this.CNXMLDoc = new Text(checkNotNull(CNXMLDoc));
+        this.manifestDoc = new Text(checkNotNull(manifestDoc));
     }
 
     public int getVersionNumber() {

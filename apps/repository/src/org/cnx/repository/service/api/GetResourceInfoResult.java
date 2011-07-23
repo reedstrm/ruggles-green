@@ -17,9 +17,10 @@
 package org.cnx.repository.service.api;
 
 //import org.cnx.util.Assertions;
-import org.cnx.util.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
+import org.cnx.util.Nullable;
 
 /**
  * Result of a successful GetResourceInfo operation.
@@ -63,7 +64,7 @@ public class GetResourceInfoResult {
      * Asserts that {@link #hasContent()} is true.
      */
     public UploadedResourceContentInfo getContentInfo() {
-        Preconditions.checkState(hasContent(), "Resource has no content");
+        checkState(hasContent(), "Resource has no content");
         return contentInfo;
     }
 
@@ -73,6 +74,6 @@ public class GetResourceInfoResult {
 
     public static GetResourceInfoResult newUploaded(UploadedResourceContentInfo contentInfo) {
         return new GetResourceInfoResult(ResourceState.UPLOADED,
-            Preconditions.checkNotNull(contentInfo));
+            checkNotNull(contentInfo));
     }
 }

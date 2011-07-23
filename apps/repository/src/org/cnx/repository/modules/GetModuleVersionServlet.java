@@ -16,6 +16,8 @@
 
 package org.cnx.repository.modules;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -35,7 +37,6 @@ import org.cnx.repository.schema.SchemaConsts;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to get the xml and manifest of a module version.
@@ -120,7 +121,7 @@ public class GetModuleVersionServlet extends HttpServlet {
                     versionToServe);
             try {
                 versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, childKey);
-                Preconditions.checkState(versionEntity.getVersionNumber() == versionToServe,
+                checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleIdString,
                     versionToServe, versionEntity.getVersionNumber());
             } catch (Throwable e) {

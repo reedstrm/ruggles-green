@@ -16,6 +16,8 @@
 
 package org.cnx.repository.resources;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
@@ -30,8 +32,6 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.UploadedResourceContentInfo;
-
-import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to serve metadata of a resource.
@@ -62,7 +62,7 @@ public class GetResourceInfoServlet extends HttpServlet {
         final String resourceId = matcher.group(1);
 
         final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-            Services.repository.GetResourceInfo(null, resourceId);
+            Services.repository.getResourceInfo(null, resourceId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -83,7 +83,7 @@ public class GetResourceInfoServlet extends HttpServlet {
         }
 
         // Map repository OK to API OK
-        Preconditions.checkState(repositoryResponse.isOk());
+        checkState(repositoryResponse.isOk());
         final GetResourceInfoResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");

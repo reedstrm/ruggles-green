@@ -16,6 +16,9 @@
 
 package org.cnx.repository.schema;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -26,7 +29,6 @@ import org.cnx.repository.common.KeyUtil;
 import org.cnx.util.Nullable;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.common.base.Preconditions;
 
 /**
  * A JDO representing a resource entity.
@@ -113,14 +115,14 @@ public class JdoResourceEntity {
     }
 
     public void idleToPendingTransition() {
-        Preconditions.checkState(state == State.IDLE, "Encountered %s", state);
+        checkState(state == State.IDLE, "Encountered %s", state);
         state = State.PENDING_UPLOAD;
     }
 
     public void pendingToUploadedTransition(BlobKey newBlobKey) {
-        Preconditions.checkState(state == State.PENDING_UPLOAD, "Encountered %s", state);
+        checkState(state == State.PENDING_UPLOAD, "Encountered %s", state);
 
-        blobKey = Preconditions.checkNotNull(newBlobKey, "Null blob key");
+        blobKey = checkNotNull(newBlobKey, "Null blob key");
         JDOHelper.makeDirty(this, "blobKey");
 
         state = State.UPLOADED;

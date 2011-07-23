@@ -16,6 +16,9 @@
 
 package org.cnx.repository.modules;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -34,7 +37,6 @@ import org.cnx.repository.schema.SchemaConsts;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to add a version for an existing module.
@@ -53,17 +55,17 @@ public class AddModuleVersionServlet extends HttpServlet {
         // TODO(tal): validate parameters.
 
         final String cnxml =
-            Preconditions.checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
+            checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
         final String manifest =
-            Preconditions.checkNotNull(req.getParameter("manifest"),
+            checkNotNull(req.getParameter("manifest"),
                 "Missing post param \"manifest\"");
         final String moduleIdParam =
-            Preconditions.checkNotNull(req.getParameter("module_id"),
+            checkNotNull(req.getParameter("module_id"),
                 "Missing post param \"module_id\"");
 
         // TODO(tal): switch go Guava Preconditions and discard our own
         // Assertions.
-        Preconditions.checkArgument(req.getParameterMap().size() == 3,
+        checkArgument(req.getParameterMap().size() == 3,
             "Expected 3 post parameters, found %s", req.getParameterMap().size());
 
         final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdParam);

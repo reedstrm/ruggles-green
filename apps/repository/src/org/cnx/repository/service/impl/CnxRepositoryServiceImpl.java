@@ -38,20 +38,21 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     private final static CnxRepositoryServiceImpl instance = new CnxRepositoryServiceImpl();
 
     @Override
-    public RepositoryResponse<CreateResourceResult> CreateResource(RepositoryRequestContext context) {
-        return ResourceOperations.CreateResource(context);
+    public RepositoryResponse<CreateResourceResult>
+                    createResource(RepositoryRequestContext context) {
+        return ResourceOperations.createResource(context);
     }
 
     @Override
-    public RepositoryResponse<GetResourceInfoResult> GetResourceInfo(
+    public RepositoryResponse<GetResourceInfoResult> getResourceInfo(
         RepositoryRequestContext context, String resourceId) {
-        return ResourceOperations.GetResourceInfo(context, resourceId);
+        return ResourceOperations.getResourceInfo(context, resourceId);
     }
 
     @Override
-    public RepositoryResponse<ServeResourceResult> ServeResouce(RepositoryRequestContext context,
+    public RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
         String resourceId, HttpServletResponse httpResponse) {
-        return ResourceOperations.ServeResouce(context, resourceId, httpResponse);
+        return ResourceOperations.serveResource(context, resourceId, httpResponse);
     }
 
     /**

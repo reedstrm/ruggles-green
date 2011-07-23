@@ -27,13 +27,13 @@ public interface CnxRepositoryService {
      * Create an empty resource and return information on how to upload its content.
      * 
      * If the response has OK status, the new resource is created and its ID is returned in the
-     * result. In addition the repository expects the resource content to be posted at some to the
-     * upload URL returned in the response.
+     * result. In addition the repository expects the resource content to be posted at some time in
+     * in the future to the upload URL returned in the response.
      * 
      * @param context the query context
      * @return operation response.
      */
-    RepositoryResponse<CreateResourceResult> CreateResource(RepositoryRequestContext context);
+    RepositoryResponse<CreateResourceResult> createResource(RepositoryRequestContext context);
 
     /**
      * Return general information about a resource.
@@ -41,7 +41,7 @@ public interface CnxRepositoryService {
      * @param context the query context
      * @return operation resourceId a valid resource id
      */
-    RepositoryResponse<GetResourceInfoResult> GetResourceInfo(RepositoryRequestContext context,
+    RepositoryResponse<GetResourceInfoResult> getResourceInfo(RepositoryRequestContext context,
         String resourceId);
 
     /**
@@ -59,6 +59,6 @@ public interface CnxRepositoryService {
      * @param resp a HTTP servlet response in which the resource is served.
      * @return operation response.
      */
-    RepositoryResponse<ServeResourceResult> ServeResouce(RepositoryRequestContext context,
+    RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
         String resourceId, HttpServletResponse httpResponse);
 }

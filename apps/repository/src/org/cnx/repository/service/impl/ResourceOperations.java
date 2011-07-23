@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 
 import javax.jdo.PersistenceManager;
@@ -34,7 +36,6 @@ import org.cnx.repository.service.api.UploadedResourceContentInfo;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.common.base.Preconditions;
 
 /**
  * Implementation of the resource related operations of the repository service.
@@ -42,11 +43,17 @@ import com.google.common.base.Preconditions;
  * @author Tal Dayan
  */
 public class ResourceOperations {
+    /**
+     * Base path of the resource upload completion servlet. Should match servlet mapping in web.xml.
+     * Servlet mapping should be this value with the suffix "/*".
+     */
+    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/resource_factory/uploaded";
 
     /**
      * See description in {@link CnxRepositoryService}
      */
-    static RepositoryResponse<CreateResourceResult> CreateResource(RepositoryRequestContext context) {
+    static RepositoryResponse<CreateResourceResult>
+                    createResource(RepositoryRequestContext context) {
 
         final Long resourceId;
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -54,15 +61,16 @@ public class ResourceOperations {
         try {
             final JdoResourceEntity entity = new JdoResourceEntity();
             entity.idleToPendingTransition();
+
             // The unique resource id is created the first time the entity is persisted.
             pm.makePersistent(entity);
-            resourceId = Preconditions.checkNotNull(entity.getId(), "Null resource id");
+            resourceId = checkNotNull(entity.getId(), "Null resource id");
         } finally {
             pm.close();
         }
 
         final String resourceIdString = JdoResourceEntity.resoureIdToString(resourceId);
-        final String completionUrl = "/resource_factory/uploaded/" + resourceIdString;
+        final String completionUrl = UPLOAD_COMPLETION_SERVLET_PATH + "/" + resourceIdString;
         final String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
 
         return RepositoryResponse.newOk("Resource created", new CreateResourceResult(
@@ -72,7 +80,7 @@ public class ResourceOperations {
     /**
      * See description in {@link CnxRepositoryService}
      */
-    static RepositoryResponse<GetResourceInfoResult> GetResourceInfo(
+    static RepositoryResponse<GetResourceInfoResult> getResourceInfo(
         RepositoryRequestContext context, String resourceId) {
 
         // Convert to internal id
@@ -126,7 +134,7 @@ public class ResourceOperations {
     /**
      * See description in {@link CnxRepositoryService}
      */
-    static RepositoryResponse<ServeResourceResult> ServeResouce(RepositoryRequestContext context,
+    static RepositoryResponse<ServeResourceResult> serveResource(RepositoryRequestContext context,
         String resourceId, HttpServletResponse httpResponse) {
 
         final Long resourceIdLong = JdoResourceEntity.stringToResourceId(resourceId);

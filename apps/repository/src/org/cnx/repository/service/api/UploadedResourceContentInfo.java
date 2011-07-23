@@ -16,10 +16,9 @@
 
 package org.cnx.repository.service.api;
 
-//import org.cnx.util.Assertions;
-import java.util.Date;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Preconditions;
+import java.util.Date;
 
 /**
  * Represents the info of an uploaded resource info.
@@ -40,10 +39,10 @@ public class UploadedResourceContentInfo {
 
     public UploadedResourceContentInfo(String contentType, Long contentSize,
         Date contentUploadTime, String contentOriginalFileName) {
-        this.contentType = Preconditions.checkNotNull(contentType);
-        this.contentSize = Preconditions.checkNotNull(contentSize);
-        this.contentUploadTime = Preconditions.checkNotNull(contentUploadTime);
-        this.contentOriginalFileName = Preconditions.checkNotNull(contentOriginalFileName);
+        this.contentType = checkNotNull(contentType);
+        this.contentSize = checkNotNull(contentSize);
+        this.contentUploadTime = checkNotNull(contentUploadTime);
+        this.contentOriginalFileName = checkNotNull(contentOriginalFileName);
     }
 
     public String getContentType() {

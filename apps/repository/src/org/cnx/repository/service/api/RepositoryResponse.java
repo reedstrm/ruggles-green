@@ -16,9 +16,11 @@
 
 package org.cnx.repository.service.api;
 
-import org.cnx.util.Nullable;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
+import org.cnx.util.Nullable;
 
 /**
  * Base class for repository operation responses. Each operation is expected to return a subclass of
@@ -41,7 +43,7 @@ public class RepositoryResponse<T> {
     private RepositoryResponse(RepositoryStatus status, @Nullable String statusDescription,
         @Nullable T result) {
         // TODO(tal): do sanity checks
-        this.status = Preconditions.checkNotNull(status);
+        this.status = checkNotNull(status);
         this.description = statusDescription;
         this.result = result;
     }
@@ -66,8 +68,8 @@ public class RepositoryResponse<T> {
      * Return result. Asserts that status is ok.
      */
     public T getResult() {
-        Preconditions.checkState(status.isOk());
-        return Preconditions.checkNotNull(result);
+        checkState(status.isOk());
+        return checkNotNull(result);
     }
 
     /**
@@ -79,8 +81,8 @@ public class RepositoryResponse<T> {
      * @return a new response
      */
     public static <T> RepositoryResponse<T> newOk(String statusDescription, T result) {
-        Preconditions.checkNotNull(statusDescription);
-        Preconditions.checkNotNull(result);
+        checkNotNull(statusDescription);
+        checkNotNull(result);
         return new RepositoryResponse<T>(RepositoryStatus.OK, statusDescription, result);
     }
 
@@ -94,9 +96,9 @@ public class RepositoryResponse<T> {
      */
     public static <T> RepositoryResponse<T> newError(RepositoryStatus status,
         String statusDescription) {
-        Preconditions.checkNotNull(status);
-        Preconditions.checkArgument(status.isError(), "%s", status);
-        Preconditions.checkNotNull(statusDescription);
+        checkNotNull(status);
+        checkArgument(status.isError(), "%s", status);
+        checkNotNull(statusDescription);
         return new RepositoryResponse<T>(status, statusDescription, null);
     }
 }

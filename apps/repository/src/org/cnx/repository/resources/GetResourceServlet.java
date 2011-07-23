@@ -16,6 +16,8 @@
 
 package org.cnx.repository.resources;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -29,8 +31,6 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
-
-import com.google.common.base.Preconditions;
 
 /**
  * An API servlet to serve a resource using a GET request.
@@ -59,7 +59,7 @@ public class GetResourceServlet extends HttpServlet {
         final String resourceId = matcher.group(1);
 
         final RepositoryResponse<ServeResourceResult> repositoryResponse =
-            Services.repository.ServeResouce(new RepositoryRequestContext(null), resourceId, resp);
+            Services.repository.serveResouce(new RepositoryRequestContext(null), resourceId, resp);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -80,7 +80,7 @@ public class GetResourceServlet extends HttpServlet {
         }
 
         // When ok, resource has been served so there is nothing to do here.
-        Preconditions.checkState(repositoryResponse.isOk());
+        checkState(repositoryResponse.isOk());
         return;
     }
 }

@@ -16,6 +16,7 @@
 
 package org.cnx.html;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -44,6 +45,15 @@ import org.w3c.dom.NodeList;
 */
 public class HTMLGenerator {
     private static final String SOY_NAMESPACE = "org.cnx.html.HTMLGenerator";
+    private static final ImmutableSet<String> NUMBERED_ELEMENTS = ImmutableSet.of(
+            "definition",
+            "equation",
+            "example",
+            "exercise",
+            "figure",
+            "note",
+            "rule"
+    );
 
     private SoyTofu tofu;
 
@@ -86,17 +96,31 @@ public class HTMLGenerator {
         @return The rendered HTML string
     */
     public String generate(Node node) {
-        final SoyMapData params = new SoyMapData("node", domToSoyData(node));
+        final SoyMapData params = new SoyMapData("node", domToSoyData(node, new Counter()));
         return tofu.render(".main", params, null);
     }
 
-    private static SoyMapData domToSoyData(final Node node) {
+    private static SoyMapData domToSoyData(final Node node, final Counter counter) {
         final SoyMapData m = new SoyMapData();
-        m.put("nodeType", getNodeTypeName(node.getNodeType()));
+        final short nodeType = node.getNodeType();
+        final String localName = node.getLocalName();
+        final String namespaceURI = node.getNamespaceURI();
+
+        m.put("nodeType", getNodeTypeName(nodeType));
         m.put("nodeValue", nullToEmptyString(node.getNodeValue()));
-        m.put("localName", nullToEmptyString(node.getLocalName()));
-        m.put("namespaceURI", nullToEmptyString(node.getNamespaceURI()));
+        m.put("localName", nullToEmptyString(localName));
+        m.put("namespaceURI", nullToEmptyString(namespaceURI));
         m.put("prefix", nullToEmptyString(node.getPrefix()));
+
+        // Attach counter number
+        if (nodeType == Node.ELEMENT_NODE && CNXML.NAMESPACE.equals(namespaceURI)
+            && NUMBERED_ELEMENTS.contains(localName)) {
+            String type = ((Element)node).getAttribute("type");
+            if (type == null) {
+                type = "";
+            }
+            m.put("number", counter.getNextNumber(localName, type));
+        }
 
         // Attributes
         final NamedNodeMap attr = node.getAttributes();
@@ -106,7 +130,7 @@ public class HTMLGenerator {
             // Attribute nodes
             final SoyListData soyAttrList = new SoyListData();
             for (int i = 0; i < attr.getLength(); i++) {
-                soyAttrList.add(domToSoyData(attr.item(i)));
+                soyAttrList.add(domToSoyData(attr.item(i), counter));
             }
             m.put("attributeNodes", soyAttrList);
         }
@@ -115,7 +139,7 @@ public class HTMLGenerator {
         final NodeList childNodes = node.getChildNodes();
         final SoyListData childList = new SoyListData();
         for (int i = 0; i < childNodes.getLength(); i++) {
-            childList.add(domToSoyData(childNodes.item(i)));
+            childList.add(domToSoyData(childNodes.item(i), counter));
         }
         m.put("childNodes", childList);
         return m;

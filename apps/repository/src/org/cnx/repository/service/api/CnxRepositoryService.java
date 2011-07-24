@@ -18,8 +18,13 @@ package org.cnx.repository.service.api;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.util.Nullable;
+
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
+ * 
+ * TODO(tal): add support for lenses TODO(tal): add support for search TODO(tal): add methods to
+ * enumerate resources, modules and lenses.
  * 
  */
 public interface CnxRepositoryService {
@@ -61,4 +66,54 @@ public interface CnxRepositoryService {
      */
     RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
         String resourceId, HttpServletResponse httpResponse);
+
+    /**
+     * Create a new module.
+     * 
+     * If the returned response has an OK status than a new module, with no versions, has been
+     * created and its id is returned in the result. Othwrwise, no change is done in the repository.
+     * 
+     * @param context the query context
+     * @return operation response.
+     */
+    RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context);
+
+    /**
+     * Add module version
+     * 
+     * If the returned response has an OK status than a new version has been added to the module.
+     * Othwrwise, no change is done in the repository.
+     * 
+     * TODO(tal): define the XML format for the reosurce map. TODO(tal): define extra requriements
+     * from the cnxmlDoc. TODO(tal): break the XML arg into more java manageable parameters (e.g.
+     * Map for resource mapping).
+     * 
+     * @param context the query context
+     * @param cnxmlDoc an XML doc in CNXML format.
+     * @param resourceMapDoc an XML doc with resource map for this module version.
+     * @return operation response.
+     */
+    RepositoryResponse<AddModuleVersionResult> addModuleVersion(RepositoryRequestContext context,
+        String moduleId, String cnxmlDoc, String resourceMapDoc);
+
+    /**
+     * Get the information of a module version.
+     * 
+     * @param context the request context.
+     * @param moduleId the target module id
+     * @param moduleVersion the target module version or null for latest version.
+     * @return operation response.
+     */
+    RepositoryResponse<GetModuleVersionResult> getModuleVersion(RepositoryRequestContext context,
+        String moduleId, @Nullable Integer moduleVersion);
+
+    /**
+     * Get general module information.
+     * 
+     * @param context the request context.
+     * @param moduleId the target module id
+     * @return operation response.
+     */
+    RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
+        String moduleId);
 }

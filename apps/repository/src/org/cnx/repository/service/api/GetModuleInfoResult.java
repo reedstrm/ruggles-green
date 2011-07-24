@@ -16,11 +16,27 @@
 
 package org.cnx.repository.service.api;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Result of a successful serveResource() operation.
+ * Result of a successful getModuleInfo() operation.
  * 
  * @author Tal Dayan
  */
-public class ServeResourceResult {
-    // TODO(tal): any attribute to return (size, type, etc)?
+public class GetModuleInfoResult {
+    private final String moduleId;
+    private final int numberOfVersions;
+
+    public GetModuleInfoResult(String moduleId, int numberOfVersions) {
+        this.moduleId = checkNotNull(moduleId);
+        this.numberOfVersions = numberOfVersions;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public int getNumberOfVersions() {
+        return numberOfVersions;
+    }
 }

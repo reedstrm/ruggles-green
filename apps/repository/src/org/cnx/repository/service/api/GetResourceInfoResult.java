@@ -17,16 +17,16 @@
 package org.cnx.repository.service.api;
 
 //import org.cnx.util.Assertions;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.cnx.util.Nullable;
 
 /**
- * Result of a successful GetResourceInfo operation.
+ * Result of a successful getResourceInfo operation.
  * 
  * @author Tal Dayan
- * 
  */
 public class GetResourceInfoResult {
     enum ResourceState {
@@ -46,10 +46,18 @@ public class GetResourceInfoResult {
     @Nullable
     final UploadedResourceContentInfo contentInfo;
 
+    /**
+     * @param resourceState the state of this resource.
+     * @param contentInfo if resource state hasContent() is true then this is the content info.
+     *            Otherwise it should null.
+     */
     private GetResourceInfoResult(ResourceState resourceState,
-        UploadedResourceContentInfo contentInfo) {
-        this.resourceState = resourceState;
+        @Nullable UploadedResourceContentInfo contentInfo) {
+        this.resourceState = checkNotNull(resourceState);
         this.contentInfo = contentInfo;
+
+        checkArgument((resourceState.hasContent()) == (contentInfo != null), "State: %s",
+            resourceState);
     }
 
     public boolean hasContent() {
@@ -73,7 +81,6 @@ public class GetResourceInfoResult {
     }
 
     public static GetResourceInfoResult newUploaded(UploadedResourceContentInfo contentInfo) {
-        return new GetResourceInfoResult(ResourceState.UPLOADED,
-            checkNotNull(contentInfo));
+        return new GetResourceInfoResult(ResourceState.UPLOADED, checkNotNull(contentInfo));
     }
 }

@@ -24,34 +24,39 @@ public enum RepositoryStatus {
      * Operation done ok.
      */
     OK,
-    
+
     /**
      * Requested object not found.
      */
     NOT_FOUND,
-    
+
     /**
      * Version specification in request does not match object's state. Caller need to resolved the
      * version conflict.
      */
     VERSION_CONFLICT,
-    
+
     /**
      * Cannot perform the operation on an object in this state.
      */
     STATE_MISMATCH,
-    
+
     /**
      * Bad request format (e.g. bad format of an object id). This error is more about the request
      * syntax than the request semantic (e.g. if an object is not found, this is not classified as
      * BAD_REQUEST but as NOT_FOUND).
      */
     BAD_REQUEST,
-    
+
     /**
      * General error, typically internal to the server.
      */
-    SERVER_ERRROR;
+    SERVER_ERRROR,
+
+    /**
+     * Some portion of the query is too large.
+     */
+    OVERSIZE;
 
     public boolean isOk() {
         return this == OK;

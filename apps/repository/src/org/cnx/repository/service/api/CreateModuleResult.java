@@ -19,30 +19,23 @@ package org.cnx.repository.service.api;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Result of a successful resource creation operation.
+ * Result of a successful module creation operation.
  * 
  * @author Tal Dayan
  */
-public class CreateResourceResult {
+public class CreateModuleResult {
 
-    private final String resourceId;
-    private final String resourceUploadUrl;
+    private final String moduleId;
 
     /**
-     * @param resourceId the id of the new resource. This is a web safe string that is unique among
-     *            all the resource IDs.
-     * @param resourceUploadUrl a full URL to which the resource content should be uploaded.
+     * @param moduleId the id of the new module. This is a web safe string that is unique among all
+     *            the module IDs.
      */
-    public CreateResourceResult(String resourceId, String resourceUploadUrl) {
-        this.resourceId = checkNotNull(resourceId);
-        this.resourceUploadUrl = checkNotNull(resourceUploadUrl);
+    public CreateModuleResult(String moduleId) {
+        this.moduleId = checkNotNull(moduleId);
     }
 
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public String getResourceUploadUrl() {
-        return resourceUploadUrl;
+    public String getModuleId() {
+        return moduleId;
     }
 }

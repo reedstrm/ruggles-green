@@ -22,11 +22,8 @@ package org.cnx.repository.schema;
  * @author Tal Dayan
  */
 public class SchemaConsts {
-
-    // TODO(tal): move these definitions to the respective entities?
-
     /**
-     * Resource entities are persisted with this entity kind.
+     * Resource entities are persisted with keys of this kind.
      */
     public static final String RESOURCE_KEY_KIND = "Resource";
 
@@ -36,7 +33,7 @@ public class SchemaConsts {
     public static final String RESOURCE_ID_PREFIX = "R";
 
     /**
-     * Module entities are persisted with this entity kind.
+     * Module entities are persisted with keys of this kind.
      */
     public static final String MODULE_KEY_KIND = "Module";
 
@@ -46,7 +43,7 @@ public class SchemaConsts {
     public static final String MODULE_ID_PREFIX = "M";
 
     /**
-     * Module version entities are persisted with this entity kind.
+     * Module version entities are persisted with keys of this kind.
      */
     public static final String MODULE_VERSION_KEY_KIND = "ModuleVer";
 }

@@ -16,6 +16,8 @@
 
 package org.cnx.repository.schema;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -24,6 +26,9 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.cnx.repository.common.KeyUtil;
 import org.cnx.util.Nullable;
+
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A JDO representing a module entity.
@@ -34,14 +39,13 @@ import org.cnx.util.Nullable;
 public class JdoModuleEntity {
 
     /**
-     * The key of this module in the data store. Assigned automatically by the data store when this
-     * object is persisted for the first time. Unique only within the keys of this entity type. The
-     * externally exposed module id is derived from this key.
+     * The key of this module entity in the data store. Assigned automatically by the data store first
+     * time the entity is persisted. The kind of this key is always SchemaConsts.MODULE_KEY_KIND
+     * and they have a Long id assigned by the persistence manager.
      */
-    // TODO(tal): consider to use only Key keys for consistency with children.
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Long id;
+    private Key key;
 
     /**
      * Number of versions of this module. Value >= 0. If > 0, this is also the version of the last
@@ -49,13 +53,31 @@ public class JdoModuleEntity {
      */
     @Persistent
     private Integer versionCount = 0;
-
+    
     /**
-     * Get the id of this module.
+     * @return the key of this module entity. Guaranteed to be non null after the entity is
+     * persisted by the first time.
      */
     @Nullable
-    public Long getId() {
-        return id;
+    public Key getKey() {        
+        return key;
+    }
+    
+    /**
+     * Get the id of this module.
+     * 
+     * Module ID is a web safe string that can be mapped back to the module key. Module
+     * ids are permanent and can be safely used externally to refer to modules.
+     * 
+     * @return the module id or null if the resource does not have a key yet. 
+     */
+    @Nullable
+    public String getModuleId() {
+        if (key == null) {
+            return null;
+        }
+        checkState(SchemaConsts.MODULE_KEY_KIND.equals(key.getKind()), "Unexpected kind: %s at key %s", key.getKind(), key);
+        return KeyUtil.idToString(SchemaConsts.MODULE_ID_PREFIX, key.getId());
     }
 
     public int getVersionCount() {
@@ -67,20 +89,16 @@ public class JdoModuleEntity {
         JDOHelper.makeDirty(this, "versionCount");
         return versionCount;
     }
-
+    
     /**
-     * Convert an module id to external string representation.
-     */
-    public static String moduleIdToString(Long moduleId) {
-        return KeyUtil.idToString(SchemaConsts.MODULE_ID_PREFIX, moduleId);
-    }
-
-    /**
-     * Convert a module id in external string representation to internal module id. Return the
-     * module id or null of invalid string format.
+     * Convert a module id returned by getModuleId() back to the resource key.
+     * Returns null if module id has invalid format.
      */
     @Nullable
-    public static Long stringToModuleId(String idString) {
-        return KeyUtil.stringToId(SchemaConsts.MODULE_ID_PREFIX, idString);
+    public static Key moduleIdToKey(String moduleId) {
+       final Long moduleIdLong = KeyUtil.stringToId(SchemaConsts.MODULE_ID_PREFIX, moduleId);
+       return (moduleIdLong == null) 
+           ? null
+           : KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND, moduleIdLong);
     }
 }

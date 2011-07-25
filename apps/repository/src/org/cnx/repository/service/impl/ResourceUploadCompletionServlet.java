@@ -18,7 +18,6 @@ package org.cnx.repository.service.impl;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +31,7 @@ import org.cnx.repository.common.Services;
 import org.cnx.repository.schema.JdoResourceEntity;
 
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.datastore.Key;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
@@ -49,8 +49,8 @@ import com.google.appengine.api.blobstore.BlobKey;
 @SuppressWarnings("serial")
 public class ResourceUploadCompletionServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
-        .getName());
+    //private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
+    //    .getName());
 
     /**
      * This path must match the servlet registration in web.xml.
@@ -76,8 +76,8 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         final String resourceIdString = matcher.group(1);
 
         // Convert encoded resource id to internal resource id
-        final Long resourceId = JdoResourceEntity.stringToResourceId(resourceIdString);
-        if (resourceId == null) {
+        final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceIdString);
+        if (resourceKey == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
                 + resourceIdString + "]");
             return;
@@ -101,11 +101,11 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         try {
 
             tx.begin();
-            log.info("** Resource id: " + resourceId + ", resource id string = " + resourceIdString);
-            final JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceId);
+            //log.info("** Resource id: " + resourceId + ", resource id string = " + resourceIdString);
+            final JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
             if (entity.getState() != JdoResourceEntity.State.PENDING_UPLOAD) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Resource factory completion handler expected resource [" + resourceId
+                    "Resource factory completion handler expected resource [" + resourceIdString
                         + "] to be in state PENDING_UPLOAD but found [" + entity.getState() + "]");
                 return;
             }

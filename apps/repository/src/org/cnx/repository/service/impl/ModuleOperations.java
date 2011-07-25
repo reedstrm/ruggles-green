@@ -19,6 +19,8 @@ package org.cnx.repository.service.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.logging.Logger;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
@@ -45,12 +47,13 @@ import com.google.appengine.api.datastore.KeyFactory;
  * @author Tal Dayan
  */
 public class ModuleOperations {
+    private static final Logger log = Logger.getLogger(ModuleOperations.class.getName());
 
     /**
      * See description in {@link CnxRepositoryService}
      */
     static RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context) {
-        final Long moduleIdLong;
+        final String moduleId;
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
 
         try {
@@ -58,7 +61,7 @@ public class ModuleOperations {
             // The unique module id is created the first time the entity is
             // persisted.
             pm.makePersistent(entity);
-            moduleIdLong = checkNotNull(entity.getId(), "Null module id");
+            moduleId = checkNotNull(entity.getModuleId(), "Null module id");
         } catch (Throwable e) {
             e.printStackTrace();
             return RepositoryResponse.newError(RepositoryStatus.SERVER_ERRROR,
@@ -67,7 +70,6 @@ public class ModuleOperations {
             pm.close();
         }
 
-        final String moduleId = JdoModuleEntity.moduleIdToString(moduleIdLong);
         return RepositoryResponse.newOk("New module created", new CreateModuleResult(moduleId));
     }
 
@@ -77,25 +79,22 @@ public class ModuleOperations {
     static RepositoryResponse<AddModuleVersionResult> addModuleVersion(
         RepositoryRequestContext context, String moduleId, String cnxmlDoc, String resourceMapDoc) {
 
-        final Long moduleIdLong = JdoModuleEntity.stringToModuleId(moduleId);
-
-        if (moduleIdLong == null) {
+        final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
+        if (moduleKey == null) {
             return RepositoryResponse.newError(RepositoryStatus.BAD_REQUEST,
                 "Module id has bad format: [" + moduleId + "]");
         }
 
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
-
         final int newVersionNumber;
-
         try {
             tx.begin();
 
             // Read parent entity of this module
             final JdoModuleEntity moduleEntity;
             try {
-                moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
+                moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
             } catch (Throwable e) {
                 tx.rollback();
                 return RepositoryResponse.newError(RepositoryStatus.NOT_FOUND,
@@ -105,20 +104,13 @@ public class ModuleOperations {
             // Updated number of versions in the module entity
             newVersionNumber = moduleEntity.incrementVersionCount();
 
-            // Create child key for the module version entity
-            final Key parentKey =
-                KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND, moduleEntity.getId());
-            final Key childKey =
-                KeyFactory.createKey(parentKey, SchemaConsts.MODULE_VERSION_KEY_KIND,
-                    newVersionNumber);
-
-            // TODO(tal): If version already exists due to internal
-            // inconsistency, report and error rather than overwriting.
-
             // Create new version entity
             final JdoModuleVersionEntity versionEntity =
-                new JdoModuleVersionEntity(childKey, moduleIdLong, newVersionNumber, cnxmlDoc,
-                    resourceMapDoc);
+                new JdoModuleVersionEntity(moduleKey, newVersionNumber, cnxmlDoc, resourceMapDoc);
+            
+            // TODO(tal): If a module version with this key already exists (due to data
+            // inconsistency), return an error rather than overwriting it.
+           
             pm.makePersistent(versionEntity);
 
             tx.commit();
@@ -128,6 +120,10 @@ public class ModuleOperations {
             return RepositoryResponse.newError(RepositoryStatus.SERVER_ERRROR,
                 "Error while adding module version: " + e.getMessage());
         } finally {
+            if (tx.isActive()) {
+                log.severe("Transaction left opened when adding module version:  " + moduleId);
+                tx.rollback();
+            }
             checkState(!tx.isActive(), "Transaction remained active");
             pm.close();
         }
@@ -149,8 +145,8 @@ public class ModuleOperations {
                 "Illegal module version number " + moduleVersion);
         }
 
-        final Long moduleIdLong = JdoModuleEntity.stringToModuleId(moduleId);
-        if (moduleIdLong == null) {
+        final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
+        if (moduleKey == null) {
             return RepositoryResponse.newError(RepositoryStatus.BAD_REQUEST,
                 "Module id has bad format: [" + moduleId + "]");
         }
@@ -169,7 +165,7 @@ public class ModuleOperations {
             if (moduleVersion == null) {
                 final JdoModuleEntity moduleEntity;
                 try {
-                    moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
+                    moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
                 } catch (Throwable e) {
                     e.printStackTrace();
                     return RepositoryResponse.newError(RepositoryStatus.NOT_FOUND,
@@ -188,9 +184,9 @@ public class ModuleOperations {
             // Fetch module version entity
             //
             // TODO(tal) refactor and share this with other module servlets.
-            final Key parentKey = KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND, moduleId);
+            //final Key parentKey = KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND, moduleId);
             final Key childKey =
-                KeyFactory.createKey(parentKey, SchemaConsts.MODULE_VERSION_KEY_KIND,
+                KeyFactory.createKey(moduleKey, SchemaConsts.MODULE_VERSION_KEY_KIND,
                     versionToServe);
 
             try {
@@ -209,7 +205,7 @@ public class ModuleOperations {
 
         return RepositoryResponse.newOk("Fetched module version", new GetModuleVersionResult(
             moduleId, versionEntity.getVersionNumber(), versionEntity.getCNXMLDoc(), versionEntity
-                .getManifestDoc()));
+                .getResourceMapDoc()));
     }
 
     /**
@@ -217,8 +213,8 @@ public class ModuleOperations {
      */
     static RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
         String moduleId) {
-        final Long moduleIdLong = JdoModuleEntity.stringToModuleId(moduleId);
-        if (moduleIdLong == null) {
+        final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
+        if (moduleKey == null) {
             return RepositoryResponse.newError(RepositoryStatus.BAD_REQUEST,
                 "Module id has invalid format: " + moduleId);
         }

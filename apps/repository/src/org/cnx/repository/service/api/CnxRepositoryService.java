@@ -23,8 +23,11 @@ import org.cnx.util.Nullable;
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
  * 
- * TODO(tal): add support for lenses TODO(tal): add support for search TODO(tal): add methods to
- * enumerate resources, modules and lenses.
+ * TODO(tal): add support for lenses
+ * 
+ * TODO(tal): add support for search
+ * 
+ * TODO(tal): add methods to enumerate resources, modules and lenses.
  * 
  */
 public interface CnxRepositoryService {
@@ -84,9 +87,10 @@ public interface CnxRepositoryService {
      * If the returned response has an OK status than a new version has been added to the module.
      * Othwrwise, no change is done in the repository.
      * 
-     * TODO(tal): define the XML format for the reosurce map. TODO(tal): define extra requriements
-     * from the cnxmlDoc. TODO(tal): break the XML arg into more java manageable parameters (e.g.
-     * Map for resource mapping).
+     * TODO(tal): define the XML format for the reosurce map.
+     * 
+     * TODO(tal): define extra requriements from the cnxmlDoc. TODO(tal): break the XML arg into
+     * more java manageable parameters (e.g. Map for resource mapping).
      * 
      * @param context the query context
      * @param cnxmlDoc an XML doc in CNXML format.

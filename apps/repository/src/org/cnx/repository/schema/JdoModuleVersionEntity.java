@@ -69,6 +69,10 @@ public class JdoModuleVersionEntity {
         this.manifestDoc = new Text(checkNotNull(manifestDoc));
     }
 
+    public Key getKey() {
+        return key;
+    }
+
     public int getVersionNumber() {
         return versionNumber;
     }
@@ -80,7 +84,7 @@ public class JdoModuleVersionEntity {
     public String getManifestDoc() {
         return manifestDoc.getValue();
     }
-    
+
     public long getModuleId() {
         return moduleId;
     }

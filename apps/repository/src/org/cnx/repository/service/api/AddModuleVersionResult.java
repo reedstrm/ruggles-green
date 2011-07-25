@@ -25,22 +25,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AddModuleVersionResult {
     private final String moduleId;
-    private final int versionNumber;
+    private final int newVersionNumber;
 
     /**
      * @param moduleId the mdoule id
-     * @param versionNumber the version number of the new version (1 is first, 2 is second, etc).
+     * @param newVersionNumber the version number of the new version (1 is first, 2 is second, etc).
      */
-    public AddModuleVersionResult(String moduleId, int versionNumber) {
+    public AddModuleVersionResult(String moduleId, int newVersionNumber) {
         this.moduleId = checkNotNull(moduleId);
-        this.versionNumber = versionNumber;
+        this.newVersionNumber = newVersionNumber;
     }
 
     public String getModuleId() {
         return moduleId;
     }
 
-    public int getVersionNumber() {
-        return versionNumber;
+    public int getNewVersionNumber() {
+        return newVersionNumber;
     }
 }

@@ -65,6 +65,13 @@ public class RepositoryResponse<T> {
     }
 
     /**
+     * Returns an extended description that includes the description and status.
+     */
+    public String getExtendedDescription() {
+        return description + " (" + status + ")";
+    }
+
+    /**
      * Return result. Asserts that status is ok.
      */
     public T getResult() {

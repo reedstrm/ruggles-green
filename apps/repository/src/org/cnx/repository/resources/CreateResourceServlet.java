@@ -28,9 +28,9 @@ import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 
 /**
- * An API servlet to create a new resource.
+ * A temp API servlet to create a new resource.
  * 
- * TODO(tal): describe in more details.
+ * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
@@ -47,8 +47,8 @@ public class CreateResourceServlet extends HttpServlet {
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                repositoryResponse.getDescription());
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
+                .getExtendedDescription());
             return;
         }
 

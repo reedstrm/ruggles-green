@@ -49,13 +49,14 @@ public class GetResourceInfoResult {
     /**
      * @param resourceState the state of this resource.
      * @param contentInfo if resource state hasContent() is true then this is the content info.
-     *            Otherwise it should null.
+     *            Otherwise it should be null.
      */
     private GetResourceInfoResult(ResourceState resourceState,
         @Nullable UploadedResourceContentInfo contentInfo) {
         this.resourceState = checkNotNull(resourceState);
         this.contentInfo = contentInfo;
 
+        // Has content only IFF state say so.
         checkArgument((resourceState.hasContent()) == (contentInfo != null), "State: %s",
             resourceState);
     }

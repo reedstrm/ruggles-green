@@ -19,7 +19,6 @@ package org.cnx.repository.resources;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,16 +32,14 @@ import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
 
 /**
- * An API servlet to serve a resource using a GET request.
+ * A temp API servlet to serve a resource using a GET request.
  * 
- * TODO(tal): provide more details.
+ * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
 public class GetResourceServlet extends HttpServlet {
-
-    private static final Logger log = Logger.getLogger(GetResourceServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern.compile("/resource/([a-zA-Z0-9_-]+)");
 
@@ -65,16 +62,16 @@ public class GetResourceServlet extends HttpServlet {
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {
                 case BAD_REQUEST:
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        repositoryResponse.getDescription());
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
+                        .getExtendedDescription());
                     return;
                 case NOT_FOUND:
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        repositoryResponse.getDescription());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
+                        .getExtendedDescription());
                     return;
                 default:
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        repositoryResponse.getDescription());
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
+                        .getExtendedDescription());
                     return;
             }
         }

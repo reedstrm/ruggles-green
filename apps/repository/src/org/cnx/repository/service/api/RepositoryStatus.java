@@ -37,7 +37,10 @@ public enum RepositoryStatus {
     VERSION_CONFLICT,
 
     /**
-     * Cannot perform the operation on an object in this state.
+     * Cannot perform the operation on an object in this state. The actual details of the state
+     * mismatch are request specific. When this status is returned, client developer should have
+     * sufficient information to determine what the problem is (via operation documentation, via
+     * returned status message, etc).
      */
     STATE_MISMATCH,
 

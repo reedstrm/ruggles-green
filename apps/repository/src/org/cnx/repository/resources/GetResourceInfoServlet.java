@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,16 +33,14 @@ import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.UploadedResourceContentInfo;
 
 /**
- * An API servlet to serve metadata of a resource.
+ * A temp API servlet to serve metadata of a resource.
  * 
- * TODO(tal): provide more details.
+ * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
 public class GetResourceInfoServlet extends HttpServlet {
-
-    private static final Logger log = Logger.getLogger(GetResourceInfoServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern.compile("/resource_info/([a-zA-Z0-9_-]+)");
 
@@ -68,16 +65,16 @@ public class GetResourceInfoServlet extends HttpServlet {
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {
                 case BAD_REQUEST:
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        repositoryResponse.getDescription());
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
+                        .getExtendedDescription());
                     return;
                 case NOT_FOUND:
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        repositoryResponse.getDescription());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
+                        .getExtendedDescription());
                     return;
                 default:
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        repositoryResponse.getDescription());
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
+                        .getExtendedDescription());
                     return;
             }
         }

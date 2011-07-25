@@ -36,9 +36,11 @@ import com.google.appengine.api.blobstore.BlobKey;
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
  * 
- * TODO(tal): add code to verify that the request is indeed from the blobstore service. TODO(tal):
- * validate the blob (e.g. against max size and reject if does not pass). TODO(tal): verify the
- * uploading user against the resource creating user and reject if failed.
+ * TODO(tal): add code to verify that the request is indeed from the blobstore service.
+ * 
+ * TODO(tal): validate the blob (e.g. against max size and reject if does not pass).
+ * 
+ * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
  * 
  * @author Tal Dayan
  * 

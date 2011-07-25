@@ -28,7 +28,6 @@ import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.util.ImplementMeNow;
 
 /**
  * Implementation of the repository service for Google App Engine.
@@ -59,30 +58,28 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
         String resourceId, HttpServletResponse httpResponse) {
         return ResourceOperations.serveResource(context, resourceId, httpResponse);
     }
-    
-    
 
     @Override
     public RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context) {
-        throw new ImplementMeNow();
+        return ModuleOperations.createModule(context);
     }
 
     @Override
     public RepositoryResponse<AddModuleVersionResult> addModuleVersion(
         RepositoryRequestContext context, String moduleId, String cnxmlDoc, String resourceMapDoc) {
-        throw new ImplementMeNow();
+        return ModuleOperations.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
     }
 
     @Override
     public RepositoryResponse<GetModuleVersionResult> getModuleVersion(
         RepositoryRequestContext context, String moduleId, Integer moduleVersion) {
-        throw new ImplementMeNow();
+        return ModuleOperations.getModuleVersion(context, moduleId, moduleVersion);
     }
 
     @Override
     public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
         String moduleId) {
-        throw new ImplementMeNow();
+        return ModuleOperations.getModuleInfo(context, moduleId);
     }
 
     /**

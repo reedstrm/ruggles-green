@@ -16,6 +16,7 @@
 
 package org.cnx.repository.service.api;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -25,18 +26,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GetModuleInfoResult {
     private final String moduleId;
-    private final int numberOfVersions;
+    private final int versionCount;
 
-    public GetModuleInfoResult(String moduleId, int numberOfVersions) {
+    public GetModuleInfoResult(String moduleId, int versionCount) {
+        checkArgument(versionCount >= 0, "Negative version count: %s", versionCount);
         this.moduleId = checkNotNull(moduleId);
-        this.numberOfVersions = numberOfVersions;
+        this.versionCount = versionCount;
     }
 
     public String getModuleId() {
         return moduleId;
     }
 
-    public int getNumberOfVersions() {
-        return numberOfVersions;
+    public int getVersionCount() {
+        return versionCount;
     }
 }

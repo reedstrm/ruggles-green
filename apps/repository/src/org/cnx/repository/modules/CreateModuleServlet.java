@@ -16,26 +16,22 @@
 
 package org.cnx.repository.modules;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoModuleEntity;
+import org.cnx.repository.service.api.CreateModuleResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
 
 /**
- * An API servlet to create a new module.
+ * A temp API servlet to create a new module.
  * 
- * The module is created with zero versions. Must add at least one version before the module becomes
- * useful.
- * 
- * TODO(tal): describe in more details.
+ * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
@@ -45,24 +41,22 @@ public class CreateModuleServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final Long moduleId;
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryResponse<CreateModuleResult> repositoryResponse =
+            Services.repository.createModule(context);
 
-        try {
-            final JdoModuleEntity entity = new JdoModuleEntity();
-            // The unique module id is created the first time the entity is
-            // persisted.
-            pm.makePersistent(entity);
-            moduleId = checkNotNull(entity.getId(), "Null module id");
-        } finally {
-            pm.close();
+        // Map repository error to API error
+        if (repositoryResponse.isError()) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
+                .getExtendedDescription());
+            return;
         }
 
-        final String moduleIdString = JdoModuleEntity.moduleIdToString(moduleId);
-
+        // Map repository OK to API OK
+        final CreateModuleResult result = repositoryResponse.getResult();
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("module id: " + moduleIdString);
+        out.println("module id: " + result.getModuleId());
     }
 }

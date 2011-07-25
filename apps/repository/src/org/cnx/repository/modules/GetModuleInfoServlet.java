@@ -16,6 +16,8 @@
 
 package org.cnx.repository.modules;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -23,18 +25,19 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoModuleEntity;
+import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
 
 /**
- * An API servlet to get general information about a module.
+ * A temp API servlet to get general information about a module.
  * 
- * TODO(tal): provide more details.
+ * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
@@ -48,8 +51,6 @@ public class GetModuleInfoServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Parse request resource id from the query.
-        // TODO(tal): refactor out module id parsing and share with other
-        // servlets.
         final String moduleUri = req.getRequestURI();
         final Matcher matcher = uriPattern.matcher(moduleUri);
         if (!matcher.matches()) {
@@ -58,40 +59,41 @@ public class GetModuleInfoServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
-        final String moduleIdString = matcher.group(1);
+        final String moduleId = matcher.group(1);
 
-        final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdString);
-        if (moduleId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid module id format: ["
-                + moduleIdString + "]");
-            return;
-        }
-        log.info("Module id: " + moduleId + ", moduleIdString: " + moduleIdString);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryResponse<GetModuleInfoResult> repositoryResponse =
+            Services.repository.getModuleInfo(context, moduleId);
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-
-        final JdoModuleEntity moduleEntity;
-
-        try {
-            moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
-        } catch (Throwable e) {
-            // TODO(tal): share a common message between resp and log?
-            log.log(Level.SEVERE, "Could not find module by id " + moduleIdString, e);
-            resp.sendError(HttpServletResponse.SC_NO_CONTENT,
-                "Error looking up a module: " + e.getMessage());
-            return;
-        } finally {
-            pm.close();
+        // Map repository error to API error.
+        if (repositoryResponse.isError()) {
+            switch (repositoryResponse.getStatus()) {
+                case BAD_REQUEST:
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
+                        .getExtendedDescription());
+                    return;
+                case NOT_FOUND:
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
+                        .getExtendedDescription());
+                    return;
+                default:
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
+                        .getExtendedDescription());
+                    return;
+            }
         }
 
-        // All done OK. Return response.
+        // Map repository OK to API OK
+        checkState(repositoryResponse.isOk());
+        final GetModuleInfoResult result = repositoryResponse.getResult();
+
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
         // out.println();
         out.println("Module Info");
 
-        out.println("* ID = " + moduleIdString);
-        out.println("* Versions = " + moduleEntity.getVersionCount());
+        out.println("* ID = " + result.getModuleId());
+        out.println("* Versions = " + result.getVersionCount());
     }
 }

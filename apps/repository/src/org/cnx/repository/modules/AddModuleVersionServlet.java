@@ -18,118 +18,72 @@ package org.cnx.repository.modules;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoModuleEntity;
-import org.cnx.repository.schema.JdoModuleVersionEntity;
-import org.cnx.repository.schema.SchemaConsts;
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
 
 /**
- * An API servlet to add a version for an existing module.
+ * A temp API servlet to add a version for an existing module.
  * 
- * TODO(tal): describe in more details.
+ * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
 public class AddModuleVersionServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(AddModuleVersionServlet.class.getName());
-
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // TODO(tal): validate parameters.
-
-        final String cnxml =
+        final String cnxmlDoc =
             checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
-        final String manifest =
-            checkNotNull(req.getParameter("manifest"),
-                "Missing post param \"manifest\"");
-        final String moduleIdParam =
-            checkNotNull(req.getParameter("module_id"),
-                "Missing post param \"module_id\"");
+        final String resourceMapDoc =
+            checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
+        final String moduleId =
+            checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
 
-        // TODO(tal): switch go Guava Preconditions and discard our own
-        // Assertions.
-        checkArgument(req.getParameterMap().size() == 3,
-            "Expected 3 post parameters, found %s", req.getParameterMap().size());
+        checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
+            req.getParameterMap().size());
 
-        final Long moduleId = JdoModuleEntity.stringToModuleId(moduleIdParam);
-        if (moduleId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid module id format: ["
-                + moduleIdParam + "]");
-            return;
-        }
-        log.info("Module id: " + moduleId);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
+            Services.repository.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        Transaction tx = pm.currentTransaction();
-
-        final int versionNumber;
-
-        try {
-            tx.begin();
-
-            // Read parent entity of this module
-            final JdoModuleEntity moduleEntity;
-            try {
-                moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleId);
-            } catch (Throwable e) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Could not locate module ["
-                    + moduleIdParam + "]: " + e.getMessage());
-                return;
+        // Map repository error to API error.
+        if (repositoryResponse.isError()) {
+            switch (repositoryResponse.getStatus()) {
+                case BAD_REQUEST:
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
+                        .getExtendedDescription());
+                    return;
+                case NOT_FOUND:
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
+                        .getExtendedDescription());
+                    return;
+                default:
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
+                        .getExtendedDescription());
+                    return;
             }
-
-            // Updated number of versions in the parent
-            versionNumber = moduleEntity.incrementVersionCount();
-
-            // Create child key
-            final Key parentKey =
-                KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND, moduleEntity.getId());
-            final Key childKey =
-                KeyFactory
-                    .createKey(parentKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
-
-            // TODO(tal): If version already exists due to internal
-            // inconsistency, report and error rather than overwriting.
-
-            // Create new version entity
-            final JdoModuleVersionEntity versionEntity =
-                new JdoModuleVersionEntity(childKey, moduleId, versionNumber, cnxml, manifest);
-            pm.makePersistent(versionEntity);
-
-            tx.commit();
-            // TODO(tal): (in all mutating servlets), add a log message about the change.
-        } catch (Throwable e) {
-            log.log(Level.SEVERE, "Exception", e);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "General error: [" + e.getMessage() + "]");
-            return;
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            pm.close();
         }
 
-        // All done OK.
+        // Map repository OK to API OK
+        checkState(repositoryResponse.isOk());
+        final AddModuleVersionResult result = repositoryResponse.getResult();
+
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("version number: " + versionNumber);
+        out.println("module id: " + result.getModuleId());
+        out.println("new version number: " + result.getNewVersionNumber());
     }
 }

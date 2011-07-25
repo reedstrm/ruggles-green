@@ -1,18 +1,18 @@
 /*
-    Copyright 2011 Google Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+ *  Copyright 2011 Google Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package org.cnx.html;
 
@@ -139,15 +139,15 @@ public class HTMLGeneratorTests {
     }
 
     /**
-        createSpan will generate a DOM element for a simple CNXML span-style
-        element.    Examples of span elements include <code>foreign</code>,
-        <code>term</code>, etc.
+     *  createSpan will generate a DOM element for a simple CNXML span-style
+     *  element.    Examples of span elements include <code>foreign</code>,
+     *  <code>term</code>, etc.
 
-        @param tag The tag to test
-        @param id ID to attach to CNXML element
-        @param text Inner text to place in the element.
-        @return The corresponding XML DOM node.
-    */
+     *  @param tag The tag to test
+     *  @param id ID to attach to CNXML element
+     *  @param text Inner text to place in the element.
+     *  @return The corresponding XML DOM node.
+     */
     private Element createSpan(final String tag, @Nullable final String id, final String text) {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, tag);
         if (id != null) {
@@ -158,13 +158,13 @@ public class HTMLGeneratorTests {
     }
 
     /**
-        createEmphasis will generate a DOM element for a CNXML emphasis element.
+     *  createEmphasis will generate a DOM element for a CNXML emphasis element.
 
-        @param effect The effect to test
-        @param id ID to attach to CNXML element
-        @param text Inner text to place in the element.
-        @return The corresponding XML DOM node.
-    */
+     *  @param effect The effect to test
+     *  @param id ID to attach to CNXML element
+     *  @param text Inner text to place in the element.
+     *  @return The corresponding XML DOM node.
+     */
     private Element createEmphasis(@Nullable final String effect, @Nullable final String id,
                                    final String text) {
         final Element elem = createSpan("emphasis", id, text);

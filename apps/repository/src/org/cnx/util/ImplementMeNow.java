@@ -17,11 +17,10 @@
 package org.cnx.util;
 
 /**
- * A place holder exception for code being developed. Typically don't want
- * to push to production code that refers to this exception.
- * For longer term and planned unavailability of features use NotSupportedException
- * or similar.
- *
+ * A place holder exception for code being developed. Typically don't want to push to production
+ * code that refers to this exception. For longer term and planned unavailability of features use
+ * NotSupportedException or similar.
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

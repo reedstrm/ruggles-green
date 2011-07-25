@@ -229,6 +229,26 @@
     @param node DOM element node
 */
 {template .list}
+    {switch $node.attributes.display}
+        {case 'none'}
+            // render nothing
+        {case 'inline'}
+            // TODO(light): inline lists
+        {default}
+            {if $node.attributes.list_type == 'enumerated'}
+                {call .enumerated_list data="all"/}
+            {else}
+                {call .bulleted_list data="all"/}
+            {/if}
+    {/switch}
+{/template}
+
+/**
+    Render a <list list-type="bulleted"> element.
+
+    @param node DOM element node
+*/
+{template .bulleted_list private="true"}
     <ul id="{$node.attributes.id}">
         {foreach $child in $node.childNodes}
             {if $child.localName == 'item'}
@@ -236,6 +256,24 @@
             {/if}
         {/foreach}
     </ul>
+{/template}
+
+/**
+    Render a <list list-type="enumerated"> element.
+
+    @param node DOM element node
+*/
+{template .enumerated_list private="true"}
+    <ol id="{$node.attributes.id}"
+        {if $node.attributes.number_style}{sp}type="{$node.attributes.number_style}"{/if}
+        {if $node.attributes.start_value}{sp}start="{$node.attributes.start_value}"{/if}
+        >
+        {foreach $child in $node.childNodes}
+            {if $child.localName == 'item'}
+                <li>{call .children}{param node: $child/}{/call}</li>
+            {/if}
+        {/foreach}
+    </ol>
 {/template}
 
 /**

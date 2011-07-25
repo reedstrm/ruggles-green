@@ -24,8 +24,13 @@
         <path path="${soy.path}" />
     </resources>
 
+    <resources id="resources">
+        <fileset dir="src" includes="**/*.soy" />
+        <fileset dir="src" includes="**/*.xsl" />
+    </resources>
+
     <target name="compile"
-                    description="Compile the classes">
+            description="Compile the classes">
         <fail message="Please define the soy.path property to point to your Closure Template JAR">
             <condition>
                 <not> <and>
@@ -36,7 +41,7 @@
         </fail>
 
         <mkdir dir="${classdir}"/>
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
+        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="depend_lib" />
@@ -45,8 +50,7 @@
     </target>
 
     <target name="test"
-                    description="Run unit tests"
-                    depends="jar">
+            description="Run unit tests">
         <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
             <condition>
                 <not> <and>
@@ -59,7 +63,13 @@
         <mkdir dir="${test.dir}"/>
         <mkdir dir="${test.outdir}"/>
 
-        <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
+        <javac srcdir="src" destdir="${test.dir}" includeantruntime="false" debug="true" >
+            <compilerarg line="${javac.flags}"/>
+            <classpath>
+                <resources refid="depend_lib" />
+            </classpath>
+        </javac>
+        <javac srcdir="${test.src}" destdir="${test.dir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="depend_lib" />
@@ -67,11 +77,15 @@
                 <pathelement location="org.cnx.html.jar"/>
             </classpath>
         </javac>
+        <copy todir="${test.dir}">
+            <resources refid="resources" />
+        </copy>
+
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
+            <jvmarg value="-enableassertions"/>
             <classpath>
                 <resources refid="depend_lib" />
                 <pathelement path="${junit.path}"/>
-                <pathelement location="org.cnx.html.jar"/>
                 <pathelement location="${test.dir}"/>
             </classpath>
             <formatter type="plain" />
@@ -90,7 +104,7 @@
     </target>
 
     <target name="clean"
-                    description="Remove built files">
+            description="Remove built files">
         <delete dir="${classdir}" />
         <delete dir="${test.dir}" />
         <delete dir="${test.outdir}" />
@@ -98,11 +112,11 @@
     </target>
 
     <target name="jar"
-                    description="Build a JAR of the classes"
-                    depends="compile">
+            description="Build a JAR of the classes"
+            depends="compile">
         <jar destfile="org.cnx.html.jar">
             <fileset dir="${classdir}" />
-            <fileset dir="src" includes="**/*.soy" />
+            <resources refid="resources" />
         </jar>
     </target>
 </project>

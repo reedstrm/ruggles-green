@@ -33,9 +33,11 @@ import static org.junit.Assert.*;
 public class HTMLGeneratorTests {
     private Document doc;
     private static HTMLGenerator generator;
+    private DOMBuilder builder;
 
     @Before public void createDoc() throws Exception {
         doc = CNXML.getBuilder().newDocument();
+        builder = new DOMBuilder(doc);
     }
 
     @BeforeClass public static void createGenerator() {
@@ -46,31 +48,32 @@ public class HTMLGeneratorTests {
         return generator.generate(node);
     }
 
+    private String generate(final DOMBuilder builder) throws Exception {
+        return generate(builder.build());
+    }
+
     @Test public void newDocumentShouldBeEmpty() throws Exception {
-        final Element root = doc.createElementNS(CNXML.NAMESPACE, "document");
-        root.setAttribute("id", "hello");
-        doc.appendChild(root);
+        final Node node = builder.child(
+                builder.element("document")
+                        .attr("id", "hello")
+                        .child(
+                                builder.element("title").text("Hello, World!"),
+                                builder.element("content")
+                        )
+        ).build();
 
-        final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
-        title.appendChild(doc.createTextNode("Hello, World!"));
-        root.appendChild(title);
-        root.appendChild(doc.createElementNS(CNXML.NAMESPACE, "content"));
-
-        assertEquals("", generate(doc));
+        assertEquals("", generate(node));
     }
 
     @Test public void fullDocumentShouldBeShown() throws Exception {
-        final Element root = doc.createElementNS(CNXML.NAMESPACE, "document");
-        root.setAttribute("id", "hello");
-        doc.appendChild(root);
-
-        final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
-        title.appendChild(doc.createTextNode("Hello, World!"));
-        root.appendChild(title);
-
-        final Element content = doc.createElementNS(CNXML.NAMESPACE, "content");
-        content.appendChild(doc.createTextNode("My Content"));
-        root.appendChild(content);
+        final Node node = builder.child(
+                builder.element("document")
+                        .attr("id", "hello")
+                        .child(
+                                builder.element("title").text("Hello, World!"),
+                                builder.element("content").text("My Content")
+                        )
+        ).build();
 
         assertEquals("My Content", generate(doc));
     }
@@ -87,42 +90,42 @@ public class HTMLGeneratorTests {
     }
 
     @Test public void emptyParagraphTags() throws Exception {
-        Element para = doc.createElementNS(CNXML.NAMESPACE, "para");
-        para.setAttribute("id", "mypara");
-        assertEquals("<p id=\"mypara\"></p>", generate(para));
+        final Node node = builder.element("para")
+                .attr("id", "mypara")
+                .build();
+        assertEquals("<p id=\"mypara\"></p>", generate(node));
     }
 
     @Test public void paragraphShouldWrapChildren() throws Exception {
-        final Element para = doc.createElementNS(CNXML.NAMESPACE, "para");
-        final String s1 = "Hello, ";
-        final String s2 = "World!";
-        para.setAttribute("id", "mypara");
-        para.appendChild(doc.createTextNode(s1));
-        para.appendChild(doc.createTextNode(s2));
-        assertEquals("<p id=\"mypara\">Hello, World!</p>", generate(para));
+        final Node node = builder.element("para")
+                .attr("id", "mypara")
+                .text("Hello, ")
+                .text("World!")
+                .build();
+        assertEquals("<p id=\"mypara\">Hello, World!</p>", generate(node));
     }
 
     @Test public void emptySectionTags() throws Exception {
-        final Element sect = doc.createElementNS(CNXML.NAMESPACE, "section");
-        final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
-        sect.setAttribute("id", "mysect");
-        title.appendChild(doc.createTextNode("My Section"));
-        sect.appendChild(title);
-        assertEquals("<section id=\"mysect\"><h1>My Section</h1></section>", generate(sect));
+        final Node node = builder.element("section")
+                .attr("id", "mysect")
+                .child(
+                        builder.element("title").text("My Section")
+                )
+                .build();
+        assertEquals("<section id=\"mysect\"><h1>My Section</h1></section>", generate(node));
     }
 
     @Test public void sectionShouldWrapChildren() throws Exception {
-        final Element sect = doc.createElementNS(CNXML.NAMESPACE, "section");
-        final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
-        final String s1 = "Hello, ";
-        final String s2 = "World!";
-        sect.setAttribute("id", "xyzzy");
-        title.appendChild(doc.createTextNode("My Magic Section"));
-        sect.appendChild(title);
-        sect.appendChild(doc.createTextNode(s1));
-        sect.appendChild(doc.createTextNode(s2));
+        final Node node = builder.element("section")
+                .attr("id", "xyzzy")
+                .child(
+                        builder.element("title").text("My Magic Section")
+                )
+                .text("Hello, ")
+                .text("World!")
+                .build();
         assertEquals("<section id=\"xyzzy\"><h1>My Magic Section</h1>Hello, World!</section>",
-                     generate(sect));
+                     generate(node));
     }
 
     @Test public void cleanAttributeNameShouldNotModifyIdentifiers() {
@@ -138,281 +141,231 @@ public class HTMLGeneratorTests {
         assertEquals("xmlnsbib", HTMLGenerator.xmlAttributeNameToSoyIdentifier("xmlns:bib"));
     }
 
-    /**
-     *  createSpan will generate a DOM element for a simple CNXML span-style
-     *  element.    Examples of span elements include <code>foreign</code>,
-     *  <code>term</code>, etc.
-
-     *  @param tag The tag to test
-     *  @param id ID to attach to CNXML element
-     *  @param text Inner text to place in the element.
-     *  @return The corresponding XML DOM node.
-     */
-    private Element createSpan(final String tag, @Nullable final String id, final String text) {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, tag);
-        if (id != null) {
-            elem.setAttribute("id", id);
-        }
-        elem.appendChild(doc.createTextNode(text));
-        return elem;
-    }
-
-    /**
-     *  createEmphasis will generate a DOM element for a CNXML emphasis element.
-
-     *  @param effect The effect to test
-     *  @param id ID to attach to CNXML element
-     *  @param text Inner text to place in the element.
-     *  @return The corresponding XML DOM node.
-     */
-    private Element createEmphasis(@Nullable final String effect, @Nullable final String id,
-                                   final String text) {
-        final Element elem = createSpan("emphasis", id, text);
-        if (effect != null) {
-            elem.setAttribute("effect", effect);
-        }
-        return elem;
-    }
-
     @Test public void defaultEmphasisShouldBeStrong() throws Exception {
-        assertEquals("<strong>Hello</strong>", generate(createEmphasis(null, null, "Hello")));
+        assertEquals("<strong>Hello</strong>",
+                     generate(builder.element("emphasis").text("Hello")));
         assertEquals("<strong id=\"myid\">Hello</strong>",
-                     generate(createEmphasis(null, "myid", "Hello")));
+                     generate(builder.element("emphasis").attr("id", "myid").text("Hello")));
     }
 
     @Test public void boldEmphasisShouldBeStrong() throws Exception {
-        assertEquals("<strong>Hello</strong>", generate(createEmphasis("bold", null, "Hello")));
+        assertEquals("<strong>Hello</strong>",
+                     generate(builder.element("emphasis").attr("effect", "bold").text("Hello")));
         assertEquals("<strong id=\"myid\">Hello</strong>",
-                     generate(createEmphasis("bold", "myid", "Hello")));
+                     generate(builder.element("emphasis")
+                            .attr("id", "myid").attr("effect", "bold").text("Hello")));
     }
 
     @Test public void italicsEmphasisShouldBeEm() throws Exception {
-        assertEquals("<em>Hello</em>", generate(createEmphasis("italics", null, "Hello")));
+        assertEquals("<em>Hello</em>",
+                     generate(builder.element("emphasis").attr("effect", "italics").text("Hello")));
         assertEquals("<em id=\"myid\">Hello</em>",
-                     generate(createEmphasis("italics", "myid", "Hello")));
+                     generate(builder.element("emphasis")
+                            .attr("id", "myid").attr("effect", "italics").text("Hello")));
     }
 
     @Test public void underlineEmphasisShouldBeU() throws Exception {
-        assertEquals("<u>Hello</u>", generate(createEmphasis("underline", null, "Hello")));
+        assertEquals("<u>Hello</u>",
+                     generate(builder.element("emphasis").attr("effect", "underline").text("Hello")));
         assertEquals("<u id=\"myid\">Hello</u>",
-                     generate(createEmphasis("underline", "myid", "Hello")));
+                     generate(builder.element("emphasis")
+                            .attr("id", "myid").attr("effect", "underline").text("Hello")));
     }
 
     @Test public void smallcapsEmphasisShouldBeSpan() throws Exception {
         assertEquals("<span class=\"smallcaps\">Hello</span>",
-                     generate(createEmphasis("smallcaps", null, "Hello")));
+                     generate(builder.element("emphasis").attr("effect", "smallcaps").text("Hello")));
         assertEquals("<span class=\"smallcaps\" id=\"myid\">Hello</span>",
-                     generate(createEmphasis("smallcaps", "myid", "Hello")));
+                     generate(builder.element("emphasis")
+                            .attr("id", "myid").attr("effect", "smallcaps").text("Hello")));
     }
 
     @Test public void normalEmphasisShouldBeSpan() throws Exception {
         assertEquals("<span class=\"normal\">Hello</span>",
-                     generate(createEmphasis("normal", null, "Hello")));
+                     generate(builder.element("emphasis").attr("effect", "normal").text("Hello")));
         assertEquals("<span class=\"normal\" id=\"myid\">Hello</span>",
-                     generate(createEmphasis("normal", "myid", "Hello")));
+                     generate(builder.element("emphasis")
+                            .attr("id", "myid").attr("effect", "normal").text("Hello")));
     }
 
     @Test public void foreignShouldRenderAsSpan() throws Exception {
         assertEquals("<span class=\"foreign\">¡Hola, mundo!</span>",
-                     generate(createSpan("foreign", null, "¡Hola, mundo!")));
+                     generate(builder.element("foreign").text("¡Hola, mundo!")));
         assertEquals("<span class=\"foreign\" id=\"myid\">¡Hola, mundo!</span>",
-                     generate(createSpan("foreign", "myid", "¡Hola, mundo!")));
+                     generate(builder.element("foreign").attr("id", "myid").text("¡Hola, mundo!")));
     }
 
     @Test public void foreignShouldAllowUrlLinks() throws Exception {
-        final Element elem = createSpan("foreign", null, "¡Hola, mundo!");
-        elem.setAttribute("url", "http://www.example.com/");
+        final Node node = builder.element("foreign")
+            .attr("url", "http://www.example.com/")
+            .text("¡Hola, mundo!")
+            .build();
         assertEquals("<span class=\"foreign\"><a href=\"http://www.example.com/\">¡Hola, mundo!</a></span>",
-                     generate(elem));
+                     generate(node));
     }
 
     @Test public void foreignShouldAllowAnchorLinks() throws Exception {
-        final Element elem = createSpan("foreign", null, "¡Hola, mundo!");
-        elem.setAttribute("target-id", "myRefId");
+        final Node node = builder.element("foreign")
+                .attr("target-id", "myRefId")
+                .text("¡Hola, mundo!")
+                .build();
         assertEquals("<span class=\"foreign\"><a href=\"#myRefId\">¡Hola, mundo!</a></span>",
-                     generate(elem));
+                     generate(node));
     }
 
     @Test public void termShouldRenderAsSpan() throws Exception {
         assertEquals("<span class=\"term\">jargon</span>",
-                     generate(createSpan("term", null, "jargon")));
+                     generate(builder.element("term").text("jargon")));
         assertEquals("<span class=\"term\" id=\"myid\">jargon</span>",
-                     generate(createSpan("term", "myid", "jargon")));
+                     generate(builder.element("term").attr("id", "myid").text("jargon")));
     }
 
     @Test public void termShouldAllowUrlLinks() throws Exception {
-        final Element elem = createSpan("term", null, "jargon");
-        elem.setAttribute("url", "http://www.example.com/");
+        final Node node = builder.element("term")
+                .attr("url", "http://www.example.com/")
+                .text("jargon")
+                .build();
         assertEquals("<span class=\"term\"><a href=\"http://www.example.com/\">jargon</a></span>",
-                     generate(elem));
+                     generate(node));
     }
 
     @Test public void termShouldAllowAnchorLinks() throws Exception {
-        final Element elem = createSpan("term", null, "jargon");
-        elem.setAttribute("target-id", "myRefId");
-        assertEquals("<span class=\"term\"><a href=\"#myRefId\">jargon</a></span>",
-                     generate(elem));
+        assertEquals("<span class=\"term\"><a href=\"#myRef\">jargon</a></span>",
+                     generate(builder.element("term").attr("target-id", "myRef").text("jargon")));
     }
 
     @Test public void supShouldRenderAsSup() throws Exception {
-        assertEquals("<sup>exponent</sup>", generate(createSpan("sup", null, "exponent")));
+        assertEquals("<sup>exponent</sup>", generate(builder.element("sup").text("exponent")));
         assertEquals("<sup id=\"myid\">exponent</sup>",
-                     generate(createSpan("sup", "myid", "exponent")));
+                     generate(builder.element("sup").attr("id", "myid").text("exponent")));
     }
 
     @Test public void subShouldRenderAsSub() throws Exception {
-        assertEquals("<sub>index</sub>", generate(createSpan("sub", null, "index")));
+        assertEquals("<sub>index</sub>", generate(builder.element("sub").text("index")));
         assertEquals("<sub id=\"myid\">index</sub>",
-                     generate(createSpan("sub", "myid", "index")));
+                     generate(builder.element("sub").attr("id", "myid").text("index")));
     }
 
     @Test public void preformatShouldRenderAsPre() throws Exception {
-        assertEquals("<pre>my\n text</pre>", generate(createSpan("preformat", null, "my\n text")));
+        assertEquals("<pre>my\n text</pre>",
+                     generate(builder.element("preformat").text("my\n text")));
         assertEquals("<pre id=\"myid\">my\n text</pre>",
-                     generate(createSpan("preformat", "myid", "my\n text")));
+                     generate(builder.element("preformat").attr("id", "myid").text("my\n text")));
     }
 
     @Test public void defaultNewlineShouldRenderBr() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
-        assertEquals("<br>", generate(elem));
+        assertEquals("<br>", generate(builder.element("newline")));
     }
 
     @Test public void normalNewlineShouldRenderBr() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
-        elem.setAttribute("effect", "normal");
-        assertEquals("<br>", generate(elem));
+        assertEquals("<br>", generate(builder.element("newline").attr("effect", "normal")));
     }
 
     @Test public void underlineNewlineShouldRenderHr() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
-        elem.setAttribute("effect", "underline");
-        assertEquals("<hr>", generate(elem));
+        assertEquals("<hr>", generate(builder.element("newline").attr("effect", "underline")));
     }
 
     @Test public void newlineShouldHonorCount() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
-        elem.setAttribute("count", "3");
-        assertEquals("<br><br><br>", generate(elem));
+        assertEquals("<br><br><br>", generate(builder.element("newline").attr("count", "3")));
     }
 
     @Test public void underlineNewlineShouldHonorCount() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
-        elem.setAttribute("effect", "underline");
-        elem.setAttribute("count", "3");
-        assertEquals("<hr><hr><hr>", generate(elem));
+        assertEquals("<hr><hr><hr>", generate(builder.element("newline")
+                .attr("effect", "underline")
+                .attr("count", "3")
+        ));
     }
 
     @Test public void ruleShouldAllowStatements() throws Exception {
-        final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule.setAttribute("id", "my-rule");
-        final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "my-rule-statement");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule.appendChild(stmt);
+        final Node node = builder.element("rule").attr("id", "my-rule").child(
+                builder.element("statement")
+                        .attr("id", "my-rule-statement")
+                        .text("QED")
+        ).build();
         assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Rule 1</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(rule));
+                     generate(node));
     }
 
     @Test public void ruleShouldUseTitles() throws Exception {
-        final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule.setAttribute("id", "my-rule");
-        final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
-        title.appendChild(doc.createTextNode("The Best Rule"));
-        rule.appendChild(title);
-        final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "my-rule-statement");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule.appendChild(stmt);
+        final Node node = builder.element("rule").attr("id", "my-rule").child(
+                builder.element("title").text("The Best Rule"),
+                builder.element("statement")
+                        .attr("id", "my-rule-statement")
+                        .text("QED")
+        ).build();
         assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Rule 1: The Best Rule</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(rule));
+                     generate(node));
     }
 
     @Test public void ruleShouldUseLabels() throws Exception {
-        final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule.setAttribute("id", "my-rule");
-        final Element label = doc.createElementNS(CNXML.NAMESPACE, "label");
-        label.appendChild(doc.createTextNode("Ultimate Rule"));
-        rule.appendChild(label);
-        final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "my-rule-statement");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule.appendChild(stmt);
+        final Node node = builder.element("rule").attr("id", "my-rule").child(
+                builder.element("label").text("Ultimate Rule"),
+                builder.element("statement")
+                        .attr("id", "my-rule-statement")
+                        .text("QED")
+        ).build();
         assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Ultimate Rule 1</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(rule));
+                     generate(node));
     }
 
     @Test public void ruleHeadingShouldChangeForType() throws Exception {
-        final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule.setAttribute("id", "my-rule");
-        rule.setAttribute("type", "law");
-        final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "my-rule-statement");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule.appendChild(stmt);
+        final Node node = builder.element("rule").attr("id", "my-rule").attr("type", "law").child(
+                builder.element("statement")
+                        .attr("id", "my-rule-statement")
+                        .text("QED")
+        ).build();
         assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Law 1</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(rule));
+                     generate(node));
     }
 
     @Test public void ruleHeadingShouldIncrementCounter() throws Exception {
-        Element rule1, rule2;
-        Element stmt;
-        Element content;
-
-        rule1 = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule1.setAttribute("id", "rule1");
-        stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "stmt1");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule1.appendChild(stmt);
-
-        rule2 = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule2.setAttribute("id", "rule2");
-        stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "stmt2");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule2.appendChild(stmt);
-
-        content = doc.createElementNS(CNXML.NAMESPACE, "content");
-        content.appendChild(rule1);
-        content.appendChild(rule2);
-
-        doc.appendChild(doc.createElementNS(CNXML.NAMESPACE, "document"));
-        doc.getDocumentElement().appendChild(content);
+        final Node node = builder.child(
+                builder.element("document").attr("id", "doc").wrapContent(
+                        builder.element("rule")
+                                .attr("id", "rule1")
+                                .child(
+                                        builder.element("statement")
+                                                .attr("id", "stmt1")
+                                                .text("QED")
+                        ),
+                        builder.element("rule")
+                                .attr("id", "rule2")
+                                .child(
+                                        builder.element("statement")
+                                                .attr("id", "stmt2")
+                                                .text("QED")
+                        )
+                )
+        ).build();
 
         assertEquals("<div class=\"rule\" id=\"rule1\"><h2>Rule 1</h2>"
                      + "<div class=\"statement\" id=\"stmt1\">QED</div></div>"
                      + "<div class=\"rule\" id=\"rule2\"><h2>Rule 2</h2>"
                      + "<div class=\"statement\" id=\"stmt2\">QED</div></div>",
-                     generate(doc));
+                     generate(node));
     }
 
     @Test public void ruleTypesShouldCountSeparately() throws Exception {
-        Element rule1, rule2;
-        Element stmt;
-        Element content;
-
-        rule1 = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule1.setAttribute("id", "rule1");
-        rule1.setAttribute("type", "rule");
-        stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "stmt1");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule1.appendChild(stmt);
-
-        rule2 = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule2.setAttribute("id", "rule2");
-        rule2.setAttribute("type", "law");
-        stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "stmt2");
-        stmt.appendChild(doc.createTextNode("QED"));
-        rule2.appendChild(stmt);
-
-        content = doc.createElementNS(CNXML.NAMESPACE, "content");
-        content.appendChild(rule1);
-        content.appendChild(rule2);
-
-        doc.appendChild(doc.createElementNS(CNXML.NAMESPACE, "document"));
-        doc.getDocumentElement().appendChild(content);
+        final Node node = builder.child(
+                builder.element("document").attr("id", "doc").wrapContent(
+                        builder.element("rule")
+                                .attr("id", "rule1")
+                                .attr("type", "rule")
+                                .child(
+                                        builder.element("statement")
+                                                .attr("id", "stmt1")
+                                                .text("QED")
+                        ),
+                        builder.element("rule")
+                                .attr("id", "rule2")
+                                .attr("type", "law")
+                                .child(
+                                        builder.element("statement")
+                                                .attr("id", "stmt2")
+                                                .text("QED")
+                        )
+                )
+        ).build();
 
         assertEquals("<div class=\"rule\" id=\"rule1\"><h2>Rule 1</h2>"
                      + "<div class=\"statement\" id=\"stmt1\">QED</div></div>"
@@ -422,110 +375,164 @@ public class HTMLGeneratorTests {
     }
 
     @Test public void ruleShouldAllowProofs() throws Exception {
-        final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
-        rule.setAttribute("id", "my-rule");
-        final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
-        stmt.setAttribute("id", "my-rule-statement");
-        stmt.appendChild(doc.createTextNode("I exist."));
-        rule.appendChild(stmt);
-        final Element proof = doc.createElementNS(CNXML.NAMESPACE, "proof");
-        proof.setAttribute("id", "my-rule-proof");
-        proof.appendChild(doc.createTextNode("QED"));
-        rule.appendChild(proof);
+        final Node node = builder.element("rule").attr("id", "my-rule").child(
+                builder.element("statement")
+                        .attr("id", "my-rule-statement")
+                        .text("I exist."),
+                builder.element("proof")
+                        .attr("id", "my-rule-proof")
+                        .text("QED")
+        ).build();
         assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Rule 1</h2>"
                      + "<div class=\"statement\" id=\"my-rule-statement\">I exist.</div>"
                      + "<div class=\"proof\" id=\"my-rule-proof\"><h2>Proof</h2>QED</div>"
                      + "</div>",
-                     generate(rule));
+                     generate(node));
     }
 
     @Test public void exampleShouldRenderAsDiv() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "example");
-        elem.setAttribute("id", "my-example");
-        elem.appendChild(doc.createTextNode("For example, ..."));
+        final Node node = builder.element("example")
+                .attr("id", "my-example")
+                .text("For example, ...")
+                .build();
         assertEquals("<div class=\"example\" id=\"my-example\"><h2>Example 1</h2>"
                      + "For example, ...</div>",
-                     generate(elem));
+                     generate(node));
     }
 
     @Test public void exampleShouldAcceptTitle() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "example");
-        elem.setAttribute("id", "my-example");
-        final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
-        title.appendChild(doc.createTextNode("The Best One"));
-        elem.appendChild(title);
-        elem.appendChild(doc.createTextNode("For example, ..."));
+        final Node node = builder.element("example")
+                .attr("id", "my-example")
+                .child(builder.element("title").text("The Best One"))
+                .text("For example, ...")
+                .build();
         assertEquals("<div class=\"example\" id=\"my-example\"><h2>Example 1: The Best One</h2>"
                      + "For example, ...</div>",
-                     generate(elem));
+                     generate(node));
     }
 
     @Test public void exampleShouldAcceptLabel() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "example");
-        elem.setAttribute("id", "my-example");
-        final Element label = doc.createElementNS(CNXML.NAMESPACE, "label");
-        label.appendChild(doc.createTextNode("Prime Example"));
-        elem.appendChild(label);
-        elem.appendChild(doc.createTextNode("For example, ..."));
+        final Node node = builder.element("example")
+                .attr("id", "my-example")
+                .child(builder.element("label").text("Prime Example"))
+                .text("For example, ...")
+                .build();
         assertEquals("<div class=\"example\" id=\"my-example\"><h2>Prime Example 1</h2>"
                      + "For example, ...</div>",
-                     generate(elem));
+                     generate(node));
     }
 
     @Test public void exerciseShouldUseProblem() throws Exception {
-        final Element exercise = doc.createElementNS(CNXML.NAMESPACE, "exercise");
-        exercise.setAttribute("id", "texas-exercise");
-        final Element problem = doc.createElementNS(CNXML.NAMESPACE, "problem");
-        problem.setAttribute("id", "texas-problem");
-        problem.appendChild(doc.createTextNode("What is the capital of Texas?"));
-        exercise.appendChild(problem);
+        final Node node = builder.element("exercise").attr("id", "texas-exercise").child(
+                builder.element("problem")
+                        .attr("id", "texas-problem")
+                        .text("What is the capital of Texas?")
+        ).build();
         assertEquals("<div class=\"exercise\" id=\"texas-exercise\"><h2>Exercise 1</h2>"
                      + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
                      + "</div></div>",
-                     generate(exercise));
+                     generate(node));
     }
 
     @Test public void exerciseShouldUseSolution() throws Exception {
-        final Element exercise = doc.createElementNS(CNXML.NAMESPACE, "exercise");
-        exercise.setAttribute("id", "texas-exercise");
-        final Element problem = doc.createElementNS(CNXML.NAMESPACE, "problem");
-        problem.setAttribute("id", "texas-problem");
-        problem.appendChild(doc.createTextNode("What is the capital of Texas?"));
-        exercise.appendChild(problem);
-        final Element solution = doc.createElementNS(CNXML.NAMESPACE, "solution");
-        solution.setAttribute("id", "texas-solution");
-        solution.appendChild(doc.createTextNode("Austin"));
-        exercise.appendChild(solution);
+        final Node node = builder.element("exercise").attr("id", "texas-exercise").child(
+                builder.element("problem")
+                        .attr("id", "texas-problem")
+                        .text("What is the capital of Texas?"),
+                builder.element("solution")
+                        .attr("id", "texas-solution")
+                        .text("Austin")
+        ).build();
         assertEquals("<div class=\"exercise\" id=\"texas-exercise\"><h2>Exercise 1</h2>"
                      + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
                      + "</div><div class=\"solution\" id=\"texas-solution\">Austin</div></div>",
-                     generate(exercise));
+                     generate(node));
     }
 
     @Test public void exerciseShouldUseCommentary() throws Exception {
-        final Element exercise = doc.createElementNS(CNXML.NAMESPACE, "exercise");
-        exercise.setAttribute("id", "texas-exercise");
-        final Element problem = doc.createElementNS(CNXML.NAMESPACE, "problem");
-        problem.setAttribute("id", "texas-problem");
-        problem.appendChild(doc.createTextNode("What is the capital of Texas?"));
-        exercise.appendChild(problem);
-        final Element commentary = doc.createElementNS(CNXML.NAMESPACE, "commentary");
-        commentary.setAttribute("id", "texas-commentary");
-        commentary.appendChild(doc.createTextNode("This will be on the final exam."));
-        exercise.appendChild(commentary);
+        final Node node = builder.element("exercise").attr("id", "texas-exercise").child(
+                builder.element("problem")
+                        .attr("id", "texas-problem")
+                        .text("What is the capital of Texas?"),
+                builder.element("commentary")
+                        .attr("id", "texas-commentary")
+                        .text("This will be on the final exam.")
+        ).build();
         assertEquals("<div class=\"exercise\" id=\"texas-exercise\"><h2>Exercise 1</h2>"
                      + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
                      + "</div><div class=\"commentary\" id=\"texas-commentary\">"
                      + "This will be on the final exam.</div></div>",
-                     generate(exercise));
+                     generate(node));
     }
 
     @Test public void equationShouldWrapContent() throws Exception {
-        final Element elem = doc.createElementNS(CNXML.NAMESPACE, "equation");
-        elem.setAttribute("id", "my-equation");
-        elem.appendChild(doc.createTextNode("2 + 2 = 4"));
+        final Node node =
+                builder.element("equation").attr("id", "my-equation").text("2 + 2 = 4").build();
         assertEquals("<div class=\"equation\" id=\"my-equation\">"
                      + "<h2>Equation 1</h2>2 + 2 = 4</div>",
-                     generate(elem));
+                     generate(node));
+    }
+
+    private class DOMBuilder {
+        private Node node;
+
+        public DOMBuilder() {
+            this.node = null;
+        }
+
+        public DOMBuilder(Node node) {
+            this.node = node;
+        }
+
+        public DOMBuilder element(String tag) {
+            return element(CNXML.NAMESPACE, tag);
+        }
+
+        public DOMBuilder element(String ns, String tag) {
+            return new DOMBuilder(doc.createElementNS(ns, tag));
+        }
+
+        public DOMBuilder attr(String key, String value) {
+            assert node != null;
+            assert node instanceof Element;
+            ((Element)node).setAttribute(key, value);
+            return this;
+        }
+
+        public DOMBuilder child(Node... args) {
+            assert node != null;
+            for (Node arg : args) {
+                node.appendChild(arg);
+            }
+            return this;
+        }
+
+        public DOMBuilder child(DOMBuilder... args) {
+            assert node != null;
+            for (DOMBuilder arg : args) {
+                node.appendChild(arg.build());
+            }
+            return this;
+        }
+
+        public DOMBuilder text(String s) {
+            assert node != null;
+            node.appendChild(doc.createTextNode(s));
+            return this;
+        }
+
+        public DOMBuilder wrapContent(Node... args) {
+            assert node != null;
+            return child(element("content").child(args));
+        }
+
+        public DOMBuilder wrapContent(DOMBuilder... args) {
+            assert node != null;
+            return child(element("content").child(args));
+        }
+
+        public Node build() {
+            return node;
+        }
     }
 }

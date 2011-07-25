@@ -22,6 +22,7 @@
 
     <resources id="depend_lib">
         <path path="${soy.path}" />
+        <fileset dir="../../jars" includes="*.jar" />
     </resources>
 
     <resources id="resources">

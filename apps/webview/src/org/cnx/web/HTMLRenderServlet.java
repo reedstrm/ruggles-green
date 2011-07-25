@@ -16,6 +16,7 @@
 
 package org.cnx.web;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
@@ -26,7 +27,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.cnx.html.CNXML;
+import org.cnx.html.ContentMathMLProcessor;
 import org.cnx.html.HTMLGenerator;
+import org.cnx.html.Processor;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -44,7 +47,7 @@ public class HTMLRenderServlet extends HttpServlet {
     private HTMLGenerator htmlGenerator;
 
     @Override public void init(ServletConfig config) {
-        htmlGenerator = new HTMLGenerator();
+        htmlGenerator = new HTMLGenerator(ImmutableSet.<Processor>of(new ContentMathMLProcessor()));
 
         SoyFileSet.Builder builder = new SoyFileSet.Builder();
         builder.add(new File("base.soy"));

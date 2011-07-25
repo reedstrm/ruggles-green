@@ -85,6 +85,9 @@
         <mkdir dir="${war.dir}/WEB-INF/lib"/>
         <copy file="${soy.path}" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
         <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
+        <copy todir="${war.dir}/WEB-INF/lib">
+            <fileset dir="../../jars" includes="*.jar" />
+        </copy>
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
             <compilerarg line="${javac.flags}"/>
             <classpath>

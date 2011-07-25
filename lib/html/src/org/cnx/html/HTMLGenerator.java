@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,6 +46,7 @@ import org.w3c.dom.NodeList;
 */
 public class HTMLGenerator {
     private static final String SOY_NAMESPACE = "org.cnx.html.HTMLGenerator";
+    private static final String DEFAULT_TEMPLATE_RESOURCE = "html.soy";
     private static final ImmutableSet<String> NUMBERED_ELEMENTS = ImmutableSet.of(
             "definition",
             "equation",
@@ -55,14 +57,28 @@ public class HTMLGenerator {
             "rule"
     );
 
+    private Set<Processor> processors;
     private SoyTofu tofu;
 
     public HTMLGenerator() {
-        tofu = compile(getClass().getResource("html.soy"));
+        init(getClass().getResource(DEFAULT_TEMPLATE_RESOURCE), ImmutableSet.<Processor>of());
     }
 
     public HTMLGenerator(URL templateURL) {
-        tofu = compile(templateURL);
+        init(templateURL, ImmutableSet.<Processor>of());
+    }
+
+    public HTMLGenerator(Set<Processor> processors) {
+        init(getClass().getResource(DEFAULT_TEMPLATE_RESOURCE), processors);
+    }
+
+    public HTMLGenerator(URL templateURL, Set<Processor> processors) {
+        init(templateURL, processors);
+    }
+
+    private void init(URL templateURL, Set<Processor> processors) {
+        this.tofu = compile(templateURL);
+        this.processors = ImmutableSet.<Processor>copyOf(processors);
     }
 
     /**
@@ -95,7 +111,13 @@ public class HTMLGenerator {
         @param p The writer to output to
         @return The rendered HTML string
     */
-    public String generate(Node node) {
+    public String generate(Node node) throws Exception {
+        // Apply processors
+        for (Processor processor : processors) {
+            node = processor.process(node);
+        }
+
+        // Render to HTML
         final SoyMapData params = new SoyMapData("node", domToSoyData(node, new Counter()));
         return tofu.render(".main", params, null);
     }

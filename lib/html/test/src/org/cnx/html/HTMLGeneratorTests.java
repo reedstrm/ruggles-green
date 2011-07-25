@@ -42,11 +42,11 @@ public class HTMLGeneratorTests {
         generator = new HTMLGenerator();
     }
 
-    private String generate(final Node node) {
+    private String generate(final Node node) throws Exception {
         return generator.generate(node);
     }
 
-    @Test public void newDocumentShouldBeEmpty() {
+    @Test public void newDocumentShouldBeEmpty() throws Exception {
         final Element root = doc.createElementNS(CNXML.NAMESPACE, "document");
         root.setAttribute("id", "hello");
         doc.appendChild(root);
@@ -59,7 +59,7 @@ public class HTMLGeneratorTests {
         assertEquals("", generate(doc));
     }
 
-    @Test public void fullDocumentShouldBeShown() {
+    @Test public void fullDocumentShouldBeShown() throws Exception {
         final Element root = doc.createElementNS(CNXML.NAMESPACE, "document");
         root.setAttribute("id", "hello");
         doc.appendChild(root);
@@ -75,24 +75,24 @@ public class HTMLGeneratorTests {
         assertEquals("My Content", generate(doc));
     }
 
-    @Test public void textShouldBeCopied() {
+    @Test public void textShouldBeCopied() throws Exception {
         final String s = "Hello, 世界!";
         assertEquals(s, generate(doc.createTextNode(s)));
     }
 
-    @Test public void textShouldBeEscaped() {
+    @Test public void textShouldBeEscaped() throws Exception {
         final String s = "I am a \"<b>leet hacker</b>\"";
         assertEquals("I am a &quot;&lt;b&gt;leet hacker&lt;/b&gt;&quot;",
                      generate(doc.createTextNode(s)));
     }
 
-    @Test public void emptyParagraphTags() {
+    @Test public void emptyParagraphTags() throws Exception {
         Element para = doc.createElementNS(CNXML.NAMESPACE, "para");
         para.setAttribute("id", "mypara");
         assertEquals("<p id=\"mypara\"></p>", generate(para));
     }
 
-    @Test public void paragraphShouldWrapChildren() {
+    @Test public void paragraphShouldWrapChildren() throws Exception {
         final Element para = doc.createElementNS(CNXML.NAMESPACE, "para");
         final String s1 = "Hello, ";
         final String s2 = "World!";
@@ -102,7 +102,7 @@ public class HTMLGeneratorTests {
         assertEquals("<p id=\"mypara\">Hello, World!</p>", generate(para));
     }
 
-    @Test public void emptySectionTags() {
+    @Test public void emptySectionTags() throws Exception {
         final Element sect = doc.createElementNS(CNXML.NAMESPACE, "section");
         final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
         sect.setAttribute("id", "mysect");
@@ -111,7 +111,7 @@ public class HTMLGeneratorTests {
         assertEquals("<section id=\"mysect\"><h1>My Section</h1></section>", generate(sect));
     }
 
-    @Test public void sectionShouldWrapChildren() {
+    @Test public void sectionShouldWrapChildren() throws Exception {
         final Element sect = doc.createElementNS(CNXML.NAMESPACE, "section");
         final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
         final String s1 = "Hello, ";
@@ -174,135 +174,135 @@ public class HTMLGeneratorTests {
         return elem;
     }
 
-    @Test public void defaultEmphasisShouldBeStrong() {
+    @Test public void defaultEmphasisShouldBeStrong() throws Exception {
         assertEquals("<strong>Hello</strong>", generate(createEmphasis(null, null, "Hello")));
         assertEquals("<strong id=\"myid\">Hello</strong>",
                      generate(createEmphasis(null, "myid", "Hello")));
     }
 
-    @Test public void boldEmphasisShouldBeStrong() {
+    @Test public void boldEmphasisShouldBeStrong() throws Exception {
         assertEquals("<strong>Hello</strong>", generate(createEmphasis("bold", null, "Hello")));
         assertEquals("<strong id=\"myid\">Hello</strong>",
                      generate(createEmphasis("bold", "myid", "Hello")));
     }
 
-    @Test public void italicsEmphasisShouldBeEm() {
+    @Test public void italicsEmphasisShouldBeEm() throws Exception {
         assertEquals("<em>Hello</em>", generate(createEmphasis("italics", null, "Hello")));
         assertEquals("<em id=\"myid\">Hello</em>",
                      generate(createEmphasis("italics", "myid", "Hello")));
     }
 
-    @Test public void underlineEmphasisShouldBeU() {
+    @Test public void underlineEmphasisShouldBeU() throws Exception {
         assertEquals("<u>Hello</u>", generate(createEmphasis("underline", null, "Hello")));
         assertEquals("<u id=\"myid\">Hello</u>",
                      generate(createEmphasis("underline", "myid", "Hello")));
     }
 
-    @Test public void smallcapsEmphasisShouldBeSpan() {
+    @Test public void smallcapsEmphasisShouldBeSpan() throws Exception {
         assertEquals("<span class=\"smallcaps\">Hello</span>",
                      generate(createEmphasis("smallcaps", null, "Hello")));
         assertEquals("<span class=\"smallcaps\" id=\"myid\">Hello</span>",
                      generate(createEmphasis("smallcaps", "myid", "Hello")));
     }
 
-    @Test public void normalEmphasisShouldBeSpan() {
+    @Test public void normalEmphasisShouldBeSpan() throws Exception {
         assertEquals("<span class=\"normal\">Hello</span>",
                      generate(createEmphasis("normal", null, "Hello")));
         assertEquals("<span class=\"normal\" id=\"myid\">Hello</span>",
                      generate(createEmphasis("normal", "myid", "Hello")));
     }
 
-    @Test public void foreignShouldRenderAsSpan() {
+    @Test public void foreignShouldRenderAsSpan() throws Exception {
         assertEquals("<span class=\"foreign\">¡Hola, mundo!</span>",
                      generate(createSpan("foreign", null, "¡Hola, mundo!")));
         assertEquals("<span class=\"foreign\" id=\"myid\">¡Hola, mundo!</span>",
                      generate(createSpan("foreign", "myid", "¡Hola, mundo!")));
     }
 
-    @Test public void foreignShouldAllowUrlLinks() {
+    @Test public void foreignShouldAllowUrlLinks() throws Exception {
         final Element elem = createSpan("foreign", null, "¡Hola, mundo!");
         elem.setAttribute("url", "http://www.example.com/");
         assertEquals("<span class=\"foreign\"><a href=\"http://www.example.com/\">¡Hola, mundo!</a></span>",
                      generate(elem));
     }
 
-    @Test public void foreignShouldAllowAnchorLinks() {
+    @Test public void foreignShouldAllowAnchorLinks() throws Exception {
         final Element elem = createSpan("foreign", null, "¡Hola, mundo!");
         elem.setAttribute("target-id", "myRefId");
         assertEquals("<span class=\"foreign\"><a href=\"#myRefId\">¡Hola, mundo!</a></span>",
                      generate(elem));
     }
 
-    @Test public void termShouldRenderAsSpan() {
+    @Test public void termShouldRenderAsSpan() throws Exception {
         assertEquals("<span class=\"term\">jargon</span>",
                      generate(createSpan("term", null, "jargon")));
         assertEquals("<span class=\"term\" id=\"myid\">jargon</span>",
                      generate(createSpan("term", "myid", "jargon")));
     }
 
-    @Test public void termShouldAllowUrlLinks() {
+    @Test public void termShouldAllowUrlLinks() throws Exception {
         final Element elem = createSpan("term", null, "jargon");
         elem.setAttribute("url", "http://www.example.com/");
         assertEquals("<span class=\"term\"><a href=\"http://www.example.com/\">jargon</a></span>",
                      generate(elem));
     }
 
-    @Test public void termShouldAllowAnchorLinks() {
+    @Test public void termShouldAllowAnchorLinks() throws Exception {
         final Element elem = createSpan("term", null, "jargon");
         elem.setAttribute("target-id", "myRefId");
         assertEquals("<span class=\"term\"><a href=\"#myRefId\">jargon</a></span>",
                      generate(elem));
     }
 
-    @Test public void supShouldRenderAsSup() {
+    @Test public void supShouldRenderAsSup() throws Exception {
         assertEquals("<sup>exponent</sup>", generate(createSpan("sup", null, "exponent")));
         assertEquals("<sup id=\"myid\">exponent</sup>",
                      generate(createSpan("sup", "myid", "exponent")));
     }
 
-    @Test public void subShouldRenderAsSub() {
+    @Test public void subShouldRenderAsSub() throws Exception {
         assertEquals("<sub>index</sub>", generate(createSpan("sub", null, "index")));
         assertEquals("<sub id=\"myid\">index</sub>",
                      generate(createSpan("sub", "myid", "index")));
     }
 
-    @Test public void preformatShouldRenderAsPre() {
+    @Test public void preformatShouldRenderAsPre() throws Exception {
         assertEquals("<pre>my\n text</pre>", generate(createSpan("preformat", null, "my\n text")));
         assertEquals("<pre id=\"myid\">my\n text</pre>",
                      generate(createSpan("preformat", "myid", "my\n text")));
     }
 
-    @Test public void defaultNewlineShouldRenderBr() {
+    @Test public void defaultNewlineShouldRenderBr() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
         assertEquals("<br>", generate(elem));
     }
 
-    @Test public void normalNewlineShouldRenderBr() {
+    @Test public void normalNewlineShouldRenderBr() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
         elem.setAttribute("effect", "normal");
         assertEquals("<br>", generate(elem));
     }
 
-    @Test public void underlineNewlineShouldRenderHr() {
+    @Test public void underlineNewlineShouldRenderHr() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
         elem.setAttribute("effect", "underline");
         assertEquals("<hr>", generate(elem));
     }
 
-    @Test public void newlineShouldHonorCount() {
+    @Test public void newlineShouldHonorCount() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
         elem.setAttribute("count", "3");
         assertEquals("<br><br><br>", generate(elem));
     }
 
-    @Test public void underlineNewlineShouldHonorCount() {
+    @Test public void underlineNewlineShouldHonorCount() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "newline");
         elem.setAttribute("effect", "underline");
         elem.setAttribute("count", "3");
         assertEquals("<hr><hr><hr>", generate(elem));
     }
 
-    @Test public void ruleShouldAllowStatements() {
+    @Test public void ruleShouldAllowStatements() throws Exception {
         final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
         rule.setAttribute("id", "my-rule");
         final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
@@ -313,7 +313,7 @@ public class HTMLGeneratorTests {
                      generate(rule));
     }
 
-    @Test public void ruleShouldUseTitles() {
+    @Test public void ruleShouldUseTitles() throws Exception {
         final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
         rule.setAttribute("id", "my-rule");
         final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
@@ -327,7 +327,7 @@ public class HTMLGeneratorTests {
                      generate(rule));
     }
 
-    @Test public void ruleShouldUseLabels() {
+    @Test public void ruleShouldUseLabels() throws Exception {
         final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
         rule.setAttribute("id", "my-rule");
         final Element label = doc.createElementNS(CNXML.NAMESPACE, "label");
@@ -341,7 +341,7 @@ public class HTMLGeneratorTests {
                      generate(rule));
     }
 
-    @Test public void ruleHeadingShouldChangeForType() {
+    @Test public void ruleHeadingShouldChangeForType() throws Exception {
         final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
         rule.setAttribute("id", "my-rule");
         rule.setAttribute("type", "law");
@@ -353,7 +353,7 @@ public class HTMLGeneratorTests {
                      generate(rule));
     }
 
-    @Test public void ruleHeadingShouldIncrementCounter() {
+    @Test public void ruleHeadingShouldIncrementCounter() throws Exception {
         Element rule1, rule2;
         Element stmt;
         Element content;
@@ -386,7 +386,7 @@ public class HTMLGeneratorTests {
                      generate(doc));
     }
 
-    @Test public void ruleTypesShouldCountSeparately() {
+    @Test public void ruleTypesShouldCountSeparately() throws Exception {
         Element rule1, rule2;
         Element stmt;
         Element content;
@@ -421,7 +421,7 @@ public class HTMLGeneratorTests {
                      generate(doc));
     }
 
-    @Test public void ruleShouldAllowProofs() {
+    @Test public void ruleShouldAllowProofs() throws Exception {
         final Element rule = doc.createElementNS(CNXML.NAMESPACE, "rule");
         rule.setAttribute("id", "my-rule");
         final Element stmt = doc.createElementNS(CNXML.NAMESPACE, "statement");
@@ -439,7 +439,7 @@ public class HTMLGeneratorTests {
                      generate(rule));
     }
 
-    @Test public void exampleShouldRenderAsDiv() {
+    @Test public void exampleShouldRenderAsDiv() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "example");
         elem.setAttribute("id", "my-example");
         elem.appendChild(doc.createTextNode("For example, ..."));
@@ -448,7 +448,7 @@ public class HTMLGeneratorTests {
                      generate(elem));
     }
 
-    @Test public void exampleShouldAcceptTitle() {
+    @Test public void exampleShouldAcceptTitle() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "example");
         elem.setAttribute("id", "my-example");
         final Element title = doc.createElementNS(CNXML.NAMESPACE, "title");
@@ -460,7 +460,7 @@ public class HTMLGeneratorTests {
                      generate(elem));
     }
 
-    @Test public void exampleShouldAcceptLabel() {
+    @Test public void exampleShouldAcceptLabel() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "example");
         elem.setAttribute("id", "my-example");
         final Element label = doc.createElementNS(CNXML.NAMESPACE, "label");
@@ -472,7 +472,7 @@ public class HTMLGeneratorTests {
                      generate(elem));
     }
 
-    @Test public void exerciseShouldUseProblem() {
+    @Test public void exerciseShouldUseProblem() throws Exception {
         final Element exercise = doc.createElementNS(CNXML.NAMESPACE, "exercise");
         exercise.setAttribute("id", "texas-exercise");
         final Element problem = doc.createElementNS(CNXML.NAMESPACE, "problem");
@@ -485,7 +485,7 @@ public class HTMLGeneratorTests {
                      generate(exercise));
     }
 
-    @Test public void exerciseShouldUseSolution() {
+    @Test public void exerciseShouldUseSolution() throws Exception {
         final Element exercise = doc.createElementNS(CNXML.NAMESPACE, "exercise");
         exercise.setAttribute("id", "texas-exercise");
         final Element problem = doc.createElementNS(CNXML.NAMESPACE, "problem");
@@ -502,7 +502,7 @@ public class HTMLGeneratorTests {
                      generate(exercise));
     }
 
-    @Test public void exerciseShouldUseCommentary() {
+    @Test public void exerciseShouldUseCommentary() throws Exception {
         final Element exercise = doc.createElementNS(CNXML.NAMESPACE, "exercise");
         exercise.setAttribute("id", "texas-exercise");
         final Element problem = doc.createElementNS(CNXML.NAMESPACE, "problem");
@@ -520,7 +520,7 @@ public class HTMLGeneratorTests {
                      generate(exercise));
     }
 
-    @Test public void equationShouldWrapContent() {
+    @Test public void equationShouldWrapContent() throws Exception {
         final Element elem = doc.createElementNS(CNXML.NAMESPACE, "equation");
         elem.setAttribute("id", "my-equation");
         elem.appendChild(doc.createTextNode("2 + 2 = 4"));

@@ -211,8 +211,8 @@
     Generic rendering of an inline element using a span or another element.
 
     @param node CNXML DOM element node
-    @param elemName? The element name to use (defaults to span)
-    @param className? The class name to use.
+    @param? elemName The element name to use (defaults to span)
+    @param? className The class name to use.
 */
 {template .span private="true"}
     <{if $elemName}{$elemName}{else}span{/if}
@@ -262,7 +262,7 @@
     Render a newline element.
 
     @param n Number of newlines
-    @param effect? Style of newline (either 'normal' or 'underline')
+    @param? effect Style of newline (either 'normal' or 'underline')
 */
 {template .newline_private private="true"}
     {for $i in range($n)}

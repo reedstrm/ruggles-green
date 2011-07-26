@@ -120,4 +120,52 @@ public interface CnxRepositoryService {
      */
     RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
         String moduleId);
+
+    /**
+     * Create a new collection.
+     * 
+     * If the returned response has an OK status than a new collection, with no versions, has been
+     * created and its id is returned in the result. Othwrwise, no change is done in the repository.
+     * 
+     * @param context the query context
+     * @return operation response.
+     */
+    RepositoryResponse<CreateCollectionResult> createCollection(RepositoryRequestContext context);
+
+    /**
+     * Add collection version
+     * 
+     * If the returned response has an OK status than a new version has been added to the
+     * collection. Otherwise, no change is done in the repository.
+     * 
+     * TODO(tal): define extra requirements from the colxmlDoc. TODO(tal): break the XML arg into
+     * more java manageable parameters (e.g. ACL).
+     * 
+     * @param context the query context
+     * @param colxmlDoc an XML doc in COLXML format.
+     * @return operation response.
+     */
+    RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
+        RepositoryRequestContext context, String collectionId, String colxmlDoc);
+
+    /**
+     * Get the information of a collection version.
+     * 
+     * @param context the request context.
+     * @param collectionId the target collection id
+     * @param collectionVersion the target collection version or null for latest version.
+     * @return operation response.
+     */
+    RepositoryResponse<GetCollectionVersionResult> getCollectionVersion(
+        RepositoryRequestContext context, String collectionId, @Nullable Integer collectionVersion);
+
+    /**
+     * Get general collection information.
+     * 
+     * @param context the request context.
+     * @param collectionId the target collection id
+     * @return operation response.
+     */
+    RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
+        String collectionId);
 }

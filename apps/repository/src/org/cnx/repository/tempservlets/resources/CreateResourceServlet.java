@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.modules;
+package org.cnx.repository.tempservlets.resources;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,27 +23,27 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.Services;
-import org.cnx.repository.service.api.CreateModuleResult;
-import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.Services;
 
 /**
- * A temp API servlet to create a new module.
+ * A temp API servlet to create a new resource.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class CreateModuleServlet extends HttpServlet {
+public class CreateResourceServlet extends HttpServlet {
+
+    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<CreateModuleResult> repositoryResponse =
-            Services.repository.createModule(context);
+        RepositoryResponse<CreateResourceResult> repositoryResponse =
+            Services.repository.createResource(null);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {
@@ -53,10 +53,11 @@ public class CreateModuleServlet extends HttpServlet {
         }
 
         // Map repository OK to API OK
-        final CreateModuleResult result = repositoryResponse.getResult();
+        final CreateResourceResult result = repositoryResponse.getResult();
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("module id: " + result.getModuleId());
+        out.println("resource id: " + result.getResourceId());
+        out.println("upload url: " + result.getResourceUploadUrl());
     }
 }

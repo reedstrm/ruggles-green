@@ -14,8 +14,9 @@
  * the License.
  */
 
-package org.cnx.repository.schema;
+package org.cnx.repository.service.impl.schema;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -24,6 +25,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 
 /**
@@ -44,7 +46,11 @@ public class JdoModuleVersionEntity {
 
     /**
      * The ID of the module entity to which this version belong.
+     * 
+     * NOTE(tal): this information is encoded in the parent key. We duplicate it as well for better
+     * debugging using the data store viewer.
      */
+    @SuppressWarnings("unused")
     @Persistent
     private Long moduleId;
 
@@ -58,15 +64,22 @@ public class JdoModuleVersionEntity {
     private Text CNXMLDoc;
 
     @Persistent
-    private Text manifestDoc;
+    private Text resourceMapDoc;
 
-    public JdoModuleVersionEntity(Key key, long moduleId, int versionNumber, String CNXMLDoc,
-        String manifestDoc) {
-        this.key = checkNotNull(key);
-        this.moduleId = moduleId;
+    /**
+     * @param moduleKey key of parent module
+     * @param versionNumber version number of this version. Asserted to be >= 1.
+     * @param CNXMLDoc the CNXML doc of this version.
+     * @param manifestDoc the resource mapping XML doc of this version.
+     */
+    public JdoModuleVersionEntity(Key moduleKey, int versionNumber, String CNXMLDoc,
+        String resourceMapDoc) {
+        checkNotNull(moduleKey, "null module key");
+        this.key = moduleVersionKey(moduleKey, versionNumber);
+        this.moduleId = moduleKey.getId();
         this.versionNumber = versionNumber;
         this.CNXMLDoc = new Text(checkNotNull(CNXMLDoc));
-        this.manifestDoc = new Text(checkNotNull(manifestDoc));
+        this.resourceMapDoc = new Text(checkNotNull(resourceMapDoc));
     }
 
     public Key getKey() {
@@ -81,11 +94,22 @@ public class JdoModuleVersionEntity {
         return CNXMLDoc.getValue();
     }
 
-    public String getManifestDoc() {
-        return manifestDoc.getValue();
+    public String getResourceMapDoc() {
+        return resourceMapDoc.getValue();
     }
 
-    public long getModuleId() {
-        return moduleId;
+    /**
+     * Construct a module version key.
+     * 
+     * @param moduleKey the key of the parent module entity.
+     * @param versionNumber version number (asserted to be >= 1)
+     * @return the module version key.
+     */
+    public static Key moduleVersionKey(Key moduleKey, long versionNumber) {
+        checkNotNull(moduleKey, "null module key");
+        checkArgument(SchemaConsts.MODULE_KEY_KIND.equals(moduleKey.getKind()),
+            "Not a moduleKey: %s", moduleKey);
+        checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
+        return KeyFactory.createKey(moduleKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
     }
 }

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.resources;
+package org.cnx.repository.tempservlets.collections;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,27 +23,27 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.Services;
-import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.CreateCollectionResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.Services;
 
 /**
- * A temp API servlet to create a new resource.
+ * A temp API servlet to create a new collection.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class CreateResourceServlet extends HttpServlet {
-
-    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+public class CreateCollectionServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        RepositoryResponse<CreateResourceResult> repositoryResponse =
-            Services.repository.createResource(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryResponse<CreateCollectionResult> repositoryResponse =
+            Services.repository.createCollection(context);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {
@@ -53,11 +53,10 @@ public class CreateResourceServlet extends HttpServlet {
         }
 
         // Map repository OK to API OK
-        final CreateResourceResult result = repositoryResponse.getResult();
+        final CreateCollectionResult result = repositoryResponse.getResult();
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("resource id: " + result.getResourceId());
-        out.println("upload url: " + result.getResourceUploadUrl());
+        out.println("collection id: " + result.getCollectionId());
     }
 }

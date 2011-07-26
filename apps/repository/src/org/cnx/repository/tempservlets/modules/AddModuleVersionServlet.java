@@ -14,52 +14,49 @@
  * the License.
  */
 
-package org.cnx.repository.resources;
+package org.cnx.repository.tempservlets.modules;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.Services;
-import org.cnx.repository.service.api.GetResourceInfoResult;
+import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.UploadedResourceContentInfo;
+import org.cnx.repository.service.impl.Services;
 
 /**
- * A temp API servlet to serve metadata of a resource.
+ * A temp API servlet to add a version for an existing module.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetResourceInfoServlet extends HttpServlet {
-
-    private static final Pattern uriPattern = Pattern.compile("/resource_info/([a-zA-Z0-9_-]+)");
-
-    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+public class AddModuleVersionServlet extends HttpServlet {
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Parse request resource id from the query.
-        final String requestURI = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(requestURI);
-        if (!matcher.matches()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                "Could parse resource id in request URI [" + requestURI + "]");
-            return;
-        }
-        final String resourceId = matcher.group(1);
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        final String cnxmlDoc =
+            checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
+        final String resourceMapDoc =
+            checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
+        final String moduleId =
+            checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
 
-        final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-            Services.repository.getResourceInfo(null, resourceId);
+        checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
+            req.getParameterMap().size());
+
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
+            Services.repository.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -81,23 +78,12 @@ public class GetResourceInfoServlet extends HttpServlet {
 
         // Map repository OK to API OK
         checkState(repositoryResponse.isOk());
-        final GetResourceInfoResult result = repositoryResponse.getResult();
+        final AddModuleVersionResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("Resource info:");
-
-        out.println("* resource state: " + result.getResourceState());
-        out.println("* resource id: " + resourceId);
-
-        if (result.hasContent()) {
-            out.println("* uploaded content info:");
-            final UploadedResourceContentInfo contentInfo = result.getContentInfo();
-            out.println("  - content type: " + contentInfo.getContentType());
-            out.println("  - file name: " + contentInfo.getContentOriginalFileName());
-            out.println("  - size: " + contentInfo.getContentSize());
-            out.println("  - upload time: " + contentInfo.getContentUploadTime());
-        }
+        out.println("module id: " + result.getModuleId());
+        out.println("new version number: " + result.getNewVersionNumber());
     }
 }

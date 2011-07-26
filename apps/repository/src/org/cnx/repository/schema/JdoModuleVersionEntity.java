@@ -47,8 +47,8 @@ public class JdoModuleVersionEntity {
     /**
      * The ID of the module entity to which this version belong.
      * 
-     * NOTE(tal): this information is encoded in the parent key. We duplicate
-     * it as well for better debugging using the data store viewer.
+     * NOTE(tal): this information is encoded in the parent key. We duplicate it as well for better
+     * debugging using the data store viewer.
      */
     @SuppressWarnings("unused")
     @Persistent
@@ -97,18 +97,19 @@ public class JdoModuleVersionEntity {
     public String getResourceMapDoc() {
         return resourceMapDoc.getValue();
     }
-    
+
     /**
      * Construct a module version key.
      * 
      * @param moduleKey the key of the parent module entity.
      * @param versionNumber version number (asserted to be >= 1)
      * @return the module version key.
-     */   
+     */
     public static Key moduleVersionKey(Key moduleKey, long versionNumber) {
-      checkNotNull(moduleKey, "null module key");
-      checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
-      checkArgument(SchemaConsts.MODULE_KEY_KIND.equals(moduleKey.getKind()), "Not a moduleKey: %s", moduleKey);
-      return KeyFactory.createKey(moduleKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
+        checkNotNull(moduleKey, "null module key");
+        checkArgument(SchemaConsts.MODULE_KEY_KIND.equals(moduleKey.getKind()),
+            "Not a moduleKey: %s", moduleKey);
+        checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
+        return KeyFactory.createKey(moduleKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
     }
 }

@@ -18,6 +18,8 @@ package org.cnx.repository.service.impl;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,9 +50,8 @@ import com.google.appengine.api.datastore.Key;
 
 @SuppressWarnings("serial")
 public class ResourceUploadCompletionServlet extends HttpServlet {
-
-    //private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
-    //    .getName());
+    private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
+        .getName());
 
     /**
      * This path must match the servlet registration in web.xml.
@@ -67,31 +68,32 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         final String requestURI = req.getRequestURI();
         Matcher matcher = uriPattern.matcher(requestURI);
         if (!matcher.matches()) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "Resource factory completion handler could not match request URI: [" + requestURI
-                    + "]");
+            final String message =
+                "Resource factory completion handler could not match request URI: " + requestURI;
+            log.severe(message);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
             return;
-            // TODO(tal): also log an error
         }
-        final String resourceIdString = matcher.group(1);
+        final String resourceId = matcher.group(1);
 
         // Convert encoded resource id to internal resource id
-        final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceIdString);
+        final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
         if (resourceKey == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid resource id format: ["
-                + resourceIdString + "]");
+            final String message = "Invalid resource id format: [" + resourceId + "]";
+            log.severe(message);
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
-            // TODO(tal): also log an error
         }
 
         // Get blob id from the request
         Map<String, BlobKey> blobs = Services.blobstore.getUploadedBlobs(req);
         if (blobs.size() != 1) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+            final String message =
                 "Resource factory completion handler expected to find exactly one blob but found ["
-                    + blobs.size() + "]");
+                    + blobs.size() + "]";
+            log.severe(message);
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
-            // TODO(tal): also log an error
         }
         BlobKey blobKey = (BlobKey) blobs.values().toArray()[0];
 
@@ -101,28 +103,34 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         try {
 
             tx.begin();
-            //log.info("** Resource id: " + resourceId + ", resource id string = " + resourceIdString);
             final JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
             if (entity.getState() != JdoResourceEntity.State.PENDING_UPLOAD) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Resource factory completion handler expected resource [" + resourceIdString
-                        + "] to be in state PENDING_UPLOAD but found [" + entity.getState() + "]");
+                tx.rollback();
+                final String message =
+                    "Resource factory completion handler expected resource [" + resourceId
+                        + "] to be in state PENDING_UPLOAD but found [" + entity.getState() + "]";
+                log.severe(message);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                 return;
             }
             entity.pendingToUploadedTransition(blobKey);
             tx.commit();
         } catch (Throwable e) {
-            e.printStackTrace();
             if (tx.isActive()) {
+                log.severe("Transaction level active");
                 tx.rollback();
             }
-            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE,
+            final String message =
                 "Resource factory completion handle encountered an exception: [" + e.getMessage()
-                    + "]");
+                    + "]";
+            log.log(Level.SEVERE, message, e);
+            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, message);
             return;
         } finally {
             pm.close();
         }
+
+        log.info("Uploaded content of resource " + resourceId);
         // TODO(tal): is this is where we want to redirect?
         resp.sendRedirect("/");
     }

@@ -93,33 +93,33 @@ public class JdoResourceEntity {
      */
     @Persistent
     private BlobKey blobKey;
-    
+
     /**
      * @return the key of this resource entity. Guaranteed to be non null after the entity is
-     * persisted by the first time.
+     *         persisted by the first time.
      */
     @Nullable
-    public Key getKey() {        
+    public Key getKey() {
         return key;
     }
 
     /**
      * Get the id of this resource.
      * 
-     * Resource ID is a web safe string that can be mapped back to the resource key. Resource
-     * ids are permanent and can be safely used externally to refer to resources.
+     * Resource ID is a web safe string that can be mapped back to the resource key. Resource ids
+     * are permanent and can be safely used externally to refer to resources.
      * 
-     * @return the resource id or null if the resource does not have a key yet. 
+     * @return the resource id or null if the resource does not have a key yet.
      */
     @Nullable
     public String getResourceId() {
         if (key == null) {
             return null;
         }
-        checkState(SchemaConsts.RESOURCE_KEY_KIND.equals(key.getKind()), "Unexpected kind: %s at key %s", key.getKind(), key);
+        checkState(SchemaConsts.RESOURCE_KEY_KIND.equals(key.getKind()),
+            "Unexpected kind: %s at key %s", key.getKind(), key);
         return KeyUtil.idToString(SchemaConsts.RESOURCE_ID_PREFIX, key.getId());
     }
-
 
     @Nullable
     public State getState() {
@@ -147,14 +147,13 @@ public class JdoResourceEntity {
     }
 
     /**
-     * Convert a resource id returned by getResouceId() back to the resource key.
-     * Returns null if resource id has invalid format.
+     * Convert a resource id returned by getResouceId() back to the resource key. Returns null if
+     * resource id has invalid format.
      */
     @Nullable
     public static Key resourceIdToKey(String resourceId) {
-       final Long resourceIdLong = KeyUtil.stringToId(SchemaConsts.RESOURCE_ID_PREFIX, resourceId);
-       return (resourceIdLong == null) 
-           ? null
-           : KeyFactory.createKey(SchemaConsts.RESOURCE_KEY_KIND, resourceIdLong);
+        final Long resourceIdLong = KeyUtil.stringToId(SchemaConsts.RESOURCE_ID_PREFIX, resourceId);
+        return (resourceIdLong == null) ? null : KeyFactory.createKey(
+            SchemaConsts.RESOURCE_KEY_KIND, resourceIdLong);
     }
 }

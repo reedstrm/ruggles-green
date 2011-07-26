@@ -54,7 +54,8 @@ public class GetCollectionInfoServlet extends HttpServlet {
         final String collectionUri = req.getRequestURI();
         final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
-            final String message = "Could not parse collection id in request URI [" + collectionUri + "]";
+            final String message =
+                "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;

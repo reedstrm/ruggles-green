@@ -46,4 +46,19 @@ public class SchemaConsts {
      * Module version entities are persisted with keys of this kind.
      */
     public static final String MODULE_VERSION_KEY_KIND = "ModuleVer";
+
+    /**
+     * Collection entities are persisted with keys of this kind.
+     */
+    public static final String COLLECTION_KEY_KIND = "Collection";
+
+    /**
+     * Collection ids exposed via the repository API always have this prefix.
+     */
+    public static final String COLLECTION_ID_PREFIX = "C";
+
+    /**
+     * Collection version entities are persisted with keys of this kind.
+     */
+    public static final String COLLECTION_VERSION_KEY_KIND = "CollectionVer";
 }

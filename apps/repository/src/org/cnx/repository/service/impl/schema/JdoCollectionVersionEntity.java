@@ -29,30 +29,30 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 
 /**
- * A JDO representing a module version entity.
+ * A JDO representing a collection version entity.
  * 
  * @author Tal Dayan
  */
-@PersistenceCapable(table = SchemaConsts.MODULE_VERSION_KEY_KIND)
-public class JdoModuleVersionEntity {
+@PersistenceCapable(table = SchemaConsts.COLLECTION_VERSION_KEY_KIND)
+public class JdoCollectionVersionEntity {
 
     /**
-     * This key is a child key of the module entity. Its child id equals the version number of this
-     * version (first is 1).
+     * This key is a child key of the collection entity. Its child id equals the version number of
+     * this version (first is 1).
      */
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 
     /**
-     * The ID of the module entity to which this version belong.
+     * The ID of the collection entity to which this version belong.
      * 
      * NOTE(tal): this information is encoded in the parent key. We duplicate it as well for better
      * debugging using the data store viewer.
      */
     @SuppressWarnings("unused")
     @Persistent
-    private Long moduleId;
+    private Long collectionId;
 
     /**
      * Version number. First version is 1, second is 2, etc.
@@ -61,25 +61,19 @@ public class JdoModuleVersionEntity {
     private Integer versionNumber;
 
     @Persistent
-    private Text cnxmlDoc;
-
-    @Persistent
-    private Text resourceMapDoc;
+    private Text colxmlDoc;
 
     /**
-     * @param moduleKey key of parent module
+     * @param collectionKey key of parent collection
      * @param versionNumber version number of this version. Asserted to be >= 1.
-     * @param cnxmlDoc the CNXML doc of this version.
-     * @param manifestDoc the resource mapping XML doc of this version.
+     * @param colxmlDoc the COLXML doc of this version.
      */
-    public JdoModuleVersionEntity(Key moduleKey, int versionNumber, String cnxmlDoc,
-        String resourceMapDoc) {
-        checkNotNull(moduleKey, "null module key");
-        this.key = moduleVersionKey(moduleKey, versionNumber);
-        this.moduleId = moduleKey.getId();
+    public JdoCollectionVersionEntity(Key collectionKey, int versionNumber, String colxmlDoc) {
+        checkNotNull(collectionKey, "null collection key");
+        this.key = collectionVersionKey(collectionKey, versionNumber);
+        this.collectionId = collectionKey.getId();
         this.versionNumber = versionNumber;
-        this.cnxmlDoc = new Text(checkNotNull(cnxmlDoc));
-        this.resourceMapDoc = new Text(checkNotNull(resourceMapDoc));
+        this.colxmlDoc = new Text(checkNotNull(colxmlDoc));
     }
 
     public Key getKey() {
@@ -90,26 +84,23 @@ public class JdoModuleVersionEntity {
         return versionNumber;
     }
 
-    public String getCNXMLDoc() {
-        return cnxmlDoc.getValue();
-    }
-
-    public String getResourceMapDoc() {
-        return resourceMapDoc.getValue();
+    public String getColxmlDoc() {
+        return colxmlDoc.getValue();
     }
 
     /**
-     * Construct a module version key.
+     * Construct a collection version key.
      * 
-     * @param moduleKey the key of the parent module entity.
+     * @param collectionKey the key of the parent collection entity.
      * @param versionNumber version number (asserted to be >= 1)
-     * @return the module version key.
+     * @return the collection version key.
      */
-    public static Key moduleVersionKey(Key moduleKey, long versionNumber) {
-        checkNotNull(moduleKey, "null module key");
-        checkArgument(SchemaConsts.MODULE_KEY_KIND.equals(moduleKey.getKind()),
-            "Not a moduleKey: %s", moduleKey);
+    public static Key collectionVersionKey(Key collectionKey, long versionNumber) {
+        checkNotNull(collectionKey, "null collection key");
+        checkArgument(SchemaConsts.COLLECTION_KEY_KIND.equals(collectionKey.getKind()),
+            "Not a collectionKey: %s", collectionKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
-        return KeyFactory.createKey(moduleKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
+        return KeyFactory.createKey(collectionKey, SchemaConsts.COLLECTION_VERSION_KEY_KIND,
+            versionNumber);
     }
 }

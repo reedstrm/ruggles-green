@@ -55,7 +55,8 @@ public class GetCollectionVersionServlet extends HttpServlet {
         final String collectionUri = req.getRequestURI();
         final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
-            final String message = "Could not parse collection id in request URI [" + collectionUri + "]";
+            final String message =
+                "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
@@ -67,7 +68,8 @@ public class GetCollectionVersionServlet extends HttpServlet {
         // it up later.
         // TODO(tal): catch integer conversion overflow exception and return error.
         Integer collectionVersion =
-            collectionVersionString.equals("latest") ? null : Integer.valueOf(collectionVersionString);
+            collectionVersionString.equals("latest") ? null : Integer
+                .valueOf(collectionVersionString);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionVersionResult> repositoryResponse =

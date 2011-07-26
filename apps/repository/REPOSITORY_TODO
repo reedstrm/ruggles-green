@@ -1,5 +1,6 @@
 Repository global todo items
 
+* Make sure resource upload URL is absolute both in local and remote configurations.
 * Add support for collections
 * XML update (modify incoming XML with repository values (e.g. version)).
 * Replace temp servlets with actual API

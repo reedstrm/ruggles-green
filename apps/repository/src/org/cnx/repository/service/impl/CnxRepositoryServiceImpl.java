@@ -32,7 +32,7 @@ import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.util.ImplementMeNow;
+import org.cnx.util.Nullable;
 
 /**
  * Implementation of the repository service for Google App Engine.
@@ -77,7 +77,7 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<GetModuleVersionResult> getModuleVersion(
-        RepositoryRequestContext context, String moduleId, Integer moduleVersion) {
+        RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
         return ModuleOperations.getModuleVersion(context, moduleId, moduleVersion);
     }
 
@@ -90,25 +90,25 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     @Override
     public RepositoryResponse<CreateCollectionResult> createCollection(
         RepositoryRequestContext context) {
-        throw new ImplementMeNow();
+        return CollectionOperations.createCollection(context);
     }
 
     @Override
     public RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
         RepositoryRequestContext context, String collectionId, String colxmlDoc) {
-        throw new ImplementMeNow();
+        return CollectionOperations.addCollectionVersion(context, collectionId, colxmlDoc);
     }
 
     @Override
     public RepositoryResponse<GetCollectionVersionResult> getCollectionVersion(
-        RepositoryRequestContext context, String collectionId, Integer collectionVersion) {
-        throw new ImplementMeNow();
+        RepositoryRequestContext context, String collectionId, @Nullable Integer collectionVersion) {
+        return CollectionOperations.getCollectionVersion(context, collectionId, collectionVersion);
     }
 
     @Override
     public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
         RepositoryRequestContext context, String collectionId) {
-        throw new ImplementMeNow();
+        return CollectionOperations.getCollectionInfo(context, collectionId);
     }
 
     /**

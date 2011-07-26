@@ -32,6 +32,9 @@ import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.operations.CollectionOperations;
+import org.cnx.repository.service.impl.operations.ModuleOperations;
+import org.cnx.repository.service.impl.operations.ResourceOperations;
 import org.cnx.util.Nullable;
 
 /**

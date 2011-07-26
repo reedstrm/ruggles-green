@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.cnx.repository.service.api.CreateCollectionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.Services;
+import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to create a new collection.

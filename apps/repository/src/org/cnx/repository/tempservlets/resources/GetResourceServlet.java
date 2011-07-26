@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.repository.service.impl.Services;
+import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to serve a resource using a GET request.

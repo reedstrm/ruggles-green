@@ -1,20 +1,20 @@
 Repository global todo items
 
-* Make sure resource upload URL is absolute both in local and remote configurations.
-* Add support for collections
-* XML update (modify incoming XML with repository values (e.g. version)).
 * Replace temp servlets with actual API
+* XML update (modify incoming XML with repository values (e.g. version)).
+
+Others
 * parameter validations (in the servlets and the service)
 * User authentication (in servlets)
 * User authorization (in service)
 * Impose limits on posted items
-
-Others
 * Perfornamce optimization
 * Support for search
 * Ability to take down (e.g. 'invisible' flag in entities)
 
 Done
++ Add support for collections
++ Allways return abosolure resource upload URL
 + Have all schema entities using Key's rathar than longs
 + Refactor common code (e.g. module version key construction).
 + Proper logging

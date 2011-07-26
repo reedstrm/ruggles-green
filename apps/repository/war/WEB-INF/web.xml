@@ -7,7 +7,7 @@
 
     <!--  APP ENGINE STATS -->
 
-    <!--  // commented out
+    <!--  // commented out to reduce log spam.
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>

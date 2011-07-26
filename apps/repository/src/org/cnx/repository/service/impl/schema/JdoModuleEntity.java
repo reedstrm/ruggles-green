@@ -40,7 +40,7 @@ public class JdoModuleEntity {
     /**
      * The key of this module entity in the data store. Assigned automatically by the data store
      * first time the entity is persisted. The kind of this key is always
-     * SchemaConsts.MODULE_KEY_KIND and they have a Long id assigned by the persistence layer.
+     * {@link SchemaConsts#MODULE_KEY_KIND} and they have a Long id assigned by the persistence layer.
      */
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -48,7 +48,8 @@ public class JdoModuleEntity {
 
     /**
      * Number of versions of this module. Value >= 0. If > 0, this is also the version of the last
-     * version of this module (version numbering is 1, 2, ...).
+     * version of this module (version numbering is 1, 2, ...). Zero when the module was created
+     * but no version was added.
      */
     @Persistent
     private Integer versionCount = 0;

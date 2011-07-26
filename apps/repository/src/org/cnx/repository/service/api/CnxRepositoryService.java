@@ -73,8 +73,8 @@ public interface CnxRepositoryService {
     /**
      * Create a new module.
      * 
-     * If the returned response has an OK status than a new module, with no versions, has been
-     * created and its id is returned in the result. Othwrwise, no change is done in the repository.
+     * If the returned response has an OK status than a new module, with no version, has been
+     * created and its id is returned in the result. Otherwise, no change is done in the repository.
      * 
      * @param context the query context
      * @return operation response.
@@ -85,7 +85,7 @@ public interface CnxRepositoryService {
      * Add module version
      * 
      * If the returned response has an OK status than a new version has been added to the module.
-     * Othwrwise, no change is done in the repository.
+     * Otherwise, no change is done in the repository.
      * 
      * TODO(tal): define the XML format for the reosurce map.
      * 
@@ -122,10 +122,10 @@ public interface CnxRepositoryService {
         String moduleId);
 
     /**
-     * Create a new collection.
+     * Creates a new collection.
      * 
-     * If the returned response has an OK status than a new collection, with no versions, has been
-     * created and its id is returned in the result. Othwrwise, no change is done in the repository.
+     * If the returned response has an OK status than a new collection, with no version, has been
+     * created and its id is returned in the result. Otherwise, no change is done in the repository.
      * 
      * @param context the query context
      * @return operation response.

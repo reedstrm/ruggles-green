@@ -40,7 +40,7 @@ public class JdoCollectionEntity {
     /**
      * The key of this collection entity in the data store. Assigned automatically by the data store
      * first time the entity is persisted. The kind of this key is always
-     * SchemaConsts.COLLECTION_KEY_KIND and they have a Long id assigned by the persistence layer.
+     * {@link SchemaConsts#COLLECTION_KEY_KIND} and they have a Long id assigned by the persistence layer.
      */
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -48,7 +48,8 @@ public class JdoCollectionEntity {
 
     /**
      * Number of versions of this collection. Value >= 0. If > 0, this is also the version of the
-     * last version of this collection (version numbering is 1, 2, ...).
+     * last version of this collection (version numbering is 1, 2, ...). Zero when the collection was
+     * created but no version has been added.
      */
     @Persistent
     private Integer versionCount = 0;

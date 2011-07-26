@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.schema;
+package org.cnx.repository.service.impl.schema;
 
 /**
  * Global schema related constants.

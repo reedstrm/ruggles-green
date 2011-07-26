@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.schema;
+package org.cnx.repository.service.impl.schema;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -25,7 +25,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.cnx.repository.common.KeyUtil;
 import org.cnx.util.Nullable;
 
 import com.google.appengine.api.blobstore.BlobKey;

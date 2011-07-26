@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.common;
+package org.cnx.repository.service.impl.schema;
 
 /**
  * TODO(tal): transformation to/from base64 web safe is naive. Consider to optimize if needed (e.g.

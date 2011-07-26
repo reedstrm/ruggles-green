@@ -25,9 +25,6 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
-import org.cnx.repository.common.Services;
-import org.cnx.repository.schema.JdoModuleEntity;
-import org.cnx.repository.schema.JdoModuleVersionEntity;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
@@ -36,6 +33,8 @@ import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
+import org.cnx.repository.service.impl.schema.JdoModuleEntity;
+import org.cnx.repository.service.impl.schema.JdoModuleVersionEntity;
 import org.cnx.util.Nullable;
 
 import com.google.appengine.api.datastore.Key;

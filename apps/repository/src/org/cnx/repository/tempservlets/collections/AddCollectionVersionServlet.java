@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.modules;
+package org.cnx.repository.tempservlets.collections;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,10 +27,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.Services;
-import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.Services;
 
 /**
  * A temp API servlet to add a version for an existing module.
@@ -40,23 +40,21 @@ import org.cnx.repository.service.api.RepositoryResponse;
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class AddModuleVersionServlet extends HttpServlet {
+public class AddCollectionVersionServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        final String cnxmlDoc =
-            checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
-        final String resourceMapDoc =
-            checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
+        final String colxmlDoc =
+            checkNotNull(req.getParameter("colxml"), "Missing post param \"colxml\"");
         final String moduleId =
-            checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
+            checkNotNull(req.getParameter("collection_id"), "Missing post param \"collection_id\"");
 
-        checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
+        checkArgument(req.getParameterMap().size() == 2, "Expected 2 post parameters, found %s",
             req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
-            Services.repository.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
+        final RepositoryResponse<AddCollectionVersionResult> repositoryResponse =
+            Services.repository.addCollectionVersion(context, moduleId, colxmlDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -78,12 +76,12 @@ public class AddModuleVersionServlet extends HttpServlet {
 
         // Map repository OK to API OK
         checkState(repositoryResponse.isOk());
-        final AddModuleVersionResult result = repositoryResponse.getResult();
+        final AddCollectionVersionResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("module id: " + result.getModuleId());
+        out.println("collection id: " + result.getCollectionId());
         out.println("new version number: " + result.getNewVersionNumber());
     }
 }

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.modules;
+package org.cnx.repository.tempservlets.collections;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -29,49 +29,49 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.Services;
-import org.cnx.repository.service.api.GetModuleVersionResult;
+import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.Services;
 
 /**
- * A temp API servlet to get the xml and manifest of a module version.
+ * A temp API servlet to get the xml and manifest of a collection version.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetModuleVersionServlet extends HttpServlet {
+public class GetCollectionVersionServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(GetModuleVersionServlet.class.getName());
+    private static final Logger log = Logger.getLogger(GetCollectionVersionServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern
-        .compile("/module/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
+        .compile("/collection/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Parse request resource id from the query.
-        final String moduleUri = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(moduleUri);
+        final String collectionUri = req.getRequestURI();
+        final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
-            final String message = "Could not parse module id in request URI [" + moduleUri + "]";
+            final String message = "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
-        final String moduleId = matcher.group(1);
-        final String moduleVersionString = matcher.group(2);
+        final String collectionId = matcher.group(1);
+        final String collectionVersionString = matcher.group(2);
 
         // Determine version to serve. If latest, leave as null and we will set
         // it up later.
         // TODO(tal): catch integer conversion overflow exception and return error.
-        Integer moduleVersion =
-            moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
+        Integer collectionVersion =
+            collectionVersionString.equals("latest") ? null : Integer.valueOf(collectionVersionString);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<GetModuleVersionResult> repositoryResponse =
-            Services.repository.getModuleVersion(context, moduleId, moduleVersion);
+        final RepositoryResponse<GetCollectionVersionResult> repositoryResponse =
+            Services.repository.getCollectionVersion(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -97,17 +97,16 @@ public class GetModuleVersionServlet extends HttpServlet {
 
         // Map repository OK to API OK
         checkState(repositoryResponse.isOk());
-        final GetModuleVersionResult result = repositoryResponse.getResult();
+        final GetCollectionVersionResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
         out.println();
-        out.println("Module Version:");
+        out.println("Collection Version:");
 
-        out.println("* Module:\n" + result.getModuleId() + "\n");
+        out.println("* Collection:\n" + result.getCollectionId() + "\n");
         out.println("* Version:\n" + result.getVersionNumber() + "\n");
-        out.println("* CNXM:\n" + result.getCnxmlDoc());
-        out.println("* Manifest:\n" + result.getResourceMapDoc());
+        out.println("* COLXM:\n" + result.getColxmlDoc());
     }
 }

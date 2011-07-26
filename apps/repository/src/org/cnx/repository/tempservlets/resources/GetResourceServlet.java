@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.resources;
+package org.cnx.repository.tempservlets.resources;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -26,10 +26,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.Services;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.Services;
 
 /**
  * A temp API servlet to serve a resource using a GET request.

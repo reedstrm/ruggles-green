@@ -44,7 +44,7 @@
   
   <servlet>
     <servlet-name>CreateResourceServlet</servlet-name>
-    <servlet-class>org.cnx.repository.resources.CreateResourceServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.resources.CreateResourceServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -54,7 +54,7 @@
   
    <servlet>
     <servlet-name>GetResourceServlet</servlet-name>
-    <servlet-class>org.cnx.repository.resources.GetResourceServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.resources.GetResourceServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -64,7 +64,7 @@
   
     <servlet>
     <servlet-name>GetResourceInfoServlet</servlet-name>
-    <servlet-class>org.cnx.repository.resources.GetResourceInfoServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.resources.GetResourceInfoServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -76,7 +76,7 @@
   
   <servlet>
     <servlet-name>CreateModuleServlet</servlet-name>
-    <servlet-class>org.cnx.repository.modules.CreateModuleServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.modules.CreateModuleServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -86,7 +86,7 @@
   
   <servlet>
     <servlet-name>AddModuleVersionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.modules.AddModuleVersionServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.modules.AddModuleVersionServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -96,7 +96,7 @@
   
   <servlet>
     <servlet-name>GetModuleVersionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.modules.GetModuleVersionServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleVersionServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -106,14 +106,56 @@
   
    <servlet>
     <servlet-name>GetModuleInfoServlet</servlet-name>
-    <servlet-class>org.cnx.repository.modules.GetModuleInfoServlet</servlet-class>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleInfoServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
     <servlet-name>GetModuleInfoServlet</servlet-name>
     <url-pattern>/module_info/*</url-pattern>
   </servlet-mapping>
+
+  <!--  CNX COLLECTIONS API -->
+
+  <servlet>
+    <servlet-name>CreateCollectionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.CreateCollectionServlet</servlet-class>
+  </servlet>
   
+  <servlet-mapping>
+    <servlet-name>CreateCollectionServlet</servlet-name>
+    <url-pattern>/collection_factory/create</url-pattern>
+  </servlet-mapping>  
+  
+  <servlet>
+    <servlet-name>AddCollectionVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.AddCollectionVersionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>AddCollectionVersionServlet</servlet-name>
+    <url-pattern>/collection_factory/add_version</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetCollectionVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionVersionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetCollectionVersionServlet</servlet-name>
+    <url-pattern>/collection/*</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>GetCollectionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionInfoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetCollectionInfoServlet</servlet-name>
+    <url-pattern>/collection_info/*</url-pattern>
+  </servlet-mapping>
+
   <!-- Repository service -->
   
   <servlet>

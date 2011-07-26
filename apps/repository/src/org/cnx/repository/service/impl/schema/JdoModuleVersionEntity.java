@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.schema;
+package org.cnx.repository.service.impl.schema;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;

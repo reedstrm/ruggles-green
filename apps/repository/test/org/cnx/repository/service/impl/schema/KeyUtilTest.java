@@ -1,4 +1,4 @@
-package org.cnx.repository.common;
+package org.cnx.repository.service.impl.schema;
 
 // TODO(tal): move test to a parallel source directory structure.
 
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
+import org.cnx.repository.service.impl.schema.KeyUtil;
 import org.junit.Test;
 
 public class KeyUtilTest {

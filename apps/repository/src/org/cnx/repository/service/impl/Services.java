@@ -14,13 +14,12 @@
  * the License.
  */
 
-package org.cnx.repository.common;
+package org.cnx.repository.service.impl;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobstoreService;

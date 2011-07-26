@@ -1,18 +1,18 @@
 /*
-    Copyright 2011 Google Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+ *  Copyright 2011 Google Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package org.cnx.html;
 
@@ -35,16 +35,18 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
-    HTMLGenerator converts a CNXML file to HTML.
-*/
+ *  HTMLGenerator converts a CNXML file to HTML.
+ */
 public class HTMLGenerator {
     private static final String SOY_NAMESPACE = "org.cnx.html.HTMLGenerator";
+    private static final String DEFAULT_TEMPLATE_RESOURCE = "html.soy";
     private static final ImmutableSet<String> NUMBERED_ELEMENTS = ImmutableSet.of(
             "definition",
             "equation",
@@ -55,24 +57,38 @@ public class HTMLGenerator {
             "rule"
     );
 
+    private Set<Processor> processors;
     private SoyTofu tofu;
 
     public HTMLGenerator() {
-        tofu = compile(getClass().getResource("html.soy"));
+        init(getClass().getResource(DEFAULT_TEMPLATE_RESOURCE), ImmutableSet.<Processor>of());
     }
 
     public HTMLGenerator(URL templateURL) {
-        tofu = compile(templateURL);
+        init(templateURL, ImmutableSet.<Processor>of());
+    }
+
+    public HTMLGenerator(Set<Processor> processors) {
+        init(getClass().getResource(DEFAULT_TEMPLATE_RESOURCE), processors);
+    }
+
+    public HTMLGenerator(URL templateURL, Set<Processor> processors) {
+        init(templateURL, processors);
+    }
+
+    private void init(URL templateURL, Set<Processor> processors) {
+        this.tofu = compile(templateURL);
+        this.processors = ImmutableSet.<Processor>copyOf(processors);
     }
 
     /**
-        The compile method creates a tofu for the HTML generation templates.
-
-        Subclasses should define the .main template in the tofu to customize the output of
-        generate.
-
-        @see #generate(Node)
-    */
+     *  The compile method creates a tofu for the HTML generation templates.
+     *
+     *  Subclasses should define the .main template in the tofu to customize the output of
+     *  generate.
+     *
+     *  @see #generate(Node)
+     */
     protected SoyTofu compile(URL url) {
         // Inject our custom Soy functions
         ArrayList<Module> modules = new ArrayList<Module>(2);
@@ -87,15 +103,21 @@ public class HTMLGenerator {
     }
 
     /**
-        The generate method outputs HTML to the given writer that corresponds to the given CNXML
-        node.  The node passed into generate is usually the XML document node, but it can be a
-        particular element.
+     *  The generate method outputs HTML to the given writer that corresponds to the given CNXML
+     *  node.  The node passed into generate is usually the XML document node, but it can be a
+     *  particular element.
+     *
+     *  @param node The CNXML node to render
+     *  @param p The writer to output to
+     *  @return The rendered HTML string
+     */
+    public String generate(Node node) throws Exception {
+        // Apply processors
+        for (Processor processor : processors) {
+            node = processor.process(node);
+        }
 
-        @param node The CNXML node to render
-        @param p The writer to output to
-        @return The rendered HTML string
-    */
-    public String generate(Node node) {
+        // Render to HTML
         final SoyMapData params = new SoyMapData("node", domToSoyData(node, new Counter()));
         return tofu.render(".main", params, null);
     }
@@ -146,13 +168,13 @@ public class HTMLGenerator {
     }
 
     /**
-        getNodeTypeName converts a DOM nodeType attribute into a string suitable for
-        use in Soy.
-
-        @param type A DOM node type
-        @return A string representation of the node type
-        @see org.w3c.dom.Node
-    */
+     *  getNodeTypeName converts a DOM nodeType attribute into a string suitable for
+     *  use in Soy.
+     *
+     *  @param type A DOM node type
+     *  @return A string representation of the node type
+     *  @see org.w3c.dom.Node
+     */
     private static String getNodeTypeName(final short type) {
         switch (type) {
         case Node.ATTRIBUTE_NODE:
@@ -184,11 +206,11 @@ public class HTMLGenerator {
     }
 
     /**
-        xmlAttributesToSoyMap converts attribute nodes into a Soy map.
-
-        @param map An DOM named node map of attributes.
-        @return The corresponding Soy map
-    */
+     *  xmlAttributesToSoyMap converts attribute nodes into a Soy map.
+     *
+     *  @param map An DOM named node map of attributes.
+     *  @return The corresponding Soy map
+     */
     private static SoyMapData xmlAttributesToSoyMap(final NamedNodeMap map) {
         final SoyMapData soyMap = new SoyMapData();
         for (int i = 0; i < map.getLength(); i++) {
@@ -200,19 +222,19 @@ public class HTMLGenerator {
     }
 
     /**
-        Clean an attribute name to a Soy identifier.    Soy does not allow any
-        non-identifer characters in a map key, so an attribute name must be
-        sanitized.  The following rules are applied:
-
-        <ol>
-            <li>If the character can be used in an identifier, it is copied as-is.
-            <li>If the character is a hyphen, it is converted to an underscore.
-            <li>Any other character is discarded (this includes digits for the first character).
-        </ol>
-
-        @param s The string to clean
-        @return A valid Soy identifier
-    */
+     *  Clean an attribute name to a Soy identifier.    Soy does not allow any
+     *  non-identifer characters in a map key, so an attribute name must be
+     *  sanitized.  The following rules are applied:
+     *
+     *  <ol>
+     *      <li>If the character can be used in an identifier, it is copied as-is.
+     *      <li>If the character is a hyphen, it is converted to an underscore.
+     *      <li>Any other character is discarded (this includes digits for the first character).
+     *  </ol>
+     *
+     *  @param s The string to clean
+     *  @return A valid Soy identifier
+     */
     static String xmlAttributeNameToSoyIdentifier(final String s) {
         int size = 0;
         char[] name = new char[s.length()];

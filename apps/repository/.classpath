@@ -9,6 +9,10 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/validation-api-1.0.0.GA.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-r09.jar" sourcepath="war/WEB-INF/lib/guava-src-r09.zip"/>
+=======
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-r09.jar"/>
+>>>>>>> 5654ab89a3605c07475b71ef291acf192a7c9839
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

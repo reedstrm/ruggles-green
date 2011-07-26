@@ -1,18 +1,18 @@
 /*
-    Copyright 2011 Google Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+ *  Copyright 2011 Google Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package org.cnx.html;
 
@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
-    SoyExtras contains functions needed by the Soy templates for HTML generation.
-*/
+ *  SoyExtras contains functions needed by the Soy templates for HTML generation.
+ */
 class SoyExtras extends AbstractModule {
     @Override public void configure() {
         final Multibinder<SoyFunction> soyFunctionsSetBinder =
@@ -46,11 +46,11 @@ class SoyExtras extends AbstractModule {
     }
 
     /**
-        FindElemFunction provides the <code>findElem()</code> function to Soy.
-        The function takes two arguments: the first is a DOM node (transformed into
-        a Soy map), and the second is a string.  It returns the first child node of
-        the DOM node whose tag matches the string.
-    */
+     *  FindElemFunction provides the <code>findElem()</code> function to Soy.
+     *  The function takes two arguments: the first is a DOM node (transformed into
+     *  a Soy map), and the second is a string.  It returns the first child node of
+     *  the DOM node whose tag matches the string.
+     */
     @Singleton private static class FindElemFunction implements SoyTofuFunction {
         private static final String NAME = "findElem";
 
@@ -95,10 +95,10 @@ class SoyExtras extends AbstractModule {
     }
 
     /**
-        InnerTextFunction provides the <code>innerText()</code> function to Soy.
-        The function takes one argument: a DOM node.    It returns the concatenation
-        of the text nodes inside the node.
-    */
+     *  InnerTextFunction provides the <code>innerText()</code> function to Soy.
+     *  The function takes one argument: a DOM node.    It returns the concatenation
+     *  of the text nodes inside the node.
+     */
     @Singleton private static class InnerTextFunction implements SoyTofuFunction {
         private static final String NAME = "innerText";
 
@@ -140,10 +140,10 @@ class SoyExtras extends AbstractModule {
     }
 
     /**
-      StrtodFunction provides the <code>strtod()</code> function to Soy.
-      The function takes one argument: a string.  It returns the equivalent
-      integer, or null if the string does not represent an integer.
-    */
+     *  StrtodFunction provides the <code>strtod()</code> function to Soy.
+     *  The function takes one argument: a string.  It returns the equivalent
+     *  integer, or null if the string does not represent an integer.
+     */
     @Singleton private static class StrtodFunction implements SoyTofuFunction {
         private static final String NAME = "strtod";
 

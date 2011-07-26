@@ -18,16 +18,21 @@ package org.cnx.repository.service.impl;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.CreateCollectionResult;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.GetCollectionInfoResult;
+import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.GetModuleInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.util.ImplementMeNow;
 
 /**
  * Implementation of the repository service for Google App Engine.
@@ -80,6 +85,30 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
         String moduleId) {
         return ModuleOperations.getModuleInfo(context, moduleId);
+    }
+
+    @Override
+    public RepositoryResponse<CreateCollectionResult> createCollection(
+        RepositoryRequestContext context) {
+        throw new ImplementMeNow();
+    }
+
+    @Override
+    public RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
+        RepositoryRequestContext context, String collectionId, String colxmlDoc) {
+        throw new ImplementMeNow();
+    }
+
+    @Override
+    public RepositoryResponse<GetCollectionVersionResult> getCollectionVersion(
+        RepositoryRequestContext context, String collectionId, Integer collectionVersion) {
+        throw new ImplementMeNow();
+    }
+
+    @Override
+    public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
+        RepositoryRequestContext context, String collectionId) {
+        throw new ImplementMeNow();
     }
 
     /**

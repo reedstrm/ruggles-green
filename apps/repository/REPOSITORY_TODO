@@ -1,5 +1,6 @@
 Repository global todo items
 
+* Add support for collections
 * XML update (modify incoming XML with repository values (e.g. version)).
 * Replace temp servlets with actual API
 * parameter validations (in the servlets and the service)

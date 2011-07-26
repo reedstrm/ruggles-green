@@ -480,6 +480,100 @@ public class HTMLGeneratorTests {
                      generate(node));
     }
 
+    @Test public void defaultListShouldRenderAsUl() throws Exception {
+        final Node node = builder.element("list").attr("id", "basicList").child(
+                builder.element("item").text("One"),
+                builder.element("item").text("Two"),
+                builder.element("item").text("Three")
+        ).build();
+        assertEquals("<ul id=\"basicList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void bulletedListShouldRenderAsUl() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "bulletList")
+                .attr("list-type", "bulleted")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ul id=\"bulletList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void enumeratedListShouldRenderAsOl() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "enumList")
+                .attr("list-type", "enumerated")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ol id=\"enumList\"><li>One</li><li>Two</li><li>Three</li></ol>",
+                     generate(node));
+    }
+
+    @Test public void enumeratedListShouldAllowStartValue() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "enumList")
+                .attr("list-type", "enumerated")
+                .attr("start-value", "3")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ol id=\"enumList\" start=\"3\"><li>One</li><li>Two</li><li>Three</li></ol>",
+                     generate(node));
+    }
+
+    @Test public void bulletedListShouldIgnoreStartValue() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "bulletList")
+                .attr("list-type", "bulleted")
+                .attr("start-value", "3")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ul id=\"bulletList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void blockListShouldAllowItemSep() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "mylist")
+                .attr("item-sep", "-AND-A")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ul id=\"mylist\"><li>One-AND-A</li><li>Two-AND-A</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void listItemShouldAllowId() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "mylist")
+                .child(
+                        builder.element("item").attr("id", "anItem").text("One"),
+                        builder.element("item").text("Two")
+                )
+        .build();
+        assertEquals("<ul id=\"mylist\"><li id=\"anItem\">One</li><li>Two</li></ul>",
+                     generate(node));
+    }
+
     private class DOMBuilder {
         private Node node;
 

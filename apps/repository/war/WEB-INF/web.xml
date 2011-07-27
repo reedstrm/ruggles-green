@@ -160,7 +160,7 @@
   
   <servlet>
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.ResourceUploadCompletionServlet</servlet-class>
+    <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
   </servlet>
    
   <servlet-mapping>

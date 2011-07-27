@@ -676,6 +676,58 @@ public class HTMLGeneratorTests {
                      generate(node));
     }
 
+    @Test public void mediaImageShouldRenderAsImg() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "myImage")
+                .attr("alt", "A great image")
+                .child(builder.element("image")
+                        .attr("src", "http://www.example.com/foo.png")
+                        .attr("mime-type", "image/png")
+                        .attr("height", "42")
+                        .attr("width", "128")
+                )
+                .build();
+        assertEquals("<img id=\"myImage\" alt=\"A great image\" "
+                     + "src=\"http://www.example.com/foo.png\" width=\"128\" height=\"42\">",
+                     generate(node));
+    }
+
+    @Test public void mediaObjectShouldRenderAsObject() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(builder.element("object")
+                        .attr("src", "http://www.example.com/my-widget")
+                        .attr("mime-type", "application/x-widget")
+                        .attr("height", "42")
+                        .attr("width", "128")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" "
+                     + "data=\"http://www.example.com/my-widget\" width=\"128\" height=\"42\">"
+                     + "Epic widget</object>",
+                     generate(node));
+    }
+
+    @Test public void mediaShouldIgnorePdf() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(
+                        builder.element("image")
+                                .attr("src", "http://www.example.com/foo.png")
+                                .attr("mime-type", "image/png")
+                                .attr("for", "pdf"),
+                        builder.element("object")
+                                .attr("src", "http://www.example.com/my-widget")
+                                .attr("mime-type", "application/x-widget")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\">"
+                     + "Epic widget</object>",
+                     generate(node));
+    }
+
     private class DOMBuilder {
         private Node node;
 

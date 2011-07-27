@@ -439,20 +439,33 @@
 {/template}
 
 /**
- *  Dispatch the media element.
+ *  Render the media element.
  *
  *  @param node DOM element node
  */
 {template .media}
-    {if findElem($node, 'image')}
-        {call .image}
-            {param id: $node.attributes.id/}
-            {param alt: $node.attributes.alt/}
-            {param node: findElem($node, 'image')/}
-        {/call}
-    {/if}
+    {call .media_dispatch}
+        {param node: media($node)/}
+        {param id: $node.attributes.id/}
+        {param alt: $node.attributes.alt/}
+    {/call}
 {/template}
 
+/**
+ *  Dispatch the media child element.
+ *
+ *  @param node DOM element node for the media child.
+ *  @param id Media ID
+ *  @param alt Media alternate text
+ */
+{template .media_dispatch private="true"}
+    {switch $node.localName}
+        {case 'image'}
+            {call .image data="all"/}
+        {case 'object'}
+            {call .object data="all"/}
+    {/switch}
+{/template}
 
 /**
  *  Render an image inside a media tag.
@@ -462,7 +475,24 @@
  *  @param node The image DOM element node
  */
 {template .image private="true"}
-    <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}">
+    <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}"
+        {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
+        {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
+{/template}
+
+/**
+ *  Render an object inside a media tag.
+ *
+ *  @param id The id from <media>
+ *  @param alt The alternate text from <media>
+ *  @param node The object DOM element node
+ */
+{template .object private="true"}
+    <object id="{$id}" data="{$node.attributes.src}"
+        {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
+        {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
+        {if $alt}{$alt}{/if}
+    </object>
 {/template}
 
 /**

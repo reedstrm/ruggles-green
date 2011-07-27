@@ -29,6 +29,7 @@ import com.google.template.soy.data.restricted.IntegerData;
 import com.google.template.soy.data.restricted.NullData;
 import com.google.template.soy.data.restricted.StringData;
 import com.google.template.soy.shared.restricted.SoyFunction;
+import com.google.template.soy.tofu.SoyTofuException;
 import com.google.template.soy.tofu.restricted.SoyTofuFunction;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,7 @@ class SoyExtras extends AbstractModule {
         soyFunctionsSetBinder.addBinding().to(FindElemFunction.class);
         soyFunctionsSetBinder.addBinding().to(InnerTextFunction.class);
         soyFunctionsSetBinder.addBinding().to(StrtodFunction.class);
+        soyFunctionsSetBinder.addBinding().to(MediaFunction.class);
     }
 
     /**
@@ -173,6 +175,71 @@ class SoyExtras extends AbstractModule {
                 // If the string does not represent an integer, then return Soy null.
                 return NullData.INSTANCE;
             }
+        }
+    }
+
+    /**
+     *  MediaFunction provides the <code>media()</code> function to Soy.
+     *  The function takes one argument: a CNXML DOM node.  It returns the first valid media
+     *  DOM node.
+     */
+    @Singleton private static class MediaFunction implements SoyTofuFunction {
+        private static final String NAME = "media";
+        private static final ImmutableSet<String> MEDIA_ELEMENTS = ImmutableSet.of(
+                "audio",
+                "download",
+                "flash",
+                "image",
+                "java-applet",
+                "object",
+                "video"
+        );
+
+        @Inject public MediaFunction() {}
+
+        @Override public String getName() {
+            return NAME;
+        }
+
+        @Override public Set<Integer> getValidArgsSizes() {
+            return ImmutableSet.of(1);
+        }
+
+        @Override public SoyData computeForTofu(List<SoyData> args) {
+            SoyMapData elem;
+
+            // TODO(light): Better error messages
+            if (args.get(0) instanceof SoyMapData) {
+                elem = (SoyMapData)args.get(0);
+            } else {
+                throw new IllegalArgumentException(
+                        "Argument 1 to " + NAME + "() function is not SoyMapData");
+            }
+
+            // Find first appropriate child node
+            final SoyListData childNodes = elem.getListData("childNodes");
+            for (SoyData childData : childNodes) {
+                if (!(childData instanceof SoyMapData)) {
+                    continue;
+                }
+
+                final SoyMapData child = (SoyMapData)childData;
+                String mediaFor = null;
+                try {
+                    mediaFor = child.getString("attributes.for");
+                } catch (IllegalArgumentException e) {
+                    // The element has no "for" attribute.  Guice is documented to return null for
+                    // a missing key, but actually throws an exception.  Exception can be safely
+                    // ignored.
+                }
+                if ("element".equals(child.getString("nodeType"))
+                        && CNXML.NAMESPACE.equals(child.getString("namespaceURI"))
+                        && MEDIA_ELEMENTS.contains(child.getString("localName"))
+                        && !"pdf".equals(mediaFor)) {
+                    return child;
+                }
+            }
+            return NullData.INSTANCE;
         }
     }
 }

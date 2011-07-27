@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.api;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.util.Nullable;
@@ -168,4 +170,12 @@ public interface CnxRepositoryService {
      */
     RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
         String collectionId);
+    
+     /**
+      * Returns a map of export type ids to export type specification. The result of this
+      * method is guaranteed to be stable throughout the life of this repository service instance
+      * and to be consistent across repository process runs (that is, types can be added, removed
+      * or modifies though ids and types are always stable).
+      */
+     Map<String, ExportType> getExportTypes();
 }

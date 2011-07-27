@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.AddCollectionVersionResult;
@@ -24,6 +26,7 @@ import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateCollectionResult;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.GetModuleInfoResult;
@@ -32,6 +35,7 @@ import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.CollectionOperations;
 import org.cnx.repository.service.impl.operations.ModuleOperations;
 import org.cnx.repository.service.impl.operations.ResourceOperations;
@@ -112,6 +116,11 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
         RepositoryRequestContext context, String collectionId) {
         return CollectionOperations.getCollectionInfo(context, collectionId);
+    }
+    
+    @Override
+    public Map<String, ExportType> getExportTypes() {
+        return ExportTypesConfiguration.getExportTypes();
     }
 
     /**

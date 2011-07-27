@@ -1,29 +1,29 @@
 /*
-    Copyright 2011 Google Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+ *  Copyright 2011 Google Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 // html.soy - Build HTML from CNXML
 
 {namespace org.cnx.html.HTMLGenerator}
 
 /**
-    Primary entry point for HTMLGenerator.  This template takes a CNXML DOM
-    node and dispatches the rendering template.
-
-    @param node DOM node to render
-*/
+ *  Primary entry point for HTMLGenerator.  This template takes a CNXML DOM
+ *  node and dispatches the rendering template.
+ *
+ *  @param node DOM node to render
+ */
 {template .main}
     {if $node.nodeType == 'text'}
         {$node.nodeValue}
@@ -84,28 +84,28 @@
 {/template}
 
 /**
-    Render top-level document.
-
-    @param node DOM document node
-*/
+ *  Render top-level document.
+ *
+ *  @param node DOM document node
+ */
 {template .document}
     {call .children}{param node: findElem($node, 'content')/}{/call}
 {/template}
 
 /**
-    Render a para element.
-
-    @param node DOM element node
-*/
+ *  Render a para element.
+ *
+ *  @param node DOM element node
+ */
 {template .para}
     <p id="{$node.attributes.id}">{call .children data="all"/}</p>
 {/template}
 
 /**
-    Render a section element.
-
-    @param node DOM element node
-*/
+ *  Render a section element.
+ *
+ *  @param node DOM element node
+ */
 {template .section}
     <section id="{$node.attributes.id}">
         <h1>{innerText(findElem($node, 'title'))}</h1>
@@ -114,10 +114,10 @@
 {/template}
 
 /**
-    Render an emphasis element.
-
-    @param node DOM element node
-*/
+ *  Render an emphasis element.
+ *
+ *  @param node DOM element node
+ */
 {template .emphasis}
     {switch $node.attributes.effect}
         {case 'italics'}
@@ -150,10 +150,10 @@
 {/template}
 
 /**
-    Render the CNXML foreign element.
-
-    @param node DOM element node
-*/
+ *  Render the CNXML foreign element.
+ *
+ *  @param node DOM element node
+ */
 {template .foreign}
     <span class="foreign"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
         {call .maybeLink data="all"/}
@@ -161,10 +161,10 @@
 {/template}
 
 /**
-    Render the CNXML term element.
-
-    @param node DOM element node
-*/
+ *  Render the CNXML term element.
+ *
+ *  @param node DOM element node
+ */
 {template .term}
     <span class="term"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
         {call .maybeLink data="all"/}
@@ -172,10 +172,10 @@
 {/template}
 
 /**
-    Render the sup element.
-
-    @param node DOM element node
-*/
+ *  Render the sup element.
+ *
+ *  @param node DOM element node
+ */
 {template .sup}
     {call .span}
         {param node: $node/}
@@ -184,10 +184,10 @@
 {/template}
 
 /**
-    Render the sub element.
-
-    @param node DOM element node
-*/
+ *  Render the sub element.
+ *
+ *  @param node DOM element node
+ */
 {template .sub}
     {call .span}
         {param node: $node/}
@@ -196,10 +196,10 @@
 {/template}
 
 /**
-    Render the preformat element.
-
-    @param node DOM element node
-*/
+ *  Render the preformat element.
+ *
+ *  @param node DOM element node
+ */
 {template .preformat}
     {call .span}
         {param node: $node/}
@@ -208,12 +208,12 @@
 {/template}
 
 /**
-    Generic rendering of an inline element using a span or another element.
-
-    @param node CNXML DOM element node
-    @param elemName? The element name to use (defaults to span)
-    @param className? The class name to use.
-*/
+ *  Generic rendering of an inline element using a span or another element.
+ *
+ *  @param node CNXML DOM element node
+ *  @param? elemName The element name to use (defaults to span)
+ *  @param? className The class name to use.
+ */
 {template .span private="true"}
     <{if $elemName}{$elemName}{else}span{/if}
         {if $className}{sp}class="{$className}"{/if}
@@ -224,10 +224,10 @@
 {/template}
 
 /**
-    Render a list element.
-
-    @param node DOM element node
-*/
+ *  Render a list element.
+ *
+ *  @param node DOM element node
+ */
 {template .list}
     <ul id="{$node.attributes.id}">
         {foreach $child in $node.childNodes}
@@ -239,10 +239,10 @@
 {/template}
 
 /**
-    Render a newline element.
-
-    @param node DOM element node
-*/
+ *  Render a newline element.
+ *
+ *  @param node DOM element node
+ */
 {template .newline}
     // TODO(light): id is ignored
     {if $node.attributes.count}
@@ -259,11 +259,11 @@
 {/template}
 
 /**
-    Render a newline element.
-
-    @param n Number of newlines
-    @param effect? Style of newline (either 'normal' or 'underline')
-*/
+ *  Render a newline element.
+ *
+ *  @param n Number of newlines
+ *  @param? effect Style of newline (either 'normal' or 'underline')
+ */
 {template .newline_private private="true"}
     {for $i in range($n)}
         {if $effect == 'underline'}
@@ -275,12 +275,12 @@
 {/template}
 
 /**
-    Render a link element, or any CNXML element that has link attributes
-    (e.g. foreign, term, etc.).  Note that this requires link attributes to be
-    present; if the attributes are optional, then you should use .maybeLink.
-
-    @param node DOM element node
-*/
+ *  Render a link element, or any CNXML element that has link attributes
+ *  (e.g. foreign, term, etc.).  Note that this requires link attributes to be
+ *  present; if the attributes are optional, then you should use .maybeLink.
+ *
+ *  @param node DOM element node
+ */
 {template .link}
     {if $node.attributes.url}
         <a href="{$node.attributes.url}">{call .children data="all"/}</a>
@@ -292,12 +292,12 @@
 {/template}
 
 /**
-    Render a link element, or any CNXML element that has link attributes
-    (e.g. foreign, term, etc.).  If no link attributes are found, then the
-    children of the node are rendered directly.
-
-    @param node DOM element node
-*/
+ *  Render a link element, or any CNXML element that has link attributes
+ *  (e.g. foreign, term, etc.).  If no link attributes are found, then the
+ *  children of the node are rendered directly.
+ *
+ *  @param node DOM element node
+ */
 {template .maybeLink}
     {if $node.attributes.url or $node.attributes.document or $node.attributes.target_id or $node.attr.resource or $node.attr.version}
         {call .link data="all"/}
@@ -307,10 +307,10 @@
 {/template}
 
 /**
-    Dispatch the media element.
-
-    @param node DOM element node
-*/
+ *  Dispatch the media element.
+ *
+ *  @param node DOM element node
+ */
 {template .media}
     {if findElem($node, 'image')}
         {call .image}
@@ -323,44 +323,44 @@
 
 
 /**
-    Render an image inside a media tag.
-
-    @param id The id from <media>
-    @param alt The alternate text from <media>
-    @param node The image DOM element node
-*/
+ *  Render an image inside a media tag.
+ *
+ *  @param id The id from <media>
+ *  @param alt The alternate text from <media>
+ *  @param node The image DOM element node
+ */
 {template .image private="true"}
     <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}">
 {/template}
 
 /**
-    Render all the children of a parent using .main.
-
-    @param node Parent DOM node
-*/
+ *  Render all the children of a parent using .main.
+ *
+ *  @param node Parent DOM node
+ */
 {template .children private="true"}
     {foreach $child in $node.childNodes}{call .main}{param node: $child/}{/call}{/foreach}
 {/template}
 
 /**
-    Render m:math XML element and its descendants.
-
-    As per the HTML5 specification, there is no namespacing in the output.
-    http://dev.w3.org/html5/spec/the-map-element.html#mathml
-
-    @param node DOM node matching a <m:math> element.
-*/
+ *  Render m:math XML element and its descendants.
+ *
+ *  As per the HTML5 specification, there is no namespacing in the output.
+ *  http://dev.w3.org/html5/spec/the-map-element.html#mathml
+ *
+ *  @param node DOM node matching a <m:math> element.
+ */
 {template .math}
     <math>{call .mathChildren data="all"/}</math>
 {/template}
 
 /**
-    Copy children of a MathML element.
-
-    Don't use .main for this purpose, because .main is expecting CNXML.
-
-    @param node DOM node for a MathML element
-*/
+ *  Copy children of a MathML element.
+ *
+ *  Don't use .main for this purpose, because .main is expecting CNXML.
+ *
+ *  @param node DOM node for a MathML element
+ */
 {template .mathChildren}
     {foreach $child in $node.childNodes}
         {if $child.nodeType == 'text'}
@@ -374,10 +374,10 @@
 {/template}
 
 /**
-    Copy attributes of a MathML element.
-
-    @param node DOM node for a MathML element
-*/
+ *  Copy attributes of a MathML element.
+ *
+ *  @param node DOM node for a MathML element
+ */
 {template .mathAttributes}
     {foreach $attr in $node.attributeNodes}
         {sp}{$attr.localName}="{$attr.nodeValue}"
@@ -385,10 +385,10 @@
 {/template}
 
 /**
-    Render a rule element.
-
-    @param node DOM element node
-*/
+ *  Render a rule element.
+ *
+ *  @param node DOM element node
+ */
 {template .rule}
     {call .numbered data="all"}
         {param class: 'rule'/}
@@ -416,10 +416,10 @@
 {/template}
 
 /**
-    Render a statement element.
-
-    @param node DOM element node
-*/
+ *  Render a statement element.
+ *
+ *  @param node DOM element node
+ */
 {template .statement}
     {call .span data="all"}
         {param elemName: 'div'/}
@@ -428,10 +428,10 @@
 {/template}
 
 /**
-    Render a proof element.
-
-    @param node DOM element node
-*/
+ *  Render a proof element.
+ *
+ *  @param node DOM element node
+ */
 {template .proof}
     <div class="proof"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
         // TODO(light): Heading depth
@@ -441,10 +441,10 @@
 {/template}
 
 /**
-    Render an example element.
-
-    @param node DOM element node
-*/
+ *  Render an example element.
+ *
+ *  @param node DOM element node
+ */
 {template .example}
     {call .numbered data="all"}
         {param class: 'example'/}
@@ -459,10 +459,10 @@
 {/template}
 
 /**
-    Render a definition element.
-
-    @param node DOM element node
-*/
+ *  Render a definition element.
+ *
+ *  @param node DOM element node
+ */
 {template .definition}
     <div class="definition"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
         // TODO(light): Use proper heading levels
@@ -491,10 +491,10 @@
 {/template}
 
 /**
-    Render an exercise element.
-
-    @param node DOM element node
-*/
+ *  Render an exercise element.
+ *
+ *  @param node DOM element node
+ */
 {template .exercise}
     {call .numbered data="all"}
         {param class: 'exercise'/}
@@ -509,10 +509,10 @@
 {/template}
 
 /**
-    Render a commentary element.
-
-    @param node DOM element node
-*/
+ *  Render a commentary element.
+ *
+ *  @param node DOM element node
+ */
 {template .commentary}
     {call .span data="all"}
         {param elemName: 'div'/}
@@ -521,10 +521,10 @@
 {/template}
 
 /**
-    Render a problem element.
-
-    @param node DOM element node
-*/
+ *  Render a problem element.
+ *
+ *  @param node DOM element node
+ */
 {template .problem}
     {call .span data="all"}
         {param elemName: 'div'/}
@@ -533,10 +533,10 @@
 {/template}
 
 /**
-    Render a solution element.
-
-    @param node DOM element node
-*/
+ *  Render a solution element.
+ *
+ *  @param node DOM element node
+ */
 {template .solution}
     {call .span data="all"}
         {param elemName: 'div'/}
@@ -545,10 +545,10 @@
 {/template}
 
 /**
-    Render an equation element.
-
-    @param node DOM element node
-*/
+ *  Render an equation element.
+ *
+ *  @param node DOM element node
+ */
 {template .equation}
     {call .numbered data="all"}
         {param class: 'equation'/}
@@ -563,12 +563,12 @@
 {/template}
 
 /**
-    Render a numbered group.
-
-    @param node DOM node
-    @param class CSS class to apply to the generated div
-    @param label Label for this type
-*/
+ *  Render a numbered group.
+ *
+ *  @param node DOM node
+ *  @param class CSS class to apply to the generated div
+ *  @param label Label for this type
+ */
 {template .numbered private="true"}
     <div class="{$class}"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
         // TODO(light): Use proper heading levels

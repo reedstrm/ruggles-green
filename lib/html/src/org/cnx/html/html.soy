@@ -51,6 +51,10 @@
                 {call .newline data="all"/}
             {case 'preformat'}
                 {call .preformat data="all"/}
+            {case 'code'}
+                {call .code data="all"/}
+            {case 'note'}
+                {call .note data="all"/}
             {case 'media'}
                 {call .media data="all"/}
             {case 'math'}
@@ -205,6 +209,69 @@
         {param node: $node/}
         {param elemName: 'pre'/}
     {/call}
+{/template}
+
+/**
+ *  Render the code element.
+ *
+ *  @param node DOM element node
+ */
+{template .code}
+    {switch $node.attributes.display}
+        {case 'none'}
+            // render nothing
+        {case 'block'}
+            <pre>
+                {call .span data="all"}
+                    {param elemName: 'code'/}
+                {/call}
+            </pre>
+        {default}
+            {call .span data="all"}
+                {param elemName: 'code'/}
+            {/call}
+    {/switch}
+{/template}
+
+/**
+ *  Render the note element.
+ *
+ *  @param node DOM element node
+ */
+{template .note}
+    {switch $node.attributes.display}
+        {case 'none'}
+            // render nothing
+        {case 'inline'}
+            {call .span data="all"}
+                {param className: 'note'/}
+            {/call}
+        {default}
+            <div class="note" id="{$node.attributes.id}">
+                // TODO(light): Use proper heading levels
+                <h2>
+                    {if findElem($node, 'label')}
+                        {innerText(findElem($node, 'label'))}
+                    {else}
+                        {switch $node.attributes.type}
+                            {case 'aside'}
+                                Aside
+                            {case 'warning'}
+                                Warning
+                            {case 'tip'}
+                                Tip
+                            {case 'important'}
+                                Important
+                            {default}
+                                Note
+                        {/switch}
+                    {/if}
+                    :
+                    {if findElem($node, 'title')}{sp}{innerText(findElem($node, 'title'))}{/if}
+                </h2>
+                {call .children data="all"/}
+            </div>
+    {/switch}
 {/template}
 
 /**

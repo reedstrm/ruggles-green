@@ -16,6 +16,7 @@
 
 package org.cnx.html;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.internal.Nullable;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -258,6 +259,107 @@ public class HTMLGeneratorTests {
                      generate(builder.element("preformat").text("my\n text")));
         assertEquals("<pre id=\"myid\">my\n text</pre>",
                      generate(builder.element("preformat").attr("id", "myid").text("my\n text")));
+    }
+
+    @Test public void defaultCodeShouldRenderAsCode() throws Exception {
+        assertEquals("<code>print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").text("print \"Hello\"")));
+        assertEquals("<code id=\"py\">print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").attr("id", "py").text("print \"Hello\"")));
+    }
+
+    @Test public void inlineCodeShouldRenderAsCode() throws Exception {
+        assertEquals("<code>print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").text("print \"Hello\"")));
+        assertEquals("<code id=\"py\">print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").attr("id", "py").text("print \"Hello\"")));
+    }
+
+    @Test public void blockCodeShouldRenderAsPre() throws Exception {
+        final Node node1 = builder.element("code")
+                .attr("display", "block")
+                .text("print \"Hello\"")
+                .build();
+        assertEquals("<pre><code>print &quot;Hello&quot;</code></pre>", generate(node1));
+
+        final Node node2 = builder.element("code")
+                .attr("display", "block")
+                .attr("id", "py")
+                .text("print \"Hello\"")
+                .build();
+        assertEquals("<pre><code id=\"py\">print &quot;Hello&quot;</code></pre>", generate(node2));
+    }
+
+    @Test public void defaultNoteShouldRenderAsDiv() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "cake")
+                .text("Huge success")
+                .build();
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Huge success</div>",
+                     generate(node));
+    }
+
+    @Test public void blockNoteShouldRenderAsDiv() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "cake")
+                .attr("display", "block")
+                .text("Huge success")
+                .build();
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Huge success</div>",
+                     generate(node));
+    }
+
+    @Test public void inlineNoteShouldRenderAsSpan() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "cake")
+                .attr("display", "inline")
+                .text("Huge success")
+                .build();
+        assertEquals("<span class=\"note\" id=\"cake\">Huge success</span>",
+                     generate(node));
+    }
+
+    @Test public void noteTypeShouldChangeHeading() throws Exception {
+        final DOMBuilder b = builder.element("note")
+                .attr("id", "cake")
+                .text("Neurotoxin");
+
+        b.attr("type", "note");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "aside");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Aside:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "warning");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Warning:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "tip");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Tip:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "important");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Important:</h2>Neurotoxin</div>",
+                     generate(b));
+    }
+
+    @Test public void noteLabelShouldChangeHeading() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "sageadvice")
+                .child(builder.element("label").text("Pro tip"))
+                .text("Write tests")
+                .build();
+        assertEquals("<div class=\"note\" id=\"sageadvice\"><h2>Pro tip:</h2>Write tests</div>",
+                     generate(node));
+    }
+
+    @Test public void noteTitleShouldChangeHeading() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "sageadvice")
+                .child(builder.element("title").text("Beginner Mistake"))
+                .text("Write tests")
+                .build();
+        assertEquals("<div class=\"note\" id=\"sageadvice\">"
+                     + "<h2>Note: Beginner Mistake</h2>Write tests</div>",
+                     generate(node));
     }
 
     @Test public void defaultNewlineShouldRenderBr() throws Exception {

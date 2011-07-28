@@ -41,74 +41,74 @@
     -->
   
   <!-- CNX RESOURCE API -->
-  
+
   <servlet>
     <servlet-name>CreateResourceServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.resources.CreateResourceServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>CreateResourceServlet</servlet-name>
     <url-pattern>/resource_factory/create</url-pattern>
-  </servlet-mapping>    
-  
-   <servlet>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>GetResourceServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.resources.GetResourceServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>GetResourceServlet</servlet-name>
     <url-pattern>/resource/*</url-pattern>
   </servlet-mapping>
-  
-    <servlet>
+
+  <servlet>
     <servlet-name>GetResourceInfoServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.resources.GetResourceInfoServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>GetResourceInfoServlet</servlet-name>
     <url-pattern>/resource_info/*</url-pattern>
-  </servlet-mapping>  
-  
-  <!--  CNX MODULES API -->
-  
+  </servlet-mapping>
+
+  <!-- CNX MODULES API -->
+
   <servlet>
     <servlet-name>CreateModuleServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.modules.CreateModuleServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>CreateModuleServlet</servlet-name>
     <url-pattern>/module_factory/create</url-pattern>
-  </servlet-mapping>  
-  
+  </servlet-mapping>
+
   <servlet>
     <servlet-name>AddModuleVersionServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.modules.AddModuleVersionServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>AddModuleVersionServlet</servlet-name>
     <url-pattern>/module_factory/add_version</url-pattern>
   </servlet-mapping>
-  
+
   <servlet>
     <servlet-name>GetModuleVersionServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleVersionServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>GetModuleVersionServlet</servlet-name>
     <url-pattern>/module/*</url-pattern>
   </servlet-mapping>
-  
-   <servlet>
+
+  <servlet>
     <servlet-name>GetModuleInfoServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleInfoServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>GetModuleInfoServlet</servlet-name>
     <url-pattern>/module_info/*</url-pattern>
@@ -157,31 +157,48 @@
   </servlet-mapping>
 
   <!-- Repository service -->
-  
+
   <servlet>
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
     <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
   </servlet>
-   
+
   <servlet-mapping>
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
     <url-pattern>/resource_factory/uploaded/*</url-pattern>
-  </servlet-mapping> 
-   
-  <!--  TEST -->
-  
-   <servlet>
+  </servlet-mapping>
+
+  <!-- TEST -->
+
+  <servlet>
     <servlet-name>TestServlet</servlet-name>
     <servlet-class>org.cnx.repository.test.TestServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>TestServlet</servlet-name>
     <url-pattern>/test</url-pattern>
-  </servlet-mapping>  
-  
-  
-  
+  </servlet-mapping>
+
+  <!-- Mapping for AtomPub API -->
+  <servlet>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer
+    </servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>
+        org.cnx.repository.atompub.servlets.servicedocument;
+      </param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <url-pattern>/atompub/*</url-pattern>
+  </servlet-mapping>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>CnxDemo.html</welcome-file>

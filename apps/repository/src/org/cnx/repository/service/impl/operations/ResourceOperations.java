@@ -21,8 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
+import com.google.common.collect.Lists;
 
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -196,7 +198,8 @@ public class ResourceOperations {
                 "Error serving the resource content: " + resourceId, log, Level.SEVERE, e);
         }
 
-        return ResponseUtil.loggedOk("Resource served: " + resourceId, new ServeResourceResult(),
-            log);
+        KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
+        ServeResourceResult result = new ServeResourceResult(Lists.newArrayList(blobkeyHeader));
+        return ResponseUtil.loggedOk("Resource served: " + resourceId, result, log);
     }
 }

@@ -152,16 +152,19 @@ public class CnxAtomPubClient {
 
         @SuppressWarnings("unchecked")
         List<Link> otherLinks = resourceEntry.getOtherLinks();
-        String uploadUrl = otherLinks.get(0).getHref();
+        // TODO(arjuns) : Create a function to extract out blobstore URL.
+        uploadFileToBlobStore(otherLinks.get(0).getHrefResolved(), file);
 
-        PostMethod postMethod = new PostMethod(uploadUrl);
+        return resourceEntry;
+    }
+
+    public void uploadFileToBlobStore(String blobstoreUrl, File file) throws HttpException, IOException {
+        PostMethod postMethod = new PostMethod(blobstoreUrl);
         Part[] parts = { new FilePart(file.getName(), file) };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
         int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
         // Preconditions.checkState(status == 302);
-
-        return resourceEntry;
     }
 
     public ClientEntry createNewModule() throws ProponoException {
@@ -200,8 +203,7 @@ public class CnxAtomPubClient {
 
         Entry getEntry = null;
         try {
-            getEntry =
-                Atom10Parser.parseEntry(new StringReader(response), null);
+            getEntry = Atom10Parser.parseEntry(new StringReader(response), null);
         } catch (IllegalArgumentException e1) {
             // TODO(arjuns): Auto-generated catch block
             e1.printStackTrace();

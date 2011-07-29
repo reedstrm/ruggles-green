@@ -28,9 +28,11 @@ import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import java.io.IOException;
@@ -38,6 +40,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +52,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 /**
  * Servlet to Handle CNX Resources.
@@ -61,7 +65,7 @@ public class CnxAtomResourceServlet {
     private final String COLLECTION_RESOURCE_POST = "/";
 
     private final String RESOURCE_GET_PATH_PARAM = "resourceId";
-    private final String RESOURCE_GET_URL_PATTERN = "/{"  + RESOURCE_GET_PATH_PARAM  + "}";
+    private final String RESOURCE_GET_URL_PATTERN = "/{" + RESOURCE_GET_PATH_PARAM + "}";
 
     private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
@@ -125,9 +129,23 @@ public class CnxAtomResourceServlet {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
-        repositoryService.serveResouce(atomPubService.getConstants().getRepositoryContext(),
-            resourceId, res);
+        RepositoryResponse<ServeResourceResult> serveResourceResult =
+            repositoryService.serveResouce(atomPubService.getConstants().getRepositoryContext(),
+                resourceId, res);
 
-        return Response.ok().build();
+        if (serveResourceResult.isOk()) {
+            ServeResourceResult result = serveResourceResult.getResult();
+            List<KeyValue> listOfHeaders = result.getListOfHeaders();
+
+            ResponseBuilder responseBuilder = Response.ok();
+
+            for(KeyValue currHeader : listOfHeaders) {
+                responseBuilder.header(currHeader.getKey(), currHeader.getValue());
+            }
+
+            return responseBuilder.build();
+        }
+
+        return Response.serverError().build();
     }
 }

@@ -16,6 +16,7 @@
 
 package org.cnx.html;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.internal.Nullable;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -260,6 +261,107 @@ public class HTMLGeneratorTests {
                      generate(builder.element("preformat").attr("id", "myid").text("my\n text")));
     }
 
+    @Test public void defaultCodeShouldRenderAsCode() throws Exception {
+        assertEquals("<code>print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").text("print \"Hello\"")));
+        assertEquals("<code id=\"py\">print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").attr("id", "py").text("print \"Hello\"")));
+    }
+
+    @Test public void inlineCodeShouldRenderAsCode() throws Exception {
+        assertEquals("<code>print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").text("print \"Hello\"")));
+        assertEquals("<code id=\"py\">print &quot;Hello&quot;</code>",
+                     generate(builder.element("code").attr("id", "py").text("print \"Hello\"")));
+    }
+
+    @Test public void blockCodeShouldRenderAsPre() throws Exception {
+        final Node node1 = builder.element("code")
+                .attr("display", "block")
+                .text("print \"Hello\"")
+                .build();
+        assertEquals("<pre><code>print &quot;Hello&quot;</code></pre>", generate(node1));
+
+        final Node node2 = builder.element("code")
+                .attr("display", "block")
+                .attr("id", "py")
+                .text("print \"Hello\"")
+                .build();
+        assertEquals("<pre><code id=\"py\">print &quot;Hello&quot;</code></pre>", generate(node2));
+    }
+
+    @Test public void defaultNoteShouldRenderAsDiv() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "cake")
+                .text("Huge success")
+                .build();
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Huge success</div>",
+                     generate(node));
+    }
+
+    @Test public void blockNoteShouldRenderAsDiv() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "cake")
+                .attr("display", "block")
+                .text("Huge success")
+                .build();
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Huge success</div>",
+                     generate(node));
+    }
+
+    @Test public void inlineNoteShouldRenderAsSpan() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "cake")
+                .attr("display", "inline")
+                .text("Huge success")
+                .build();
+        assertEquals("<span class=\"note\" id=\"cake\">Huge success</span>",
+                     generate(node));
+    }
+
+    @Test public void noteTypeShouldChangeHeading() throws Exception {
+        final DOMBuilder b = builder.element("note")
+                .attr("id", "cake")
+                .text("Neurotoxin");
+
+        b.attr("type", "note");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "aside");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Aside:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "warning");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Warning:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "tip");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Tip:</h2>Neurotoxin</div>",
+                     generate(b));
+        b.attr("type", "important");
+        assertEquals("<div class=\"note\" id=\"cake\"><h2>Important:</h2>Neurotoxin</div>",
+                     generate(b));
+    }
+
+    @Test public void noteLabelShouldChangeHeading() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "sageadvice")
+                .child(builder.element("label").text("Pro tip"))
+                .text("Write tests")
+                .build();
+        assertEquals("<div class=\"note\" id=\"sageadvice\"><h2>Pro tip:</h2>Write tests</div>",
+                     generate(node));
+    }
+
+    @Test public void noteTitleShouldChangeHeading() throws Exception {
+        final Node node = builder.element("note")
+                .attr("id", "sageadvice")
+                .child(builder.element("title").text("Beginner Mistake"))
+                .text("Write tests")
+                .build();
+        assertEquals("<div class=\"note\" id=\"sageadvice\">"
+                     + "<h2>Note: Beginner Mistake</h2>Write tests</div>",
+                     generate(node));
+    }
+
     @Test public void defaultNewlineShouldRenderBr() throws Exception {
         assertEquals("<br>", generate(builder.element("newline")));
     }
@@ -477,6 +579,152 @@ public class HTMLGeneratorTests {
                 builder.element("equation").attr("id", "my-equation").text("2 + 2 = 4").build();
         assertEquals("<div class=\"equation\" id=\"my-equation\">"
                      + "<h2>Equation 1</h2>2 + 2 = 4</div>",
+                     generate(node));
+    }
+
+    @Test public void defaultListShouldRenderAsUl() throws Exception {
+        final Node node = builder.element("list").attr("id", "basicList").child(
+                builder.element("item").text("One"),
+                builder.element("item").text("Two"),
+                builder.element("item").text("Three")
+        ).build();
+        assertEquals("<ul id=\"basicList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void bulletedListShouldRenderAsUl() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "bulletList")
+                .attr("list-type", "bulleted")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ul id=\"bulletList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void enumeratedListShouldRenderAsOl() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "enumList")
+                .attr("list-type", "enumerated")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ol id=\"enumList\"><li>One</li><li>Two</li><li>Three</li></ol>",
+                     generate(node));
+    }
+
+    @Test public void enumeratedListShouldAllowStartValue() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "enumList")
+                .attr("list-type", "enumerated")
+                .attr("start-value", "3")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ol id=\"enumList\" start=\"3\"><li>One</li><li>Two</li><li>Three</li></ol>",
+                     generate(node));
+    }
+
+    @Test public void bulletedListShouldIgnoreStartValue() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "bulletList")
+                .attr("list-type", "bulleted")
+                .attr("start-value", "3")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ul id=\"bulletList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void blockListShouldAllowItemSep() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "mylist")
+                .attr("item-sep", "-AND-A")
+                .child(
+                        builder.element("item").text("One"),
+                        builder.element("item").text("Two"),
+                        builder.element("item").text("Three")
+                )
+        .build();
+        assertEquals("<ul id=\"mylist\"><li>One-AND-A</li><li>Two-AND-A</li><li>Three</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void listItemShouldAllowId() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "mylist")
+                .child(
+                        builder.element("item").attr("id", "anItem").text("One"),
+                        builder.element("item").text("Two")
+                )
+        .build();
+        assertEquals("<ul id=\"mylist\"><li id=\"anItem\">One</li><li>Two</li></ul>",
+                     generate(node));
+    }
+
+    @Test public void mediaImageShouldRenderAsImg() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "myImage")
+                .attr("alt", "A great image")
+                .child(builder.element("image")
+                        .attr("src", "http://www.example.com/foo.png")
+                        .attr("mime-type", "image/png")
+                        .attr("height", "42")
+                        .attr("width", "128")
+                )
+                .build();
+        assertEquals("<img id=\"myImage\" alt=\"A great image\" "
+                     + "src=\"http://www.example.com/foo.png\" width=\"128\" height=\"42\">",
+                     generate(node));
+    }
+
+    @Test public void mediaObjectShouldRenderAsObject() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(builder.element("object")
+                        .attr("src", "http://www.example.com/my-widget")
+                        .attr("mime-type", "application/x-widget")
+                        .attr("height", "42")
+                        .attr("width", "128")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" "
+                     + "data=\"http://www.example.com/my-widget\" width=\"128\" height=\"42\">"
+                     + "Epic widget</object>",
+                     generate(node));
+    }
+
+    @Test public void mediaShouldIgnorePdf() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(
+                        builder.element("image")
+                                .attr("src", "http://www.example.com/foo.png")
+                                .attr("mime-type", "image/png")
+                                .attr("for", "pdf"),
+                        builder.element("object")
+                                .attr("src", "http://www.example.com/my-widget")
+                                .attr("mime-type", "application/x-widget")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\">"
+                     + "Epic widget</object>",
                      generate(node));
     }
 

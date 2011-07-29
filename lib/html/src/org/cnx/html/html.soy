@@ -51,6 +51,10 @@
                 {call .newline data="all"/}
             {case 'preformat'}
                 {call .preformat data="all"/}
+            {case 'code'}
+                {call .code data="all"/}
+            {case 'note'}
+                {call .note data="all"/}
             {case 'media'}
                 {call .media data="all"/}
             {case 'math'}
@@ -208,6 +212,69 @@
 {/template}
 
 /**
+ *  Render the code element.
+ *
+ *  @param node DOM element node
+ */
+{template .code}
+    {switch $node.attributes.display}
+        {case 'none'}
+            // render nothing
+        {case 'block'}
+            <pre>
+                {call .span data="all"}
+                    {param elemName: 'code'/}
+                {/call}
+            </pre>
+        {default}
+            {call .span data="all"}
+                {param elemName: 'code'/}
+            {/call}
+    {/switch}
+{/template}
+
+/**
+ *  Render the note element.
+ *
+ *  @param node DOM element node
+ */
+{template .note}
+    {switch $node.attributes.display}
+        {case 'none'}
+            // render nothing
+        {case 'inline'}
+            {call .span data="all"}
+                {param className: 'note'/}
+            {/call}
+        {default}
+            <div class="note" id="{$node.attributes.id}">
+                // TODO(light): Use proper heading levels
+                <h2>
+                    {if findElem($node, 'label')}
+                        {innerText(findElem($node, 'label'))}
+                    {else}
+                        {switch $node.attributes.type}
+                            {case 'aside'}
+                                Aside
+                            {case 'warning'}
+                                Warning
+                            {case 'tip'}
+                                Tip
+                            {case 'important'}
+                                Important
+                            {default}
+                                Note
+                        {/switch}
+                    {/if}
+                    :
+                    {if findElem($node, 'title')}{sp}{innerText(findElem($node, 'title'))}{/if}
+                </h2>
+                {call .children data="all"/}
+            </div>
+    {/switch}
+{/template}
+
+/**
  *  Generic rendering of an inline element using a span or another element.
  *
  *  @param node CNXML DOM element node
@@ -229,10 +296,37 @@
  *  @param node DOM element node
  */
 {template .list}
+    {switch $node.attributes.display}
+        {case 'none'}
+            // render nothing
+        {case 'inline'}
+            // TODO(light): inline lists
+        {default}
+            {if $node.attributes.list_type == 'enumerated'}
+                {call .enumerated_list data="all"/}
+            {else}
+                {call .bulleted_list data="all"/}
+            {/if}
+    {/switch}
+{/template}
+
+/**
+ *  Render a <list list-type="bulleted"> element.
+ *
+ *  @param node DOM element node
+ */
+{template .bulleted_list private="true"}
     <ul id="{$node.attributes.id}">
         {foreach $child in $node.childNodes}
             {if $child.localName == 'item'}
-                <li>{call .children}{param node: $child/}{/call}</li>
+                {call .list_item}
+                    {param node: $child/}
+                    {param itemSep}
+                        {if not isLast($child) and $node.attributes.item_sep}
+                            {$node.attributes.item_sep}
+                        {/if}
+                    {/param}
+                {/call}
             {/if}
         {/foreach}
     </ul>
@@ -256,6 +350,44 @@
             {param effect: $node.attributes.effect/}
         {/call}
     {/if}
+{/template}
+
+/**
+ *  Render a <list list-type="enumerated"> element.
+ *
+ *  @param node DOM element node
+ */
+{template .enumerated_list private="true"}
+    <ol id="{$node.attributes.id}"
+        {if $node.attributes.number_style}{sp}type="{$node.attributes.number_style}"{/if}
+        {if $node.attributes.start_value}{sp}start="{$node.attributes.start_value}"{/if}
+        >
+        {foreach $child in $node.childNodes}
+            {if $child.localName == 'item'}
+                {call .list_item}
+                    {param node: $child/}
+                    {param itemSep}
+                        {if not isLast($child) and $node.attributes.item_sep}
+                            {$node.attributes.item_sep}
+                        {/if}
+                    {/param}
+                {/call}
+            {/if}
+        {/foreach}
+    </ol>
+{/template}
+
+/**
+ *  Render an item element.
+ *
+ *  @param node DOM element node
+ *  @param? itemSep Item separator to append
+ */
+{template .list_item private="true"}
+    <li{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
+        {call .children data="all"/}
+        {if $itemSep}{$itemSep}{/if}
+    </li>
 {/template}
 
 /**
@@ -307,20 +439,33 @@
 {/template}
 
 /**
- *  Dispatch the media element.
+ *  Render the media element.
  *
  *  @param node DOM element node
  */
 {template .media}
-    {if findElem($node, 'image')}
-        {call .image}
-            {param id: $node.attributes.id/}
-            {param alt: $node.attributes.alt/}
-            {param node: findElem($node, 'image')/}
-        {/call}
-    {/if}
+    {call .media_dispatch}
+        {param node: media($node)/}
+        {param id: $node.attributes.id/}
+        {param alt: $node.attributes.alt/}
+    {/call}
 {/template}
 
+/**
+ *  Dispatch the media child element.
+ *
+ *  @param node DOM element node for the media child.
+ *  @param id Media ID
+ *  @param alt Media alternate text
+ */
+{template .media_dispatch private="true"}
+    {switch $node.localName}
+        {case 'image'}
+            {call .image data="all"/}
+        {case 'object'}
+            {call .object data="all"/}
+    {/switch}
+{/template}
 
 /**
  *  Render an image inside a media tag.
@@ -330,7 +475,24 @@
  *  @param node The image DOM element node
  */
 {template .image private="true"}
-    <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}">
+    <img id="{$id}" alt="{$alt}" src="{$node.attributes.src}"
+        {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
+        {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
+{/template}
+
+/**
+ *  Render an object inside a media tag.
+ *
+ *  @param id The id from <media>
+ *  @param alt The alternate text from <media>
+ *  @param node The object DOM element node
+ */
+{template .object private="true"}
+    <object id="{$id}" data="{$node.attributes.src}"
+        {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
+        {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
+        {if $alt}{$alt}{/if}
+    </object>
 {/template}
 
 /**

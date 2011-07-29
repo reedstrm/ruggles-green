@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -18,6 +18,11 @@ package org.cnx.repository.tempservlets.resources;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.operations.Services;
+
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,16 +31,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.service.api.RepositoryRequestContext;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.repository.service.impl.operations.Services;
-
 /**
  * A temp API servlet to serve a resource using a GET request.
- * 
+ *
  * TODO(tal): delete this servlet after implementing the real API.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -55,6 +55,7 @@ public class GetResourceServlet extends HttpServlet {
         }
         final String resourceId = matcher.group(1);
 
+        // TODO(arjuns) : This doesnt work.
         final RepositoryResponse<ServeResourceResult> repositoryResponse =
             Services.repository.serveResouce(new RepositoryRequestContext(null), resourceId, resp);
 

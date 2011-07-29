@@ -188,7 +188,7 @@
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <param-value>
-        org.cnx.repository.atompub.servlets.servicedocument;
+        org.cnx.repository.atompub.servlets;
       </param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>

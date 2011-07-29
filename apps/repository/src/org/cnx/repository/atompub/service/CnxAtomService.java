@@ -24,6 +24,8 @@ import com.sun.syndication.propono.atom.common.Workspace;
 
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class CnxAtomService extends AtomService {
     private CnxAtomPubConstants constants;
+    private Workspace workspace;
 
     public CnxAtomPubConstants getConstants() {
         return constants;
@@ -46,14 +49,25 @@ public class CnxAtomService extends AtomService {
          * For Connexions repository, there is only one workspace. Each workspace will have three
          * AtomPubcollections : 1. Resources 2. Modules 3. Collections.
          */
-        Workspace workSpace = new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE,
-            CustomMediaTypes.TEXT);
-        getWorkspaces().add(workSpace);
+        workspace = new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, CustomMediaTypes.TEXT);
+        getWorkspaces().add(workspace);
 
-        workSpace
+        workspace
             .addCollection(getCollectionForCnxResource(constants.getCollectionResourceScheme()));
-        workSpace.addCollection(getCollectionForCnxModule(constants.getCollectionModuleScheme()));
-        workSpace.addCollection(getCollectionForCnxCollection(constants
+        workspace.addCollection(getCollectionForCnxModule(constants.getCollectionModuleScheme()));
+        workspace.addCollection(getCollectionForCnxCollection(constants
             .getCollectionCnxCollectionScheme()));
+
+    }
+
+    /**
+     * Serialize an AtomService object into an XML document
+     */
+    public Document getServiceDocument() {
+        Document doc = new Document();
+        Element root = new Element("service", ATOM_PROTOCOL);
+        doc.setRootElement(root);
+        root.addContent(workspace.workspaceToElement());
+        return doc;
     }
 }

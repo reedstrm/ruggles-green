@@ -1,6 +1,7 @@
 # Use full directory paths compared to directory names.
 # Auto generated folders for Apps
 .metadata/
+appengine-generated/
 apps/repository/war/WEB-INF/classes/
 apps/repository/.settings/
 

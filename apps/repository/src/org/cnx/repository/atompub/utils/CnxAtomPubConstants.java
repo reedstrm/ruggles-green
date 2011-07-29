@@ -18,9 +18,25 @@ package org.cnx.repository.atompub.utils;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
+
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
+import java.io.IOException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -37,6 +53,9 @@ public class CnxAtomPubConstants {
 
     /** Path for REST URL for ATOMPUB API */
     public final URL atomPubRestUrl;
+
+    // TODO(arjuns) : Fix this.
+    public final static int LOCAL_SERVER_PORT= 8888;
 
     public CnxAtomPubConstants(String reqUrl, int port) {
         // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
@@ -92,7 +111,7 @@ public class CnxAtomPubConstants {
     /** Path for Resource AtomPub collection relative to {@link #atomPubRestUrl}. */
     public static final String COLLECTION_RESOURCE_REL_PATH = "/resource";
 
-    /** Get URI for AtomPub collection for CNX Resources. */
+    /** Get URL for AtomPub collection for CNX Resources. */
     public URL getCollectionResourcesAbsPath() {
         try {
             return new URL(atomPubRestUrl + COLLECTION_RESOURCE_REL_PATH);
@@ -103,6 +122,21 @@ public class CnxAtomPubConstants {
             throw new RuntimeException(e);
         }
     }
+
+    /** Get URL for Resource to fetch via AtomPub. */
+    public URL getResourceAbsPath(String resourceId) {
+        try {
+            return new URL(getCollectionResourcesAbsPath() + "/" + resourceId);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Relation tag for BlobstoreUrl under Other Link. */
+    public static final String REL_TAG_FOR_BLOBSTORE_URL = "related";
 
     /** Scheme for AtomPub collection for CnxResources. */
     public final URL getCollectionResourceScheme() {
@@ -121,10 +155,38 @@ public class CnxAtomPubConstants {
     public static final String COLLECTION_MODULE_GET_PATH = "/";
     public static final String COLLECTION_MODULE_POST_PATH = "/";
 
+    /** Version String for all versioned items. */
+    public static final String VERSION_STRING = "version";
+
     /** Get URI for AtomPub collection for CNX Modules. */
     public URL getCollectionModulesAbsPath() {
         try {
             return new URL(atomPubRestUrl + COLLECTION_MODULE_REL_PATH);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Get URL for Module to fetch via AtomPub. */
+    public URL getModuleAbsPath(String moduleId) {
+        try {
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Get URL for ModuleVersion to fetch via AtomPub. */
+    public URL getModuleVersionAbsPath(String moduleId, String version) {
+        try {
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId + "/" + VERSION_STRING
+                + "/" + version);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -170,4 +232,121 @@ public class CnxAtomPubConstants {
 
     /** Name for CNX Workspace. */
     public static final String CNX_WORKSPACE_TITLE = "Connexions Workspace";
+
+    // TODO(arjuns) : remove this.
+    /** Temporary global userId. */
+    public static final String GLOBAL_USER_ID = "temp_user";
+
+    // TODO(arjuns) : remove this.
+    /** Temporary way to get Repository Context. */
+    public RepositoryRequestContext getRepositoryContext() {
+        return new RepositoryRequestContext(GLOBAL_USER_ID);
+    }
+
+    /** Relation tag for Edit links for CNX Resources/Modules/Collections. */
+    public static final String LINK_RELATION_EDIT_TAG = "edit";
+
+    /** Delimeter to connect Ids and Versions. */
+    public static final String DELIMITER_ID_VERSION = ":";
+
+    /** Delimeter for combining CNXML and Resource */
+    public static final String DELIMITER_CONTENT = "!!!!----!!!!";
+
+    /** Default new Version for any module. */
+    public static final int NEW_MODULE_DEFAULT_VERSION = 0;
+
+    /** Get AtomPub Content for CNXML Doc. */
+    private Content getCnxmlContent(String cnxmlDoc) {
+        Content cnxmlContent = new Content();
+        cnxmlContent.setType(CustomMediaTypes.TEXT);
+        cnxmlContent.setValue(cnxmlDoc);
+        cnxmlContent.setSrc("CNXML");
+
+        return cnxmlContent;
+    }
+
+    /** Get AtomPub Content for ResourceMapping Doc. */
+    private Content getResourceMappingContent(String resourceMappingDoc) {
+        Content resourceMappingContent = new Content();
+        resourceMappingContent.setType(CustomMediaTypes.TEXT);
+        resourceMappingContent.setValue(resourceMappingDoc);
+        resourceMappingContent.setSrc("RESOURCE_MAPPING");
+
+        return resourceMappingContent;
+    }
+
+    /** Get AtomPub List of Contents from CNXMl and ResourceMappingDoc. */
+    public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc) {
+
+        StringBuilder contentValueBuilder = new StringBuilder()
+            .append(cnxmlDoc)
+            .append(DELIMITER_CONTENT)
+            .append(resourceMappingDoc);
+
+        Content content = new Content();
+        content.setType(CustomMediaTypes.APPLICATION_ATOM_XML);
+        content.setValue(contentValueBuilder.toString());
+
+        return Lists.newArrayList(content);
+
+        // TODO(arjuns) : Fix this.
+//        return Lists.newArrayList(getCnxmlContent(cnxmlDoc),
+//            getResourceMappingContent(resourceMappingDoc));
+    }
+
+    /** Get CNXML Doc from Content */
+    public static String getCnxmlDocFromContent(Content content) {
+        String contentValue = content.getValue();
+
+        String args[] = contentValue.split(DELIMITER_CONTENT);
+        return args[0];
+    }
+
+    /** Get ResourceMapping Doc from Content */
+    public static String getResourceMappingDocFromContent(Content content) {
+        String contentValue = content.getValue();
+
+        String args[] = contentValue.split(DELIMITER_CONTENT);
+        return args[1];
+    }
+
+    /** Get moduleId/collectionId from AtomId. */
+    public static String getIdFromAtomPubId(String atomPubId) {
+        String[] args = atomPubId.split(":");
+        return args[0];
+    }
+
+    /** Get version from AtomId. */
+    public static String getVersionFromAtomPubId(String atomPubId) {
+        String[] args = atomPubId.split(":");
+        return args[1];
+    }
+
+    /** Get AtomPubId from moduleId/collectionId and version. */
+    public static String getAtomPubIdFromCnxIdAndVersion(String cnxId, String version) {
+        return cnxId + DELIMITER_ID_VERSION + version;
+    }
+
+    // TODO(arjuns) : See if this is better.
+    public static void serializeEntry(Entry entry, Writer writer)
+            throws IllegalArgumentException, FeedException, IOException {
+
+            // Build a feed containing only the entry
+            List<Entry> entries = new ArrayList<Entry>();
+            entries.add(entry);
+            Feed feed1 = new Feed();
+            feed1.setFeedType("atom_1.0");
+            feed1.setEntries(entries);
+
+            // Get Rome to output feed as a JDOM document
+            WireFeedOutput wireFeedOutput = new WireFeedOutput();
+            Document feedDoc = wireFeedOutput.outputJDom(feed1);
+
+            // Grab entry element from feed and get JDOM to serialize it
+//            Element entryElement= (Element)feedDoc.getRootElement().getChildren().get(0);
+
+            XMLOutputter outputter = new XMLOutputter();
+            Element listOfChildren = (Element) feedDoc.getRootElement().getChildren().get(0);
+            outputter.output(listOfChildren, writer);
+        }
 }

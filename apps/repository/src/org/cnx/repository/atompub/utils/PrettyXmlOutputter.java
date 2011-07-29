@@ -15,10 +15,17 @@
  */
 package org.cnx.repository.atompub.utils;
 
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Generator;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 
 /**
@@ -39,6 +46,19 @@ public class PrettyXmlOutputter {
     public static String prettyXmlOutputElement(Element element) {
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         return xmlOutputter.outputString(element);
+    }
+
+    public static String prettyXmlOutputEntry(Entry entry) throws IllegalArgumentException, FeedException, IOException {
+        StringWriter writer = new StringWriter();
+        Atom10Generator.serializeEntry(entry, writer);
+//        CnxAtomPubConstants.serializeEntry(entry, writer);
+        return writer.toString();
+    }
+
+    public static String prettyXmlOutputMyEntry(Entry entry) throws IllegalArgumentException, FeedException, IOException {
+        StringWriter writer = new StringWriter();
+        CnxAtomPubConstants.serializeEntry(entry, writer);
+        return writer.toString();
     }
 
 }

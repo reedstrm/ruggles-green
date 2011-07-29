@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets.servicedocument;
+package org.cnx.repository.atompub.servlets;
 
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxCollectionCategoryEle;
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxModuleCategoryEle;

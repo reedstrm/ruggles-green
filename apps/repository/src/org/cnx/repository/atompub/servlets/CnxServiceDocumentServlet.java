@@ -13,12 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets.servicedocument;
+package org.cnx.repository.atompub.servlets;
 
 import com.sun.syndication.propono.atom.server.AtomRequest;
 import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
-import org.cnx.repository.atompub.service.CnxAtomHandlerUtils;
+import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
@@ -41,20 +41,17 @@ public class CnxServiceDocumentServlet {
     private final String SERVICE_DOCUMENT_GET = "/";
 
     @GET
-//    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-    @Path(SERVICE_DOCUMENT_GET)
-    public Response getServiceDocument(@Context HttpServletRequest req,
-            @Context HttpServletResponse res) {
+    // @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
+            @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
+            @Path(SERVICE_DOCUMENT_GET)
+            public
+            Response getServiceDocument(@Context HttpServletRequest req,
+                    @Context HttpServletResponse res) {
         // TODO(arjuns) : Add caching and exception handling.
         AtomRequest areq = new AtomRequestImpl(req);
-        CnxAtomServiceDocumentHandler serviceDocHandler =
-            CnxAtomHandlerUtils.createCnxServiceAtomHandler(req, res);
+        CnxAtomService atomService = new CnxAtomService(req);
 
-        return Response
-            .ok()
-            .entity(
-                PrettyXmlOutputter.prettyXmlOutputDocument(serviceDocHandler.getAtomService(areq)
-                    .serviceToDocument())).build();
+        return Response.ok().entity(
+            PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument())).build();
     }
 }

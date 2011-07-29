@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets.servicedocument;
+package org.cnx.repository.atompub.servlets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -40,11 +40,10 @@ import java.util.List;
  * @author Arjun Satyapal
  */
 public class CnxServiceDocumentServletTest extends CnxAtomPubBaseTest {
-    private final static String PACKAGE = "org.cnx.repository.atompub.servlets.servicedocument";
     private CnxAtomPubClient cnxClient;
 
     public CnxServiceDocumentServletTest() throws Exception {
-        super(PACKAGE);
+        super();
     }
 
     @Before

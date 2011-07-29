@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets.servicedocument;
+package org.cnx.repository.atompub.servlets;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -29,10 +29,9 @@ import java.net.MalformedURLException;
  * @author Arjun Satyapal
  */
 public class CnxCategoriesDocumentServletTest extends CnxAtomPubBaseTest {
-    private final static String PACKAGE = "org.cnx.repository.atompub.servlets.servicedocument";
 
     public CnxCategoriesDocumentServletTest() throws MalformedURLException {
-        super(PACKAGE);
+        super();
     }
 
     @Test

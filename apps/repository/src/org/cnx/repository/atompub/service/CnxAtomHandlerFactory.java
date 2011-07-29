@@ -15,12 +15,8 @@
  */
 package org.cnx.repository.atompub.service;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sun.syndication.propono.atom.server.AtomHandler;
 import com.sun.syndication.propono.atom.server.AtomHandlerFactory;
-
-import org.cnx.repository.atompub.servlets.servicedocument.CnxAtomServiceDocumentHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,19 +37,11 @@ public class CnxAtomHandlerFactory extends AtomHandlerFactory {
 
     @Override
     public AtomHandler newAtomHandler(HttpServletRequest req, HttpServletResponse res) {
+        return null;
         /*
          * rome-propono assumes that there is only one handler for the whole system. Whereas it is
          * better to have different AtomHandlers for each AtomPub collection.
          */
-        checkNotNull(handlerType,
-                "handlerType should be set in order to create proper CnxAtomHandler.");
-
-        switch (handlerType) {
-        case SERVICE:
-            return new CnxAtomServiceDocumentHandler(req);
-        default:
-            throw new IllegalArgumentException("Unsupported handlerType = " + handlerType);
-        }
     }
 
     public CnxAtomHandlerEnum getHandlerType() {

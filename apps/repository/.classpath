@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jdom-1.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-core-1.8.jar" sourcepath="/usr/local/google/opengitclients/arjunsatyapal/trunk/java_prerequisites/java-jars/jersey-1.8/jersey-core-1.8.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-server-1.8.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-1.0.jar" sourcepath="/usr/local/google/opengitclients/arjunsatyapal/trunk/java_prerequisites/java-jars/rome-1.0/rome-1.0-sources.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-propono-1.0.0.jar" sourcepath="/usr/local/google/opengitclients/arjunsatyapal/trunk/java_prerequisites/java-jars/rome-propono-1.0.0/rome-propono-1.0.0-sources.jar"/>
@@ -24,5 +24,10 @@
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="test/testlib/appengine-testing.1.5.2.jar"/>
+	<classpathentry kind="lib" path="test/testlib/appengine-api-labs.jar"/>
+	<classpathentry kind="lib" path="test/testlib/appengine-api-stubs.jar"/>
+	<classpathentry kind="lib" path="test/testlib/appengine-api.jar"/>
+	<classpathentry kind="lib" path="test/testlib/commons-beanutils-1.8.3.jar" sourcepath="/home/arjuns/Desktop/Downloads/srcjar/commons-beanutils-1.8.3-sources.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

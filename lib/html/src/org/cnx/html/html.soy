@@ -108,7 +108,7 @@
  */
 {template .section}
     <section id="{$node.attributes.id}">
-        <h1>{innerText(findElem($node, 'title'))}</h1>
+        {if findElem($node, 'title')}<h1>{innerText(findElem($node, 'title'))}</h1>{/if}
         {call .children data="all"/}
     </section>
 {/template}

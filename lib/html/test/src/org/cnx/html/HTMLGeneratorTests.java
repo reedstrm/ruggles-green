@@ -128,6 +128,13 @@ public class HTMLGeneratorTests {
                      generate(node));
     }
 
+    @Test public void sectionTitleShouldBeOptional() throws Exception {
+        final Node node = builder.element("section")
+                .attr("id", "xyzzy").text("Hello, World!").build();
+        assertEquals("<section id=\"xyzzy\">Hello, World!</section>",
+                     generate(node));
+    }
+
     @Test public void cleanAttributeNameShouldNotModifyIdentifiers() {
         final String name = "fooBar_42";
         assertEquals(name, HTMLGenerator.xmlAttributeNameToSoyIdentifier(name));

@@ -22,6 +22,7 @@ import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
 
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -54,7 +55,8 @@ public class ResourceOperations {
      *
      * TODO(tal): any way to get the local server prefix at runtime?
      */
-    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:8888";
+    // TODO(arjuns) : Fix the port issue.
+    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT;
 
     private static final Logger log = Logger.getLogger(ResourceOperations.class.getName());
 

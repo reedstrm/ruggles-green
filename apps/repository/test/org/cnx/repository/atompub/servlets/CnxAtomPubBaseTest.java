@@ -32,18 +32,18 @@ import java.net.URL;
  * @author Arjun Satyapal
  */
 public abstract class CnxAtomPubBaseTest extends JerseyTest {
-    //TODO(arjuns) : Move this to parent folder.
+    // TODO(arjuns) : Move this to parent folder.
 
     private final static String PACKAGE = "org.cnx.repository.atompub.servlets";
 
-//    private WebResource webResource;
+    // private WebResource webResource;
     private CnxAtomPubConstants constants;
     private URL cnxServerAtomPubUrl;
     private int cnxServerPort;
 
-//    public WebResource getWebResource() {
-//        return webResource;
-//    }
+    // public WebResource getWebResource() {
+    // return webResource;
+    // }
 
     public CnxAtomPubConstants getConstants() {
         return constants;
@@ -65,18 +65,20 @@ public abstract class CnxAtomPubBaseTest extends JerseyTest {
         super(new WebAppDescriptor.Builder(PACKAGE).contextPath(
             CnxAtomPubConstants.ATOMPUB_URL_PREFIX).build());
 
-//        webResource = resource();// .path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
-//        cnxServerAtomPubUrl = webResource.getURI().toURL();
+        // webResource = resource();// .path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
+        // cnxServerAtomPubUrl = webResource.getURI().toURL();
 
-        //TODO(arjuns) : Temp override as junit is not working with datastore.
-        cnxServerAtomPubUrl = new URL("http://localhost:8888/atompub");
+        // TODO(arjuns) : Temp override as junit is not working with datastore.
+        cnxServerAtomPubUrl =
+            new URL("http://localhost:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
 
         // Initializing AppEngine environment.
         SystemProperty.environment.set(Environment.Value.Development);
 
         // Initializing CnxAtomPub Service.
         constants =
-//            new CnxAtomPubConstants(webResource.getURI().toString(), webResource.getURI().getPort());
-        new CnxAtomPubConstants(cnxServerAtomPubUrl.toString(), 8888);
+        // new CnxAtomPubConstants(webResource.getURI().toString(), webResource.getURI().getPort());
+            new CnxAtomPubConstants(cnxServerAtomPubUrl.toString(),
+                CnxAtomPubConstants.LOCAL_SERVER_PORT);
     }
 }

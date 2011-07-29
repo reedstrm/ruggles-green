@@ -17,7 +17,13 @@
 package org.cnx.html;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.internal.Nullable;
+import com.google.inject.name.Names;
+import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.SoyModule;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -35,14 +41,21 @@ public class HTMLGeneratorTests {
     private Document doc;
     private static HTMLGenerator generator;
     private DOMBuilder builder;
+    private static Injector injector;
 
     @Before public void createDoc() throws Exception {
-        doc = CNXML.getBuilder().newDocument();
-        builder = new DOMBuilder(doc);
+        doc = injector.getInstance(DocumentBuilder.class).newDocument();
+        final String cnxmlNamespace = injector.getInstance(
+                Key.get(String.class, Names.named("CNXML_NAMESPACE")));
+        builder = new DOMBuilder(doc, cnxmlNamespace);
     }
 
     @BeforeClass public static void createGenerator() {
-        generator = new HTMLGenerator();
+        injector = Guice.createInjector(
+                new SoyModule(),
+                new DefaultModule()
+        );
+        generator = injector.getInstance(HTMLGenerator.class);
     }
 
     private String generate(final Node node) throws Exception {
@@ -138,15 +151,15 @@ public class HTMLGeneratorTests {
 
     @Test public void cleanAttributeNameShouldNotModifyIdentifiers() {
         final String name = "fooBar_42";
-        assertEquals(name, HTMLGenerator.xmlAttributeNameToSoyIdentifier(name));
+        assertEquals(name, SoyHTMLGenerator.xmlAttributeNameToSoyIdentifier(name));
     }
 
     @Test public void cleanAttributeNameShouldConvertHyphensToUnderscores() {
-        assertEquals("target_id", HTMLGenerator.xmlAttributeNameToSoyIdentifier("target-id"));
+        assertEquals("target_id", SoyHTMLGenerator.xmlAttributeNameToSoyIdentifier("target-id"));
     }
 
     @Test public void cleanAttributeNameShouldRemoveSpecials() {
-        assertEquals("xmlnsbib", HTMLGenerator.xmlAttributeNameToSoyIdentifier("xmlns:bib"));
+        assertEquals("xmlnsbib", SoyHTMLGenerator.xmlAttributeNameToSoyIdentifier("xmlns:bib"));
     }
 
     @Test public void defaultEmphasisShouldBeStrong() throws Exception {
@@ -730,17 +743,19 @@ public class HTMLGeneratorTests {
 
     private class DOMBuilder {
         private Node node;
-
-        public DOMBuilder() {
-            this.node = null;
-        }
+        private String defaultNamespace;
 
         public DOMBuilder(Node node) {
             this.node = node;
         }
 
+        public DOMBuilder(Node node, String namespace) {
+            this.node = node;
+            this.defaultNamespace = namespace;
+        }
+
         public DOMBuilder element(String tag) {
-            return element(CNXML.NAMESPACE, tag);
+            return element(defaultNamespace, tag);
         }
 
         public DOMBuilder element(String ns, String tag) {

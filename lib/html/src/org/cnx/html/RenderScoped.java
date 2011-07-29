@@ -16,19 +16,17 @@
 
 package org.cnx.html;
 
-import org.w3c.dom.Node;
+import com.google.inject.ScopeAnnotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- *  Implementors of the HTMLGenerator interface can convert CNXML to HTML.
+ *  RenderScoped is the annotation for {@link RenderScope}.
+ *
+ *  @see RenderScope
  */
-public interface HTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
-     *  node passed into generate is usually the XML document node, but it can be a particular element.
-     *
-     *  @param node The CNXML node to render
-     *  @param p The writer to output to
-     *  @return The rendered HTML string
-     */
-    public String generate(Node node) throws Exception;
-}
+@Target({ TYPE, METHOD }) @Retention(RUNTIME) @ScopeAnnotation
+public @interface RenderScoped {}

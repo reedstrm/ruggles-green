@@ -16,22 +16,22 @@
 
 package org.cnx.web;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.SoyModule;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.*;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.*;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.cnx.html.CNXML;
-import org.cnx.html.ContentMathMLProcessor;
+import org.cnx.html.DefaultModule;
+import org.cnx.html.DefaultProcessorModule;
 import org.cnx.html.HTMLGenerator;
-import org.cnx.html.Processor;
+import org.cnx.html.RenderScope;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  *  HTMLRenderServlet is a simple servlet that displays a form for pasting in XML
@@ -45,11 +45,21 @@ public class HTMLRenderServlet extends HttpServlet {
 
     private SoyTofu tofu;
     private HTMLGenerator htmlGenerator;
+    private Provider<DocumentBuilder> documentBuilderProvider;
+    private RenderScope renderScope;
 
     @Override public void init(ServletConfig config) {
-        htmlGenerator = new HTMLGenerator(ImmutableSet.<Processor>of(new ContentMathMLProcessor()));
+        Injector injector = Guice.createInjector(
+                new SoyModule(),
+                new DefaultModule(),
+                new DefaultProcessorModule(),
+                new WebViewModule()
+        );
+        htmlGenerator = injector.getInstance(HTMLGenerator.class);
+        documentBuilderProvider = injector.getProvider(DocumentBuilder.class);
+        renderScope = injector.getInstance(RenderScope.class);
 
-        SoyFileSet.Builder builder = new SoyFileSet.Builder();
+        SoyFileSet.Builder builder = injector.getInstance(SoyFileSet.Builder.class);
         builder.add(new File("base.soy"));
         builder.add(new File("web.soy"));
         tofu = builder.build().compileToJavaObj().forNamespace("org.cnx.web");
@@ -63,31 +73,10 @@ public class HTMLRenderServlet extends HttpServlet {
 
     @Override public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        // Parse source
         final String source = req.getParameter(sourceParam);
-        DocumentBuilder builder;
-        Document sourceDoc;
-
+        final String docHtml;
         try {
-            builder = CNXML.getBuilder();
-        } catch (ParserConfigurationException e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                           "XML parser could not be set up");
-            return;
-        }
-        try {
-            sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
-        } catch (SAXException e) {
-            final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
-            resp.setContentType(mimeType);
-            resp.getWriter().print(tofu.render(".renderFailed", params, null));
-            return;
-        }
-
-        // Generate HTML
-        String docHtml = null;
-        try {
-            docHtml = htmlGenerator.generate(sourceDoc);
+            docHtml = render(source);
         } catch (Exception e) {
             final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
             resp.setContentType(mimeType);
@@ -99,5 +88,20 @@ public class HTMLRenderServlet extends HttpServlet {
         final SoyMapData params = new SoyMapData("source", source, "docHtml", docHtml);
         resp.setContentType(mimeType);
         resp.getWriter().print(tofu.render(".render", params, null));
+    }
+
+    private String render(String source) throws Exception {
+        DocumentBuilder builder;
+        Document sourceDoc;
+
+        renderScope.enter();
+        try {
+            // TODO(light): seed document-specific values
+            builder = documentBuilderProvider.get();
+            sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
+            return htmlGenerator.generate(sourceDoc);
+        } finally {
+            renderScope.exit();
+        }
     }
 }

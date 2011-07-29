@@ -16,19 +16,19 @@
 
 package org.cnx.html;
 
-import org.w3c.dom.Node;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.multibindings.Multibinder;
+import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.tofu.SoyTofu;
 
 /**
- *  Implementors of the HTMLGenerator interface can convert CNXML to HTML.
+ *  DefaultProcessorModule is the default set of DOM processors.
  */
-public interface HTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
-     *  node passed into generate is usually the XML document node, but it can be a particular element.
-     *
-     *  @param node The CNXML node to render
-     *  @param p The writer to output to
-     *  @return The rendered HTML string
-     */
-    public String generate(Node node) throws Exception;
+public class DefaultProcessorModule extends AbstractModule {
+    @Override protected void configure() {
+        Multibinder<Processor> processorBinder = Multibinder.newSetBinder(binder(), Processor.class);
+        processorBinder.addBinding().to(ContentMathMLProcessor.class);
+    }
 }

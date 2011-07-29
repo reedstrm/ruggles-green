@@ -14,21 +14,18 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.web;
 
-import org.w3c.dom.Node;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 /**
- *  Implementors of the HTMLGenerator interface can convert CNXML to HTML.
+ *  WebViewModule is the Guice configuration for the web view application.
  */
-public interface HTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
-     *  node passed into generate is usually the XML document node, but it can be a particular element.
-     *
-     *  @param node The CNXML node to render
-     *  @param p The writer to output to
-     *  @return The rendered HTML string
-     */
-    public String generate(Node node) throws Exception;
+public class WebViewModule extends AbstractModule {
+    @Override protected void configure() {
+        bind(String.class)
+                .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
+                .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
+    }
 }

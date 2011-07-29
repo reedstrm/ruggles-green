@@ -21,6 +21,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Named;
 import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
@@ -195,7 +196,11 @@ class SoyExtras extends AbstractModule {
                 "video"
         );
 
-        @Inject public MediaFunction() {}
+        private final String cnxmlNamespace;
+
+        @Inject public MediaFunction(@Named("CNXML_NAMESPACE") String cnxmlNamespace) {
+            this.cnxmlNamespace = cnxmlNamespace;
+        }
 
         @Override public String getName() {
             return NAME;
@@ -233,7 +238,7 @@ class SoyExtras extends AbstractModule {
                     // ignored.
                 }
                 if ("element".equals(child.getString("nodeType"))
-                        && CNXML.NAMESPACE.equals(child.getString("namespaceURI"))
+                        && cnxmlNamespace.equals(child.getString("namespaceURI"))
                         && MEDIA_ELEMENTS.contains(child.getString("localName"))
                         && !"pdf".equals(mediaFor)) {
                     return child;

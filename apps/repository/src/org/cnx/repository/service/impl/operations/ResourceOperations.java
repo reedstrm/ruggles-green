@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -40,20 +41,21 @@ import com.google.appengine.api.datastore.Key;
 
 /**
  * Implementation of the resource related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ResourceOperations {
     /**
      * Prefix for relative upload URLs.
-     * 
+     *
      * TODO(tal): when running locally in eclipse, blobstore service retruns a partial upload URL
      * that starts with '/'. In this case, we add this prefix. When running on production app
      * engine, blobstore return correctly a full URL.
-     * 
+     *
      * TODO(tal): any way to get the local server prefix at runtime?
      */
-    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:8888";
+    // TODO(arjuns) : Fix the port issue.
+    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT;
 
     private static final Logger log = Logger.getLogger(ResourceOperations.class.getName());
 
@@ -61,6 +63,8 @@ public class ResourceOperations {
      * Base path of the resource upload completion servlet. Should match servlet mapping in web.xml.
      * Servlet mapping should be this value with the suffix "/*".
      */
+    // TODO(arjuns) : Do we need one common URL for uploading all resources, or they need to
+    // be parameterized as well?
     private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/resource_factory/uploaded";
 
     /**

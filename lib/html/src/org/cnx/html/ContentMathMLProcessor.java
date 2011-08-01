@@ -16,36 +16,32 @@
 
 package org.cnx.html;
 
-import javax.xml.transform.Source;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
  *  ContentMathMLProcessor transforms content MathML into presentation MathML.
  */
-public class ContentMathMLProcessor implements Processor {
-    private static final String TRANSFORMER_FACTORY_CLASS =
-            "org.apache.xalan.processor.TransformerFactoryImpl";
-    private Transformer transformer;
+@Singleton public class ContentMathMLProcessor implements Processor {
+    private final Transformer transformer;
+    private final DocumentBuilder documentBuilder;
 
-    public ContentMathMLProcessor() {
-        final TransformerFactory factory = TransformerFactory.newInstance(TRANSFORMER_FACTORY_CLASS, null);
-        final Source xsltSource = new StreamSource(getClass().getResourceAsStream("ctop.xsl"));
-        try {
-            transformer = factory.newTransformer(xsltSource);
-        } catch (TransformerConfigurationException e) {
-            throw new IllegalStateException("ContentMathMLProcessor XSLT is invalid", e);
-        }
+    @Inject public ContentMathMLProcessor(
+            @Named("ContentMathMLProcessor.transformer") Transformer transformer,
+            DocumentBuilder documentBuilder) {
+        this.documentBuilder = documentBuilder;
+        this.transformer = transformer;
     }
 
     public Node process(Node node) throws Exception {
-        final Document doc = CNXML.getBuilder().newDocument();
+        final Document doc = documentBuilder.newDocument();
         transformer.transform(new DOMSource(node), new DOMResult(doc));
         return doc;
     }

@@ -24,11 +24,11 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- *  RenderScoped is the annotation for {@link RenderScope}.
+ *  RenderTime is the annotation for {@link RenderScope}.
  *
- *  @see RenderScope
+ *  @see RenderTime
  */
 @Target({ TYPE, METHOD })
 @Retention(RUNTIME)
 @ScopeAnnotation
-public @interface RenderScoped {}
+public @interface RenderTime {}

@@ -49,7 +49,7 @@ public class DefaultModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), Processor.class);
 
         RenderScope scope = new RenderScope();
-        bindScope(RenderScoped.class, scope);
+        bindScope(RenderTime.class, scope);
         bind(RenderScope.class).toInstance(scope);
     }
 

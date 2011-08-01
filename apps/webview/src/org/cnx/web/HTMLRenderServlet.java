@@ -46,7 +46,7 @@ public class HTMLRenderServlet extends HttpServlet {
     private static final String sourceParam = "source";
 
     private SoyTofu tofu;
-    private HTMLGenerator htmlGenerator;
+    private Provider<HTMLGenerator> generatorProvider;
     private Provider<DocumentBuilder> documentBuilderProvider;
     private RenderScope renderScope;
 
@@ -57,7 +57,6 @@ public class HTMLRenderServlet extends HttpServlet {
                 new DefaultProcessorModule(),
                 new WebViewModule()
         );
-        htmlGenerator = injector.getInstance(HTMLGenerator.class);
         documentBuilderProvider = injector.getProvider(DocumentBuilder.class);
         renderScope = injector.getInstance(RenderScope.class);
 
@@ -105,7 +104,7 @@ public class HTMLRenderServlet extends HttpServlet {
             // TODO(light): seed document-specific values
             builder = documentBuilderProvider.get();
             sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
-            return htmlGenerator.generate(sourceDoc);
+            return generatorProvider.get().generate(sourceDoc);
         } finally {
             renderScope.exit();
         }

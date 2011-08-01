@@ -231,7 +231,11 @@
 {template .list}
     {switch $node.attributes.display}
         {case 'none'}
-            // render nothing
+            {if $node.attributes.list_type == 'enumerated'}
+                {call .enumerated_list data="all"}{param hidden: true/}{/call}
+            {else}
+                {call .bulleted_list data="all"}{param hidden: true/}{/call}
+            {/if}
         {case 'inline'}
             // TODO(light): inline lists
         {default}
@@ -247,9 +251,10 @@
  *  Render a <list list-type="bulleted"> element.
  *
  *  @param node DOM element node
+ *  @param? hidden Whether to hide element
  */
 {template .bulleted_list private="true"}
-    <ul id="{$node.attributes.id}">
+    <ul id="{$node.attributes.id}"{if $hidden} style="display:none;"{/if}>
         {foreach $child in $node.childNodes}
             {if $child.localName == 'item'}
                 {call .list_item}
@@ -266,34 +271,16 @@
 {/template}
 
 /**
- *  Render a newline element.
- *
- *  @param node DOM element node
- */
-{template .newline}
-    // TODO(light): id is ignored
-    {if $node.attributes.count}
-        {call .newline_private}
-            {param n: strtod($node.attributes.count)/}
-            {param effect: $node.attributes.effect/}
-        {/call}
-    {else}
-        {call .newline_private}
-            {param n: 1/}
-            {param effect: $node.attributes.effect/}
-        {/call}
-    {/if}
-{/template}
-
-/**
  *  Render a <list list-type="enumerated"> element.
  *
  *  @param node DOM element node
+ *  @param? hidden Whether to hide element
  */
 {template .enumerated_list private="true"}
     <ol id="{$node.attributes.id}"
         {if $node.attributes.number_style}{sp}type="{$node.attributes.number_style}"{/if}
         {if $node.attributes.start_value}{sp}start="{$node.attributes.start_value}"{/if}
+        {if $hidden}{sp}style="display:none;"{/if}
         >
         {foreach $child in $node.childNodes}
             {if $child.localName == 'item'}
@@ -321,6 +308,26 @@
         {call .children data="all"/}
         {if $itemSep}{$itemSep}{/if}
     </li>
+{/template}
+
+/**
+ *  Render a newline element.
+ *
+ *  @param node DOM element node
+ */
+{template .newline}
+    // TODO(light): id is ignored
+    {if $node.attributes.count}
+        {call .newline_private}
+            {param n: strtod($node.attributes.count)/}
+            {param effect: $node.attributes.effect/}
+        {/call}
+    {else}
+        {call .newline_private}
+            {param n: 1/}
+            {param effect: $node.attributes.effect/}
+        {/call}
+    {/if}
 {/template}
 
 /**

@@ -21,8 +21,12 @@
     <property file="local.properties" />
 
     <resources id="depend_lib">
-        <path path="${soy.path}" />
-        <fileset dir="../../jars" includes="*.jar" />
+        <path>
+            <pathelement path="${soy.path}" />
+            <pathelement location="../../jars/serializer-2.7.1.jar" />
+            <pathelement location="../../jars/xalan-2.7.1.jar" />
+            <pathelement location="../../jars/xml-apis-2.7.1.jar" />
+        </path>
     </resources>
 
     <resources id="resources">

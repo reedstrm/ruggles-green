@@ -24,6 +24,8 @@ import com.google.template.soy.SoyModule;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.*;
 import javax.xml.parsers.DocumentBuilder;
@@ -78,7 +80,11 @@ public class HTMLRenderServlet extends HttpServlet {
         try {
             docHtml = render(source);
         } catch (Exception e) {
-            final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+
+            final SoyMapData params = new SoyMapData("source", source, "reason", sw.toString());
             resp.setContentType(mimeType);
             resp.getWriter().print(tofu.render(".renderFailed", params, null));
             return;

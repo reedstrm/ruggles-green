@@ -14,21 +14,24 @@
  * the License.
  */
 
-package org.cnx.repository.tempservlets.resources;
+package org.cnx.repository.tempservlets.exports;
 
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.service.api.ExportReference;
+import org.cnx.repository.service.api.ExportScopeType;
+import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.api.ServeExportResult;
+import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
+import org.cnx.repository.service.impl.operations.ParamUtil;
 import org.cnx.repository.service.impl.operations.Services;
 
 /**
@@ -39,24 +42,42 @@ import org.cnx.repository.service.impl.operations.Services;
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetResourceServlet extends HttpServlet {
+public class GetExportServlet extends HttpServlet {
 
-    private static final Pattern uriPattern = Pattern.compile("/resource/([a-zA-Z0-9_-]+)");
+    // private static final Pattern uriPattern = Pattern.compile("/resource/([a-zA-Z0-9_-]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Parse request resource id from the query.
-        final String requestURI = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(requestURI);
-        if (!matcher.matches()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                "Could parse resource id in request URI [" + requestURI + "]");
-            return;
-        }
-        final String resourceId = matcher.group(1);
 
-        final RepositoryResponse<ServeResourceResult> repositoryResponse =
-            Services.repository.serveResouce(new RepositoryRequestContext(null), resourceId, resp);
+        // TODO(tal): do validation, check for nulls, etc.
+        // TODO(tal): move param serialization/deserialiazition to to method that take/get export
+        // reference
+        final ExportScopeType scopeType =
+            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
+        final String objectId = req.getParameter("id");
+        final ExportType exportType =
+            ExportTypesConfiguration.getExportTypes().get(req.getParameter("type"));
+        final String versionNumberParam = req.getParameter("version");
+        final Integer versionNumber =
+            (versionNumberParam == null || versionNumberParam.equals("null")) ? null : Integer
+                .valueOf(versionNumberParam);
+
+        // // Parse request resource id from the query.
+        // final String requestURI = req.getRequestURI();
+        // final Matcher matcher = uriPattern.matcher(requestURI);
+        // if (!matcher.matches()) {
+        // resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+        // "Could parse resource id in request URI [" + requestURI + "]");
+        // return;
+        // }
+        // final String resourceId = matcher.group(1);
+
+        final ExportReference exportReference =
+            new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
+
+        final RepositoryResponse<ServeExportResult> repositoryResponse =
+            Services.repository.serveExport(new RepositoryRequestContext(null), exportReference,
+                resp);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

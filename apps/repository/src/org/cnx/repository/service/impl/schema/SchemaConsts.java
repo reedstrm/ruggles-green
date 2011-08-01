@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -61,4 +61,9 @@ public class SchemaConsts {
      * Collection version entities are persisted with keys of this kind.
      */
     public static final String COLLECTION_VERSION_KEY_KIND = "CollectionVer";
+
+    /**
+     * Export item entities are persisted with keys of this kind.
+     */
+    public static final String EXPORT_ITEM_KEY_KIND = "Export";
 }

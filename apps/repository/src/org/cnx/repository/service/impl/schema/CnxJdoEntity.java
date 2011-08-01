@@ -14,14 +14,14 @@
  * the License.
  */
 
-package org.cnx.util;
+package org.cnx.repository.service.impl.schema;
 
 /**
- * Temp replacement for Java @Nullable.
+ * Base class of all CNX JDO entities.
  * 
- * TODO(tal): discard and use javax.annotations.Nullable instead.
+ * @author tal
  * 
- * @author Tal Dayan
  */
-public @interface Nullable {
+public abstract class CnxJdoEntity {
+    // Nothing to add here for now
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -55,12 +55,10 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
     /**
      * This path must match the servlet registration in web.xml.
      */
+    // TODO(tal): change the parameter passing to CGI args rather than path.
     private static final Pattern uriPattern = Pattern
         .compile("/resource_factory/uploaded/([a-zA-Z0-9_-]+)");
 
-    /**
-     * Service entry point for all HTTP methods.
-     */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Parse encoded resource id from the request

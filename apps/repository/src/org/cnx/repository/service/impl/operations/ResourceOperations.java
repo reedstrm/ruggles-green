@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,7 +19,6 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -81,7 +80,7 @@ public class ResourceOperations {
             resourceId = checkNotNull(entity.getResourceId(), "Null resource id");
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Failed to create a new resource", log, Level.SEVERE, e);
+                "Failed to create a new resource", log, e);
         } finally {
             pm.close();
         }
@@ -108,7 +107,7 @@ public class ResourceOperations {
         final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
         if (resourceKey == null) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Resource id has bad format: [" + resourceId + "]", log, Level.WARNING);
+                "Resource id has bad format: [" + resourceId + "]", log);
         }
 
         // Lookup resource entity
@@ -118,7 +117,7 @@ public class ResourceOperations {
             entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                "Could not locate resource [" + resourceId + "]", log, Level.WARNING, e);
+                "Could not locate resource [" + resourceId + "]", log, e);
         } finally {
             pm.close();
         }
@@ -136,7 +135,7 @@ public class ResourceOperations {
                     Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
                 if (blobInfo == null) {
                     return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Could not locate blob at key: " + entity.getBlobKey(), log, Level.SEVERE);
+                        "Could not locate blob at key: " + entity.getBlobKey(), log);
                 }
                 final UploadedResourceContentInfo contentInfo =
                     new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
@@ -145,7 +144,7 @@ public class ResourceOperations {
                 break;
             default:
                 return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                    "Unknown resource entity state:" + entity.getState(), log, Level.SEVERE);
+                    "Unknown resource entity state:" + entity.getState(), log);
         }
 
         return ResponseUtil.loggedOk("Retrieved info of resource " + resourceId, result, log);
@@ -160,7 +159,7 @@ public class ResourceOperations {
         final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
         if (resourceKey == null) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Resource id has bad format: " + resourceId, log, Level.WARNING);
+                "Resource id has bad format: " + resourceId, log);
         }
 
         PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -169,16 +168,13 @@ public class ResourceOperations {
         try {
             JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
             if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
-                return ResponseUtil
-                    .loggedError(RepositoryStatus.STATE_MISMATCH,
-                        "Resource content has not been uploaded yet: " + resourceId, log,
-                        Level.WARNING);
+                return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                    "Resource content has not been uploaded yet: " + resourceId, log);
             }
             blobKey = entity.getBlobKey();
         } catch (Throwable e) {
-            e.printStackTrace();
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                "Could not locate resources: " + resourceId, log, Level.WARNING);
+                "Could not locate resources: " + resourceId, log, e);
         } finally {
             pm.close();
         }
@@ -187,9 +183,8 @@ public class ResourceOperations {
         try {
             Services.blobstore.serve(blobKey, httpResponse);
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Error serving the resource content: " + resourceId, log, Level.SEVERE, e);
+                "Error serving the resource content: " + resourceId, log, e);
         }
 
         return ResponseUtil.loggedOk("Resource served: " + resourceId, new ServeResourceResult(),

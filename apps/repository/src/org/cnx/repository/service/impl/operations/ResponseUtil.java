@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,6 +15,8 @@
  */
 
 package org.cnx.repository.service.impl.operations;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,14 +57,29 @@ class ResponseUtil {
         return RepositoryResponse.newError(status, message);
     }
 
-    static <T> RepositoryResponse<T> loggedError(RepositoryStatus status, String statusDescription,
-        Logger log, Level level, Throwable e) {
-        return internalLoggedError(status, statusDescription, log, Level.SEVERE, e);
+    /**
+     * Map repository status to log level.
+     */
+    private static Level statusLogLevel(RepositoryStatus status) {
+        checkNotNull(status, "null status");
+        switch (status) {
+            case SERVER_ERRROR:
+                return Level.SEVERE;
+            case OK:
+                return Level.INFO;
+            default:
+                return Level.WARNING;
+        }
     }
 
     static <T> RepositoryResponse<T> loggedError(RepositoryStatus status, String statusDescription,
-        Logger log, Level level) {
-        return internalLoggedError(status, statusDescription, log, Level.SEVERE, null);
+        Logger log, Throwable e) {
+        return internalLoggedError(status, statusDescription, log, statusLogLevel(status), e);
+    }
+
+    static <T> RepositoryResponse<T> loggedError(RepositoryStatus status, String statusDescription,
+        Logger log) {
+        return internalLoggedError(status, statusDescription, log, statusLogLevel(status), null);
     }
 
     /**

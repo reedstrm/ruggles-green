@@ -1,7 +1,10 @@
 Repository global todo items
 
-* Replace temp servlets with actual API
+* Add to add module/collection method version param for version conflict detection
+* Replace temp servlets with actual API (Arjun)
+* Support for exports
 * XML update (modify incoming XML with repository values (e.g. version)).
+* Add verifications that uploaded completion method are actually called from blobstore and not directly by a user.
 
 Others
 * parameter validations (in the servlets and the service)

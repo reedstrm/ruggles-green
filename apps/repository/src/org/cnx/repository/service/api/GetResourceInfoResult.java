@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -30,7 +30,8 @@ import org.cnx.util.Nullable;
  */
 public class GetResourceInfoResult {
     enum ResourceState {
-        PENDING_UPLOAD, UPLOADED;
+        PENDING_UPLOAD,
+        UPLOADED;
 
         // TODO(tal): better name?
         public boolean hasContent() {

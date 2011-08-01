@@ -167,6 +167,38 @@
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
     <url-pattern>/resource_factory/uploaded/*</url-pattern>
   </servlet-mapping> 
+  
+   <!--  CNX EXPORTS API -->
+  
+  <servlet>
+    <servlet-name>GetExportUploadUrlServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.exports.GetExportUploadUrlServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetExportUploadUrlServlet</servlet-name>
+    <url-pattern>/exports/getuploadurl</url-pattern>
+  </servlet-mapping>  
+  
+   <servlet>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ExportUploadCompletionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <url-pattern>/exports/uploaded</url-pattern>
+  </servlet-mapping>  
+  
+   <servlet>
+    <servlet-name>GetExportServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.exports.GetExportServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetExportServlet</servlet-name>
+    <url-pattern>/exports/get</url-pattern>
+  </servlet-mapping> 
    
   <!--  TEST -->
   

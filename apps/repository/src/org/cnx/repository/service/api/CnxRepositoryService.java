@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -170,12 +170,53 @@ public interface CnxRepositoryService {
      */
     RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
         String collectionId);
-    
-     /**
-      * Returns a map of export type ids to export type specification. The result of this
-      * method is guaranteed to be stable throughout the life of this repository service instance
-      * and to be consistent across repository process runs (that is, types can be added, removed
-      * or modifies though ids and types are always stable).
-      */
-     Map<String, ExportType> getExportTypes();
+
+    /**
+     * Returns a map of export type ids to export type specification. The result of this method is
+     * guaranteed to be stable throughout the life of this repository service instance and to be
+     * consistent across repository process runs (that is, types can be added, removed or modifies
+     * though ids and types are always stable).
+     */
+    Map<String, ExportType> getExportTypes();
+
+    /**
+     * Get an upload URL to attach an export to an entity.
+     * 
+     * The actual export is not published until it content is actually posted successfully. If this
+     * export already exists, the new content overwrites the existing one.
+     * 
+     * @param context the request context.
+     * @param exportReference reference to the export to be uploaded.
+     * 
+     * @return operation response.
+     */
+    RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
+        RepositoryRequestContext context, ExportReference exportReference);
+
+    /**
+     * Serve export content.
+     * 
+     * Send the export content with its content type to the given servlet response. This is
+     * typically called from a doGet() of a servlet. If the returned status is OK, no further action
+     * is required from the servlet.
+     * 
+     * TODO(tal): comment about the state of httpServlet when returning with an error (is the
+     * response changed? Does caller need to reset it?)>
+     * 
+     * @param context the query context
+     * @param exportRererence reference to the export to be served
+     * @param httpResponse the HttpResponse to which the export should be served.
+     */
+    RepositoryResponse<ServeExportResult> serveExport(RepositoryRequestContext context,
+        ExportReference exportReference, HttpServletResponse httpResponse);
+
+    /**
+     * Delete an export.
+     * 
+     * @param context the request context.
+     * @param exportReference reference to the export to be deleted.
+     * @return operation response.
+     */
+    RepositoryResponse<DeleteExportResult> deleteExport(RepositoryRequestContext context,
+        ExportReference exportReference);
 }

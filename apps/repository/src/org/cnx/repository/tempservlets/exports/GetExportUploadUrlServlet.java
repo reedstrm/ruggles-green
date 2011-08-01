@@ -14,11 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.tempservlets.modules;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+package org.cnx.repository.tempservlets.exports;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,38 +23,42 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.ExportReference;
+import org.cnx.repository.service.api.ExportScopeType;
+import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.operations.ParamUtil;
 import org.cnx.repository.service.impl.operations.Services;
 
 /**
- * A temp API servlet to add a version for an existing module.
+ * A temp API servlet to create initiate export upload.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class AddModuleVersionServlet extends HttpServlet {
+public class GetExportUploadUrlServlet extends HttpServlet {
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        final String cnxmlDoc =
-            checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
-        final String resourceMapDoc =
-            checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
-        final String moduleId =
-            checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
-            req.getParameterMap().size());
+        final ExportScopeType scopeType =
+            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
+        final String objectId = req.getParameter("id");
+        final String exportTypeId = req.getParameter("type");
+        final String versionNumberParam = req.getParameter("version");
+        final Integer versionNumber =
+            versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
-            Services.repository.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
+        final ExportReference exportReference =
+            new ExportReference(scopeType, objectId, versionNumber, exportTypeId);
 
-        // Map repository error to API error.
+        RepositoryResponse<GetExportUploadUrlResult> repositoryResponse =
+            Services.repository.getExportUploadUrl(context, exportReference);
+
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {
                 case BAD_REQUEST:
@@ -77,13 +77,11 @@ public class AddModuleVersionServlet extends HttpServlet {
         }
 
         // Map repository OK to API OK
-        checkState(repositoryResponse.isOk());
-        final AddModuleVersionResult result = repositoryResponse.getResult();
-
+        final GetExportUploadUrlResult result = repositoryResponse.getResult();
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("module id: " + result.getModuleId());
-        out.println("new version number: " + result.getNewVersionNumber());
+        out.println("upload url: " + result.getExportUploadUrl());
+        out.println("expected type: " + result.getExpectedContentType());
     }
 }

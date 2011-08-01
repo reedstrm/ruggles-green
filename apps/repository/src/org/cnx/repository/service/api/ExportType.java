@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -28,33 +28,26 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableSet;
  * @author Tal Dayan
  */
 public class ExportType {
-    /**
-     * The type of repository objects to which an export can be attached.
-     * 
-     * @author tal
-     */
-    public enum Scope {
-        RESOURCE, MODULE_VERSION, MODULE, COLLECTION_VERSION, COLLECTION
-    }
 
     private final String id;
     private final String contentType;
-    private final Set<Scope> allowedScopes;
+    private final Set<ExportScopeType> allowedScopeTypes;
 
     /**
      * @param id export type id. This is a stable and non empty web safe string that is unique (case
      *            sensitive) among all export types ever supported.
      * @param contentType content type of this export type. e.g. "application/pdf" for PDF. content
      *            type is not unique in the sense that multiple export types may have the same
-     *            content type. Only content of this type is accepted by the system for this
-     *            export type.
-     * @param allowedScopes the set of scopes to which this export type can be attached. OK to have
-     *            an empty set.
+     *            content type. Only content of this type is accepted by the system for this export
+     *            type.
+     * @param allowedScopeTypes the set of scopes to which this export type can be attached. OK to
+     *            have an empty set.
      */
-    public ExportType(String id, String contentType, Set<Scope> allowedScopes) {
+    public ExportType(String id, String contentType, Set<ExportScopeType> allowedScopeTypes) {
+        // TODO(tal): assert that id is a web safe string (a-zA-Z._-0-9).
         this.id = checkNotNull(id);
         this.contentType = checkNotNull(contentType);
-        this.allowedScopes = ImmutableSet.copyOf(allowedScopes);
+        this.allowedScopeTypes = ImmutableSet.copyOf(allowedScopeTypes);
     }
 
     public String getId() {
@@ -65,7 +58,7 @@ public class ExportType {
         return contentType;
     }
 
-    public Set<Scope> getValidScopes() {
-        return allowedScopes;
+    public Set<ExportScopeType> getAllowedScopeTypes() {
+        return allowedScopeTypes;
     }
 }

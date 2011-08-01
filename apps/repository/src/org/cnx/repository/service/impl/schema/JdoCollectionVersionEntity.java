@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -34,7 +34,7 @@ import com.google.appengine.api.datastore.Text;
  * @author Tal Dayan
  */
 @PersistenceCapable(table = SchemaConsts.COLLECTION_VERSION_KEY_KIND)
-public class JdoCollectionVersionEntity {
+public class JdoCollectionVersionEntity extends CnxJdoEntity {
 
     /**
      * This key is a child key of the collection entity. Its child id equals the version number of

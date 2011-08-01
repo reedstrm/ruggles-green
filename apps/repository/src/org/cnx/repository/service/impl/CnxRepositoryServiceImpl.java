@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -26,19 +26,25 @@ import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateCollectionResult;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.DeleteExportResult;
+import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
+import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.GetModuleInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.CollectionOperations;
+import org.cnx.repository.service.impl.operations.ExportOperations;
 import org.cnx.repository.service.impl.operations.ModuleOperations;
 import org.cnx.repository.service.impl.operations.ResourceOperations;
+import org.cnx.util.ImplementMeNow;
 import org.cnx.util.Nullable;
 
 /**
@@ -117,10 +123,28 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
         RepositoryRequestContext context, String collectionId) {
         return CollectionOperations.getCollectionInfo(context, collectionId);
     }
-    
+
     @Override
     public Map<String, ExportType> getExportTypes() {
         return ExportTypesConfiguration.getExportTypes();
+    }
+
+    @Override
+    public RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
+        RepositoryRequestContext context, ExportReference exportReference) {
+        return ExportOperations.getExportUploadUrl(context, exportReference);
+    }
+
+    @Override
+    public RepositoryResponse<ServeExportResult> serveExport(RepositoryRequestContext context,
+        ExportReference exportReference, HttpServletResponse httpResponse) {
+        return ExportOperations.serveExport(context, exportReference, httpResponse);
+    }
+
+    @Override
+    public RepositoryResponse<DeleteExportResult> deleteExport(RepositoryRequestContext context,
+        ExportReference exportReference) {
+        throw new ImplementMeNow();
     }
 
     /**

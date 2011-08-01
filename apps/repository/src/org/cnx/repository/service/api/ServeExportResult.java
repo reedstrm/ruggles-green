@@ -14,14 +14,13 @@
  * the License.
  */
 
-package org.cnx.util;
+package org.cnx.repository.service.api;
 
 /**
- * Temp replacement for Java @Nullable.
- * 
- * TODO(tal): discard and use javax.annotations.Nullable instead.
+ * Result of a successful serveExport() operation.
  * 
  * @author Tal Dayan
  */
-public @interface Nullable {
+public class ServeExportResult {
+    // TODO(tal): any attribute to return (size, type, etc)?
 }

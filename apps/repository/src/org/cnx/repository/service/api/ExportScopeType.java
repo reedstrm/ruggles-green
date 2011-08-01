@@ -14,14 +14,23 @@
  * the License.
  */
 
-package org.cnx.util;
+package org.cnx.repository.service.api;
 
 /**
- * Temp replacement for Java @Nullable.
- * 
- * TODO(tal): discard and use javax.annotations.Nullable instead.
+ * Represent the type of object to which an export can be attach
  * 
  * @author Tal Dayan
  */
-public @interface Nullable {
+public enum ExportScopeType {
+    MODULE_VERSION,
+    MODULE,
+    COLLECTION_VERSION,
+    COLLECTION;
+
+    /**
+     * Test if this scope type is a version of a parent entity.
+     */
+    public boolean isVersion() {
+        return this == MODULE_VERSION || this == COLLECTION_VERSION;
+    }
 }

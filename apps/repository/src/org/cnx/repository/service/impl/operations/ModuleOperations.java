@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,7 +19,6 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -62,7 +61,7 @@ public class ModuleOperations {
             moduleId = checkNotNull(entity.getModuleId(), "Null module id");
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Error when trying to create a new module", log, Level.SEVERE, e);
+                "Error when trying to create a new module", log, e);
         } finally {
             pm.close();
         }
@@ -80,8 +79,7 @@ public class ModuleOperations {
         final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Cannot add module version, module id has bad format: [" + moduleId + "]", log,
-                Level.WARNING);
+                "Cannot add module version, module id has bad format: [" + moduleId + "]", log);
         }
 
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -97,8 +95,7 @@ public class ModuleOperations {
             } catch (Throwable e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                    "Cannot add module version, module not found: " + moduleId, log, Level.WARNING,
-                    e);
+                    "Cannot add module version, module not found: " + moduleId, log, e);
             }
 
             // Updated number of versions in the module entity
@@ -116,7 +113,7 @@ public class ModuleOperations {
         } catch (Throwable e) {
             tx.rollback();
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Error while trying to add a version to module " + moduleId, log, Level.SEVERE, e);
+                "Error while trying to add a version to module " + moduleId, log, e);
         } finally {
             if (tx.isActive()) {
                 log.severe("Transaction left opened when adding module version:  " + moduleId);
@@ -138,13 +135,13 @@ public class ModuleOperations {
 
         if (moduleVersion != null && moduleVersion < 1) {
             ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Illegal module version number "
-                + moduleVersion, log, Level.WARNING);
+                + moduleVersion, log);
         }
 
         final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
             ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Module id has bad format: ["
-                + moduleId + "]", log, Level.WARNING);
+                + moduleId + "]", log);
         }
 
         PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -164,12 +161,12 @@ public class ModuleOperations {
                     moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
                 } catch (Throwable e) {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                        "Could not locate module " + moduleId, log, Level.WARNING);
+                        "Could not locate module " + moduleId, log);
                 }
                 // If module has no versions than there is not latest version.
                 if (moduleEntity.getVersionCount() < 1) {
                     ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
-                        "Module has no versions: " + moduleId, log, Level.WARNING);
+                        "Module has no versions: " + moduleId, log);
                 }
                 versionToServe = moduleEntity.getVersionCount();
             } else {
@@ -185,9 +182,10 @@ public class ModuleOperations {
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
             } catch (Throwable e) {
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                    "Error while looking module version " + moduleId + "/" + versionToServe, log,
-                    Level.SEVERE, e);
+                return ResponseUtil
+                    .loggedError(RepositoryStatus.SERVER_ERRROR,
+                        "Error while looking module version " + moduleId + "/" + versionToServe,
+                        log, e);
             }
         } finally {
             pm.close();
@@ -207,7 +205,7 @@ public class ModuleOperations {
         final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Module id has invalid format: " + moduleId, log, Level.WARNING);
+                "Module id has invalid format: " + moduleId, log);
         }
 
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -216,7 +214,7 @@ public class ModuleOperations {
             moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not find module "
-                + moduleId, log, Level.WARNING, e);
+                + moduleId, log, e);
         } finally {
             pm.close();
         }

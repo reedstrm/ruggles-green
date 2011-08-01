@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
+import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
 
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
@@ -44,8 +45,8 @@ public class ExportTypesConfiguration {
      * Internal utility method to add an export type to a map builder.
      */
     private static void addType(ImmutableMap.Builder<String, ExportType> builder, String id,
-        String contentType, ExportType.Scope... allowedScopes) {
-        builder.put(id, new ExportType(id, contentType, Sets.newHashSet(allowedScopes)));
+        String contentType, ExportScopeType... allowedScopeTypes) {
+        builder.put(id, new ExportType(id, contentType, Sets.newHashSet(allowedScopeTypes)));
     }
 
     /**
@@ -58,12 +59,14 @@ public class ExportTypesConfiguration {
             new ImmutableMap.Builder<String, ExportType>();
 
         // Canonical PDF
-        addType(builder, "pdf_std", "application/pdf", ExportType.Scope.MODULE,
-            ExportType.Scope.COLLECTION);
-        
+        addType(builder, "pdf_std", "application/pdf", ExportScopeType.MODULE,
+            ExportScopeType.MODULE_VERSION, ExportScopeType.COLLECTION,
+            ExportScopeType.COLLECTION_VERSION);
+
         // Canonical EPUB
-        addType(builder, "epub_std", "application/xhtml+xml", ExportType.Scope.MODULE,
-            ExportType.Scope.COLLECTION);
+        addType(builder, "epub_std", "application/xhtml+xml", ExportScopeType.MODULE,
+            ExportScopeType.MODULE_VERSION, ExportScopeType.COLLECTION,
+            ExportScopeType.COLLECTION_VERSION);
 
         return builder.build();
     }

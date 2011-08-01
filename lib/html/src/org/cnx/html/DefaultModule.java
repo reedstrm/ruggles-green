@@ -37,9 +37,11 @@ public class DefaultModule extends AbstractModule {
     @Override protected void configure() {
         bind(HTMLGenerator.class).to(SoyHTMLGenerator.class);
         bind(DocumentBuilder.class).toProvider(DocumentBuilderProvider.class).asEagerSingleton();
-        bind(TransformerFactory.class).toProvider(TransformerFactoryProvider.class).asEagerSingleton();
+        bind(TransformerFactory.class)
+                .toProvider(TransformerFactoryProvider.class)
+                .asEagerSingleton();
         bind(String.class)
-                .annotatedWith(Names.named("CNXML_NAMESPACE"))
+                .annotatedWith(CnxmlNamespace.class)
                 .toInstance("http://cnx.rice.edu/cnxml");
         install(new SoyExtras());
 

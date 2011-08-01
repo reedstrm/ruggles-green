@@ -64,7 +64,9 @@ public class SoyHTMLGenerator implements HTMLGenerator {
             "rule"
     );
 
-    @BindingAnnotation @Target({ FIELD, PARAMETER, METHOD }) @Retention(RUNTIME)
+    @BindingAnnotation
+    @Target({ FIELD, PARAMETER, METHOD })
+    @Retention(RUNTIME)
     public @interface Template {}
 
     private final SoyTofu tofu;
@@ -72,7 +74,7 @@ public class SoyHTMLGenerator implements HTMLGenerator {
     private final String cnxmlNamespace;
 
     @Inject public SoyHTMLGenerator(@Template SoyTofu tofu, Set<Processor> processors,
-            @Named("CNXML_NAMESPACE") String cnxmlNamespace) {
+            @CnxmlNamespace String cnxmlNamespace) {
         this.tofu = tofu;
         this.processors = ImmutableSet.copyOf(processors);
         this.cnxmlNamespace = cnxmlNamespace;

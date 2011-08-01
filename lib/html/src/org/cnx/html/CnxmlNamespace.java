@@ -16,20 +16,15 @@
 
 package org.cnx.html;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
-import com.google.inject.multibindings.Multibinder;
-import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.tofu.SoyTofu;
+import com.google.inject.BindingAnnotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- *  DefaultProcessorModule is the default set of DOM processors.
- */
-public class DefaultProcessorModule extends AbstractModule {
-    @Override protected void configure() {
-        Multibinder<Processor> processorBinder =
-                Multibinder.newSetBinder(binder(), Processor.class);
-        processorBinder.addBinding().to(ContentMathMLProcessor.class);
-    }
-}
+@BindingAnnotation
+@Target({ FIELD, PARAMETER, METHOD })
+@Retention(RUNTIME)
+public @interface CnxmlNamespace {}

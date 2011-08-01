@@ -28,5 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  *  @see RenderScope
  */
-@Target({ TYPE, METHOD }) @Retention(RUNTIME) @ScopeAnnotation
+@Target({ TYPE, METHOD })
+@Retention(RUNTIME)
+@ScopeAnnotation
 public @interface RenderScoped {}

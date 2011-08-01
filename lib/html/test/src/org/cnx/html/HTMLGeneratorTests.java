@@ -46,7 +46,7 @@ public class HTMLGeneratorTests {
     @Before public void createDoc() throws Exception {
         doc = injector.getInstance(DocumentBuilder.class).newDocument();
         final String cnxmlNamespace = injector.getInstance(
-                Key.get(String.class, Names.named("CNXML_NAMESPACE")));
+                Key.get(String.class, CnxmlNamespace.class));
         builder = new DOMBuilder(doc, cnxmlNamespace);
     }
 

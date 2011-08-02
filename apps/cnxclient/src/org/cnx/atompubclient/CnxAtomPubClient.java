@@ -16,7 +16,6 @@ package org.cnx.atompubclient;
  * the License.
  */
 
-
 import com.google.common.base.Preconditions;
 
 import com.sun.syndication.feed.atom.Entry;
@@ -160,7 +159,8 @@ public class CnxAtomPubClient {
         return resourceEntry;
     }
 
-    public void uploadFileToBlobStore(String blobstoreUrl, File file) throws HttpException, IOException {
+    public void uploadFileToBlobStore(String blobstoreUrl, File file) throws HttpException,
+            IOException {
         PostMethod postMethod = new PostMethod(blobstoreUrl);
         Part[] parts = { new FilePart(file.getName(), file) };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));

@@ -38,28 +38,32 @@ import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
 public class HTMLGeneratorTests {
-    private Document doc;
-    private static HTMLGenerator generator;
-    private DOMBuilder builder;
     private static Injector injector;
+    private Document doc;
+    private DOMBuilder builder;
 
-    @Before public void createDoc() throws Exception {
-        doc = injector.getInstance(DocumentBuilder.class).newDocument();
-        final String cnxmlNamespace = injector.getInstance(
-                Key.get(String.class, Names.named("CNXML_NAMESPACE")));
-        builder = new DOMBuilder(doc, cnxmlNamespace);
-    }
-
-    @BeforeClass public static void createGenerator() {
+    @BeforeClass public static void createInjector() {
         injector = Guice.createInjector(
                 new SoyModule(),
                 new DefaultModule()
         );
-        generator = injector.getInstance(HTMLGenerator.class);
+    }
+
+    @Before public void init() throws Exception {
+        doc = injector.getInstance(DocumentBuilder.class).newDocument();
+        final String cnxmlNamespace = injector.getInstance(
+                Key.get(String.class, CnxmlNamespace.class));
+        builder = new DOMBuilder(doc, cnxmlNamespace);
     }
 
     private String generate(final Node node) throws Exception {
-        return generator.generate(node);
+        final RenderScope scope = injector.getInstance(RenderScope.class);
+        scope.enter();
+        try {
+            return injector.getInstance(HTMLGenerator.class).generate(node);
+        } finally {
+            scope.exit();
+        }
     }
 
     private String generate(final DOMBuilder builder) throws Exception {

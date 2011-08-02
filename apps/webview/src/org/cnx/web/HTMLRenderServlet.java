@@ -24,6 +24,8 @@ import com.google.template.soy.SoyModule;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.*;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,7 +46,7 @@ public class HTMLRenderServlet extends HttpServlet {
     private static final String sourceParam = "source";
 
     private SoyTofu tofu;
-    private HTMLGenerator htmlGenerator;
+    private Provider<HTMLGenerator> generatorProvider;
     private Provider<DocumentBuilder> documentBuilderProvider;
     private RenderScope renderScope;
 
@@ -55,7 +57,6 @@ public class HTMLRenderServlet extends HttpServlet {
                 new DefaultProcessorModule(),
                 new WebViewModule()
         );
-        htmlGenerator = injector.getInstance(HTMLGenerator.class);
         documentBuilderProvider = injector.getProvider(DocumentBuilder.class);
         renderScope = injector.getInstance(RenderScope.class);
 
@@ -78,7 +79,11 @@ public class HTMLRenderServlet extends HttpServlet {
         try {
             docHtml = render(source);
         } catch (Exception e) {
-            final SoyMapData params = new SoyMapData("source", source, "reason", e.toString());
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+
+            final SoyMapData params = new SoyMapData("source", source, "reason", sw.toString());
             resp.setContentType(mimeType);
             resp.getWriter().print(tofu.render(".renderFailed", params, null));
             return;
@@ -99,7 +104,7 @@ public class HTMLRenderServlet extends HttpServlet {
             // TODO(light): seed document-specific values
             builder = documentBuilderProvider.get();
             sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
-            return htmlGenerator.generate(sourceDoc);
+            return generatorProvider.get().generate(sourceDoc);
         } finally {
             renderScope.exit();
         }

@@ -16,17 +16,15 @@
 
 package org.cnx.html;
 
-import com.google.inject.ScopeAnnotation;
+import com.google.inject.BindingAnnotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- *  RenderScoped is the annotation for {@link RenderScope}.
- *
- *  @see RenderScope
- */
-@Target({ TYPE, METHOD }) @Retention(RUNTIME) @ScopeAnnotation
-public @interface RenderScoped {}
+@BindingAnnotation
+@Target({ FIELD, PARAMETER, METHOD })
+@Retention(RUNTIME)
+public @interface CnxmlNamespace {}

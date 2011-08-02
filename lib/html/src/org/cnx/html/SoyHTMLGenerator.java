@@ -52,7 +52,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  *  SoyHTMLGenerator converts a CNXML file to HTML using Closure Templates.
  */
-public class SoyHTMLGenerator implements HTMLGenerator {
+@RenderTime public class SoyHTMLGenerator implements HTMLGenerator {
     public static final String SOY_NAMESPACE = "org.cnx.html.SoyHTMLGenerator";
     private static final ImmutableSet<String> NUMBERED_ELEMENTS = ImmutableSet.of(
             "definition",
@@ -64,7 +64,9 @@ public class SoyHTMLGenerator implements HTMLGenerator {
             "rule"
     );
 
-    @BindingAnnotation @Target({ FIELD, PARAMETER, METHOD }) @Retention(RUNTIME)
+    @BindingAnnotation
+    @Target({ FIELD, PARAMETER, METHOD })
+    @Retention(RUNTIME)
     public @interface Template {}
 
     private final SoyTofu tofu;
@@ -72,7 +74,7 @@ public class SoyHTMLGenerator implements HTMLGenerator {
     private final String cnxmlNamespace;
 
     @Inject public SoyHTMLGenerator(@Template SoyTofu tofu, Set<Processor> processors,
-            @Named("CNXML_NAMESPACE") String cnxmlNamespace) {
+            @CnxmlNamespace String cnxmlNamespace) {
         this.tofu = tofu;
         this.processors = ImmutableSet.copyOf(processors);
         this.cnxmlNamespace = cnxmlNamespace;

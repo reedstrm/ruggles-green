@@ -198,7 +198,7 @@ class SoyExtras extends AbstractModule {
 
         private final String cnxmlNamespace;
 
-        @Inject public MediaFunction(@Named("CNXML_NAMESPACE") String cnxmlNamespace) {
+        @Inject public MediaFunction(@CnxmlNamespace String cnxmlNamespace) {
             this.cnxmlNamespace = cnxmlNamespace;
         }
 

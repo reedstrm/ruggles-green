@@ -24,7 +24,8 @@ import org.w3c.dom.Node;
 public interface HTMLGenerator {
     /**
      *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
-     *  node passed into generate is usually the XML document node, but it can be a particular element.
+     *  node passed into generate is usually the XML document node, but it can be a particular
+     *  element.
      *
      *  @param node The CNXML node to render
      *  @param p The writer to output to

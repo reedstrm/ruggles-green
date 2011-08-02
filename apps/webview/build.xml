@@ -88,7 +88,7 @@
         <copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="../../jars" includes="*.jar" />
         </copy>
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false">
+        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="appengine_lib"/>

@@ -31,7 +31,7 @@
              inheritAll="true"
              target="default"
              dir="${third.party.jars}" />
-
+        
         <ant antfile="guava/build.xml"
              inheritAll="true"
              target="default"
@@ -42,9 +42,12 @@
              target="default"
              dir="${third.party.jars}" />
 
-        <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
-        
-        <javac srcdir="${srcdir}" destdir="${classdir}" includeantruntime="false" debug="true">
+        <fileset id="depend_lib" dir="${output.jars}" includes="*.jar"/>
+
+        <javac srcdir="${srcdir}"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
@@ -61,6 +64,7 @@
     <tstamp>
         <format property="timenow" pattern="ddMMyyyyHHmm" />
     </tstamp>
+
 
     <property name="common-jar-name" value="cnx-common" />
     <property name="dest-common-jar" value="${libdir}/${common-jar-name}.${timenow}.jar" />

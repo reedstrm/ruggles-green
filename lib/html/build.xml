@@ -22,7 +22,7 @@
 
     <resources id="depend_lib">
         <path>
-            <pathelement path="${soy.path}" />
+            <pathelement location="../../jars/soy-20100708.jar" />
             <pathelement location="../../jars/serializer-2.7.1.jar" />
             <pathelement location="../../jars/xalan-2.7.1.jar" />
             <pathelement location="../../jars/xml-apis-2.7.1.jar" />
@@ -36,15 +36,6 @@
 
     <target name="compile"
             description="Compile the classes">
-        <fail message="Please define the soy.path property to point to your Closure Template JAR">
-            <condition>
-                <not> <and>
-                        <isset property="soy.path"/>
-                        <available file="${soy.path}"/>
-                </and> </not>
-            </condition>
-        </fail>
-
         <mkdir dir="${classdir}"/>
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}"/>

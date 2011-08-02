@@ -83,7 +83,7 @@
                     description="Compile the application servlet code">
         <mkdir dir="${classdir}"/>
         <mkdir dir="${war.dir}/WEB-INF/lib"/>
-        <copy file="${soy.path}" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
+        <copy file="../../jars/soy-20100708.jar" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
         <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
         <copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="../../jars" includes="*.jar" />

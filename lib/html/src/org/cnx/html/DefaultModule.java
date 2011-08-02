@@ -35,7 +35,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class DefaultModule extends AbstractModule {
     @Override protected void configure() {
-        bind(HTMLGenerator.class).to(SoyHTMLGenerator.class);
+        bind(HTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
         bind(DocumentBuilder.class).toProvider(DocumentBuilderProvider.class).asEagerSingleton();
         bind(TransformerFactory.class)
                 .toProvider(TransformerFactoryProvider.class)

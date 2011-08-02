@@ -46,7 +46,8 @@
     </target>
 
     <target name="test"
-            description="Run unit tests">
+            description="Run unit tests"
+            depends="jar">
         <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
             <condition>
                 <not> <and>
@@ -59,12 +60,6 @@
         <mkdir dir="${test.dir}"/>
         <mkdir dir="${test.outdir}"/>
 
-        <javac srcdir="src" destdir="${test.dir}" includeantruntime="false" debug="true" >
-            <compilerarg line="${javac.flags}"/>
-            <classpath>
-                <resources refid="depend_lib" />
-            </classpath>
-        </javac>
         <javac srcdir="${test.src}" destdir="${test.dir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}"/>
             <classpath>
@@ -73,21 +68,19 @@
                 <pathelement location="org.cnx.html.jar"/>
             </classpath>
         </javac>
-        <copy todir="${test.dir}">
-            <resources refid="resources" />
-        </copy>
 
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
             <jvmarg value="-enableassertions"/>
             <classpath>
                 <resources refid="depend_lib" />
                 <pathelement path="${junit.path}"/>
+                <pathelement location="org.cnx.html.jar"/>
                 <pathelement location="${test.dir}"/>
             </classpath>
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*.java"/>
+                    <include name="**/*Tests.java"/>
                 </fileset>
             </batchtest>
         </junit>

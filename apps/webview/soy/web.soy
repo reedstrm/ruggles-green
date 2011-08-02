@@ -79,6 +79,7 @@
  *  Rendered output
  *
  *  @param source CNXML
+ *  @param moduleId CNXML module ID
  *  @param docHtml HTML of CNXML document
  */
 {template .render}
@@ -87,7 +88,7 @@
         {param content}
             <div class="copy">{$docHtml|noAutoescape}</div>
             <h1>Source</h1>
-            {call .editForm}{param source: $source/}{/call}
+            {call .editForm data="all"/}
         {/param}
     {/call}
 {/template}
@@ -96,6 +97,7 @@
  *  Render failed
  *
  *  @param source CNXML
+ *  @param moduleId CNXML module ID
  *  @param reason Reason why render failed
  */
 {template .renderFailed}
@@ -105,7 +107,7 @@
             <p>Your render failed, the error is as follows:</p>
             <pre style="color:red">{$reason}</pre>
             <h1>Source</h1>
-            {call .editForm}{param source: $source/}{/call}
+            {call .editForm data="all"/}
         {/param}
     {/call}
 {/template}
@@ -114,9 +116,11 @@
  *  CNXML editor
  *
  *  @param? source CNXML
+ *  @param? moduleId CNXML module ID
  */
 {template .editForm private="true"}
     <form action="/" method="POST">
+        Module ID: <input name="module" type="text"{if $moduleId} value="{$moduleId}"{/if}><br>
         <textarea name="source" rows="40" cols="80">{if $source}{$source}{/if}</textarea><br>
         <input type="submit" value="Render">
     </form>

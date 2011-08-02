@@ -18,7 +18,9 @@ package org.cnx.web;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyModule;
 import com.google.template.soy.data.SoyMapData;
@@ -44,6 +46,7 @@ import org.w3c.dom.Document;
 public class HTMLRenderServlet extends HttpServlet {
     private static final String mimeType = "text/html; charset=utf-8";
     private static final String sourceParam = "source";
+    private static final String moduleIdParam = "module";
 
     private SoyTofu tofu;
     private Provider<HTMLGenerator> generatorProvider;
@@ -57,6 +60,7 @@ public class HTMLRenderServlet extends HttpServlet {
                 new DefaultProcessorModule(),
                 new WebViewModule()
         );
+        generatorProvider = injector.getProvider(HTMLGenerator.class);
         documentBuilderProvider = injector.getProvider(DocumentBuilder.class);
         renderScope = injector.getInstance(RenderScope.class);
 
@@ -75,33 +79,42 @@ public class HTMLRenderServlet extends HttpServlet {
     @Override public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         final String source = req.getParameter(sourceParam);
+        final String moduleId = req.getParameter(moduleIdParam);
         final String docHtml;
         try {
-            docHtml = render(source);
+            docHtml = render(moduleId, source);
         } catch (Exception e) {
             final StringWriter sw = new StringWriter();
             final PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
 
-            final SoyMapData params = new SoyMapData("source", source, "reason", sw.toString());
+            final SoyMapData params = new SoyMapData(
+                    "source", source,
+                    "moduleId", moduleId,
+                    "reason", sw.toString()
+            );
             resp.setContentType(mimeType);
             resp.getWriter().print(tofu.render(".renderFailed", params, null));
             return;
         }
 
         // Render response
-        final SoyMapData params = new SoyMapData("source", source, "docHtml", docHtml);
+        final SoyMapData params = new SoyMapData(
+                "source", source,
+                "moduleId", moduleId,
+                "docHtml", docHtml
+        );
         resp.setContentType(mimeType);
         resp.getWriter().print(tofu.render(".render", params, null));
     }
 
-    private String render(String source) throws Exception {
+    private String render(String moduleId, String source) throws Exception {
         DocumentBuilder builder;
         Document sourceDoc;
 
         renderScope.enter();
         try {
-            // TODO(light): seed document-specific values
+            renderScope.seed(Key.get(String.class, Names.named("moduleId")), moduleId);
             builder = documentBuilderProvider.get();
             sourceDoc = builder.parse(new ByteArrayInputStream(source.getBytes()));
             return generatorProvider.get().generate(sourceDoc);

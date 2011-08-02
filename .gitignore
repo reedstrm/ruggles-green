@@ -3,7 +3,7 @@
 .metadata/
 appengine-generated/
 apps/repository/war/WEB-INF/classes/
-apps/repository/.settings/
+.settings/
 
 # ignoring jars
 appengine-*.jar

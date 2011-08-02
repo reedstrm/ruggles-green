@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/jars/appengine-api-1.0-sdk-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-appengine-1.0.9.final.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-core-1.1.5.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-jpa-1.1.5.jar"/>
+	<classpathentry kind="lib" path="build/jars/geronimo-jpa_3.0_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/geronimo-jta_1.1_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
+	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsr107cache-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/validation-api-1.0.0.GA-sources.jar"/>
+	<classpathentry kind="lib" path="build/jars/validation-api-1.0.0.GA.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

@@ -84,9 +84,11 @@
         <copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="${third_party}">
                 <include name="soy-20100708.jar"/>
-                <include name="xalan-2.7.1.jar"/>
-                <include name="serializer-2.7.1.jar"/>
-                <include name="xml-apis-2.7.1.jar"/>
+            </fileset>
+            <fileset dir="${third_party}/xalan-2.7.1">
+                <include name="xalan.jar"/>
+                <include name="serializer.jar"/>
+                <include name="xml-apis.jar"/>
             </fileset>
         </copy>
         <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />

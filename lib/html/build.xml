@@ -22,10 +22,10 @@
 
     <resources id="depend_lib">
         <path>
-            <pathelement location="../../jars/soy-20100708.jar" />
-            <pathelement location="../../jars/serializer-2.7.1.jar" />
-            <pathelement location="../../jars/xalan-2.7.1.jar" />
-            <pathelement location="../../jars/xml-apis-2.7.1.jar" />
+            <pathelement location="../../third_party/soy-20100708.jar" />
+            <pathelement location="../../third_party/serializer-2.7.1.jar" />
+            <pathelement location="../../third_party/xalan-2.7.1.jar" />
+            <pathelement location="../../third_party/xml-apis-2.7.1.jar" />
         </path>
     </resources>
 

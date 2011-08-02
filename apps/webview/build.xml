@@ -83,7 +83,18 @@
         <mkdir dir="${war.dir}/WEB-INF/lib"/>
         <copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="${third_party}">
-                <include name="soy-20100708.jar"/>
+                <include name="soy-excluding-deps-20100708.jar" />
+                <include name="jsr305.jar" />
+            </fileset>
+            <fileset dir="${third_party}/guava/guava-r09">
+                <include name="guava-r09.jar" />
+            </fileset>
+            <fileset dir="${third_party}/guice">
+                <include name="aopalliance.jar" />
+                <include name="guice-3.0.jar" />
+                <include name="guice-assistedinject-3.0.jar" />
+                <include name="guice-multibindings-3.0.jar" />
+                <include name="javax.inject.jar" />
             </fileset>
             <fileset dir="${third_party}/xalan-2.7.1">
                 <include name="xalan.jar"/>

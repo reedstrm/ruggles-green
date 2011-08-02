@@ -22,7 +22,14 @@
 
     <resources id="depend_lib">
         <path>
-            <pathelement location="${third_party}/soy-20100708.jar" />
+            <pathelement location="${third_party}/jsr305.jar" />
+            <pathelement location="${third_party}/guava/guava-r09/guava-r09.jar" />
+            <pathelement location="${third_party}/guice/aopalliance.jar" />
+            <pathelement location="${third_party}/guice/guice-3.0.jar" />
+            <pathelement location="${third_party}/guice/guice-assistedinject-3.0.jar" />
+            <pathelement location="${third_party}/guice/guice-multibindings-3.0.jar" />
+            <pathelement location="${third_party}/guice/javax.inject.jar" />
+            <pathelement location="${third_party}/soy-excluding-deps-20100708.jar" />
             <pathelement location="${third_party}/xalan-2.7.1/serializer.jar" />
             <pathelement location="${third_party}/xalan-2.7.1/xalan.jar" />
             <pathelement location="${third_party}/xalan-2.7.1/xml-apis.jar" />

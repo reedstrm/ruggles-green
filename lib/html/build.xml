@@ -22,10 +22,10 @@
 
     <resources id="depend_lib">
         <path>
-            <pathelement location="../../third_party/soy-20100708.jar" />
-            <pathelement location="../../third_party/serializer-2.7.1.jar" />
-            <pathelement location="../../third_party/xalan-2.7.1.jar" />
-            <pathelement location="../../third_party/xml-apis-2.7.1.jar" />
+            <pathelement location="${third_party}/soy-20100708.jar" />
+            <pathelement location="${third_party}/serializer-2.7.1.jar" />
+            <pathelement location="${third_party}/xalan-2.7.1.jar" />
+            <pathelement location="${third_party}/xml-apis-2.7.1.jar" />
         </path>
     </resources>
 
@@ -48,15 +48,6 @@
     <target name="test"
             description="Run unit tests"
             depends="jar">
-        <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
-            <condition>
-                <not> <and>
-                        <isset property="junit.path"/>
-                        <available file="${junit.path}"/>
-                </and> </not>
-            </condition>
-        </fail>
-
         <mkdir dir="${test.dir}"/>
         <mkdir dir="${test.outdir}"/>
 
@@ -64,7 +55,7 @@
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${junit.path}"/>
+                <pathelement path="${third_party}/junit-4.8.2.jar"/>
                 <pathelement location="org.cnx.html.jar"/>
             </classpath>
         </javac>
@@ -73,7 +64,7 @@
             <jvmarg value="-enableassertions"/>
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${junit.path}"/>
+                <pathelement path="${third_party}/junit-4.8.2.jar"/>
                 <pathelement location="org.cnx.html.jar"/>
                 <pathelement location="${test.dir}"/>
             </classpath>

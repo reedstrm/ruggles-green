@@ -34,7 +34,6 @@
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
     <import file="${appengine.sdk}/config/user/ant-macros.xml"/>
 
-
     <target name="war" depends="enhance" 
                     description="Assemble the application directory">
         <mkdir dir="${war.dir}/WEB-INF"/>
@@ -73,7 +72,6 @@
     </resources>
     <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
 
-    <property name="html.dir" location="../../lib/html"/>
     <target name="html">
         <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
     </target>
@@ -83,11 +81,15 @@
                     description="Compile the application servlet code">
         <mkdir dir="${classdir}"/>
         <mkdir dir="${war.dir}/WEB-INF/lib"/>
-        <copy file="../../third_party/soy-20100708.jar" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
-        <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
         <copy todir="${war.dir}/WEB-INF/lib">
-            <fileset dir="../../third_party" includes="*.jar" />
+            <fileset dir="${third_party}">
+                <include name="soy-20100708.jar"/>
+                <include name="xalan-2.7.1.jar"/>
+                <include name="serializer-2.7.1.jar"/>
+                <include name="xml-apis-2.7.1.jar"/>
+            </fileset>
         </copy>
+        <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
             <classpath>
@@ -99,15 +101,6 @@
     <target name="test"
                     description="Run unit tests"
                     depends="compile, war">
-        <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
-            <condition>
-                <not> <and>
-                        <isset property="junit.path"/>
-                        <available file="${junit.path}"/>
-                </and> </not>
-            </condition>
-        </fail>
-
         <mkdir dir="${test.dir}"/>
         <mkdir dir="${test.outdir}"/>
 
@@ -115,7 +108,7 @@
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="appengine_lib"/>
-                <pathelement path="${junit.path}"/>
+                <pathelement path="${third_party}/junit-4.8.2.jar"/>
                 <pathelement location="${classdir}"/>
             </classpath>
         </javac>
@@ -123,7 +116,7 @@
             <classpath>
                 <resources refid="appengine_lib"/>
                 <pathelement path="${appengine.sdk}/lib/testing/appengine-testing.jar"/>
-                <pathelement path="${junit.path}"/>
+                <pathelement path="${third_party}/junit-4.8.2.jar"/>
                 <pathelement location="${classdir}"/>
                 <pathelement location="${test.dir}"/>
             </classpath>

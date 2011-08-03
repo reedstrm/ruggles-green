@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
+	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-assistedinject-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-multibindings-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/javax.inject.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

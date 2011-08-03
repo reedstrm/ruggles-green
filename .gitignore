@@ -6,6 +6,7 @@ apps/repository/war/WEB-INF/classes/
 .settings/
 bin/
 war/
+*.class
 
 # ignoring jars
 appengine-*.jar

@@ -33,6 +33,7 @@
             <pathelement location="${third_party}/xalan-2.7.1/serializer.jar" />
             <pathelement location="${third_party}/xalan-2.7.1/xalan.jar" />
             <pathelement location="${third_party}/xalan-2.7.1/xml-apis.jar" />
+            <pathelement location="${util.dir}/build/org.cnx.util.jar" />
         </path>
     </resources>
 
@@ -42,7 +43,8 @@
     </resources>
 
     <target name="compile"
-            description="Compile the classes">
+            description="Compile the classes"
+            depends="util">
         <mkdir dir="${classdir}"/>
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}"/>
@@ -50,6 +52,10 @@
                 <resources refid="depend_lib" />
             </classpath>
         </javac>
+    </target>
+
+    <target name="util">
+        <ant antfile="${util.dir}/build.xml" dir="${util.dir}" target="jar" inheritAll="false" />
     </target>
 
     <target name="test"

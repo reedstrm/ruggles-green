@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -25,7 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- *  DocumentBuilderProvider provides a DocumentBuilder
+ *  DocumentBuilderProvider allows Guice to inject DocumentBuilder instances.
  */
 public class DocumentBuilderProvider implements Provider<DocumentBuilder> {
     private static final String XML_EXTERNAL_ENTITIES_ATTR =

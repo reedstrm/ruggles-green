@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -22,7 +22,7 @@ import com.google.inject.name.Named;
 import javax.xml.transform.TransformerFactory;
 
 /**
- *  TransformerFactoryProvider provides TransformerFactory objects.
+ *  TransformerFactoryProvider allows Guice to inject TransformerFactory instances.
  */
 public class TransformerFactoryProvider implements Provider<TransformerFactory> {
     private String factoryClass;

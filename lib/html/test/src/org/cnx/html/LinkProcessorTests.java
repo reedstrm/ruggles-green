@@ -17,6 +17,7 @@
 package org.cnx.html;
 
 import java.net.URI;
+import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

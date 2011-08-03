@@ -25,7 +25,6 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
@@ -36,10 +35,6 @@ import javax.xml.transform.stream.StreamSource;
 public class DefaultModule extends AbstractModule {
     @Override protected void configure() {
         bind(HTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
-        bind(DocumentBuilder.class).toProvider(DocumentBuilderProvider.class).asEagerSingleton();
-        bind(TransformerFactory.class)
-                .toProvider(TransformerFactoryProvider.class)
-                .asEagerSingleton();
         bind(String.class)
                 .annotatedWith(CnxmlNamespace.class)
                 .toInstance("http://cnx.rice.edu/cnxml");
@@ -60,7 +55,7 @@ public class DefaultModule extends AbstractModule {
     }
 
     @Provides @Singleton @Named("ContentMathMLProcessor.transformer")
-            Transformer provideTransformer(TransformerFactory factory) {
+            Transformer provideContentMathMLTransformer(TransformerFactory factory) {
         try {
             return factory.newTransformer(new StreamSource(
                         ContentMathMLProcessor.class.getResourceAsStream("ctop.xsl")));

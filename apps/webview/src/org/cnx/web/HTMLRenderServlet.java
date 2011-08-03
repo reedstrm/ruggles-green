@@ -35,6 +35,7 @@ import org.cnx.html.DefaultModule;
 import org.cnx.html.DefaultProcessorModule;
 import org.cnx.html.HTMLGenerator;
 import org.cnx.html.RenderScope;
+import org.cnx.util.UtilModule;
 import org.w3c.dom.Document;
 
 /**
@@ -55,9 +56,10 @@ public class HTMLRenderServlet extends HttpServlet {
 
     @Override public void init(ServletConfig config) {
         Injector injector = Guice.createInjector(
-                new SoyModule(),
                 new DefaultModule(),
                 new DefaultProcessorModule(),
+                new SoyModule(),
+                new UtilModule(),
                 new WebViewModule()
         );
         generatorProvider = injector.getProvider(HTMLGenerator.class);

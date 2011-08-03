@@ -29,6 +29,8 @@ import java.io.StringWriter;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.cnx.util.UtilModule;
+import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,8 +46,9 @@ public class HTMLGeneratorTests {
 
     @BeforeClass public static void createInjector() {
         injector = Guice.createInjector(
+                new DefaultModule(),
                 new SoyModule(),
-                new DefaultModule()
+                new UtilModule()
         );
     }
 

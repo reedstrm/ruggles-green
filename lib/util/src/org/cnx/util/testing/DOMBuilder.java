@@ -14,14 +14,17 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.util.testing;
 
 import com.google.common.base.Preconditions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-class DOMBuilder {
+/**
+ *  A DOMBuilder instance builds XML DOM trees using the builder pattern.
+ */
+public class DOMBuilder {
     private static final String CONTENT_TAG = "content";
     private Node node;
     private String defaultNamespace;
@@ -49,7 +52,7 @@ class DOMBuilder {
     }
 
     public DOMBuilder element(String ns, String tag) {
-        return new DOMBuilder(getDocument().createElementNS(ns, tag));
+        return new DOMBuilder(getDocument().createElementNS(ns, tag), defaultNamespace);
     }
 
     public DOMBuilder attr(String key, String value) {

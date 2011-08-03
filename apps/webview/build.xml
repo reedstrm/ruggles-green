@@ -76,9 +76,13 @@
         <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
     </target>
 
+    <target name="util">
+        <ant antfile="${util.dir}/build.xml" dir="${util.dir}" target="jar" inheritAll="false" />
+    </target>
+
     <target name="compile"
-                    depends="html"
-                    description="Compile the application servlet code">
+            depends="html, util"
+            description="Compile the application servlet code">
         <mkdir dir="${classdir}"/>
         <mkdir dir="${war.dir}/WEB-INF/lib"/>
         <copy todir="${war.dir}/WEB-INF/lib">
@@ -103,6 +107,7 @@
             </fileset>
         </copy>
         <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
+        <copy file="${util.dir}/build/org.cnx.util.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.util.jar" />
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
             <classpath>

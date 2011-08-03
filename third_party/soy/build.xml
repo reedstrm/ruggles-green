@@ -14,26 +14,22 @@
     limitations under the License.
 -->
 
-<project name="appengine" default="default">
+<project name="soy" default="default">
     <description>
-        Copies AppEngine jar to output.jars dir.
+        <!-- Fixing description and checks for other build.xmls -->
+        Copies soy jar to ${target_dir}
     </description>
 
-    <resources id="appengine-1.5.2">
-        <fileset dir="appengine/appengine-1.5.2/lib/user" includes="*.jar" />
-        <fileset dir="appengine/appengine-1.5.2/lib/shared" includes="*.jar" />
-    </resources>
-    
-    <resources id="appengine-1.5.2.testing" >
-        <fileset dir="appengine/appengine-1.5.2/lib/testing" includes="*.jar" />
-    </resources>
+    <!-- TODO(arjuns) : This name is incorrect. Should have version instead of date." -->
+    <fileset id="soy-20100708"
+             dir="soy/soy-20100708"
+             includes="*.jar" />
 
     <target name="default">
         <fail message="Target path for jars is not set.">
             <condition>
                 <not>
                     <and>
-                        <isset property="output.jars" />
                         <isset property="target_dir" />
                     </and>
                 </not>
@@ -41,23 +37,7 @@
         </fail>
 
         <copy todir="${target_dir}">
-            <resources refid="appengine-1.5.2" />
-        </copy>
-    </target>
-
-    <target name="testing">
-        <fail message="Target path for jars is not set.">
-            <condition>
-                <not>
-                    <and>
-                        <isset property="test_lib_dir" />
-                    </and>
-                </not>
-            </condition>
-        </fail>
-        
-        <copy todir="${test_lib_dir}">
-            <resources refid="appengine-1.5.2.testing" />
+            <fileset refid="soy-20100708" />
         </copy>
     </target>
 </project>

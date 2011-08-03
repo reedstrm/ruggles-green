@@ -70,18 +70,48 @@
             <include name="*.jar"/>
         </fileset>
     </resources>
+    
+    <resources id="testing_lib">
+        <fileset dir="${test.lib}">
+            <include name="*.jar" />
+        </fileset>
+    </resources>
     <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
 
     <target name="html">
         <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
     </target>
 
+
     <target name="compile"
                     depends="html"
                     description="Compile the application servlet code">
         <mkdir dir="${classdir}"/>
         <mkdir dir="${war.dir}/WEB-INF/lib"/>
-        <copy todir="${war.dir}/WEB-INF/lib">
+        
+        <property name="target_dir" value="${basedir}/${output.jars}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+        
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+        
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+        
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+        
+        <!--copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="${third_party}">
                 <include name="soy-excluding-deps-20100708.jar" />
                 <include name="jsr305.jar" />
@@ -101,7 +131,10 @@
                 <include name="serializer.jar"/>
                 <include name="xml-apis.jar"/>
             </fileset>
-        </copy>
+        </copy -->
+        
+        
+        <!-- TODO(arjuns) : Convert this which will be similar to apps/common build.xml --> 
         <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
@@ -111,12 +144,25 @@
         </javac>
     </target>
 
-    <target name="test"
+    <!--target name="test"
                     description="Run unit tests"
                     depends="compile, war">
         <mkdir dir="${test.dir}"/>
         <mkdir dir="${test.outdir}"/>
+        <mkdir dir="${test.lib}" />
 
+        <property name="target_dir" value="${basedir}/${test.lib}" />
+        
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+        
+        <ant antfile="appengine/build.xml"
+             inheritAll="true"
+             target="testing"
+             dir="${third.party.jars}" />
+        
         <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
             <compilerarg line="${javac.flags}"/>
             <classpath>
@@ -128,6 +174,7 @@
         <junit fork="yes" printsummary="yes" failureproperty="test.failed" dir="war">
             <classpath>
                 <resources refid="appengine_lib"/>
+                <resources refid="testing_lib" />
                 <pathelement path="${appengine.sdk}/lib/testing/appengine-testing.jar"/>
                 <pathelement path="${third_party}/junit-4.8.2.jar"/>
                 <pathelement location="${classdir}"/>
@@ -146,13 +193,14 @@
                 <isset property="test.failed"/>
             </condition>
         </fail>
-    </target>
+    </target-->
 
     <target name="clean"
                     description="Force a clean slate to rebuild">
         <delete dir="${war.dir}"/>
         <delete dir="${test.dir}"/>
         <delete dir="${test.outdir}"/>
+        <delete dir="${test.lib}" />
     </target>
 
     <target name="runserver" depends="war"

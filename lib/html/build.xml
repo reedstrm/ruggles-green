@@ -20,7 +20,8 @@
     <property file="build.properties" />
     <property file="local.properties" />
 
-    <resources id="depend_lib">
+    <!--resources id="depend_lib">
+        
         <path>
             <pathelement location="${third_party}/jsr305.jar" />
             <pathelement location="${third_party}/guava/guava-r09/guava-r09.jar" />
@@ -34,67 +35,114 @@
             <pathelement location="${third_party}/xalan-2.7.1/xalan.jar" />
             <pathelement location="${third_party}/xalan-2.7.1/xml-apis.jar" />
         </path>
-    </resources>
+    </resources-->
 
     <resources id="resources">
         <fileset dir="src" includes="**/*.soy" />
         <fileset dir="src" includes="**/*.xsl" />
     </resources>
 
-    <target name="compile"
-            description="Compile the classes">
-        <mkdir dir="${classdir}"/>
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
-            <compilerarg line="${javac.flags}"/>
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+
+    <target name="compile" description="Compile the classes">
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${output.jars}" />
+
+        <ant antfile="jsr/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+                 
+        <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
             <classpath>
-                <resources refid="depend_lib" />
+                <fileset refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
-    <target name="test"
-            description="Run unit tests"
-            depends="jar">
-        <mkdir dir="${test.dir}"/>
-        <mkdir dir="${test.outdir}"/>
+    <target name="test" description="Run unit tests" depends="jar">
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
 
-        <javac srcdir="${test.src}" destdir="${test.dir}" includeantruntime="false" debug="true">
-            <compilerarg line="${javac.flags}"/>
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+            
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+        
+        <javac srcdir="${test.src}"
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${third_party}/junit-4.8.2.jar"/>
-                <pathelement location="org.cnx.html.jar"/>
+                <resources refid="depend_test_lib" />
+                <!--pathelement path="${third_party}/junit-4.8.2.jar" /-->
+                <!-- TODO(arjuns) : Fix this jar path." -->
+                <pathelement location="org.cnx.html.jar" />
             </classpath>
         </javac>
 
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
-            <jvmarg value="-enableassertions"/>
+            <jvmarg value="-enableassertions" />
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${third_party}/junit-4.8.2.jar"/>
-                <pathelement location="org.cnx.html.jar"/>
-                <pathelement location="${test.dir}"/>
+                <resources refid="depend_test_lib" />
+                <!--pathelement path="${third_party}/junit-4.8.2.jar" /-->
+                <!-- TODO(arjuns) : Fix this jar path." -->
+                <pathelement location="org.cnx.html.jar" />
+                <pathelement location="${test.dir}" />
             </classpath>
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*Tests.java"/>
+                    <include name="**/*Tests.java" />
                 </fileset>
             </batchtest>
         </junit>
 
         <fail message="Tests failed!">
             <condition>
-                <isset property="test.failed"/>
+                <isset property="test.failed" />
             </condition>
         </fail>
     </target>
 
-    <target name="clean"
-            description="Remove built files">
+    <target name="clean" description="Remove built files">
         <delete dir="${classdir}" />
         <delete dir="${test.dir}" />
         <delete dir="${test.outdir}" />
+        <delete dir="${test.lib}" />
         <delete file="org.cnx.html.jar" />
     </target>
 

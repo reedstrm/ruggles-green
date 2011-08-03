@@ -14,50 +14,29 @@
     limitations under the License.
 -->
 
-<project name="appengine" default="default">
+<project name="jsr" default="default">
     <description>
-        Copies AppEngine jar to output.jars dir.
+        Copies Guice jar to ${output.jars}
     </description>
 
-    <resources id="appengine-1.5.2">
-        <fileset dir="appengine/appengine-1.5.2/lib/user" includes="*.jar" />
-        <fileset dir="appengine/appengine-1.5.2/lib/shared" includes="*.jar" />
-    </resources>
-    
-    <resources id="appengine-1.5.2.testing" >
-        <fileset dir="appengine/appengine-1.5.2/lib/testing" includes="*.jar" />
-    </resources>
+    <fileset id="guice-3.0"
+             dir="guice/guice-3.0"
+             includes="*.jar" />
 
     <target name="default">
         <fail message="Target path for jars is not set.">
             <condition>
                 <not>
                     <and>
-                        <isset property="output.jars" />
                         <isset property="target_dir" />
+                        <isset property="output.jars" />
                     </and>
                 </not>
             </condition>
         </fail>
 
         <copy todir="${target_dir}">
-            <resources refid="appengine-1.5.2" />
-        </copy>
-    </target>
-
-    <target name="testing">
-        <fail message="Target path for jars is not set.">
-            <condition>
-                <not>
-                    <and>
-                        <isset property="test_lib_dir" />
-                    </and>
-                </not>
-            </condition>
-        </fail>
-        
-        <copy todir="${test_lib_dir}">
-            <resources refid="appengine-1.5.2.testing" />
+            <fileset refid="guice-3.0" />
         </copy>
     </target>
 </project>

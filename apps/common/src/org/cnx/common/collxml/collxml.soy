@@ -1,0 +1,69 @@
+/*
+ *  Copyright 2011 Google Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+{namespace org.cnx.common.collxml.SoyHTMLGenerator}
+
+/**
+ *  Render a collection (extracted by SoyHTMLGenerator).
+ *
+ *  @param items A list of item maps.  Each item can be a subcollection or a module.
+ */
+{template .main}
+    <ol class="collection">
+        {foreach $item in $items}
+            {call .item data="$item"/}
+        {/foreach}
+    </ol>
+{/template}
+
+/**
+ *  Dispatch the rendering of an item.
+ *
+ *  @param item The item map to dispatch.  Item must have a "type" key.
+ */
+{template .item private="true"}
+    {switch $item.type}
+        {case 'subcollection'}
+            {call .subcollection}{param subcollection: $item/}{/call}
+        {case 'module'}
+            {call .module}{param module: $item/}{/call}
+    {/switch}
+{/template}
+
+/**
+ *  Render a module item (extracted by SoyHTMLGenerator).
+ *
+ *  @param module The item map.  Has the keys "title" and "uri".
+ */
+{template .module private="true"}
+    <li class="module"><a href="{$module.uri}">{$module.title}</a></li>
+{/template}
+
+/**
+ *  Render a subcollection item (extracted by SoyHTMLGenerator).
+ *
+ *  @param subcollection The item map.  Has the keys "title" and "items".
+ */
+{template .subcollection private="true"}
+    <li class="subcollection">
+        <span class="title">{$subcollection.title}</a>
+        <ol class="subcollection">
+            {foreach $item in $subcollection.items}
+                {call .item data="$item"/}
+            {/foreach}
+        </ol>
+    </li>
+{/template}

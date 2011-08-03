@@ -156,19 +156,6 @@ public class HTMLGeneratorTests {
                      generate(node));
     }
 
-    @Test public void cleanAttributeNameShouldNotModifyIdentifiers() {
-        final String name = "fooBar_42";
-        assertEquals(name, SoyHTMLGenerator.xmlAttributeNameToSoyIdentifier(name));
-    }
-
-    @Test public void cleanAttributeNameShouldConvertHyphensToUnderscores() {
-        assertEquals("target_id", SoyHTMLGenerator.xmlAttributeNameToSoyIdentifier("target-id"));
-    }
-
-    @Test public void cleanAttributeNameShouldRemoveSpecials() {
-        assertEquals("xmlnsbib", SoyHTMLGenerator.xmlAttributeNameToSoyIdentifier("xmlns:bib"));
-    }
-
     @Test public void defaultEmphasisShouldBeStrong() throws Exception {
         assertEquals("<strong>Hello</strong>",
                      generate(builder.element("emphasis").text("Hello")));

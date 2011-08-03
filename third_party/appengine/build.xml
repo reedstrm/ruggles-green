@@ -19,7 +19,7 @@
         Copies AppEngine jar to output.jars dir.
     </description>
 
-    <fileset id="appengine-1.5.2" dir="appengine/appengine-1.5.2" includes="*.jar" />
+    <fileset id="appengine-1.5.2" dir="appengine/appengine-1.5.2/lib/user" includes="*.jar" />
 
     <target name="default">
         <fail message="Target path for jars is not set.">

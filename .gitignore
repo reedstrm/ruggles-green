@@ -4,6 +4,7 @@
 appengine-generated/
 apps/repository/war/WEB-INF/classes/
 .settings/
+bin/
 
 # ignoring jars
 appengine-*.jar

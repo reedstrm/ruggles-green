@@ -32,11 +32,13 @@
     </fail>
 
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
-    <import file="${appengine.sdk}/config/user/ant-macros.xml"/>
+    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml"/>
 
-    <target name="war" depends="enhance" 
+    <target name="war" depends="compile" 
                     description="Assemble the application directory">
         <mkdir dir="${war.dir}/WEB-INF"/>
+        <mkdir dir="${war.dir}/WEB-INF/classes"/>
+        <mkdir dir="${war.dir}/WEB-INF/lib"/>
         <copy todir="${war.dir}">
             <fileset dir="soy">
                 <exclude name="**/.hg/**"/>
@@ -51,117 +53,78 @@
                 <include name="*.xml"/>
             </fileset>
         </copy>
-        <enhance_war war="${war.dir}"/>
-    </target>
-
-    <target name="enhance" depends="compile"
-                    description="Enhance the classes after compilation">
-        <enhance_war war="${war.dir}"/>
-    </target>
-
-    <resources id="appengine_lib">
-        <fileset dir="${appengine.sdk}/lib/user">
-            <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${appengine.sdk}/lib/shared">
-            <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${war.dir}/WEB-INF/lib">
-            <include name="*.jar"/>
-        </fileset>
-    </resources>
-    <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
-
-    <target name="html">
-        <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
-    </target>
-
-    <target name="util">
-        <ant antfile="${util.dir}/build.xml" dir="${util.dir}" target="jar" inheritAll="false" />
-    </target>
-
-    <target name="compile"
-            depends="html, util"
-            description="Compile the application servlet code">
-        <mkdir dir="${classdir}"/>
-        <mkdir dir="${war.dir}/WEB-INF/lib"/>
         <copy todir="${war.dir}/WEB-INF/lib">
-            <fileset dir="${third_party}">
-                <include name="soy-excluding-deps-20100708.jar" />
-                <include name="jsr305.jar" />
-            </fileset>
-            <fileset dir="${third_party}/guava/guava-r09">
-                <include name="guava-r09.jar" />
-            </fileset>
-            <fileset dir="${third_party}/guice">
-                <include name="aopalliance.jar" />
-                <include name="guice-3.0.jar" />
-                <include name="guice-assistedinject-3.0.jar" />
-                <include name="guice-multibindings-3.0.jar" />
-                <include name="javax.inject.jar" />
-            </fileset>
-            <fileset dir="${third_party}/xalan-2.7.1">
-                <include name="xalan.jar"/>
-                <include name="serializer.jar"/>
-                <include name="xml-apis.jar"/>
-            </fileset>
+            <fileset dir="${output.jars}" includes="*.jar" />
         </copy>
-        <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
-        <copy file="${util.dir}/build/org.cnx.util.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.util.jar" />
+        <copy todir="${war.dir}/WEB-INF/classes">
+            <fileset dir="${classdir}" includes="**/*.class" />
+        </copy>
+        <enhance_war war="${war.dir}"/>
+    </target>
+
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+    <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
+    <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
+
+    <target name="compile" description="Compile the application servlet code">
+        <mkdir dir="${classdir}"/>
+        <mkdir dir="${output.jars}"/>
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+        
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+        
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+        
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+        
+        <ant antfile="appengine/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+        
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../../lib/util" />
+        
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../../lib/html" />
+        
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../common" />
+
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
             <classpath>
-                <resources refid="appengine_lib"/>
+                <resources refid="depend_lib"/>
             </classpath>
         </javac>
-    </target>
-
-    <target name="test"
-                    description="Run unit tests"
-                    depends="compile, war">
-        <mkdir dir="${test.dir}"/>
-        <mkdir dir="${test.outdir}"/>
-
-        <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
-            <compilerarg line="${javac.flags}"/>
-            <classpath>
-                <resources refid="appengine_lib"/>
-                <pathelement path="${third_party}/junit-4.8.2.jar"/>
-                <pathelement location="${classdir}"/>
-            </classpath>
-        </javac>
-        <junit fork="yes" printsummary="yes" failureproperty="test.failed" dir="war">
-            <classpath>
-                <resources refid="appengine_lib"/>
-                <pathelement path="${appengine.sdk}/lib/testing/appengine-testing.jar"/>
-                <pathelement path="${third_party}/junit-4.8.2.jar"/>
-                <pathelement location="${classdir}"/>
-                <pathelement location="${test.dir}"/>
-            </classpath>
-            <formatter type="plain" />
-            <batchtest todir="${test.outdir}">
-                <fileset dir="${test.src}">
-                    <include name="**/*.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-
-        <fail message="Tests failed!">
-            <condition>
-                <isset property="test.failed"/>
-            </condition>
-        </fail>
     </target>
 
     <target name="clean"
                     description="Force a clean slate to rebuild">
+        <delete dir="build"/>
         <delete dir="${war.dir}"/>
-        <delete dir="${test.dir}"/>
-        <delete dir="${test.outdir}"/>
     </target>
 
-    <target name="runserver" depends="war"
-                    description="Run the dev_appserver">
+    <target name="runserver" depends="war" description="Run the dev_appserver">
         <dev_appserver war="${war.dir}" port="${http.port}"/>
     </target>
 

@@ -19,7 +19,7 @@
         Copies rompe-propono to output.jars dir.
     </description>
 
-    <fileset id="rome-propno-1.0.0"
+    <fileset id="rome-propono-1.0.0"
              dir="rome-propono/rome-propono-1.0.0"
              includes="*.jar" />
 

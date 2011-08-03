@@ -20,56 +20,82 @@
     <property file="build.properties" />
     <property file="local.properties" />
 
-    <resources id="depend_lib">
-        <path>
-            <pathelement location="${third_party}/jsr305.jar" />
-            <pathelement location="${third_party}/guava/guava-r09/guava-r09.jar" />
-            <pathelement location="${third_party}/guice/aopalliance.jar" />
-            <pathelement location="${third_party}/guice/guice-3.0.jar" />
-            <pathelement location="${third_party}/guice/guice-assistedinject-3.0.jar" />
-            <pathelement location="${third_party}/guice/guice-multibindings-3.0.jar" />
-            <pathelement location="${third_party}/guice/javax.inject.jar" />
-            <pathelement location="${third_party}/soy-excluding-deps-20100708.jar" />
-            <pathelement location="${third_party}/xalan-2.7.1/serializer.jar" />
-            <pathelement location="${third_party}/xalan-2.7.1/xalan.jar" />
-            <pathelement location="${third_party}/xalan-2.7.1/xml-apis.jar" />
-            <pathelement location="${util.dir}/build/org.cnx.util.jar" />
-        </path>
-    </resources>
 
     <resources id="resources">
         <fileset dir="src" includes="**/*.soy" />
         <fileset dir="src" includes="**/*.xsl" />
     </resources>
 
-    <target name="compile"
-            description="Compile the classes"
-            depends="util">
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+    <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+
+    <target name="compile" description="Compile the classes">
         <mkdir dir="${classdir}"/>
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
+        <mkdir dir="${output.jars}" />
+
+        <ant antfile="jsr/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../util" />
+
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true">
             <compilerarg line="${javac.flags}"/>
             <classpath>
-                <resources refid="depend_lib" />
+                <fileset refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
-    <target name="util">
-        <ant antfile="${util.dir}/build.xml" dir="${util.dir}" target="jar" inheritAll="false" />
-    </target>
-
-    <target name="test"
-            description="Run unit tests"
-            depends="jar">
+    <target name="test" description="Run unit tests" depends="jar">
         <mkdir dir="${test.dir}"/>
         <mkdir dir="${test.outdir}"/>
 
-        <javac srcdir="${test.src}" destdir="${test.dir}" includeantruntime="false" debug="true">
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+
+        <javac srcdir="${test.src}"
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${third_party}/junit-4.8.2.jar"/>
-                <pathelement location="org.cnx.html.jar"/>
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.html.jar"/>
             </classpath>
         </javac>
 
@@ -77,8 +103,8 @@
             <jvmarg value="-enableassertions"/>
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${third_party}/junit-4.8.2.jar"/>
-                <pathelement location="org.cnx.html.jar"/>
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.html.jar"/>
                 <pathelement location="${test.dir}"/>
             </classpath>
             <formatter type="plain" />
@@ -96,20 +122,23 @@
         </fail>
     </target>
 
-    <target name="clean"
-            description="Remove built files">
-        <delete dir="${classdir}" />
-        <delete dir="${test.dir}" />
-        <delete dir="${test.outdir}" />
-        <delete file="org.cnx.html.jar" />
+    <target name="clean" description="Remove built files">
+        <delete dir="build" />
     </target>
 
     <target name="jar"
             description="Build a JAR of the classes"
             depends="compile">
-        <jar destfile="org.cnx.html.jar">
+        <mkdir dir="build/lib" />
+        <jar destfile="build/lib/org.cnx.html.jar">
             <fileset dir="${classdir}" />
             <resources refid="resources" />
         </jar>
+    </target>
+
+    <target name="copyjar"
+            description="Copy jar to calling build file"
+            depends="jar">
+        <copy file="build/lib/org.cnx.html.jar" tofile="${target_dir}/org.cnx.html.latest.jar" />
     </target>
 </project>

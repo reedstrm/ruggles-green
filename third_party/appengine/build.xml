@@ -19,7 +19,14 @@
         Copies AppEngine jar to output.jars dir.
     </description>
 
-    <fileset id="appengine-1.5.2" dir="appengine/appengine-1.5.2" includes="*.jar" />
+    <resources id="appengine-1.5.2">
+        <fileset dir="appengine/appengine-1.5.2/lib/user" includes="*.jar" />
+        <fileset dir="appengine/appengine-1.5.2/lib/shared" includes="*.jar" />
+    </resources>
+    
+    <resources id="appengine-1.5.2.testing" >
+        <fileset dir="appengine/appengine-1.5.2/lib/testing" includes="*.jar" />
+    </resources>
 
     <target name="default">
         <fail message="Target path for jars is not set.">
@@ -34,7 +41,23 @@
         </fail>
 
         <copy todir="${target_dir}">
-            <fileset refid="appengine-1.5.2" />
+            <resources refid="appengine-1.5.2" />
+        </copy>
+    </target>
+
+    <target name="testing">
+        <fail message="Target path for jars is not set.">
+            <condition>
+                <not>
+                    <and>
+                        <isset property="test_lib_dir" />
+                    </and>
+                </not>
+            </condition>
+        </fail>
+        
+        <copy todir="${test_lib_dir}">
+            <resources refid="appengine-1.5.2.testing" />
         </copy>
     </target>
 </project>

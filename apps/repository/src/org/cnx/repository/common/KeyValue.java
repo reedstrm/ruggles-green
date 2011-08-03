@@ -19,12 +19,13 @@ import java.io.Serializable;
 
 /**
  * Since Java does not provide any KeyValue/Pair classs, this is to fill that gap.
+ * Key and value both are strings.
  *
  * @author Arjun Satyapal
  */
 public class KeyValue implements Serializable {
-    private String key;
-    private String value;
+    private final String key;
+    private final String value;
 
     public KeyValue(String key, String value) {
         this.key = key;

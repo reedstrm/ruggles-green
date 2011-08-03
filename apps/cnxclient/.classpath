@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/jars/appengine-api-1.0-sdk-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/cnx-common.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
+	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsr107cache-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

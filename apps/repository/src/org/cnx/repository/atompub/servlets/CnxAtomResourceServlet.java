@@ -40,7 +40,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +54,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 /**
- * Servlet to Handle CNX Resources.
+ * Jersey Servlets for Cnx Resources.
  *
  * @author Arjun Satyapal
  */
@@ -135,11 +134,8 @@ public class CnxAtomResourceServlet {
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();
-            List<KeyValue> listOfHeaders = result.getListOfHeaders();
-
             ResponseBuilder responseBuilder = Response.ok();
-
-            for(KeyValue currHeader : listOfHeaders) {
+            for(KeyValue currHeader : result.getListOfHeaders()) {
                 responseBuilder.header(currHeader.getKey(), currHeader.getValue());
             }
 

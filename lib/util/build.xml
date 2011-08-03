@@ -20,19 +20,35 @@
     <property file="build.properties" />
     <property file="local.properties" />
 
-    <resources id="depend_lib">
-        <path>
-            <pathelement location="${third_party}/jsr305.jar" />
-            <pathelement location="${third_party}/guava/guava-r09/guava-r09.jar" />
-            <pathelement location="${third_party}/guice/guice-3.0.jar" />
-            <pathelement location="${third_party}/guice/javax.inject.jar" />
-        </path>
-    </resources>
+
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+
+    <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
 
     <target name="compile"
             description="Compile the classes">
         <mkdir dir="${classdir}"/>
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
+        <mkdir dir="${output.jars}"/>
+
+        <ant antfile="jsr/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true">
             <compilerarg line="${javac.flags}"/>
             <classpath>
                 <resources refid="depend_lib" />
@@ -48,8 +64,14 @@
     <target name="jar"
             description="Build a JAR of the classes"
             depends="compile">
-        <jar destfile="build/org.cnx.util.jar">
+        <jar destfile="build/lib/org.cnx.util.jar">
             <fileset dir="${classdir}" />
         </jar>
+    </target>
+
+    <target name="copyjar"
+            description="Copy jar to calling build file"
+            depends="jar">
+        <copy file="build/lib/org.cnx.util.jar" tofile="${target_dir}/org.cnx.util.latest.jar" />
     </target>
 </project>

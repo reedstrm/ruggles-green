@@ -16,6 +16,13 @@
 
 package org.cnx.repository.service.api;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.cnx.util.Nullable;
 
 /**
@@ -25,28 +32,66 @@ import org.cnx.util.Nullable;
  */
 public class RepositoryRequestContext {
 
+    public final String hostUrl;
+
     @Nullable
     public final String authenticatedUserId;
 
     // TODO(tal): add here more attributes (e.g. debug level, debug logger, etc)
 
     /**
+     * @param hostUrl the prefix of the server URL up to the path (not including). Examples:
+     *            "http://localhost:8888", "http://my_app-appstope.com". Used to construct URLs
+     *            returned in repository responses.
+     * 
      * @param authenticatedUserId an optional string with the user id. Null if no user id is
      *            associated with this request. It is the responsibility of the caller to
      *            authenticate the user. The repository service uses this value to authorize the
      *            operation.
      */
-    public RepositoryRequestContext(@Nullable String authenticatedUserId) {
+    public RepositoryRequestContext(String hostUrl, @Nullable String authenticatedUserId) {
+        this.hostUrl = checkNotNull(hostUrl);
         this.authenticatedUserId = authenticatedUserId;
     }
 
     /**
-     * Get the authenticated id of the user. Null if no user ID (anonymous).
-     * 
-     * @return
+     * Convenience constructor to construct form httpRequest.
      */
+    public RepositoryRequestContext(HttpServletRequest httpRequest,
+        @Nullable String authenticatedUserId) {
+        this(computeHostUrl(httpRequest), authenticatedUserId);
+    }
+
+    public String getHostUrl() {
+        return hostUrl;
+    }
+
     @Nullable
     public String getAuthenticatedUserId() {
         return authenticatedUserId;
+    }
+
+    /**
+     * Compute local host base url from an incoming httpRequest.
+     * 
+     * @param httpRequest an incoming HTTP request.
+     * @return host URL (e.g. "http://myserver.com" or "http://localhost:8888"
+     */
+    private static String computeHostUrl(HttpServletRequest httpRequest) {
+        final String scheme = httpRequest.getScheme();
+        final int port = httpRequest.getLocalPort();
+
+        // Is the default port for this scheme?
+        final boolean isDefaultPort =
+            ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
+
+        final URL url;
+        try {
+            url = new URL(scheme, httpRequest.getLocalName(), isDefaultPort ? -1 : port, "");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Could not construct host url", e);
+        }
+
+        return url.toString();
     }
 }

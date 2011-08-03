@@ -23,10 +23,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateCollectionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to create a new collection.
@@ -37,13 +38,14 @@ import org.cnx.repository.service.api.RepositoryResponse;
  */
 @SuppressWarnings("serial")
 public class CreateCollectionServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<CreateCollectionResult> repositoryResponse =
-            RepositoryServer.getService().createCollection(context);
+            repository.createCollection(context);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

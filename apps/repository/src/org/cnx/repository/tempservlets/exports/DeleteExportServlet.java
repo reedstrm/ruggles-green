@@ -23,13 +23,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.ParamUtil;
 
@@ -42,6 +43,7 @@ import org.cnx.repository.service.impl.operations.ParamUtil;
  */
 @SuppressWarnings("serial")
 public class DeleteExportServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -59,7 +61,7 @@ public class DeleteExportServlet extends HttpServlet {
             new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
 
         final RepositoryResponse<DeleteExportResult> repositoryResponse =
-            RepositoryServer.getService().deleteExport(new RepositoryRequestContext(null), exportReference);
+            repository.deleteExport(new RepositoryRequestContext(req, null), exportReference);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

@@ -59,9 +59,8 @@ public class ExportOperations {
      * See description in {@link CnxRepositoryService#getExportUploadUrl}
      */
     public static RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
-        RepositoryRequestContext context, ExportReference exportReference, String defaultBlobUploadPrefix) {
-        checkNotNull(defaultBlobUploadPrefix);
-        
+        RepositoryRequestContext context, ExportReference exportReference) {
+
         // Validate the export reference
         final ExportReferenceValidationResult validationResult =
             ExportReferenceValidationResult.forReference(exportReference);
@@ -96,8 +95,8 @@ public class ExportOperations {
         // TODO(tal): share the prefix logic with resource creation.
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
-            log.warning("Prefexing resource upload url with '" + defaultBlobUploadPrefix + "'");
-            uploadUrl = defaultBlobUploadPrefix + uploadUrl;
+            log.warning("Prefexing resource upload url with '" + context.hostUrl + "'");
+            uploadUrl = context.hostUrl + uploadUrl;
         }
 
         // All done OK.

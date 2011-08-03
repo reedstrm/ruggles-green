@@ -42,5 +42,5 @@ public class Services {
     // TODO(tal): should we create an instance on the fly for each use?
     public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
 
-    //public static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+    // public static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 }

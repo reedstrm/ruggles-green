@@ -26,10 +26,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to serve a resource using a GET request.
@@ -40,6 +41,7 @@ import org.cnx.repository.service.api.ServeResourceResult;
  */
 @SuppressWarnings("serial")
 public class GetResourceServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Pattern uriPattern = Pattern.compile("/resource/([a-zA-Z0-9_-]+)");
 
@@ -57,7 +59,7 @@ public class GetResourceServlet extends HttpServlet {
 
         // TODO(arjuns) : This doesnt work.
         final RepositoryResponse<ServeResourceResult> repositoryResponse =
-            RepositoryServer.getService().serveResouce(new RepositoryRequestContext(null), resourceId, resp);
+            repository.serveResouce(new RepositoryRequestContext(req, null), resourceId, resp);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

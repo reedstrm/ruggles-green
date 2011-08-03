@@ -29,10 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetModuleVersionInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.google.appengine.repackaged.com.google.common.base.Join;
 
@@ -45,6 +46,7 @@ import com.google.appengine.repackaged.com.google.common.base.Join;
  */
 @SuppressWarnings("serial")
 public class GetModuleVersionInfoServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Logger log = Logger.getLogger(GetModuleVersionInfoServlet.class.getName());
 
@@ -71,9 +73,9 @@ public class GetModuleVersionInfoServlet extends HttpServlet {
         Integer moduleVersion =
             moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<GetModuleVersionInfoResult> repositoryResponse =
-            RepositoryServer.getService().getModuleVersionInfo(context, moduleId, moduleVersion);
+            repository.getModuleVersionInfo(context, moduleId, moduleVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

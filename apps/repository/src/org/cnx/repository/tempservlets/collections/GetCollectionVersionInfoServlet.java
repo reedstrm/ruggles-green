@@ -29,10 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.google.appengine.repackaged.com.google.common.base.Join;
 
@@ -45,6 +46,7 @@ import com.google.appengine.repackaged.com.google.common.base.Join;
  */
 @SuppressWarnings("serial")
 public class GetCollectionVersionInfoServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Logger log = Logger.getLogger(GetCollectionVersionInfoServlet.class
         .getName());
@@ -74,9 +76,9 @@ public class GetCollectionVersionInfoServlet extends HttpServlet {
             collectionVersionString.equals("latest") ? null : Integer
                 .valueOf(collectionVersionString);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<GetCollectionVersionInfoResult> repositoryResponse =
-            RepositoryServer.getService().getCollectionVersionInfo(context, collectionId, collectionVersion);
+            repository.getCollectionVersionInfo(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

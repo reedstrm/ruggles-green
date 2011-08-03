@@ -57,8 +57,7 @@ public class ResourceOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<CreateResourceResult> createResource(
-        RepositoryRequestContext context, String defaultBlobUploadPrefix) {
-        checkNotNull(defaultBlobUploadPrefix);
+        RepositoryRequestContext context) {
 
         final String resourceId;
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -80,8 +79,8 @@ public class ResourceOperations {
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
-            log.warning("Prefexing resource upload url with '" + defaultBlobUploadPrefix + "'");
-            uploadUrl = defaultBlobUploadPrefix + uploadUrl;
+            log.warning("Prefexing resource upload url with '" + context.hostUrl + "'");
+            uploadUrl = context.hostUrl + uploadUrl;
         }
 
         return ResponseUtil.loggedOk("Resource created: " + resourceId, new CreateResourceResult(

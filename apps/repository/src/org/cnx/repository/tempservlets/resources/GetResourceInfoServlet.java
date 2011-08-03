@@ -27,10 +27,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetResourceInfoResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.UploadedResourceContentInfo;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to serve metadata of a resource.
@@ -44,7 +46,7 @@ public class GetResourceInfoServlet extends HttpServlet {
 
     private static final Pattern uriPattern = Pattern.compile("/resource_info/([a-zA-Z0-9_-]+)");
 
-    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -59,7 +61,7 @@ public class GetResourceInfoServlet extends HttpServlet {
         final String resourceId = matcher.group(1);
 
         final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-            RepositoryServer.getService().getResourceInfo(null, resourceId);
+            repository.getResourceInfo(new RepositoryRequestContext(req, null), resourceId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

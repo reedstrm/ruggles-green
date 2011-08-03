@@ -23,12 +23,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 import org.cnx.repository.service.impl.operations.ParamUtil;
 
 /**
@@ -40,6 +41,7 @@ import org.cnx.repository.service.impl.operations.ParamUtil;
  */
 @SuppressWarnings("serial")
 public class GetExportUploadUrlServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -52,12 +54,12 @@ public class GetExportUploadUrlServlet extends HttpServlet {
         final Integer versionNumber =
             versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final ExportReference exportReference =
             new ExportReference(scopeType, objectId, versionNumber, exportTypeId);
 
         RepositoryResponse<GetExportUploadUrlResult> repositoryResponse =
-            RepositoryServer.getService().getExportUploadUrl(context, exportReference);
+            repository.getExportUploadUrl(context, exportReference);
 
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {

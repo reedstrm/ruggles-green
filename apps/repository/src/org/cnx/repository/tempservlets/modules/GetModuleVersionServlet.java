@@ -29,10 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to get the xml and manifest of a module version.
@@ -43,6 +44,7 @@ import org.cnx.repository.service.api.RepositoryResponse;
  */
 @SuppressWarnings("serial")
 public class GetModuleVersionServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Logger log = Logger.getLogger(GetModuleVersionServlet.class.getName());
 
@@ -69,9 +71,9 @@ public class GetModuleVersionServlet extends HttpServlet {
         Integer moduleVersion =
             moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<GetModuleVersionResult> repositoryResponse =
-            RepositoryServer.getService().getModuleVersion(context, moduleId, moduleVersion);
+            repository.getModuleVersion(context, moduleId, moduleVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

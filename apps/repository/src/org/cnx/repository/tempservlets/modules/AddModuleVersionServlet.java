@@ -27,10 +27,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to add a version for an existing module.
@@ -41,6 +42,7 @@ import org.cnx.repository.service.api.RepositoryResponse;
  */
 @SuppressWarnings("serial")
 public class AddModuleVersionServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -54,9 +56,9 @@ public class AddModuleVersionServlet extends HttpServlet {
         checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
             req.getParameterMap().size());
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
-            RepositoryServer.getService().addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
+            repository.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

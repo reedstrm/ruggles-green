@@ -23,9 +23,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to create a new resource.
@@ -36,14 +38,13 @@ import org.cnx.repository.service.api.RepositoryResponse;
  */
 @SuppressWarnings("serial")
 public class CreateResourceServlet extends HttpServlet {
-
-    // private static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         RepositoryResponse<CreateResourceResult> repositoryResponse =
-            RepositoryServer.getService().createResource(null);
+            repository.createResource(new RepositoryRequestContext(req, null));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

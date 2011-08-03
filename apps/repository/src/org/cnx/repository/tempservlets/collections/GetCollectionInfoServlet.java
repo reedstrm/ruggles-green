@@ -29,10 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.google.appengine.repackaged.com.google.common.base.Join;
 
@@ -45,6 +46,7 @@ import com.google.appengine.repackaged.com.google.common.base.Join;
  */
 @SuppressWarnings("serial")
 public class GetCollectionInfoServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Logger log = Logger.getLogger(GetCollectionInfoServlet.class.getName());
 
@@ -64,9 +66,9 @@ public class GetCollectionInfoServlet extends HttpServlet {
         }
         final String collectionId = matcher.group(1);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<GetCollectionInfoResult> repositoryResponse =
-            RepositoryServer.getService().getCollectionInfo(context, collectionId);
+            repository.getCollectionInfo(context, collectionId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

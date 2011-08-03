@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -53,8 +55,9 @@ public class CnxAtomPubConstants {
     /** Path for REST URL for ATOMPUB API */
     public final URL atomPubRestUrl;
 
-    // TODO(tal): if the 'const' are determined at runtime, change the package
-    // name as 'consts' implies compiel time consts. (e.g. 'config').
+    // TODO(arjuns) : Fix this.
+    public final static int LOCAL_SERVER_PORT = 8888;
+
     public CnxAtomPubConstants(String reqUrl, int port) {
         // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
         String applicationId = SystemProperty.applicationId.get();
@@ -237,8 +240,8 @@ public class CnxAtomPubConstants {
 
     // TODO(arjuns) : remove this.
     /** Temporary way to get Repository Context. */
-    public RepositoryRequestContext getRepositoryContext() {
-        return new RepositoryRequestContext(GLOBAL_USER_ID);
+    public RepositoryRequestContext getRepositoryContext(HttpServletRequest httpRequest) {
+        return new RepositoryRequestContext(httpRequest, GLOBAL_USER_ID);
     }
 
     /** Relation tag for Edit links for CNX Resources/Modules/Collections. */

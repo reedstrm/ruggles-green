@@ -29,10 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to get the xml and manifest of a collection version.
@@ -43,6 +44,7 @@ import org.cnx.repository.service.api.RepositoryResponse;
  */
 @SuppressWarnings("serial")
 public class GetCollectionVersionServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Logger log = Logger.getLogger(GetCollectionVersionServlet.class.getName());
 
@@ -71,9 +73,9 @@ public class GetCollectionVersionServlet extends HttpServlet {
             collectionVersionString.equals("latest") ? null : Integer
                 .valueOf(collectionVersionString);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<GetCollectionVersionResult> repositoryResponse =
-            RepositoryServer.getService().getCollectionVersion(context, collectionId, collectionVersion);
+            repository.getCollectionVersion(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

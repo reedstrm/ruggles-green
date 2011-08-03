@@ -27,10 +27,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.AddCollectionVersionResult;
+import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to add a version for an existing module.
@@ -41,6 +42,7 @@ import org.cnx.repository.service.api.RepositoryResponse;
  */
 @SuppressWarnings("serial")
 public class AddCollectionVersionServlet extends HttpServlet {
+    private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -52,9 +54,9 @@ public class AddCollectionVersionServlet extends HttpServlet {
         checkArgument(req.getParameterMap().size() == 2, "Expected 2 post parameters, found %s",
             req.getParameterMap().size());
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<AddCollectionVersionResult> repositoryResponse =
-            RepositoryServer.getService().addCollectionVersion(context, moduleId, colxmlDoc);
+            repository.addCollectionVersion(context, moduleId, colxmlDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

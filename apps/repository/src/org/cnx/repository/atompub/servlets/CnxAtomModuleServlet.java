@@ -36,7 +36,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
@@ -46,6 +45,7 @@ import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 import org.jdom.JDOMException;
 
 import com.google.common.base.Throwables;
@@ -73,7 +73,7 @@ public class CnxAtomModuleServlet {
     private final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/version/{"
         + VERSION_PATH_PARAM + "}";
 
-    private final CnxRepositoryService repositoryService = RepositoryServer.getService();
+    private final CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
     @POST
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
@@ -84,7 +84,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<CreateModuleResult> createdModule =
-            repositoryService.createModule(atomPubService.getConstants().getRepositoryContext());
+            repositoryService.createModule(atomPubService.getConstants().getRepositoryContext(req));
 
         if (createdModule.isOk()) {
             /*
@@ -195,9 +195,8 @@ public class CnxAtomModuleServlet {
                 .getContents().get(0));
 
         RepositoryResponse<AddModuleVersionResult> createdModule =
-            repositoryService.addModuleVersion(
-                atomPubService.getConstants().getRepositoryContext(), moduleId, cnxmlDoc,
-                resourceMappingDoc);
+            repositoryService.addModuleVersion(atomPubService.getConstants().getRepositoryContext(
+                req), moduleId, cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -257,9 +256,8 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(
-                atomPubService.getConstants().getRepositoryContext(), moduleId, Integer
-                    .parseInt(version));
+            repositoryService.getModuleVersion(atomPubService.getConstants().getRepositoryContext(
+                req), moduleId, Integer.parseInt(version));
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult result = moduleVersionResult.getResult();

@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test/src"/>
-	<classpathentry kind="lib" path="org.cnx.html.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
 	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
@@ -16,5 +15,6 @@
 	<classpathentry kind="lib" path="build/jars/xalan.jar"/>
 	<classpathentry kind="lib" path="build/jars/xml-apis.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

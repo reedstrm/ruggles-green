@@ -84,6 +84,16 @@ public interface CnxRepositoryService {
     RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context);
 
     /**
+     * Get general module information.
+     * 
+     * @param context the request context.
+     * @param moduleId the target module id
+     * @return operation response.
+     */
+    RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
+        String moduleId);
+
+    /**
      * Add module version
      * 
      * If the returned response has an OK status than a new version has been added to the module.
@@ -103,7 +113,7 @@ public interface CnxRepositoryService {
         String moduleId, String cnxmlDoc, String resourceMapDoc);
 
     /**
-     * Get the information of a module version.
+     * Get the content of a module version.
      * 
      * @param context the request context.
      * @param moduleId the target module id
@@ -114,14 +124,15 @@ public interface CnxRepositoryService {
         String moduleId, @Nullable Integer moduleVersion);
 
     /**
-     * Get general module information.
+     * Get the general information of a module version.
      * 
      * @param context the request context.
      * @param moduleId the target module id
+     * @param moduleVersion the target module version or null for latest version.
      * @return operation response.
      */
-    RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
-        String moduleId);
+    RepositoryResponse<GetModuleVersionInfoResult> getModuleVersionInfo(
+        RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion);
 
     /**
      * Creates a new collection.
@@ -133,6 +144,16 @@ public interface CnxRepositoryService {
      * @return operation response.
      */
     RepositoryResponse<CreateCollectionResult> createCollection(RepositoryRequestContext context);
+
+    /**
+     * Get general collection information.
+     * 
+     * @param context the request context.
+     * @param collectionId the target collection id
+     * @return operation response.
+     */
+    RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
+        String collectionId);
 
     /**
      * Add collection version
@@ -151,7 +172,7 @@ public interface CnxRepositoryService {
         RepositoryRequestContext context, String collectionId, String colxmlDoc);
 
     /**
-     * Get the information of a collection version.
+     * Get the content of a collection version.
      * 
      * @param context the request context.
      * @param collectionId the target collection id
@@ -162,14 +183,15 @@ public interface CnxRepositoryService {
         RepositoryRequestContext context, String collectionId, @Nullable Integer collectionVersion);
 
     /**
-     * Get general collection information.
+     * Get the information of a collection version.
      * 
      * @param context the request context.
      * @param collectionId the target collection id
+     * @param collectionVersion the target collection version or null for latest version.
      * @return operation response.
      */
-    RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
-        String collectionId);
+    RepositoryResponse<GetCollectionVersionInfoResult> getCollectionVersionInfo(
+        RepositoryRequestContext context, String collectionId, @Nullable Integer collectionVersion);
 
     /**
      * Returns a map of export type ids to export type specification. The result of this method is

@@ -19,6 +19,7 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -27,11 +28,14 @@ import javax.jdo.Transaction;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
+import org.cnx.repository.service.api.ExportInfo;
 import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.GetModuleVersionInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
+import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
 import org.cnx.repository.service.impl.schema.JdoModuleEntity;
 import org.cnx.repository.service.impl.schema.JdoModuleVersionEntity;
 import org.cnx.util.Nullable;
@@ -68,6 +72,43 @@ public class ModuleOperations {
 
         return ResponseUtil.loggedOk("New module created: " + moduleId, new CreateModuleResult(
             moduleId), log);
+    }
+
+    /**
+     * See description in {@link CnxRepositoryService}
+     */
+    public static RepositoryResponse<GetModuleInfoResult> getModuleInfo(
+        RepositoryRequestContext context, String moduleId) {
+        final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
+        if (moduleKey == null) {
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                "Module id has invalid format: " + moduleId, log);
+        }
+
+        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final JdoModuleEntity moduleEntity;
+
+        final List<ExportInfo> exports;
+        try {
+            try {
+                moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
+            } catch (Throwable e) {
+                return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                    "Could not find module " + moduleId, log, e);
+            }
+
+            final List<JdoExportItemEntity> exportEntities =
+                ExportUtil.queryChildExports(pm, moduleKey);
+            exports = ExportUtil.exportInfoList(exportEntities);
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                "Error while fetching info of module " + moduleId, log, e);
+        } finally {
+            pm.close();
+        }
+
+        return ResponseUtil.loggedOk("Retrieved info of module " + moduleId,
+            new GetModuleInfoResult(moduleId, moduleEntity.getVersionCount(), exports), log);
     }
 
     /**
@@ -200,26 +241,78 @@ public class ModuleOperations {
     /**
      * See description in {@link CnxRepositoryService}
      */
-    public static RepositoryResponse<GetModuleInfoResult> getModuleInfo(
-        RepositoryRequestContext context, String moduleId) {
-        final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
-        if (moduleKey == null) {
-            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Module id has invalid format: " + moduleId, log);
+    public static RepositoryResponse<GetModuleVersionInfoResult> getModuleVersionInfo(
+        RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
+
+        if (moduleVersion != null && moduleVersion < 1) {
+            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Illegal module version number "
+                + moduleVersion, log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
-        final JdoModuleEntity moduleEntity;
+        final Key moduleKey = JdoModuleEntity.moduleIdToKey(moduleId);
+        if (moduleKey == null) {
+            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Module id has bad format: ["
+                + moduleId + "]", log);
+        }
+
+        PersistenceManager pm = Services.datastore.getPersistenceManager();
+
+        final int versionToServe;
+        final List<ExportInfo> exports;
+        final JdoModuleVersionEntity versionEntity;
         try {
-            moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
-        } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not find module "
-                + moduleId, log, e);
+            // TODO(tal): refactor this and share with other operations in this file.
+            //
+            // Determine module version to serve. If 'latest' than read module entity and
+            // determine latest version.
+            //
+            // NOTE(tal): we don't need to use a transaction for the module lookup and the
+            // version entity since versions are never deleted and version count is monotonic.
+            //
+            if (moduleVersion == null) {
+                final JdoModuleEntity moduleEntity;
+                try {
+                    moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
+                } catch (Throwable e) {
+                    return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                        "Could not locate module " + moduleId, log);
+                }
+                // If module has no versions than there is not latest version.
+                if (moduleEntity.getVersionCount() < 1) {
+                    ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                        "Module has no versions: " + moduleId, log);
+                }
+                versionToServe = moduleEntity.getVersionCount();
+            } else {
+                versionToServe = moduleVersion;
+            }
+
+            // Fetch module version entity its exports
+            final Key moduleVersionKey =
+                JdoModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
+            try {
+                versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, moduleVersionKey);
+                checkState(versionEntity.getVersionNumber() == versionToServe,
+                    "Inconsistent version in module %s, expected %s found %s", moduleId,
+                    versionToServe, versionEntity.getVersionNumber());
+
+                final List<JdoExportItemEntity> exportEntities =
+                    ExportUtil.queryChildExports(pm, moduleVersionKey);
+                exports = ExportUtil.exportInfoList(exportEntities);
+
+            } catch (Throwable e) {
+                return ResponseUtil
+                    .loggedError(RepositoryStatus.SERVER_ERRROR,
+                        "Error while looking module version " + moduleId + "/" + versionToServe,
+                        log, e);
+            }
         } finally {
             pm.close();
         }
 
-        return ResponseUtil.loggedOk("Retrieved info of module " + moduleId,
-            new GetModuleInfoResult(moduleId, moduleEntity.getVersionCount()), log);
+        final GetModuleVersionInfoResult result =
+            new GetModuleVersionInfoResult(moduleId, versionEntity.getVersionNumber(), exports);
+        return ResponseUtil.loggedOk("Fetched module version info", result, log);
     }
+
 }

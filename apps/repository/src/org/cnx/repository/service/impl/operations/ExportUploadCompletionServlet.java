@@ -90,7 +90,6 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         final BlobKey blobKey = (BlobKey) blobs.values().toArray()[0];
         checkNotNull(blobKey);
 
-        // final Key moduleKey = JdoModuleEntity.moduleIdToKey(objectId);
         PersistenceManager pm = Services.datastore.getPersistenceManager();
         Transaction tx = pm.currentTransaction();
         tx.begin();

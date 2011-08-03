@@ -34,6 +34,8 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.operations.Services;
 
+import com.google.appengine.repackaged.com.google.common.base.Join;
+
 /**
  * A temp API servlet to get general information about a collection.
  * 
@@ -96,5 +98,6 @@ public class GetCollectionInfoServlet extends HttpServlet {
 
         out.println("* ID = " + result.getCollectionId());
         out.println("* Versions = " + result.getVersionCount());
+        out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }
 }

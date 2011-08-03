@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -23,13 +23,13 @@ package org.cnx.repository.atompub.service;
 public enum CnxAtomHandlerEnum {
     /** This will handle requests related to Resource. */
     RESOURCE,
-    
+
     /** This will handle requests related to Module. */
     MODULE,
-    
+
     /** This will handle requests related to CNX Collections. */
     COLLECTION,
-    
+
     /** This will handle all other requests. */
     SERVICE;
 }

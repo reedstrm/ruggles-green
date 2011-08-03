@@ -30,9 +30,11 @@ import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
+import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.GetModuleVersionInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
@@ -44,7 +46,6 @@ import org.cnx.repository.service.impl.operations.CollectionOperations;
 import org.cnx.repository.service.impl.operations.ExportOperations;
 import org.cnx.repository.service.impl.operations.ModuleOperations;
 import org.cnx.repository.service.impl.operations.ResourceOperations;
-import org.cnx.util.ImplementMeNow;
 import org.cnx.util.Nullable;
 
 /**
@@ -83,6 +84,12 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
+    public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
+        String moduleId) {
+        return ModuleOperations.getModuleInfo(context, moduleId);
+    }
+
+    @Override
     public RepositoryResponse<AddModuleVersionResult> addModuleVersion(
         RepositoryRequestContext context, String moduleId, String cnxmlDoc, String resourceMapDoc) {
         return ModuleOperations.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
@@ -95,15 +102,21 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
-        String moduleId) {
-        return ModuleOperations.getModuleInfo(context, moduleId);
+    public RepositoryResponse<GetModuleVersionInfoResult> getModuleVersionInfo(
+        RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
+        return ModuleOperations.getModuleVersionInfo(context, moduleId, moduleVersion);
     }
 
     @Override
     public RepositoryResponse<CreateCollectionResult> createCollection(
         RepositoryRequestContext context) {
         return CollectionOperations.createCollection(context);
+    }
+
+    @Override
+    public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
+        RepositoryRequestContext context, String collectionId) {
+        return CollectionOperations.getCollectionInfo(context, collectionId);
     }
 
     @Override
@@ -119,9 +132,10 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
-        RepositoryRequestContext context, String collectionId) {
-        return CollectionOperations.getCollectionInfo(context, collectionId);
+    public RepositoryResponse<GetCollectionVersionInfoResult> getCollectionVersionInfo(
+        RepositoryRequestContext context, String collectionId, Integer collectionVersion) {
+        return CollectionOperations.getCollectionVersionInfo(context, collectionId,
+            collectionVersion);
     }
 
     @Override
@@ -144,7 +158,7 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     @Override
     public RepositoryResponse<DeleteExportResult> deleteExport(RepositoryRequestContext context,
         ExportReference exportReference) {
-        throw new ImplementMeNow();
+        return ExportOperations.deleteExport(context, exportReference);
     }
 
     /**

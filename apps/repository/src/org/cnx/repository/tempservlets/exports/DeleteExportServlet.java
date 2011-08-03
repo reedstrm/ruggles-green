@@ -16,33 +16,32 @@
 
 package org.cnx.repository.tempservlets.exports;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.ParamUtil;
 import org.cnx.repository.service.impl.operations.Services;
 
 /**
- * A temp API servlet to serve a resource using a GET request.
+ * A temp API servlet to delete an export.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetExportServlet extends HttpServlet {
+public class DeleteExportServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -59,9 +58,8 @@ public class GetExportServlet extends HttpServlet {
         final ExportReference exportReference =
             new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
 
-        final RepositoryResponse<ServeExportResult> repositoryResponse =
-            Services.repository.serveExport(new RepositoryRequestContext(null), exportReference,
-                resp);
+        final RepositoryResponse<DeleteExportResult> repositoryResponse =
+            Services.repository.deleteExport(new RepositoryRequestContext(null), exportReference);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -81,8 +79,10 @@ public class GetExportServlet extends HttpServlet {
             }
         }
 
-        // When ok, resource has been served so there is nothing to do here.
-        checkState(repositoryResponse.isOk());
-        return;
+        // Map repository OK to API OK
+        resp.setContentType("text/plain");
+        PrintWriter out = resp.getWriter();
+
+        out.println(repositoryResponse.getDescription());
     }
 }

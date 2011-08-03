@@ -19,6 +19,7 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -27,13 +28,16 @@ import javax.jdo.Transaction;
 import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateCollectionResult;
+import org.cnx.repository.service.api.ExportInfo;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
+import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.impl.schema.JdoCollectionEntity;
 import org.cnx.repository.service.impl.schema.JdoCollectionVersionEntity;
+import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
 import org.cnx.util.Nullable;
 
 import com.google.appengine.api.datastore.Key;
@@ -68,6 +72,44 @@ public class CollectionOperations {
 
         return ResponseUtil.loggedOk("New collection created: " + collectionId,
             new CreateCollectionResult(collectionId), log);
+    }
+
+    /**
+     * See description in {@link CnxRepositoryService}
+     */
+    public static RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
+        RepositoryRequestContext context, String collectionId) {
+        final Key collectionKey = JdoCollectionEntity.collectionIdToKey(collectionId);
+        if (collectionKey == null) {
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                "Collection id has invalid format: " + collectionId, log);
+        }
+
+        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final JdoCollectionEntity collectionEntity;
+        final List<ExportInfo> exports;
+        try {
+            try {
+                collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
+            } catch (Throwable e) {
+                return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                    "Could not find collection " + collectionId, log, e);
+            }
+
+            // Get exports info
+            final List<JdoExportItemEntity> exportEntities =
+                ExportUtil.queryChildExports(pm, collectionKey);
+            exports = ExportUtil.exportInfoList(exportEntities);
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                "Error fetching the info of collection " + collectionId, log, e);
+        } finally {
+            pm.close();
+        }
+
+        return ResponseUtil.loggedOk("Retrieved info of collection " + collectionId,
+            new GetCollectionInfoResult(collectionId, collectionEntity.getVersionCount(), exports),
+            log);
     }
 
     /**
@@ -204,26 +246,77 @@ public class CollectionOperations {
     /**
      * See description in {@link CnxRepositoryService}
      */
-    public static RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
-        RepositoryRequestContext context, String collectionId) {
-        final Key collectionKey = JdoCollectionEntity.collectionIdToKey(collectionId);
-        if (collectionKey == null) {
-            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Collection id has invalid format: " + collectionId, log);
+    public static RepositoryResponse<GetCollectionVersionInfoResult> getCollectionVersionInfo(
+        RepositoryRequestContext context, String collectionId, @Nullable Integer collectionVersion) {
+
+        if (collectionVersion != null && collectionVersion < 1) {
+            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                "Illegal collection version number " + collectionVersion, log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
-        final JdoCollectionEntity collectionEntity;
+        final Key collectionKey = JdoCollectionEntity.collectionIdToKey(collectionId);
+        if (collectionKey == null) {
+            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                "Collection id has bad format: [" + collectionId + "]", log);
+        }
+
+        PersistenceManager pm = Services.datastore.getPersistenceManager();
+
+        final int versionToServe;
+        final JdoCollectionVersionEntity versionEntity;
+        final List<ExportInfo> exports;
         try {
-            collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
-        } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                "Could not find collection " + collectionId, log, e);
+            // Determine collection version to serve. If 'latest' than read collection entity and
+            // determine latest version.
+            //
+            // NOTE(tal): we don't need to use a transaction for the collection lookup and the
+            // version entity since versions are never deleted and version count is monotonic.
+            //
+            if (collectionVersion == null) {
+                final JdoCollectionEntity collectionEntity;
+                try {
+                    collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
+                } catch (Throwable e) {
+                    return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                        "Could not locate collection " + collectionId, log);
+                }
+                // If collection has no versions than there is not latest version.
+                if (collectionEntity.getVersionCount() < 1) {
+                    ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                        "Collection has no versions: " + collectionId, log);
+                }
+                versionToServe = collectionEntity.getVersionCount();
+            } else {
+                versionToServe = collectionVersion;
+            }
+
+            // Fetch collection version entity
+            final Key collectionVersionKey =
+                JdoCollectionVersionEntity.collectionVersionKey(collectionKey, versionToServe);
+            try {
+                versionEntity =
+                    pm.getObjectById(JdoCollectionVersionEntity.class, collectionVersionKey);
+                checkState(versionEntity.getVersionNumber() == versionToServe,
+                    "Inconsistent version in collection %s, expected %s found %s", collectionId,
+                    versionToServe, versionEntity.getVersionNumber());
+            } catch (Throwable e) {
+                return ResponseUtil
+                    .loggedError(RepositoryStatus.SERVER_ERRROR,
+                        "Error while looking collection version " + collectionId + "/"
+                            + versionToServe, log, e);
+            }
+
+            final List<JdoExportItemEntity> exportEntities =
+                ExportUtil.queryChildExports(pm, collectionVersionKey);
+            exports = ExportUtil.exportInfoList(exportEntities);
         } finally {
             pm.close();
         }
 
-        return ResponseUtil.loggedOk("Retrieved info of collection " + collectionId,
-            new GetCollectionInfoResult(collectionId, collectionEntity.getVersionCount()), log);
+        final GetCollectionVersionInfoResult result =
+            new GetCollectionVersionInfoResult(collectionId, versionEntity.getVersionNumber(),
+                exports);
+        return ResponseUtil.loggedOk("Fetched collection version info", result, log);
     }
+
 }

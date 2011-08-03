@@ -19,19 +19,25 @@ package org.cnx.repository.service.api;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
 /**
- * Result of a successful getCollectionInfo() operation.
+ * Result of a successful getCollectionVersionInfo() operation.
  * 
  * @author Tal Dayan
  */
 public class GetCollectionInfoResult {
     private final String collectionId;
     private final int versionCount;
+    private final ImmutableList<ExportInfo> exports;
 
-    public GetCollectionInfoResult(String collectionId, int versionCount) {
-        checkArgument(versionCount >= 0, "Negative version count: %s", versionCount);
+    public GetCollectionInfoResult(String collectionId, int versionCountr, List<ExportInfo> exports) {
+        checkArgument(versionCountr >= 0, "Invalid collection version count: %s", versionCountr);
         this.collectionId = checkNotNull(collectionId);
-        this.versionCount = versionCount;
+        this.versionCount = versionCountr;
+        this.exports = ImmutableList.copyOf(checkNotNull(exports));
     }
 
     public String getCollectionId() {
@@ -40,5 +46,9 @@ public class GetCollectionInfoResult {
 
     public int getVersionCount() {
         return versionCount;
+    }
+
+    public ImmutableList<ExportInfo> getExports() {
+        return exports;
     }
 }

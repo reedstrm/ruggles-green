@@ -18,7 +18,6 @@ package org.cnx.repository.service.impl.schema;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -45,6 +44,12 @@ public class JdoExportItemEntity extends CnxJdoEntity {
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 
+    // TODO(tal): currently we use this key to do ancestor queries in JDO.
+    // It contains a copy of key.getParent(). Is there a direct way to do
+    // ancestor queries in JDO? If not, should be drop JDO?
+    @Persistent
+    private Key parentKey;
+
     // @Persistent
     // private final String exportId;
 
@@ -65,9 +70,8 @@ public class JdoExportItemEntity extends CnxJdoEntity {
      */
     public JdoExportItemEntity(Key key, BlobKey blobKey) {
         this.key = checkNotNull(key);
-
+        this.parentKey = checkNotNull(key.getParent());
         this.blobKey = checkNotNull(blobKey);
-        JDOHelper.makeDirty(this, "blobKey");
     }
 
     public Key getKey() {

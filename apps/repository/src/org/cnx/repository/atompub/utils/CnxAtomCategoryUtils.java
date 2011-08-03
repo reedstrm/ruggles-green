@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,13 +15,13 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import com.sun.syndication.feed.atom.Category;
-
 import java.net.URL;
+
+import com.sun.syndication.feed.atom.Category;
 
 /**
  * Utility class for AtomCategories.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomCategoryUtils {
@@ -31,7 +31,7 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Resources.
-     *
+     * 
      * @param resourceScheme Scheme for Cnx Resources.
      */
     public static Category getCnxResourceCategoryEle(URL resourceScheme) {
@@ -41,7 +41,7 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Modules..
-     *
+     * 
      * @param moduleScheme Scheme for Cnx Modules..
      */
     public static Category getCnxModuleCategoryEle(URL moduleScheme) {
@@ -51,7 +51,7 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Collection..
-     *
+     * 
      * @param cnxCollectionScheme Scheme for Cnx Collections.
      */
     public static Category getCnxCollectionCategoryEle(URL cnxCollectionScheme) {

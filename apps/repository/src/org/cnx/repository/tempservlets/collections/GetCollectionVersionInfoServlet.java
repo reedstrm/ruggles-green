@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.tempservlets.modules;
+package org.cnx.repository.tempservlets.collections;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.operations.Services;
@@ -37,35 +37,46 @@ import org.cnx.repository.service.impl.operations.Services;
 import com.google.appengine.repackaged.com.google.common.base.Join;
 
 /**
- * A temp API servlet to get general information about a module.
+ * A temp API servlet to get the general info of a collection version.
  * 
  * TODO(tal): delete this servlet after implementing the real API.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetModuleInfoServlet extends HttpServlet {
+public class GetCollectionVersionInfoServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(GetModuleInfoServlet.class.getName());
+    private static final Logger log = Logger.getLogger(GetCollectionVersionInfoServlet.class
+        .getName());
 
-    private static final Pattern uriPattern = Pattern.compile("/module_info/([a-zA-Z0-9_-]+)");
+    private static final Pattern uriPattern = Pattern
+        .compile("/collection_version_info/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Parse request resource id from the query.
-        final String moduleUri = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(moduleUri);
+        final String collectionUri = req.getRequestURI();
+        final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
-            final String message = "Could not parse module id in request URI [" + moduleUri + "]";
+            final String message =
+                "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
-        final String moduleId = matcher.group(1);
+        final String collectionId = matcher.group(1);
+        final String collectionVersionString = matcher.group(2);
+
+        // Determine version to serve. If latest, leave as null and we will set
+        // it up later.
+        // TODO(tal): catch integer conversion overflow exception and return error.
+        Integer collectionVersion =
+            collectionVersionString.equals("latest") ? null : Integer
+                .valueOf(collectionVersionString);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<GetModuleInfoResult> repositoryResponse =
-            Services.repository.getModuleInfo(context, moduleId);
+        final RepositoryResponse<GetCollectionVersionInfoResult> repositoryResponse =
+            Services.repository.getCollectionVersionInfo(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -78,6 +89,10 @@ public class GetModuleInfoServlet extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
                         .getExtendedDescription());
                     return;
+                case STATE_MISMATCH:
+                    resp.sendError(HttpServletResponse.SC_NO_CONTENT, repositoryResponse
+                        .getExtendedDescription());
+                    return;
                 default:
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
                         .getExtendedDescription());
@@ -87,16 +102,16 @@ public class GetModuleInfoServlet extends HttpServlet {
 
         // Map repository OK to API OK
         checkState(repositoryResponse.isOk());
-        final GetModuleInfoResult result = repositoryResponse.getResult();
+        final GetCollectionVersionInfoResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        // out.println();
-        out.println("Module Info");
+        out.println();
+        out.println("Collection Version:");
 
-        out.println("* ID = " + result.getModuleId());
-        out.println("* Versions = " + result.getVersionCount());
+        out.println("* Collection:\n" + result.getCollectionId() + "\n");
+        out.println("* Version:\n" + result.getVersionNumber() + "\n");
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }
 }

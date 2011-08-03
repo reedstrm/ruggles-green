@@ -7,7 +7,12 @@
 
     <!--  APP ENGINE STATS -->
 
-    <!--  // commented out to reduce log spam.
+    <!--  
+    // Commented this section out to reduce log spam. 
+    //
+    // TODO(tal): is there a better way to control the appstat or its logging using a
+    // runtime switch?
+    -->
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
@@ -38,7 +43,6 @@
             <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
-    -->
   
   <!-- CNX RESOURCE API -->
 
@@ -103,6 +107,16 @@
     <servlet-name>GetModuleVersionServlet</servlet-name>
     <url-pattern>/module/*</url-pattern>
   </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>GetModuleVersionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleVersionInfoServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetModuleVersionInfoServlet</servlet-name>
+    <url-pattern>/module_version_info/*</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>GetModuleInfoServlet</servlet-name>
@@ -127,6 +141,16 @@
   </servlet-mapping>  
   
   <servlet>
+    <servlet-name>GetCollectionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionInfoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetCollectionInfoServlet</servlet-name>
+    <url-pattern>/collection_info/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>AddCollectionVersionServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.collections.AddCollectionVersionServlet</servlet-class>
   </servlet>
@@ -146,14 +170,14 @@
     <url-pattern>/collection/*</url-pattern>
   </servlet-mapping>
   
-   <servlet>
-    <servlet-name>GetCollectionInfoServlet</servlet-name>
-    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionInfoServlet</servlet-class>
+    <servlet>
+    <servlet-name>GetCollectionVersionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionVersionInfoServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>GetCollectionInfoServlet</servlet-name>
-    <url-pattern>/collection_info/*</url-pattern>
+    <servlet-name>GetCollectionVersionInfoServlet</servlet-name>
+    <url-pattern>/collection_version_info/*</url-pattern>
   </servlet-mapping>
 
   <!-- Repository service -->
@@ -198,6 +222,16 @@
   <servlet-mapping>
     <servlet-name>GetExportServlet</servlet-name>
     <url-pattern>/exports/get</url-pattern>
+  </servlet-mapping> 
+  
+     <servlet>
+    <servlet-name>DeleteExportServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.exports.DeleteExportServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>DeleteExportServlet</servlet-name>
+    <url-pattern>/exports/delete</url-pattern>
   </servlet-mapping> 
    
   <!--  TEST -->

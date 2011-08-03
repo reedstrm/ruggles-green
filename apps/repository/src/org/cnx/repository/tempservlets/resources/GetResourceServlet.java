@@ -18,11 +18,6 @@ package org.cnx.repository.tempservlets.resources;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import org.cnx.repository.service.api.RepositoryRequestContext;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.repository.service.impl.operations.Services;
-
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,11 +26,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.operations.Services;
+
 /**
  * A temp API servlet to serve a resource using a GET request.
- *
+ * 
  * TODO(tal): delete this servlet after implementing the real API.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

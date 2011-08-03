@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,22 +15,21 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.impl.Atom10Generator;
+import java.io.IOException;
+import java.io.StringWriter;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Generator;
 
 /**
  * Utility class to print PrettyXmls for JDOM.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class PrettyXmlOutputter {
@@ -48,14 +47,16 @@ public class PrettyXmlOutputter {
         return xmlOutputter.outputString(element);
     }
 
-    public static String prettyXmlOutputEntry(Entry entry) throws IllegalArgumentException, FeedException, IOException {
+    public static String prettyXmlOutputEntry(Entry entry) throws IllegalArgumentException,
+        FeedException, IOException {
         StringWriter writer = new StringWriter();
         Atom10Generator.serializeEntry(entry, writer);
-//        CnxAtomPubConstants.serializeEntry(entry, writer);
+        // CnxAtomPubConstants.serializeEntry(entry, writer);
         return writer.toString();
     }
 
-    public static String prettyXmlOutputMyEntry(Entry entry) throws IllegalArgumentException, FeedException, IOException {
+    public static String prettyXmlOutputMyEntry(Entry entry) throws IllegalArgumentException,
+        FeedException, IOException {
         StringWriter writer = new StringWriter();
         CnxAtomPubConstants.serializeEntry(entry, writer);
         return writer.toString();

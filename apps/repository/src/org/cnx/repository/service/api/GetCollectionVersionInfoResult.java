@@ -24,28 +24,29 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Result of a successful getModuleInfo() operation.
+ * Result of a successful getCollectionVersionInfo() operation.
  * 
  * @author Tal Dayan
  */
-public class GetModuleInfoResult {
-    private final String moduleId;
-    private final int versionCount;
+public class GetCollectionVersionInfoResult {
+    private final String collectionId;
+    private final int versionNumber;
     private final ImmutableList<ExportInfo> exports;
 
-    public GetModuleInfoResult(String moduleId, int versionCount, List<ExportInfo> exports) {
-        checkArgument(versionCount >= 0, "Negative version count: %s", versionCount);
-        this.moduleId = checkNotNull(moduleId);
-        this.versionCount = versionCount;
+    public GetCollectionVersionInfoResult(String collectionId, int versionNumber,
+        List<ExportInfo> exports) {
+        checkArgument(versionNumber >= 1, "Invalid version number: %s", versionNumber);
+        this.collectionId = checkNotNull(collectionId);
+        this.versionNumber = versionNumber;
         this.exports = ImmutableList.copyOf(checkNotNull(exports));
     }
 
-    public String getModuleId() {
-        return moduleId;
+    public String getCollectionId() {
+        return collectionId;
     }
 
-    public int getVersionCount() {
-        return versionCount;
+    public int getVersionNumber() {
+        return versionNumber;
     }
 
     public ImmutableList<ExportInfo> getExports() {

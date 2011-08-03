@@ -1,33 +1,43 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.utils;
 
-import javax.ws.rs.core.MediaType;
+package org.cnx.repository.service.api;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * AtomPub Media Types.
+ * Immutable class with summary info of an export instance.
  * 
- * @author Arjun Satyapal
+ * @author Tal Dayan
  */
-public class CustomMediaTypes extends MediaType {
-    /** ServiceDocument : "application/atomsvc+xml" */
-    public final static String APPLICATION_ATOMSVC_XML = "application/atomsvc+xml";
-    public final static MediaType APPLICATION_ATOMSVC_XML_TYPE = new MediaType("application",
-        "atomsvc+xml");
+public class ExportInfo {
+    private final ExportType exportType;
 
-    /** MediaType : "text" */
-    public final static String TEXT = "text";
+    // TODO(tal): add more export attributes (user, date, size, etc).
+
+    public ExportInfo(ExportType exportType) {
+        this.exportType = checkNotNull(exportType);
+    }
+
+    public ExportType getExportType() {
+        return exportType;
+    }
+
+    @Override
+    public String toString() {
+        return exportType.getId();
+    }
 }

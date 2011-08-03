@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,14 +15,6 @@
  */
 package org.cnx.repository.atompub.servlets;
 
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
-
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -31,9 +23,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.service.CnxAtomService;
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+
+import com.sun.syndication.propono.atom.server.AtomRequest;
+import com.sun.syndication.propono.atom.server.AtomRequestImpl;
+
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)
@@ -42,11 +42,11 @@ public class CnxServiceDocumentServlet {
 
     @GET
     // @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-            @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-            @Path(SERVICE_DOCUMENT_GET)
-            public
-            Response getServiceDocument(@Context HttpServletRequest req,
-                    @Context HttpServletResponse res) {
+                    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
+                    @Path(SERVICE_DOCUMENT_GET)
+                    public
+                    Response getServiceDocument(@Context HttpServletRequest req,
+                        @Context HttpServletResponse res) {
         // TODO(arjuns) : Add caching and exception handling.
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomService = new CnxAtomService(req);

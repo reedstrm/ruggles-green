@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,18 +15,17 @@
  */
 package org.cnx.repository.atompub.service;
 
-import com.sun.syndication.propono.atom.server.AtomHandler;
-import com.sun.syndication.propono.atom.server.AtomHandlerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.syndication.propono.atom.server.AtomHandler;
+import com.sun.syndication.propono.atom.server.AtomHandlerFactory;
+
 /**
- * rome-propono based Factory to provide AtomHandler.
- * This is controlled using SystemProperty
- *     com.sun.syndication.propono.atom.server.AtomHandlerFactory
- * whose value is provided in appengine-web.xml
- *
+ * rome-propono based Factory to provide AtomHandler. This is controlled using SystemProperty
+ * com.sun.syndication.propono.atom.server.AtomHandlerFactory whose value is provided in
+ * appengine-web.xml
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomHandlerFactory extends AtomHandlerFactory {

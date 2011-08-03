@@ -41,21 +41,22 @@ import com.google.appengine.api.datastore.Key;
 
 /**
  * Implementation of the resource related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ResourceOperations {
     /**
      * Prefix for relative upload URLs.
-     *
+     * 
      * TODO(tal): when running locally in eclipse, blobstore service retruns a partial upload URL
      * that starts with '/'. In this case, we add this prefix. When running on production app
      * engine, blobstore return correctly a full URL.
-     *
+     * 
      * TODO(tal): any way to get the local server prefix at runtime?
      */
     // TODO(arjuns) : Fix the port issue.
-    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT;
+    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:"
+        + CnxAtomPubConstants.LOCAL_SERVER_PORT;
 
     private static final Logger log = Logger.getLogger(ResourceOperations.class.getName());
 

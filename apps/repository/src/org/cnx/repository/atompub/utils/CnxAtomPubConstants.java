@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,22 +15,6 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import com.google.appengine.api.utils.SystemProperty;
-import com.google.appengine.api.utils.SystemProperty.Environment;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
-
-import org.cnx.repository.service.api.RepositoryRequestContext;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -39,8 +23,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
+import com.google.appengine.api.utils.SystemProperty;
+import com.google.appengine.api.utils.SystemProperty.Environment;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
+
 /**
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomPubConstants {
@@ -55,7 +54,7 @@ public class CnxAtomPubConstants {
     public final URL atomPubRestUrl;
 
     // TODO(arjuns) : Fix this.
-    public final static int LOCAL_SERVER_PORT= 8888;
+    public final static int LOCAL_SERVER_PORT = 8888;
 
     public CnxAtomPubConstants(String reqUrl, int port) {
         // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
@@ -278,10 +277,9 @@ public class CnxAtomPubConstants {
     /** Get AtomPub List of Contents from CNXMl and ResourceMappingDoc. */
     public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc) {
 
-        StringBuilder contentValueBuilder = new StringBuilder()
-            .append(cnxmlDoc)
-            .append(DELIMITER_CONTENT)
-            .append(resourceMappingDoc);
+        StringBuilder contentValueBuilder =
+            new StringBuilder().append(cnxmlDoc).append(DELIMITER_CONTENT).append(
+                resourceMappingDoc);
 
         Content content = new Content();
         content.setType(CustomMediaTypes.APPLICATION_ATOM_XML);
@@ -290,8 +288,8 @@ public class CnxAtomPubConstants {
         return Lists.newArrayList(content);
 
         // TODO(arjuns) : Fix this.
-//        return Lists.newArrayList(getCnxmlContent(cnxmlDoc),
-//            getResourceMappingContent(resourceMappingDoc));
+        // return Lists.newArrayList(getCnxmlContent(cnxmlDoc),
+        // getResourceMappingContent(resourceMappingDoc));
     }
 
     /** Get CNXML Doc from Content */
@@ -328,25 +326,25 @@ public class CnxAtomPubConstants {
     }
 
     // TODO(arjuns) : See if this is better.
-    public static void serializeEntry(Entry entry, Writer writer)
-            throws IllegalArgumentException, FeedException, IOException {
+    public static void serializeEntry(Entry entry, Writer writer) throws IllegalArgumentException,
+        FeedException, IOException {
 
-            // Build a feed containing only the entry
-            List<Entry> entries = new ArrayList<Entry>();
-            entries.add(entry);
-            Feed feed1 = new Feed();
-            feed1.setFeedType("atom_1.0");
-            feed1.setEntries(entries);
+        // Build a feed containing only the entry
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(entry);
+        Feed feed1 = new Feed();
+        feed1.setFeedType("atom_1.0");
+        feed1.setEntries(entries);
 
-            // Get Rome to output feed as a JDOM document
-            WireFeedOutput wireFeedOutput = new WireFeedOutput();
-            Document feedDoc = wireFeedOutput.outputJDom(feed1);
+        // Get Rome to output feed as a JDOM document
+        WireFeedOutput wireFeedOutput = new WireFeedOutput();
+        Document feedDoc = wireFeedOutput.outputJDom(feed1);
 
-            // Grab entry element from feed and get JDOM to serialize it
-//            Element entryElement= (Element)feedDoc.getRootElement().getChildren().get(0);
+        // Grab entry element from feed and get JDOM to serialize it
+        // Element entryElement= (Element)feedDoc.getRootElement().getChildren().get(0);
 
-            XMLOutputter outputter = new XMLOutputter();
-            Element listOfChildren = (Element) feedDoc.getRootElement().getChildren().get(0);
-            outputter.output(listOfChildren, writer);
-        }
+        XMLOutputter outputter = new XMLOutputter();
+        Element listOfChildren = (Element) feedDoc.getRootElement().getChildren().get(0);
+        outputter.output(listOfChildren, writer);
+    }
 }

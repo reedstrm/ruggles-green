@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,15 +15,15 @@
  */
 package org.cnx.repository.atompub.utils;
 
+import java.net.URL;
+
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
 
-import java.net.URL;
-
 /**
  * Utility class for CNX AtomCollections.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomCollectionUtils {
@@ -43,12 +43,12 @@ public class CnxAtomCollectionUtils {
 
     public static Collection getCollectionForCnxCollection(URL cnxCollectionScheme) {
         return getCnxCollection(CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_TITLE,
-            cnxCollectionScheme,
-            CnxAtomCategoryUtils.getCnxCollectionCategoryEle(cnxCollectionScheme));
+            cnxCollectionScheme, CnxAtomCategoryUtils
+                .getCnxCollectionCategoryEle(cnxCollectionScheme));
     }
 
     private static Collection getCnxCollection(String collectionName, URL collectionPath,
-            Category category) {
+        Category category) {
         Collection collection = new Collection(collectionName, null, collectionPath.toString());
 
         Categories categories = new Categories();

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,12 +19,6 @@ import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxCollec
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxModuleCategoryEle;
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxResourceCategoryEle;
 
-import com.sun.syndication.propono.atom.common.Categories;
-
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -33,9 +27,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+
+import com.sun.syndication.propono.atom.common.Categories;
+
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
@@ -46,7 +46,7 @@ public class CnxCategoriesDocumentServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(CATEGORY_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
-            @Context HttpServletResponse response) {
+        @Context HttpServletResponse response) {
         // TODO(arjuns) : Add caching and exception handling.
 
         CnxAtomPubConstants constants =
@@ -57,8 +57,7 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxCollectionCategoryEle(constants
             .getCollectionCnxCollectionScheme()));
 
-        return Response.ok()
-            .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
-            .build();
+        return Response.ok().entity(
+            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
     }
 }

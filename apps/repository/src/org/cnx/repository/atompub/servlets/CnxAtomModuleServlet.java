@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,29 +14,6 @@
  * the License.
  */
 package org.cnx.repository.atompub.servlets;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.impl.Atom10Parser;
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
-
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-import org.cnx.repository.service.api.AddModuleVersionResult;
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateModuleResult;
-import org.cnx.repository.service.api.GetModuleVersionResult;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-import org.jdom.JDOMException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,9 +36,31 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.service.CnxAtomService;
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.CreateModuleResult;
+import org.cnx.repository.service.api.GetModuleVersionResult;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+import org.jdom.JDOMException;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
+import com.sun.syndication.propono.atom.server.AtomRequest;
+import com.sun.syndication.propono.atom.server.AtomRequestImpl;
+
 /**
  * Servlet to Handle CNX Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH)
@@ -80,7 +79,7 @@ public class CnxAtomModuleServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_MODULE_POST)
     public Response createNewModule(@Context HttpServletRequest req,
-            @Context HttpServletResponse res) {
+        @Context HttpServletResponse res) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
@@ -137,8 +136,8 @@ public class CnxAtomModuleServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response createNewModule(@Context HttpServletRequest req,
-            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-            @PathParam(VERSION_PATH_PARAM) String version) {
+        @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+        @PathParam(VERSION_PATH_PARAM) String version) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
@@ -252,8 +251,8 @@ public class CnxAtomModuleServlet {
     @GET
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response getModuleVersion(@Context HttpServletRequest req,
-            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-            @PathParam(VERSION_PATH_PARAM) String version) {
+        @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+        @PathParam(VERSION_PATH_PARAM) String version) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 

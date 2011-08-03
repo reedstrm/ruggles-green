@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,19 +19,19 @@ import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollect
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxModule;
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxResource;
 
-import com.sun.syndication.propono.atom.common.AtomService;
-import com.sun.syndication.propono.atom.common.Workspace;
+import javax.servlet.http.HttpServletRequest;
 
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServletRequest;
+import com.sun.syndication.propono.atom.common.AtomService;
+import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
  * Cnx AtomPub Service.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomService extends AtomService {

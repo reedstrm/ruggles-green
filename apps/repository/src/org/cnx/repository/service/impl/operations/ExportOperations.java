@@ -16,15 +16,18 @@
 
 package org.cnx.repository.service.impl.operations;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Transaction;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
@@ -38,6 +41,8 @@ import com.google.appengine.api.blobstore.BlobKey;
 
 /**
  * Implementation of the export related operations of the repository service.
+ * 
+ * TODO(tal): support the semantic of 'latest' in collection and module export operations.
  * 
  * @author Tal Dayan
  */
@@ -143,5 +148,57 @@ public class ExportOperations {
         // TODO(tal): should do here the same header trick as in serving a resource?
         return ResponseUtil.loggedOk("Resource served: " + exportReference.toString(),
             new ServeExportResult(), log);
+    }
+
+    /**
+     * See description in {@link CnxRepositoryService}
+     */
+    public static RepositoryResponse<DeleteExportResult> deleteExport(
+        RepositoryRequestContext context, ExportReference exportReference) {
+
+        // Validate the export reference.
+        final ExportReferenceValidationResult validationResult =
+            ExportReferenceValidationResult.forReference(exportReference);
+        if (validationResult.getRepositoryStatus().isError()) {
+            return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
+                validationResult.getStatusDescription(), log);
+        }
+
+        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        Transaction tx = pm.currentTransaction();
+        tx.begin();
+        final BlobKey blobKey;
+        try {
+            // Lookup export, return NOT FOUND it not found.
+            final JdoExportItemEntity entity;
+            try {
+                entity =
+                    pm.getObjectById(JdoExportItemEntity.class, validationResult.getExportKey());
+            } catch (Throwable e) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Export not found: "
+                    + exportReference, log, e);
+            }
+
+            // Export entity found.
+            blobKey = checkNotNull(entity.getBlobKey());
+            pm.deletePersistent(entity);
+
+            tx.commit();
+        } catch (Throwable e) {
+            tx.rollback();
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                "Error when deleting export" + exportReference, log, e);
+        } finally {
+            checkArgument(!tx.isActive(), "Transaction left active");
+            pm.close();
+        }
+
+        // TODO(tal): what should be the best sequence to delete the entity and its blob?
+        // Ideally they should be done in one transaction but app engine does not support it.
+        Services.blobstore.delete(blobKey);
+
+        return ResponseUtil.loggedOk("Export found and deleted: " + exportReference + ", blobKey: "
+            + blobKey.getKeyString(), new DeleteExportResult(), log);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,24 +14,6 @@
  * the License.
  */
 package org.cnx.repository.atompub.servlets;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
-
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateResourceResult;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import java.io.IOException;
 import java.net.URI;
@@ -50,9 +32,26 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.service.CnxAtomService;
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.propono.atom.server.AtomRequest;
+import com.sun.syndication.propono.atom.server.AtomRequestImpl;
+
 /**
  * Servlet to Handle CNX Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH)
@@ -61,7 +60,7 @@ public class CnxAtomResourceServlet {
     private final String COLLECTION_RESOURCE_POST = "/";
 
     private final String RESOURCE_GET_PATH_PARAM = "resourceId";
-    private final String RESOURCE_GET_URL_PATTERN = "/{"  + RESOURCE_GET_PATH_PARAM  + "}";
+    private final String RESOURCE_GET_URL_PATTERN = "/{" + RESOURCE_GET_PATH_PARAM + "}";
 
     private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
@@ -69,7 +68,7 @@ public class CnxAtomResourceServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_RESOURCE_POST)
     public Response postNewResource(@Context HttpServletRequest req,
-            @Context HttpServletResponse res) {
+        @Context HttpServletResponse res) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
@@ -119,9 +118,8 @@ public class CnxAtomResourceServlet {
 
     @GET
     @Path(RESOURCE_GET_URL_PATTERN)
-    public Response
-            postNewResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
-                    @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
+    public Response postNewResource(@Context HttpServletRequest req,
+        @Context HttpServletResponse res, @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 

@@ -2,5 +2,29 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/aopalliance.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-api-1.0-sdk-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-api-labs-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-jsr107cache-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-local-runtime-shared.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/cnx-common.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/el-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-r09.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-assistedinject-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-multibindings-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/javax.inject.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr107cache-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr305.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.html.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.util.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/serializer.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/soy-excluding-deps-20100708.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xalan.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xml-apis.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

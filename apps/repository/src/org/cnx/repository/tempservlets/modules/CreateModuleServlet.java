@@ -23,10 +23,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to create a new module.
@@ -43,7 +43,7 @@ public class CreateModuleServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateModuleResult> repositoryResponse =
-            Services.repository.createModule(context);
+            RepositoryServer.getService().createModule(context);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

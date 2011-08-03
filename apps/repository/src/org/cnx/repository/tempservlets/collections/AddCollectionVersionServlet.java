@@ -27,10 +27,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to add a version for an existing module.
@@ -54,7 +54,7 @@ public class AddCollectionVersionServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<AddCollectionVersionResult> repositoryResponse =
-            Services.repository.addCollectionVersion(context, moduleId, colxmlDoc);
+            RepositoryServer.getService().addCollectionVersion(context, moduleId, colxmlDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

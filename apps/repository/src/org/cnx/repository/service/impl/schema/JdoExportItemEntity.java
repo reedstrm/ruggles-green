@@ -86,6 +86,10 @@ public class JdoExportItemEntity extends CnxJdoEntity {
         return blobKey;
     }
 
+    public Key getParentKey() {
+        return parentKey;
+    }
+
     /**
      * Construct an export item key.
      * 

@@ -32,6 +32,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
@@ -39,7 +40,6 @@ import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -62,7 +62,7 @@ public class CnxAtomResourceServlet {
     private final String RESOURCE_GET_PATH_PARAM = "resourceId";
     private final String RESOURCE_GET_URL_PATTERN = "/{" + RESOURCE_GET_PATH_PARAM + "}";
 
-    private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
+    private CnxRepositoryService repositoryService = RepositoryServer.getService();
 
     @POST
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)

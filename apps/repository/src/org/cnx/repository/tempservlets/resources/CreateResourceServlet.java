@@ -23,9 +23,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to create a new resource.
@@ -43,7 +43,7 @@ public class CreateResourceServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         RepositoryResponse<CreateResourceResult> repositoryResponse =
-            Services.repository.createResource(null);
+            RepositoryServer.getService().createResource(null);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

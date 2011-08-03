@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to get the xml and manifest of a collection version.
@@ -73,7 +73,7 @@ public class GetCollectionVersionServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionVersionResult> repositoryResponse =
-            Services.repository.getCollectionVersion(context, collectionId, collectionVersion);
+            RepositoryServer.getService().getCollectionVersion(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

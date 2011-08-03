@@ -36,6 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
@@ -45,7 +46,6 @@ import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 import org.jdom.JDOMException;
 
 import com.google.common.base.Throwables;
@@ -73,7 +73,7 @@ public class CnxAtomModuleServlet {
     private final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/version/{"
         + VERSION_PATH_PARAM + "}";
 
-    private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
+    private final CnxRepositoryService repositoryService = RepositoryServer.getService();
 
     @POST
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)

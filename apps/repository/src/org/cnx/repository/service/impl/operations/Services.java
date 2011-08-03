@@ -19,9 +19,6 @@ package org.cnx.repository.service.impl.operations;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
@@ -45,5 +42,5 @@ public class Services {
     // TODO(tal): should we create an instance on the fly for each use?
     public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
 
-    public static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+    //public static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 }

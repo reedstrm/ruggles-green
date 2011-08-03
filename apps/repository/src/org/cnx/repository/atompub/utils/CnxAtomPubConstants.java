@@ -53,9 +53,8 @@ public class CnxAtomPubConstants {
     /** Path for REST URL for ATOMPUB API */
     public final URL atomPubRestUrl;
 
-    // TODO(arjuns) : Fix this.
-    public final static int LOCAL_SERVER_PORT = 8888;
-
+    // TODO(tal): if the 'const' are determined at runtime, change the package
+    // name as 'consts' implies compiel time consts. (e.g. 'config').
     public CnxAtomPubConstants(String reqUrl, int port) {
         // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
         String applicationId = SystemProperty.applicationId.get();

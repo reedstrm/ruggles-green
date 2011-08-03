@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
@@ -31,7 +32,6 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.ParamUtil;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to delete an export.
@@ -59,7 +59,7 @@ public class DeleteExportServlet extends HttpServlet {
             new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
 
         final RepositoryResponse<DeleteExportResult> repositoryResponse =
-            Services.repository.deleteExport(new RepositoryRequestContext(null), exportReference);
+            RepositoryServer.getService().deleteExport(new RepositoryRequestContext(null), exportReference);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -45,18 +44,6 @@ import com.google.appengine.api.datastore.Key;
  * @author Tal Dayan
  */
 public class ResourceOperations {
-    /**
-     * Prefix for relative upload URLs.
-     * 
-     * TODO(tal): when running locally in eclipse, blobstore service retruns a partial upload URL
-     * that starts with '/'. In this case, we add this prefix. When running on production app
-     * engine, blobstore return correctly a full URL.
-     * 
-     * TODO(tal): any way to get the local server prefix at runtime?
-     */
-    // TODO(arjuns) : Fix the port issue.
-    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:"
-        + CnxAtomPubConstants.LOCAL_SERVER_PORT;
 
     private static final Logger log = Logger.getLogger(ResourceOperations.class.getName());
 
@@ -64,15 +51,14 @@ public class ResourceOperations {
      * Base path of the resource upload completion servlet. Should match servlet mapping in web.xml.
      * Servlet mapping should be this value with the suffix "/*".
      */
-    // TODO(arjuns) : Do we need one common URL for uploading all resources, or they need to
-    // be parameterized as well?
     private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/resource_factory/uploaded";
 
     /**
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<CreateResourceResult> createResource(
-        RepositoryRequestContext context) {
+        RepositoryRequestContext context, String defaultBlobUploadPrefix) {
+        checkNotNull(defaultBlobUploadPrefix);
 
         final String resourceId;
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -94,8 +80,8 @@ public class ResourceOperations {
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
-            log.warning("Prefexing resource upload url with " + DEFAULT_UPLOAD_URL_PREFIX);
-            uploadUrl = DEFAULT_UPLOAD_URL_PREFIX + uploadUrl;
+            log.warning("Prefexing resource upload url with '" + defaultBlobUploadPrefix + "'");
+            uploadUrl = defaultBlobUploadPrefix + uploadUrl;
         }
 
         return ResponseUtil.loggedOk("Resource created: " + resourceId, new CreateResourceResult(

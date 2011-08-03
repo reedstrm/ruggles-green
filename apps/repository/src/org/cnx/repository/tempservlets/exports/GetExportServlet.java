@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
@@ -32,7 +33,6 @@ import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.ParamUtil;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to serve a resource using a GET request.
@@ -60,7 +60,7 @@ public class GetExportServlet extends HttpServlet {
             new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
 
         final RepositoryResponse<ServeExportResult> repositoryResponse =
-            Services.repository.serveExport(new RepositoryRequestContext(null), exportReference,
+            RepositoryServer.getService().serveExport(new RepositoryRequestContext(null), exportReference,
                 resp);
 
         // Map repository error to API error.

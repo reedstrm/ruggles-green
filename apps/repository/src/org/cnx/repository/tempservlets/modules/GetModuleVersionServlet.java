@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to get the xml and manifest of a module version.
@@ -71,7 +71,7 @@ public class GetModuleVersionServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetModuleVersionResult> repositoryResponse =
-            Services.repository.getModuleVersion(context, moduleId, moduleVersion);
+            RepositoryServer.getService().getModuleVersion(context, moduleId, moduleVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

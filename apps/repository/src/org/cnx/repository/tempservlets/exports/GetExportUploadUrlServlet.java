@@ -23,13 +23,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.operations.ParamUtil;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to create initiate export upload.
@@ -57,7 +57,7 @@ public class GetExportUploadUrlServlet extends HttpServlet {
             new ExportReference(scopeType, objectId, versionNumber, exportTypeId);
 
         RepositoryResponse<GetExportUploadUrlResult> repositoryResponse =
-            Services.repository.getExportUploadUrl(context, exportReference);
+            RepositoryServer.getService().getExportUploadUrl(context, exportReference);
 
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {

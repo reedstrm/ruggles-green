@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -58,12 +60,21 @@ import org.cnx.util.Nullable;
  */
 public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
-    private final static CnxRepositoryServiceImpl instance = new CnxRepositoryServiceImpl();
+    private final String defaultBlobUploadPrefix;
+
+    /**
+     * @param defaultBlobUploadPrefix a prefix to prepend to blobstore local upload URLs to make
+     *            them absolute (e.g. "http://127.0.0.1:8888"). Used only when running locally for
+     *            debugging.
+     */
+    public CnxRepositoryServiceImpl(String defaultBlobUploadPrefix) {
+        this.defaultBlobUploadPrefix = checkNotNull(defaultBlobUploadPrefix);
+    }
 
     @Override
     public RepositoryResponse<CreateResourceResult>
                     createResource(RepositoryRequestContext context) {
-        return ResourceOperations.createResource(context);
+        return ResourceOperations.createResource(context, defaultBlobUploadPrefix);
     }
 
     @Override
@@ -146,7 +157,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     @Override
     public RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
         RepositoryRequestContext context, ExportReference exportReference) {
-        return ExportOperations.getExportUploadUrl(context, exportReference);
+        return ExportOperations.getExportUploadUrl(context, exportReference,
+            defaultBlobUploadPrefix);
     }
 
     @Override
@@ -159,18 +171,5 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<DeleteExportResult> deleteExport(RepositoryRequestContext context,
         ExportReference exportReference) {
         return ExportOperations.deleteExport(context, exportReference);
-    }
-
-    /**
-     * Get a repository service instance.
-     * 
-     * The instance is reentrant and thread safe such that a single instance is sufficient for an
-     * entire application.
-     * 
-     * @return a repository service instance. The returned instance is not necessarily unique every
-     *         call.
-     */
-    public static CnxRepositoryService getService() {
-        return instance;
     }
 }

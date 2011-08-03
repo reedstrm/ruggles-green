@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.operations.Services;
 
 import com.google.appengine.repackaged.com.google.common.base.Join;
 
@@ -66,7 +66,7 @@ public class GetCollectionInfoServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionInfoResult> repositoryResponse =
-            Services.repository.getCollectionInfo(context, collectionId);
+            RepositoryServer.getService().getCollectionInfo(context, collectionId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

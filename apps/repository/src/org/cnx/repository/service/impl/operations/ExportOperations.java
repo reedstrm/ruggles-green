@@ -48,9 +48,6 @@ import com.google.appengine.api.blobstore.BlobKey;
  */
 public class ExportOperations {
 
-    // TODO(tal): Move to a shared place. See ResourceOperations, also used there.
-    private static final String DEFAULT_UPLOAD_URL_PREFIX = "http://127.0.0.1:8888";
-
     private static final Logger log = Logger.getLogger(ExportOperations.class.getName());
 
     /**
@@ -62,8 +59,9 @@ public class ExportOperations {
      * See description in {@link CnxRepositoryService#getExportUploadUrl}
      */
     public static RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
-        RepositoryRequestContext context, ExportReference exportReference) {
-
+        RepositoryRequestContext context, ExportReference exportReference, String defaultBlobUploadPrefix) {
+        checkNotNull(defaultBlobUploadPrefix);
+        
         // Validate the export reference
         final ExportReferenceValidationResult validationResult =
             ExportReferenceValidationResult.forReference(exportReference);
@@ -98,8 +96,8 @@ public class ExportOperations {
         // TODO(tal): share the prefix logic with resource creation.
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
-            log.warning("Prefexing resource upload url with " + DEFAULT_UPLOAD_URL_PREFIX);
-            uploadUrl = DEFAULT_UPLOAD_URL_PREFIX + uploadUrl;
+            log.warning("Prefexing resource upload url with '" + defaultBlobUploadPrefix + "'");
+            uploadUrl = defaultBlobUploadPrefix + uploadUrl;
         }
 
         // All done OK.

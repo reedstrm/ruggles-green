@@ -21,6 +21,7 @@ import com.google.appengine.api.utils.SystemProperty.Environment;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 
 import java.net.MalformedURLException;
@@ -70,7 +71,7 @@ public abstract class CnxAtomPubBaseTest extends JerseyTest {
 
         // TODO(arjuns) : Temp override as junit is not working with datastore.
         cnxServerAtomPubUrl =
-            new URL("http://localhost:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
+            new URL(RepositoryServer.LOCAL_BASE_URL + "/atompub");
 
         // Initializing AppEngine environment.
         SystemProperty.environment.set(Environment.Value.Development);
@@ -79,6 +80,6 @@ public abstract class CnxAtomPubBaseTest extends JerseyTest {
         constants =
         // new CnxAtomPubConstants(webResource.getURI().toString(), webResource.getURI().getPort());
             new CnxAtomPubConstants(cnxServerAtomPubUrl.toString(),
-                CnxAtomPubConstants.LOCAL_SERVER_PORT);
+                RepositoryServer.LOCAL_PORT);
     }
 }

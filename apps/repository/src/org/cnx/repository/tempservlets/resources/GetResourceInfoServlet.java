@@ -27,10 +27,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.RepositoryServer;
 import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.UploadedResourceContentInfo;
-import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to serve metadata of a resource.
@@ -59,7 +59,7 @@ public class GetResourceInfoServlet extends HttpServlet {
         final String resourceId = matcher.group(1);
 
         final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-            Services.repository.getResourceInfo(null, resourceId);
+            RepositoryServer.getService().getResourceInfo(null, resourceId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

@@ -31,7 +31,7 @@
              inheritAll="true"
              target="default"
              dir="${third.party.jars}" />
-        
+
         <ant antfile="guava/build.xml"
              inheritAll="true"
              target="default"
@@ -42,12 +42,9 @@
              target="default"
              dir="${third.party.jars}" />
 
-        <fileset id="depend_lib" dir="${output.jars}" includes="*.jar"/>
-
-        <javac srcdir="${srcdir}"
-               destdir="${classdir}"
-               includeantruntime="false"
-               debug="true">
+        <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+        
+        <javac srcdir="${srcdir}" destdir="${classdir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
@@ -64,13 +61,21 @@
     <tstamp>
         <format property="timenow" pattern="ddMMyyyyHHmm" />
     </tstamp>
+
+    <property name="common-jar-name" value="cnx-common" />
+    <property name="dest-common-jar" value="${libdir}/${common-jar-name}.${timenow}.jar" />
     
     <target name="jar"
             description="Build a JAR of the classes"
             depends="compile">
-        <jar destfile="${libdir}/cnx-common.${timenow}.jar" >
+        <jar destfile="${dest-common-jar}" >
             <fileset dir="${classdir}" />
-            <fileset dir="${output.jars}" />
         </jar>
+    </target>
+
+    <target name="copyjar"
+        description="Copy jar to calling Build file."
+        depends="jar">
+        <copy file="${dest-common-jar}" tofile="${target_dir}/${common-jar-name}.latest.jar"/>
     </target>
 </project>

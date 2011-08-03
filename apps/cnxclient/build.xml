@@ -13,34 +13,65 @@
 
     <property file="build.properties" />
     <property file="local.properties" />
-
     <property name="target_dir" value="${basedir}/${output.jars}" />
-
+    
     <target name="compile" description="Compile the classes">
         <mkdir dir="${classdir}" />
         <mkdir dir="${libdir}" />
         <mkdir dir="${output.jars}" />
 
-        <!-- Add dependent jars to be copied. before classes are compiled. -->
-        <ant antfile="jdom/build.xml"
+        <ant antfile="commons-beanutils/build.xml"
+                     inheritAll="true"
+                     target="default"
+                     dir="${third.party.jars}" />
+        
+        <ant antfile="commons-httpclient/build.xml"
+                     inheritAll="true"
+                     target="default"
+                     dir="${third.party.jars}" />
+
+
+        <ant antfile="rome-propono/build.xml"
              inheritAll="true"
              target="default"
              dir="${third.party.jars}" />
+
+        <ant antfile="build.xml"
+            inheritall="false"
+            target="copyjar"
+            dir="${basedir}/${commondir}" >
+            <property name="target_dir" value="${target_dir}" />
+        </ant>
+        
+        <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+        
+        <javac srcdir="${srcdir}" destdir="${classdir}" includeantruntime="false" debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+            </classpath>
+        </javac>
     </target>
 
     <target name="clean" description="Remove built files">
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
         <delete dir="${classdir}" />
         <delete dir="${output.jars}" />
         <delete dir="${libdir}" />
     </target>
 
+    <tstamp>
+        <format property="timenow" pattern="ddMMyyyyHHmm" />
+    </tstamp>
+            
+    <property name="client-jar-name" value="cnxclient" />
+    <property name="dest-client-jar" value="${libdir}/${client-jar-name}.${timenow}.jar" />
+        
     <target name="jar"
-                description="Build a JAR of the classes"
-                depends="compile">
-        <jar destfile="org.cnx.cnxclient.jar">
+            description="Build a JAR of the classes"
+            depends="compile">
+        <jar destfile="${dest-client-jar}">
             <fileset dir="${classdir}" />
-            <fileset dir="${output.jars}" />
-            <fileset dir="${libdir}" />
         </jar>
     </target>
 </project>

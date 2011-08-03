@@ -198,7 +198,13 @@ public class ResourceOperations {
                 "Error serving the resource content: " + resourceId, log, Level.SEVERE, e);
         }
 
-        KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
+        /*
+         * Appengine uses Blobstore for storing big blobs. Upload and download from Blobstores
+         * is done separately from normal App. At the time of serving the blob, Blobstore service
+         * sets a header with "BlobKey = <value>" and then App Engine replaces the body of the
+         * response with the content of the blob.
+         */
+        final KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
         ServeResourceResult result = new ServeResourceResult(Lists.newArrayList(blobkeyHeader));
         return ResponseUtil.loggedOk("Resource served: " + resourceId, result, log);
     }

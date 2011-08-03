@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.api;
 
+import com.google.common.base.Preconditions;
+
 import org.cnx.repository.common.KeyValue;
 
 import java.util.List;
@@ -29,17 +31,16 @@ public class ServeResourceResult {
     // TODO(tal): any attribute to return (size, type, etc)?
 
     // List of headers to be set by Repository Service client.
-    private List<KeyValue> listOfHeaders;
+    private final List<KeyValue> listOfHeaders;
 
     public List<KeyValue> getListOfHeaders() {
         return listOfHeaders;
     }
 
-    public void setListOfHeaders(List<KeyValue> listOfHeaders) {
-        this.listOfHeaders = listOfHeaders;
-    }
-
     public ServeResourceResult(List<KeyValue> listOfHeaders) {
+        Preconditions.checkNotNull(listOfHeaders);
+        // At present, CNXService implementation is expected to reutrn one Httpheader for BlobKey.
+        Preconditions.checkArgument(listOfHeaders.size() == 1);
         this.listOfHeaders = listOfHeaders;
     }
 }

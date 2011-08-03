@@ -51,6 +51,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
+ * AtomPub client for CNX Repository.
  *
  * @author Arjun Satyapal
  */

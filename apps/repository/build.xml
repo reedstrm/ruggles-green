@@ -33,7 +33,7 @@
         </copy-->
         <copy todir="${war.dir}/WEB-INF">
             <fileset dir="src/WEB-INF">
-                <include name="*.xml"/>
+                <include name="*.*" />
             </fileset>
         </copy>
         <copy todir="${war.dir}/WEB-INF/lib">

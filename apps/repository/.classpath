@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="testlib/" kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -8,6 +9,8 @@
 	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-local-runtime-shared.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-remote-api.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-tools-api.jar"/>
 	<classpathentry kind="lib" path="build/jars/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
@@ -44,5 +47,5 @@
 	<classpathentry kind="lib" path="build/jars/xalan-2.7.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="build/jars/xml-apis.jar"/>
-	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>

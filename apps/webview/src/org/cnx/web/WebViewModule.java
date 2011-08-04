@@ -18,9 +18,13 @@ package org.cnx.web;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.tofu.SoyTofu;
+import java.io.File;
 import org.cnx.html.LinkProcessor;
 import org.cnx.html.Processor;
 import org.cnx.html.RenderTime;
@@ -39,6 +43,13 @@ public class WebViewModule extends AbstractModule {
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
         processorBinder.addBinding().to(LinkProcessor.class);
+    }
+
+    @Provides @Singleton @WebViewTemplate
+            SoyTofu provideTofu(SoyFileSet.Builder builder) {
+        builder.add(new File("base.soy"));
+        builder.add(new File("module.soy"));
+        return builder.build().compileToJavaObj();
     }
 
     @Provides @RenderTime @Named("moduleId") String provideModuleId() {

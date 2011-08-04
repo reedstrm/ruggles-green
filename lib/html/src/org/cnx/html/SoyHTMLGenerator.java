@@ -33,7 +33,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  *  SoyHTMLGenerator converts a CNXML file to HTML using Closure Templates.
  */
-@RenderTime public class SoyHTMLGenerator implements HTMLGenerator {
+@RenderTime public class SoyHTMLGenerator implements ModuleHTMLGenerator {
     public static final String SOY_NAMESPACE = "org.cnx.html.SoyHTMLGenerator";
 
     @BindingAnnotation

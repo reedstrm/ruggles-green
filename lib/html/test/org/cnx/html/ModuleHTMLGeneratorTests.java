@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
-public class HTMLGeneratorTests {
+public class ModuleHTMLGeneratorTests {
     private static Injector injector;
     private Document doc;
     private DOMBuilder builder;
@@ -63,7 +63,7 @@ public class HTMLGeneratorTests {
         final RenderScope scope = injector.getInstance(RenderScope.class);
         scope.enter();
         try {
-            return injector.getInstance(HTMLGenerator.class).generate(node);
+            return injector.getInstance(ModuleHTMLGenerator.class).generate(node);
         } finally {
             scope.exit();
         }

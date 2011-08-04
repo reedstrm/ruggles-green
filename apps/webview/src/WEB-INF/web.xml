@@ -21,14 +21,16 @@
      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
      version="2.5">
     <display-name>CNX Live Web View</display-name>
-    
-    <servlet>
-        <servlet-name>htmlRender</servlet-name>
-        <servlet-class>org.cnx.web.HTMLRenderServlet</servlet-class>
-    </servlet>
 
-    <servlet-mapping>
-        <servlet-name>htmlRender</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
+    <filter>
+        <filter-name>guiceFilter</filter-name>
+        <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>guiceFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <listener>
+        <listener-class>org.cnx.web.GuiceConfig</listener-class>
+    </listener>
 </web-app>

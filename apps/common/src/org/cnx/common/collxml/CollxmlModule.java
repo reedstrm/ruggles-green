@@ -27,7 +27,7 @@ import com.google.template.soy.tofu.SoyTofu;
  */
 public class CollxmlModule extends AbstractModule {
     @Override protected void configure() {
-        bind(HTMLGenerator.class).to(SoyHTMLGenerator.class);
+        bind(CollectionHTMLGenerator.class).to(SoyHTMLGenerator.class);
     }
 
     @Provides @Singleton @SoyHTMLGenerator.Template

@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -19,12 +19,7 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
-import javax.servlet.http.HttpServletResponse;
+import com.google.appengine.api.blobstore.BlobKey;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.DeleteExportResult;
@@ -37,13 +32,18 @@ import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.impl.schema.CnxJdoEntity;
 import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
 
-import com.google.appengine.api.blobstore.BlobKey;
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Transaction;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Implementation of the export related operations of the repository service.
- * 
+ *
  * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- * 
+ *
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -74,7 +74,7 @@ public class ExportOperations {
         try {
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
-                pm.getObjectById(validationResult.getParentEntityClass(), validationResult
+                (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(), validationResult
                     .getParentKey());
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,

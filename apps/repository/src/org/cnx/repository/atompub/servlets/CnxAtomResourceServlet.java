@@ -36,7 +36,6 @@ import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,23 +53,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateResourceResult;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Jersey Servlets for Cnx Resources.
@@ -147,8 +129,9 @@ public class CnxAtomResourceServlet {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
-        repositoryService.serveResouce(atomPubService.getConstants().getRepositoryContext(req),
-            resourceId, res);
+        RepositoryResponse<ServeResourceResult> serveResourceResult =
+                repositoryService.serveResouce(atomPubService.getConstants().getRepositoryContext(
+                    req), resourceId, res);
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();

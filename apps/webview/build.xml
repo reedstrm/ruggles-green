@@ -59,45 +59,72 @@
         <mkdir dir="${classdir}"/>
         <mkdir dir="${output.jars}"/>
 
-        <ant antfile="soy/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-        
-        <ant antfile="guava/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-        
-        <ant antfile="guice/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-        
-        <ant antfile="xalan/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-        
         <ant antfile="appengine/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
-        
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xerces/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-apis/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-serializer/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jersey/build.xml"
+            inheritall="true"
+            target="default"
+            dir="${third_party}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <!-- Non third-party dependencies. -->
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"
-             dir="../../lib/util" />
-        
+             dir="${basedir}/${libutildir}" />
+
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"
-             dir="../../lib/html" />
-        
+             dir="${basedir}/${libhtmldir}" />
+
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"
-             dir="../common" />
+             dir="${basedir}/${commondir}" />
+
+        <ant antfile="build.xml"
+            inheritall="true"
+            target="copyjar"
+            dir="${basedir}/${cnxclientdir}" />
+
 
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
@@ -107,10 +134,14 @@
         </javac>
     </target>
 
-    <target name="clean"
-                    description="Force a clean slate to rebuild">
-        <delete dir="build"/>
+    <target name="clean" description="Force a clean slate to rebuild">
+        <delete dir="${buildir}"/>
         <delete dir="${war.dir}"/>
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${libutildir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${libhtmldir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${cnxclientdir}" />
+
     </target>
 
     <target name="runserver" depends="war" description="Run the dev_appserver">

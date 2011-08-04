@@ -53,5 +53,4 @@
             <fileset refid="jersey-1.8" />
         </copy>
     </target>
-<
 </project>

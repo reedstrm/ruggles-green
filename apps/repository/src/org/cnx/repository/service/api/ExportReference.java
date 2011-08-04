@@ -39,6 +39,9 @@ public class ExportReference {
     private final String exportTypeId;
 
     /**
+     * TODO(tal): make the notion of 'latest version' more explicit? Currently we overload
+     * the null value.
+     * 
      * @param scopeType The type of the object to which the export can be attached.
      * @param objectId The id of the object to which this object is attached. The interpretation of
      *            this id depends on scopeType. For example, if scope type is MODULE or
@@ -48,8 +51,8 @@ public class ExportReference {
      * @export exportTypeId the export type id. Must match one of the ids returned by
      *         {@link CnxRepositoryService#getExportTypes()}.
      */
-    public ExportReference(ExportScopeType scopeType, String objectId, Integer versionNumber,
-        String exportTypeId) {
+    public ExportReference(ExportScopeType scopeType, String objectId,
+        @Nullable Integer versionNumber, String exportTypeId) {
         this.scopeType = checkNotNull(scopeType);
         this.objectId = checkNotNull(objectId);
         this.versionNumber = versionNumber;

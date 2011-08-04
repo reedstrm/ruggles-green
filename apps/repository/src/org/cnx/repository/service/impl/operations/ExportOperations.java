@@ -63,7 +63,7 @@ public class ExportOperations {
 
         // Validate the export reference
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.forReference(exportReference);
+            ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
                 validationResult.getStatusDescription(), log);
@@ -114,7 +114,7 @@ public class ExportOperations {
 
         // Validate the export reference.
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.forReference(exportReference);
+            ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
                 validationResult.getStatusDescription(), log);
@@ -155,7 +155,7 @@ public class ExportOperations {
 
         // Validate the export reference.
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.forReference(exportReference);
+            ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
                 validationResult.getStatusDescription(), log);

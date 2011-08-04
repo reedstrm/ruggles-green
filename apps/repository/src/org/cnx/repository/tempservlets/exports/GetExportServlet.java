@@ -16,6 +16,8 @@
 
 package org.cnx.repository.tempservlets.exports;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
@@ -81,7 +83,7 @@ public class GetExportServlet extends HttpServlet {
                     return;
             }
         }
-
+        
         // When ok, resource has been served so there is nothing to do here.
         checkState(repositoryResponse.isOk());
         return;

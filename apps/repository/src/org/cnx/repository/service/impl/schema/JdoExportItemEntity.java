@@ -50,20 +50,10 @@ public class JdoExportItemEntity extends CnxJdoEntity {
     @Persistent
     private Key parentKey;
 
-    // @Persistent
-    // private final String exportId;
-
     @Persistent
     private BlobKey blobKey;
 
-    // TODO(tal): temp, remove.
-    // @Persistent
-    // private String dummy = "xyz";
-    // public String getDummy() { return dummy; }
-
     /**
-     * .
-     * 
      * @param key the key of this export item. Should be a value computed by
      *            {@link #moduleVersionKey}.
      * @param blobKey the key of blob with with export.

@@ -129,7 +129,7 @@ public class ExportReferenceValidationResult {
     /**
      * Validate an export reference.
      */
-    public static ExportReferenceValidationResult forReference(ExportReference exportReference) {
+    public static ExportReferenceValidationResult validateReference(ExportReference exportReference) {
         // Lookup export type by id.
         final ExportType exportType =
             ExportTypesConfiguration.getExportTypes().get(exportReference.getExportTypeId());
@@ -206,7 +206,6 @@ public class ExportReferenceValidationResult {
 
         final Key exportKey = JdoExportItemEntity.exportEntityKey(parentKey, exportType);
 
-        //
         // All is OK.
         return new ExportReferenceValidationResult(RepositoryStatus.OK, "ok", exportType,
             parentEntityClass, parentKey, exportKey);

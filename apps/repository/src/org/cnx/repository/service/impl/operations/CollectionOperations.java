@@ -280,7 +280,7 @@ public class CollectionOperations {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                         "Could not locate collection " + collectionId, log);
                 }
-                // If collection has no versions than there is not latest version.
+                // If collection has no versions than there is no latest version.
                 if (collectionEntity.getVersionCount() < 1) {
                     ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                         "Collection has no versions: " + collectionId, log);

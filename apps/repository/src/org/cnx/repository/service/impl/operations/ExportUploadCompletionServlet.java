@@ -71,7 +71,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         final ExportReference exportReference =
             new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.forReference(exportReference);
+            ExportReferenceValidationResult.validateReference(exportReference);
         checkArgument(validationResult.getRepositoryStatus().isOk(),
             "Invalid export reference: %s, error: %s", exportReference, validationResult
                 .getStatusDescription());
@@ -119,7 +119,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         }
 
         log.info("Written export " + exportReference);
-        // TODO(tal): is this is where we want to redirect?
+        // TODO(tal): is this is where we want to redirect to?
         resp.sendRedirect("/");
     }
 }

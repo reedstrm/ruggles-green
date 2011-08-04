@@ -34,7 +34,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class DefaultModule extends AbstractModule {
     @Override protected void configure() {
-        bind(HTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
+        bind(ModuleHTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
         bind(String.class)
                 .annotatedWith(CnxmlNamespace.class)
                 .toInstance("http://cnx.rice.edu/cnxml");

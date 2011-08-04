@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URI;
 import org.cnx.html.ResourceResolver;
+import org.cnx.util.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,7 +38,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  *  SoyHTMLGenerator renders HTML from a CollXML using Closure Templates.
  */
-public class SoyHTMLGenerator implements HTMLGenerator {
+public class SoyHTMLGenerator implements CollectionHTMLGenerator {
     public static final String SOY_NAMESPACE = "org.cnx.common.collxml.SoyHTMLGenerator";
 
     private static final String contentTag = "content";
@@ -80,7 +81,7 @@ public class SoyHTMLGenerator implements HTMLGenerator {
      */
     public SoyListData extractItemsFromCollection(final Document doc) throws Exception {
         final SoyListData items = new SoyListData();
-        final Element contentElement = findChild(doc.getDocumentElement(),
+        final Element contentElement = DOMUtils.findFirstChild(doc.getDocumentElement(),
                 collxmlNamespace, contentTag);
         return extractItems(contentElement);
     }
@@ -122,7 +123,7 @@ public class SoyHTMLGenerator implements HTMLGenerator {
 
         return new SoyMapData(
                 "type", "module",
-                "title", findChild(elem, metadataNamespace, "title").getTextContent(),
+                "title", DOMUtils.findFirstChild(elem, metadataNamespace, "title").getTextContent(),
                 "uri", uri.toString()
         );
     }
@@ -130,33 +131,8 @@ public class SoyHTMLGenerator implements HTMLGenerator {
     private SoyMapData extractSubcollectionItem(final Element elem) throws Exception {
         return new SoyMapData(
                 "type", "subcollection",
-                "title", findChild(elem, metadataNamespace, "title").getTextContent(),
-                "items", extractItems(findChild(elem, collxmlNamespace, "content"))
+                "title", DOMUtils.findFirstChild(elem, metadataNamespace, "title").getTextContent(),
+                "items", extractItems(DOMUtils.findFirstChild(elem, collxmlNamespace, "content"))
         );
-    }
-
-    /**
-     *  Find the first direct descendant element with the given name.
-     *
-     *  @param parent The element to search in
-     *  @param namespace The namespace URI to search for
-     *  @param name The element local name to search for
-     *  @return The first element found, or null if no such element exists.
-     */
-    private static Element findChild(final Element parent, final String namespace,
-            final String name) {
-        final NodeList childList = parent.getChildNodes();
-        final int length = childList.getLength();
-        for (int i = 0; i < length; i++) {
-            final Node child = childList.item(i);
-            final String childNamespace = child.getNamespaceURI();
-            if (child.getNodeType() == Node.ELEMENT_NODE &&
-                    ((namespace == null && childNamespace == null) ||
-                            (namespace != null && namespace.equals(childNamespace)))
-                    && name.equals(child.getNodeName())) {
-                return (Element)child;
-            }
-        }
-        return null;
     }
 }

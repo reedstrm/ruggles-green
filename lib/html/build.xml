@@ -48,6 +48,11 @@
              target="default"
              dir="${third_party}" />
 
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <ant antfile="xalan/build.xml"
              inheritAll="true"
              target="default"
@@ -68,11 +73,8 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="soy/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
 
+        <!-- Non third-party dependencies. -->
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"

@@ -59,7 +59,7 @@
         <mkdir dir="${classdir}"/>
         <mkdir dir="${output.jars}"/>
 
-        <ant antfile="soy/build.xml"
+        <ant antfile="appengine/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -79,7 +79,17 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="appengine/build.xml"
+        <ant antfile="xerces/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-apis/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-serializer/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -89,11 +99,10 @@
             target="default"
             dir="${third_party}" />
 
-        <ant antfile="asm/build.xml"
-            inheritall="true"
-            target="default"
-            dir="${third_party}" />
-
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
 
         <!-- Non third-party dependencies. -->
         <ant antfile="build.xml"

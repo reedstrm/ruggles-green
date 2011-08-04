@@ -14,22 +14,19 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.common.collxml;
 
-import org.w3c.dom.Node;
+import org.w3c.dom.Document;
 
 /**
- *  Implementors of the HTMLGenerator interface can convert CNXML to HTML.
+ *  Implementors of the CollectionHTMLGenerator interface can convert CollXML to HTML.
  */
-public interface HTMLGenerator {
+public interface CollectionHTMLGenerator {
     /**
-     *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
-     *  node passed into generate is usually the XML document node, but it can be a particular
-     *  element.
+     *  The generate method outputs HTML that corresponds to the given CollXML into a string.
      *
-     *  @param node The CNXML node to render
-     *  @param p The writer to output to
+     *  @param node The CollXML document to render
      *  @return The rendered HTML string
      */
-    public String generate(Node node) throws Exception;
+    public String generate(Document doc) throws Exception;
 }

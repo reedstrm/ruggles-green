@@ -12,9 +12,9 @@
 	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
 	<classpathentry kind="lib" path="build/jars/serializer.jar"/>
 	<classpathentry kind="lib" path="build/jars/soy-excluding-deps-20100708.jar"/>
-	<classpathentry kind="lib" path="build/jars/xalan.jar"/>
 	<classpathentry kind="lib" path="build/jars/xml-apis.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/xalan-2.7.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

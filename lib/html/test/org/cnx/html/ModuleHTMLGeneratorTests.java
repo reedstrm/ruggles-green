@@ -33,13 +33,14 @@ import org.cnx.util.UtilModule;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
-public class HTMLGeneratorTests {
+public class ModuleHTMLGeneratorTests {
     private static Injector injector;
     private Document doc;
     private DOMBuilder builder;
@@ -63,7 +64,7 @@ public class HTMLGeneratorTests {
         final RenderScope scope = injector.getInstance(RenderScope.class);
         scope.enter();
         try {
-            return injector.getInstance(HTMLGenerator.class).generate(node);
+            return injector.getInstance(ModuleHTMLGenerator.class).generate(node);
         } finally {
             scope.exit();
         }
@@ -732,6 +733,114 @@ public class HTMLGeneratorTests {
                 .build();
         assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\">"
                      + "Epic widget</object>",
+                     generate(node));
+    }
+
+    // TODO(light): For table compliance, this unit test should pass.
+    @Ignore @Test public void basicTableTest() throws Exception {
+        final Node node = builder.element("table")
+                .attr("id", "1000")
+                .attr("summary", "A data table")
+                .child(
+                        builder.element("title").text("Information"),
+                        builder.element("tgroup").attr("cols", "3").child(
+                                builder.element("thead").child(
+                                        builder.element("row").child(
+                                                builder.element("entry").text("Name"),
+                                                builder.element("entry").text("Type"),
+                                                builder.element("entry").text("Value")
+                                        )
+                                ),
+                                builder.element("tbody").child(
+                                        builder.element("row").child(
+                                                builder.element("entry").text("answer"),
+                                                builder.element("entry").text("int"),
+                                                builder.element("entry").text("42")
+                                        ),
+                                        builder.element("row").child(
+                                                builder.element("entry").text("pi"),
+                                                builder.element("entry").text("float"),
+                                                builder.element("entry").text("3.14")
+                                        )
+                                )
+                        )
+                )
+        .build();
+        assertEquals("<table id=\"1000\">"
+                + "<caption>Table 1: Information<details>A data table</details></caption>"
+                + "<thead><tr><th>Name</th><th>Type</th><th>Value</th></tr></thead>"
+                + "<tbody>"
+                + "<tr><td>answer</td><td>int</td><td>42</td></tr>"
+                + "<tr><td>pi</td><td>float</td><td>3.14</td></tr>"
+                + "</tbody>"
+                + "</table>",
+                generate(node));
+    }
+
+    /**
+     *  trickyTableTest is the trial-by-fire test that a full CALS-table compliant generator should
+     *  pass.
+     *
+     *  TODO(light): This does not pass. It is included for completeness.
+     */
+    @Ignore @Test public void trickyTableTest() throws Exception {
+        final Node node = builder.element("table")
+                .attr("id", "report_card")
+                .attr("summary", "Your grades")
+                .child(builder.element("title").text("Report card"))
+                .child(builder.element("tgroup").attr("cols", "3").child(
+                        builder.element("colspec")
+                                .attr("colnum", "1").attr("colname", "c1"),
+                        builder.element("colspec")
+                                .attr("colnum", "2").attr("colname", "c2"),
+                        builder.element("colspec")
+                                .attr("colnum", "3").attr("colname", "c3"),
+                        builder.element("thead").child(builder.element("row").child(
+                                builder.element("entry").text("Course"),
+                                builder.element("entry").text("Semester"),
+                                builder.element("entry").text("Grade")
+                        )),
+                        builder.element("tfoot").child(builder.element("row").child(
+                                builder.element("entry")
+                                        .attr("namest", "c1").attr("nameend", "c2")
+                                        .text("Course"),
+                                builder.element("entry").text("85.5%")
+                        )),
+                        builder.element("tbody").child(
+                                builder.element("row").child(
+                                        builder.element("entry")
+                                                .attr("morerows", "1").text("Biology"),
+                                        builder.element("entry").text("1"),
+                                        builder.element("entry").text("86%")
+                                ),
+                                builder.element("row").child(
+                                        builder.element("entry").text("2"),
+                                        builder.element("entry").text("91%")
+                                ),
+                                builder.element("row").child(
+                                        builder.element("entry")
+                                                .attr("morerows", "1").text("English"),
+                                        builder.element("entry").text("1"),
+                                        builder.element("entry").text("87%")
+                                ),
+                                builder.element("row").child(
+                                        builder.element("entry").text("2"),
+                                        builder.element("entry").text("78%")
+                                )
+                        )
+                ))
+                .build();
+        assertEquals("<table id=\"report_card\">"
+                     + "<caption>Table 1: Report Card<details>Your grades</details></caption>"
+                     + "<thead><tr><th>Course</th><th>Semester</th><th>Grade</th></tr></thead>"
+                     + "<tbody>"
+                     + "<tr><td rowspan=\"2\">Biology</td><td>1</td><td>86%</td></tr>"
+                     + "<tr><td>2</td><td>91%</td></tr>"
+                     + "<tr><td rowspan=\"2\">English</td><td>1</td><td>87%</td></tr>"
+                     + "<tr><td>2</td><td>78%</td></tr>"
+                     + "</tbody>"
+                     + "<tfoot><tr><th colspan=\"2\">Average:</th><th>85.5%</th></tr></tfoot>"
+                     + "</table>",
                      generate(node));
     }
 }

@@ -16,7 +16,7 @@
 
 <project name="junit" default="default">
     <description>
-        Copies Junit jar to ${test_lib_dir}
+        Copies Junit jar to ${target_dir}.
     </description>
 
     <fileset id="junit-4.8.2"

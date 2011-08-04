@@ -16,7 +16,7 @@
 
 <project name="appengine" default="default">
     <description>
-        Copies Guava jar to output.jars dir.
+        Copies Guava jar to ${target_dir}.
     </description>
 
     <fileset id="guava-r09" dir="guava/guava-r09" includes="*.jar" />
@@ -26,7 +26,6 @@
             <condition>
                 <not>
                     <and>
-                        <isset property="output.jars" />
                         <isset property="target_dir" />
                     </and>
                 </not>

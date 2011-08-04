@@ -14,14 +14,12 @@
     limitations under the License.
 -->
 
-<project name="commons-beanutils" default="default">
+<project name="jersey" default="default">
     <description>
-        Copies commons-beanutils jar to ${target_dir}.
+        Copies Jersey jar to ${target_dir}.
     </description>
 
-    <fileset id="commons-beanutils-1.8.3"
-             dir="commons-beanutils/commons-beanutils-1.8.3"
-             includes="*.jar" />
+    <fileset id="jersey-1.8" dir="jersey/jersey-1.8" includes="*.jar" />
 
     <target name="default">
         <fail message="Target path for jars is not set.">
@@ -35,7 +33,7 @@
         </fail>
 
         <copy todir="${target_dir}">
-            <fileset refid="commons-beanutils-1.8.3" />
+            <fileset refid="jersey-1.8" />
         </copy>
     </target>
 </project>

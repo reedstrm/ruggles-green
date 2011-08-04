@@ -16,7 +16,7 @@
 
 <project name="rome-propono" default="default">
     <description>
-        Copies rompe-propono to output.jars dir.
+        Copies rompe-propono jar to ${target_dir}.
     </description>
 
     <fileset id="rome-propono-1.0.0"
@@ -29,7 +29,6 @@
                 <not>
                     <and>
                         <isset property="target_dir" />
-                        <isset property="output.jars" />
                     </and>
                 </not>
             </condition>

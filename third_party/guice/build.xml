@@ -16,7 +16,7 @@
 
 <project name="jsr" default="default">
     <description>
-        Copies Guice jar to ${output.jars}
+        Copies Guice jar to ${target_dir}.
     </description>
 
     <fileset id="guice-3.0"
@@ -29,7 +29,6 @@
                 <not>
                     <and>
                         <isset property="target_dir" />
-                        <isset property="output.jars" />
                     </and>
                 </not>
             </condition>

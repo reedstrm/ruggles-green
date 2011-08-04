@@ -16,7 +16,7 @@
 
 <project name="rome" default="default">
     <description>
-        Copies Rome jar to output.jars dir.
+        Copies Rome jar to ${target_dir}.
     </description>
 
     <fileset id="rome-1.0" dir="rome/rome-1.0" includes="*.jar" />
@@ -27,7 +27,6 @@
                 <not>
                     <and>
                         <isset property="target_dir" />
-                        <isset property="output.jars" />
                     </and>
                 </not>
             </condition>

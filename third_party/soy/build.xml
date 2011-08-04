@@ -17,7 +17,7 @@
 <project name="soy" default="default">
     <description>
         <!-- Fixing description and checks for other build.xmls -->
-        Copies soy jar to ${target_dir}
+        Copies soy jar to ${target_dir}.
     </description>
 
     <!-- TODO(arjuns) : This name is incorrect. Should have version instead of date." -->

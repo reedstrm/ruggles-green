@@ -16,7 +16,7 @@
 
 <project name="jdom" default="default">
     <description>
-        Copies JDom jar to output.jars dir.
+        Copies JDom jar to ${target_dir}.
     </description>
 
     <fileset id="jdom-1.1" dir="jdom/jdom-1.1" includes="*.jar" />
@@ -26,7 +26,6 @@
             <condition>
                 <not>
                     <and>
-                        <isset property="output.jars" />
                         <isset property="target_dir" />
                     </and>
                 </not>

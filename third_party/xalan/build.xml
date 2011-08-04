@@ -16,7 +16,7 @@
 
 <project name="xalan" default="default">
     <description>
-        Copies xalan jar to ${target_dir}
+        Copies xalan jar to ${target_dir}.
     </description>
 
     <fileset id="xalan-2.7.1"

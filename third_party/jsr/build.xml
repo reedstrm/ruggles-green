@@ -16,7 +16,7 @@
 
 <project name="jsr" default="default">
     <description>
-        Copies JSR jar to ${output.jars}
+        Copies JSR jar to ${target_dir}.
     </description>
 
     <fileset id="jsr305"
@@ -29,7 +29,6 @@
                 <not>
                     <and>
                         <isset property="target_dir" />
-                        <isset property="output.jars" />
                     </and>
                 </not>
             </condition>

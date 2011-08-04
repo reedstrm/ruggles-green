@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 
 @Singleton public class RenderModuleServlet extends HttpServlet {
     private static final String TEMPLATE_NAME = "org.cnx.web.module";
-    private static final String PREFIX = "/module/";
+    private static final String PREFIX = "/light/module/";
     private static final String MIME_TYPE = "text/html; charset=utf-8";
 
     private final SoyTofu tofu;

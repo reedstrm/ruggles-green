@@ -24,6 +24,7 @@ import com.google.inject.name.Names;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,8 @@ import org.w3c.dom.Element;
     private static final String TEMPLATE_NAME = "org.cnx.web.module";
     private static final String PREFIX = "/light/module/";
     private static final String MIME_TYPE = "text/html; charset=utf-8";
+
+    private static final Logger log = Logger.getLogger(RenderModuleServlet.class.getName());
 
     private final SoyTofu tofu;
     private final XmlFetcher fetcher;
@@ -66,7 +69,7 @@ import org.w3c.dom.Element;
         try {
             module = fetcher.fetchModuleVersion(moduleId, version);
         } catch (Exception e) {
-            // TODO: Log exception
+            log.warning("Fetch error: " + e);
             // TODO: 404 or 500
             return;
         }
@@ -77,7 +80,7 @@ import org.w3c.dom.Element;
             title = getTitle(module.getModuleDocument());
             contentHtml = renderContent(moduleId, module);
         } catch (Exception e) {
-            // TODO: Log exception
+            log.warning("Render error: " + e);
             // TODO: 500
             return;
         }

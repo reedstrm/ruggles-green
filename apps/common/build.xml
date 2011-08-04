@@ -35,6 +35,11 @@
         <mkdir dir="${output.jars}" />
 
         <!-- Add dependent jars to be copied. before classes are compiled. -->
+        <ant antfile="asm/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <ant antfile="jdom/build.xml"
              inheritAll="true"
              target="default"
@@ -66,6 +71,11 @@
              dir="${third_party}" />
 
         <ant antfile="jersey/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+        
+        <ant antfile="xerces/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />

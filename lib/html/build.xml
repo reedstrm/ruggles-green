@@ -30,7 +30,7 @@
     <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
 
     <target name="compile" description="Compile the classes">
-        <mkdir dir="${classdir}"/>
+        <mkdir dir="${classdir}" />
         <mkdir dir="${output.jars}" />
 
         <ant antfile="jsr/build.xml"
@@ -53,6 +53,21 @@
              target="default"
              dir="${third_party}" />
 
+        <ant antfile="xml-apis/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-serializer/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xerces/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <ant antfile="soy/build.xml"
              inheritAll="true"
              target="default"
@@ -67,16 +82,20 @@
                destdir="${classdir}"
                includeantruntime="false"
                debug="true">
-            <compilerarg line="${javac.flags}"/>
+            <compilerarg line="${javac.flags}" />
             <classpath>
+                <resources id="test1234">
+                    <fileset dir="build/jars" includes="xm*.jar" />
+                </resources>
+
                 <fileset refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
     <target name="test" description="Run unit tests" depends="jar">
-        <mkdir dir="${test.dir}"/>
-        <mkdir dir="${test.outdir}"/>
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
 
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
 
@@ -91,33 +110,33 @@
                destdir="${test.dir}"
                includeantruntime="false"
                debug="true">
-            <compilerarg line="${javac.flags}"/>
+            <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
                 <resources refid="depend_test_lib" />
-                <pathelement location="build/lib/org.cnx.html.jar"/>
+                <pathelement location="build/lib/org.cnx.html.jar" />
             </classpath>
         </javac>
 
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
-            <jvmarg value="-enableassertions"/>
+            <jvmarg value="-enableassertions" />
             <classpath>
                 <resources refid="depend_lib" />
                 <resources refid="depend_test_lib" />
-                <pathelement location="build/lib/org.cnx.html.jar"/>
-                <pathelement location="${test.dir}"/>
+                <pathelement location="build/lib/org.cnx.html.jar" />
+                <pathelement location="${test.dir}" />
             </classpath>
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*Tests.java"/>
+                    <include name="**/*Tests.java" />
                 </fileset>
             </batchtest>
         </junit>
 
         <fail message="Tests failed!">
             <condition>
-                <isset property="test.failed"/>
+                <isset property="test.failed" />
             </condition>
         </fail>
     </target>
@@ -139,6 +158,7 @@
     <target name="copyjar"
             description="Copy jar to calling build file"
             depends="jar">
-        <copy file="build/lib/org.cnx.html.jar" tofile="${target_dir}/org.cnx.html.latest.jar" />
+        <copy file="build/lib/org.cnx.html.jar"
+              tofile="${target_dir}/org.cnx.html.latest.jar" />
     </target>
 </project>

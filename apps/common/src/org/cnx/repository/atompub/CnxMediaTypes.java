@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.utils;
+package org.cnx.repository.atompub;
 
 import javax.ws.rs.core.MediaType;
 
@@ -22,7 +22,7 @@ import javax.ws.rs.core.MediaType;
  * TODO(arjuns) : Move this to common.
  * @author Arjun Satyapal
  */
-public class CustomMediaTypes extends MediaType {
+public class CnxMediaTypes extends MediaType {
     /** ServiceDocument : "application/atomsvc+xml" */
     public final static String APPLICATION_ATOMSVC_XML = "application/atomsvc+xml";
     public final static MediaType APPLICATION_ATOMSVC_XML_TYPE = new MediaType("application",

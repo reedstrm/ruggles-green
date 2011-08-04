@@ -64,7 +64,7 @@
         <format property="timenow" pattern="ddMMyyyyHHmm" />
     </tstamp>
             
-    <property name="client-jar-name" value="cnxclient" />
+    <property name="client-jar-name" value="org.cnx.cnxclient" />
     <property name="dest-client-jar" value="${libdir}/${client-jar-name}.${timenow}.jar" />
         
     <target name="jar"
@@ -73,5 +73,11 @@
         <jar destfile="${dest-client-jar}">
             <fileset dir="${classdir}" />
         </jar>
+    </target>
+    
+    <target name="copyjar"
+        description="Copy jar to calling Build file."
+        depends="jar">
+        <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar"/>
     </target>
 </project>

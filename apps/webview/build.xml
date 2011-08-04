@@ -20,24 +20,14 @@
     <property file="local.properties" />
     <property file="build.properties" />
 
-    <!-- Check that the SDK value is set and seems sane, so we can give a nicer
-             error if not.  -->
-    <fail message="Please define the appengine.sdk property to point to your SDK directory">
-        <condition>
-            <not> <and>
-                    <isset property="appengine.sdk"/>
-                    <available file="${appengine.sdk}/config/user/ant-macros.xml"/>
-            </and> </not>
-        </condition>
-    </fail>
-
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
-    <import file="${appengine.sdk}/config/user/ant-macros.xml"/>
+    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml"/>
 
-
-    <target name="war" depends="enhance" 
+    <target name="war" depends="compile" 
                     description="Assemble the application directory">
         <mkdir dir="${war.dir}/WEB-INF"/>
+        <mkdir dir="${war.dir}/WEB-INF/classes"/>
+        <mkdir dir="${war.dir}/WEB-INF/lib"/>
         <copy todir="${war.dir}">
             <fileset dir="soy">
                 <exclude name="**/.hg/**"/>
@@ -52,105 +42,109 @@
                 <include name="*.xml"/>
             </fileset>
         </copy>
-        <enhance_war war="${war.dir}"/>
-    </target>
-
-    <target name="enhance" depends="compile"
-                    description="Enhance the classes after compilation">
-        <enhance_war war="${war.dir}"/>
-    </target>
-
-    <resources id="appengine_lib">
-        <fileset dir="${appengine.sdk}/lib/user">
-            <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${appengine.sdk}/lib/shared">
-            <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${war.dir}/WEB-INF/lib">
-            <include name="*.jar"/>
-        </fileset>
-    </resources>
-    <property name="classdir" location="${war.dir}/WEB-INF/classes"/>
-
-    <property name="html.dir" location="../../lib/html"/>
-    <target name="html">
-        <ant antfile="${html.dir}/build.xml" dir="${html.dir}" target="jar" inheritAll="false" />
-    </target>
-
-    <target name="compile"
-                    depends="html"
-                    description="Compile the application servlet code">
-        <mkdir dir="${classdir}"/>
-        <mkdir dir="${war.dir}/WEB-INF/lib"/>
-        <copy file="${soy.path}" tofile="${war.dir}/WEB-INF/lib/soy.jar" />
-        <copy file="${html.dir}/org.cnx.html.jar" tofile="${war.dir}/WEB-INF/lib/org.cnx.html.jar" />
         <copy todir="${war.dir}/WEB-INF/lib">
-            <fileset dir="../../jars" includes="*.jar" />
+            <fileset dir="${output.jars}" includes="*.jar" />
         </copy>
+        <copy todir="${war.dir}/WEB-INF/classes">
+            <fileset dir="${classdir}" includes="**/*.class" />
+        </copy>
+        <enhance_war war="${war.dir}"/>
+    </target>
+
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+    <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
+    <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
+
+    <target name="compile" description="Compile the application servlet code">
+        <mkdir dir="${classdir}"/>
+        <mkdir dir="${output.jars}"/>
+
+        <ant antfile="appengine/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xerces/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-apis/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-serializer/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jersey/build.xml"
+            inheritall="true"
+            target="default"
+            dir="${third_party}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <!-- Non third-party dependencies. -->
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="${basedir}/${libutildir}" />
+
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="${basedir}/${libhtmldir}" />
+
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="${basedir}/${commondir}" />
+
+        <ant antfile="build.xml"
+            inheritall="true"
+            target="copyjar"
+            dir="${basedir}/${cnxclientdir}" />
+
+
         <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
             <compilerarg line="${javac.flags}"/>
             <classpath>
-                <resources refid="appengine_lib"/>
+                <resources refid="depend_lib"/>
             </classpath>
         </javac>
     </target>
 
-    <target name="test"
-                    description="Run unit tests"
-                    depends="compile, war">
-        <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
-            <condition>
-                <not> <and>
-                        <isset property="junit.path"/>
-                        <available file="${junit.path}"/>
-                </and> </not>
-            </condition>
-        </fail>
-
-        <mkdir dir="${test.dir}"/>
-        <mkdir dir="${test.outdir}"/>
-
-        <javac srcdir="${test.src}" destdir="${test.dir}" debug="on" includeantruntime="false">
-            <compilerarg line="${javac.flags}"/>
-            <classpath>
-                <resources refid="appengine_lib"/>
-                <pathelement path="${junit.path}"/>
-                <pathelement location="${classdir}"/>
-            </classpath>
-        </javac>
-        <junit fork="yes" printsummary="yes" failureproperty="test.failed" dir="war">
-            <classpath>
-                <resources refid="appengine_lib"/>
-                <pathelement path="${appengine.sdk}/lib/testing/appengine-testing.jar"/>
-                <pathelement path="${junit.path}"/>
-                <pathelement location="${classdir}"/>
-                <pathelement location="${test.dir}"/>
-            </classpath>
-            <formatter type="plain" />
-            <batchtest todir="${test.outdir}">
-                <fileset dir="${test.src}">
-                    <include name="**/*.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-
-        <fail message="Tests failed!">
-            <condition>
-                <isset property="test.failed"/>
-            </condition>
-        </fail>
-    </target>
-
-    <target name="clean"
-                    description="Force a clean slate to rebuild">
+    <target name="clean" description="Force a clean slate to rebuild">
+        <delete dir="${buildir}"/>
         <delete dir="${war.dir}"/>
-        <delete dir="${test.dir}"/>
-        <delete dir="${test.outdir}"/>
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${libutildir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${libhtmldir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${cnxclientdir}" />
+
     </target>
 
-    <target name="runserver" depends="war"
-                    description="Run the dev_appserver">
+    <target name="runserver" depends="war" description="Run the dev_appserver">
         <dev_appserver war="${war.dir}" port="${http.port}"/>
     </target>
 

@@ -2,32 +2,48 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="testlib/" kind="src" path="test"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/validation-api-1.0.0.GA.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-r09.jar" sourcepath="war/WEB-INF/lib/guava-src-r09.zip"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-core-1.8.jar" sourcepath="/usr/local/google/opengitclients/arjunsatyapal/trunk/java_prerequisites/java-jars/jersey-1.8/jersey-core-1.8.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-server-1.8.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-1.0.jar" sourcepath="/usr/local/google/opengitclients/arjunsatyapal/trunk/java_prerequisites/java-jars/rome-1.0/rome-1.0-sources.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-propono-1.0.0.jar" sourcepath="/usr/local/google/opengitclients/arjunsatyapal/trunk/java_prerequisites/java-jars/rome-propono-1.0.0/rome-propono-1.0.0-sources.jar"/>
-	<classpathentry kind="lib" path="test/testlib/jersey-client-1.8.jar" sourcepath="/home/arjuns/Downloads/srcjar/jersey-client-1.8-sources.jar"/>
-	<classpathentry kind="lib" path="test/testlib/jetty-servlet-tester-6.1.8.jar"/>
-	<classpathentry kind="lib" path="test/testlib"/>
-	<classpathentry kind="lib" path="test/testlib/jersey-test-framework-grizzly-1.8.jar" sourcepath="/home/arjuns/Downloads/srcjar/jersey-test-framework-grizzly-1.8-sources.jar"/>
-	<classpathentry kind="lib" path="test/testlib/grizzly-servlet-webserver-1.9.18-i.jar"/>
-	<classpathentry kind="lib" path="test/testlib/jersey-test-framework-core-1.8.jar" sourcepath="/home/arjuns/Downloads/srcjar/jersey-test-framework-core-1.8-sources.jar"/>
-	<classpathentry kind="lib" path="test/testlib/commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="test/testlib/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/asm-3.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="test/testlib/appengine-testing.1.5.2.jar"/>
-	<classpathentry kind="lib" path="test/testlib/appengine-api-labs.jar"/>
-	<classpathentry kind="lib" path="test/testlib/appengine-api-stubs.jar"/>
-	<classpathentry kind="lib" path="test/testlib/appengine-api.jar"/>
-	<classpathentry kind="lib" path="test/testlib/commons-beanutils-1.8.3.jar" sourcepath="/home/arjuns/Desktop/Downloads/srcjar/commons-beanutils-1.8.3-sources.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/aopalliance.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-api-1.0-sdk-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-api-labs-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-jsr107cache-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-local-runtime-shared.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-beanutils-1.8.3.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/datanucleus-core-1.1.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/datanucleus-enhancer-1.1.4.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/datanucleus-jpa-1.1.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/el-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/geronimo-jpa_3.0_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/geronimo-jta_1.1_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-r09.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-assistedinject-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-multibindings-3.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/javax.inject.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jdo2-api-2.3-eb.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-core-1.8.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-server-1.8.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr107cache-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr305.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.cnxclient.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.common.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.html.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.util.latest.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/resolver.xerces-2.11.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-propono-1.0.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/serializer.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/serializer.xerces-2.11.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/soy-excluding-deps-20100708.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xalan.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xercesImpl.xerces-2.11.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xml-apis.xerces-2.11.0.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

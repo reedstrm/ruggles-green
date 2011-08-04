@@ -24,6 +24,14 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.blobstore.BlobInfo;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.datastore.Key;
+import com.google.common.collect.Lists;
+
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.common.KeyValue;
+
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -177,7 +185,14 @@ public class ResourceOperations {
                 "Error serving the resource content: " + resourceId, log, e);
         }
 
-        return ResponseUtil.loggedOk("Resource served: " + resourceId, new ServeResourceResult(),
-            log);
+        /*
+         * Appengine uses Blobstore for storing big blobs. Upload and download from Blobstores
+         * is done separately from normal App. At the time of serving the blob, Blobstore service
+         * sets a header with "BlobKey = <value>" and then App Engine replaces the body of the
+         * response with the content of the blob.
+         */
+        final KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
+        ServeResourceResult result = new ServeResourceResult(Lists.newArrayList(blobkeyHeader));
+        return ResponseUtil.loggedOk("Resource served: " + resourceId, result, log);
     }
 }

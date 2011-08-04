@@ -426,7 +426,7 @@
     {elseif $node.attributes.target_id and not $node.attributes.document}
         <a href="#{$node.attributes.target_id}">{call .children data="all"/}</a>
     {else}
-        <span style="color:red;font-weight:bold">UNRECOGNIZED LINK</span>
+        {call .children data="all"/}
     {/if}
 {/template}
 

@@ -20,108 +20,147 @@
     <property file="build.properties" />
     <property file="local.properties" />
 
-    <resources id="depend_lib">
-        <path>
-            <pathelement path="${soy.path}" />
-            <pathelement location="../../jars/serializer-2.7.1.jar" />
-            <pathelement location="../../jars/xalan-2.7.1.jar" />
-            <pathelement location="../../jars/xml-apis-2.7.1.jar" />
-        </path>
-    </resources>
 
     <resources id="resources">
         <fileset dir="src" includes="**/*.soy" />
         <fileset dir="src" includes="**/*.xsl" />
     </resources>
 
-    <target name="compile"
-            description="Compile the classes">
-        <fail message="Please define the soy.path property to point to your Closure Template JAR">
-            <condition>
-                <not> <and>
-                        <isset property="soy.path"/>
-                        <available file="${soy.path}"/>
-                </and> </not>
-            </condition>
-        </fail>
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+    <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
 
-        <mkdir dir="${classdir}"/>
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="true">
-            <compilerarg line="${javac.flags}"/>
+    <target name="compile" description="Compile the classes">
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${output.jars}" />
+
+        <ant antfile="jsr/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-apis/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-serializer/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xerces/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+
+        <!-- Non third-party dependencies. -->
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../util" />
+
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
             <classpath>
-                <resources refid="depend_lib" />
+                <resources id="test1234">
+                    <fileset dir="build/jars" includes="xm*.jar" />
+                </resources>
+
+                <fileset refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
-    <target name="test"
-            description="Run unit tests">
-        <fail message="Please define the junit.path property to point to the JUnit 4 JAR">
-            <condition>
-                <not> <and>
-                        <isset property="junit.path"/>
-                        <available file="${junit.path}"/>
-                </and> </not>
-            </condition>
-        </fail>
+    <target name="test" description="Run unit tests" depends="jar">
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
 
-        <mkdir dir="${test.dir}"/>
-        <mkdir dir="${test.outdir}"/>
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
 
-        <javac srcdir="src" destdir="${test.dir}" includeantruntime="false" debug="true" >
-            <compilerarg line="${javac.flags}"/>
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+
+        <javac srcdir="${test.src}"
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.html.jar" />
             </classpath>
         </javac>
-        <javac srcdir="${test.src}" destdir="${test.dir}" includeantruntime="false" debug="true">
-            <compilerarg line="${javac.flags}"/>
-            <classpath>
-                <resources refid="depend_lib" />
-                <pathelement path="${junit.path}"/>
-                <pathelement location="org.cnx.html.jar"/>
-            </classpath>
-        </javac>
-        <copy todir="${test.dir}">
-            <resources refid="resources" />
-        </copy>
 
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
-            <jvmarg value="-enableassertions"/>
+            <jvmarg value="-enableassertions" />
             <classpath>
                 <resources refid="depend_lib" />
-                <pathelement path="${junit.path}"/>
-                <pathelement location="${test.dir}"/>
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.html.jar" />
+                <pathelement location="${test.dir}" />
             </classpath>
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*.java"/>
+                    <include name="**/*Tests.java" />
                 </fileset>
             </batchtest>
         </junit>
 
         <fail message="Tests failed!">
             <condition>
-                <isset property="test.failed"/>
+                <isset property="test.failed" />
             </condition>
         </fail>
     </target>
 
-    <target name="clean"
-            description="Remove built files">
-        <delete dir="${classdir}" />
-        <delete dir="${test.dir}" />
-        <delete dir="${test.outdir}" />
-        <delete file="org.cnx.html.jar" />
+    <target name="clean" description="Remove built files">
+        <delete dir="build" />
     </target>
 
     <target name="jar"
             description="Build a JAR of the classes"
             depends="compile">
-        <jar destfile="org.cnx.html.jar">
+        <mkdir dir="build/lib" />
+        <jar destfile="build/lib/org.cnx.html.jar">
             <fileset dir="${classdir}" />
             <resources refid="resources" />
         </jar>
+    </target>
+
+    <target name="copyjar"
+            description="Copy jar to calling build file"
+            depends="jar">
+        <copy file="build/lib/org.cnx.html.jar"
+              tofile="${target_dir}/org.cnx.html.latest.jar" />
     </target>
 </project>

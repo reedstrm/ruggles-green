@@ -19,7 +19,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * AtomPub Media Types.
- * 
+ * TODO(arjuns) : Move this to common.
  * @author Arjun Satyapal
  */
 public class CustomMediaTypes extends MediaType {

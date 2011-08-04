@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
+	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
+	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

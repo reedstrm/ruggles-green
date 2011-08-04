@@ -22,8 +22,9 @@
     <resources id="appengine-1.5.2">
         <fileset dir="appengine/appengine-1.5.2/lib/user" includes="*.jar" />
         <fileset dir="appengine/appengine-1.5.2/lib/shared" includes="*.jar" />
+        <fileset dir="appengine/appengine-1.5.2/lib/tools/orm" includes="*.jar" />
     </resources>
-    
+
     <resources id="appengine-1.5.2.testing" >
         <fileset dir="appengine/appengine-1.5.2/lib/testing" includes="*.jar" />
     </resources>
@@ -54,7 +55,7 @@
                 </not>
             </condition>
         </fail>
-        
+
         <copy todir="${test_lib_dir}">
             <resources refid="appengine-1.5.2.testing" />
         </copy>

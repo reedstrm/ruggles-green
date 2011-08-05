@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -24,14 +24,7 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.blobstore.BlobInfo;
-import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Key;
-import com.google.common.collect.Lists;
-
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.common.KeyValue;
-
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -45,6 +38,7 @@ import org.cnx.repository.service.impl.schema.JdoResourceEntity;
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
+import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
@@ -65,7 +59,7 @@ public class ResourceOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<CreateResourceResult> createResource(
-        RepositoryRequestContext context) {
+            RepositoryRequestContext context) {
 
         final String resourceId;
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -78,7 +72,7 @@ public class ResourceOperations {
             resourceId = checkNotNull(entity.getResourceId(), "Null resource id");
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Failed to create a new resource", log, e);
+                    "Failed to create a new resource", log, e);
         } finally {
             pm.close();
         }
@@ -99,13 +93,13 @@ public class ResourceOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<GetResourceInfoResult> getResourceInfo(
-        RepositoryRequestContext context, String resourceId) {
+            RepositoryRequestContext context, String resourceId) {
 
         // Convert to internal id
         final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
         if (resourceKey == null) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Resource id has bad format: [" + resourceId + "]", log);
+                    "Resource id has bad format: [" + resourceId + "]", log);
         }
 
         // Lookup resource entity
@@ -115,7 +109,7 @@ public class ResourceOperations {
             entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                "Could not locate resource [" + resourceId + "]", log, e);
+                    "Could not locate resource [" + resourceId + "]", log, e);
         } finally {
             pm.close();
         }
@@ -133,7 +127,7 @@ public class ResourceOperations {
                     Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
                 if (blobInfo == null) {
                     return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Could not locate blob at key: " + entity.getBlobKey(), log);
+                            "Could not locate blob at key: " + entity.getBlobKey(), log);
                 }
                 final UploadedResourceContentInfo contentInfo =
                     new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
@@ -142,7 +136,7 @@ public class ResourceOperations {
                 break;
             default:
                 return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                    "Unknown resource entity state:" + entity.getState(), log);
+                        "Unknown resource entity state:" + entity.getState(), log);
         }
 
         return ResponseUtil.loggedOk("Retrieved info of resource " + resourceId, result, log);
@@ -152,12 +146,12 @@ public class ResourceOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<ServeResourceResult> serveResource(
-        RepositoryRequestContext context, String resourceId, HttpServletResponse httpResponse) {
+            RepositoryRequestContext context, String resourceId, HttpServletResponse httpResponse) {
 
         final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
         if (resourceKey == null) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                "Resource id has bad format: " + resourceId, log);
+                    "Resource id has bad format: " + resourceId, log);
         }
 
         PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -167,12 +161,12 @@ public class ResourceOperations {
             JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
             if (entity.getState() != JdoResourceEntity.State.UPLOADED) {
                 return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
-                    "Resource content has not been uploaded yet: " + resourceId, log);
+                        "Resource content has not been uploaded yet: " + resourceId, log);
             }
             blobKey = entity.getBlobKey();
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                "Could not locate resources: " + resourceId, log, e);
+                    "Could not locate resources: " + resourceId, log, e);
         } finally {
             pm.close();
         }
@@ -182,14 +176,14 @@ public class ResourceOperations {
             Services.blobstore.serve(blobKey, httpResponse);
         } catch (IOException e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Error serving the resource content: " + resourceId, log, e);
+                    "Error serving the resource content: " + resourceId, log, e);
         }
 
         /*
-         * Appengine uses Blobstore for storing big blobs. Upload and download from Blobstores
-         * is done separately from normal App. At the time of serving the blob, Blobstore service
-         * sets a header with "BlobKey = <value>" and then App Engine replaces the body of the
-         * response with the content of the blob.
+         * Appengine uses Blobstore for storing big blobs. Upload and download from Blobstores is
+         * done separately from normal App. At the time of serving the blob, Blobstore service sets
+         * a header with "BlobKey = <value>" and then App Engine replaces the body of the response
+         * with the content of the blob.
          */
         final KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
         ServeResourceResult result = new ServeResourceResult(Lists.newArrayList(blobkeyHeader));

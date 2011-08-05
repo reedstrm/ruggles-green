@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="testlib/" kind="src" path="test"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-api-1.0-sdk-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-local-runtime-shared.jar"/>
-	<classpathentry kind="lib" path="build/jars/appengine-remote-api.jar"/>
-	<classpathentry kind="lib" path="build/jars/appengine-tools-api.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-appengine-1.0.9.final.jar"/>
 	<classpathentry kind="lib" path="build/jars/datanucleus-core-1.1.5.jar"/>
-	<classpathentry kind="lib" path="build/jars/datanucleus-enhancer-1.1.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/datanucleus-jpa-1.1.5.jar"/>
 	<classpathentry kind="lib" path="build/jars/el-api.jar"/>
 	<classpathentry kind="lib" path="build/jars/geronimo-jpa_3.0_spec-1.1.1.jar"/>
@@ -47,5 +47,10 @@
 	<classpathentry kind="lib" path="build/jars/xalan-2.7.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="build/jars/xml-apis.jar"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="lib" path="build/test/lib/grizzly-servlet-webserver-1.9.18-i.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/jersey-client-1.8.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-core-1.8.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-grizzly-1.8.jar"/>
+	<classpathentry kind="lib" path="config"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
-import org.cnx.repository.service.impl.schema.KeyUtil;
 import org.junit.Test;
 
 public class KeyUtilTest {
@@ -25,14 +24,13 @@ public class KeyUtilTest {
         assertEquals("XJQdSUGIIBENCW", KeyUtil.idToString("X", -7460683158697921450L));
         assertEquals("XHffffffffffff", KeyUtil.idToString("X", 9223372036854775807L));
         assertEquals("XIAAAAAAAAAAAA", KeyUtil.idToString("X", -9223372036854775808L));
-
-        assertEquals("CnxLiveawesome", KeyUtil.idToString("C", -8597248582506601250L));
     }
 
     @Test
     public void compatability() {
-        final long values[] = { 0, 1, -1, 0x9876543210123456L, Long.MAX_VALUE, Long.MIN_VALUE,
-                0xffffffffffffffffL, 0x8000000000000000L, 0x7fffffffffffffffL };
+        final long values[] =
+            { 0, 1, -1, 0x9876543210123456L, Long.MAX_VALUE, Long.MIN_VALUE, 0xffffffffffffffffL,
+                0x8000000000000000L, 0x7fffffffffffffffL };
 
         for (Long value : values) {
             assertEquals(value, KeyUtil.stringToId("X", KeyUtil.idToString("X", value)));

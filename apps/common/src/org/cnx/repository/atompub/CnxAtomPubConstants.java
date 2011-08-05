@@ -15,19 +15,14 @@
  */
 package org.cnx.repository.atompub;
 
-
-import com.google.appengine.api.utils.SystemProperty;
-import com.google.appengine.api.utils.SystemProperty.Environment;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-
-import com.sun.syndication.feed.atom.Content;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.sun.syndication.feed.atom.Content;
 
 /**
  *
@@ -45,27 +40,15 @@ public class CnxAtomPubConstants {
     public final URL atomPubRestUrl;
 
     // TODO(arjuns) : Fix this.
-    public final static int LOCAL_SERVER_PORT= 8888;
+    public final static int LOCAL_SERVER_PORT = 8888;
 
-    public CnxAtomPubConstants(String reqUrl, int port) {
+    public CnxAtomPubConstants(URL applicationUrl) {
         // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
-        String applicationId = SystemProperty.applicationId.get();
-        Environment env = SystemProperty.environment;
-
+        this.applicationUrl = applicationUrl;
         try {
-            URL url = null;
-            if (env.value() == SystemProperty.Environment.Value.Development) {
-                url = new URL("http://localhost:" + port);
-            } else {
-                url = new URL("http://" + applicationId + ".appspot.com");
-            }
-
-            applicationUrl = url;
             atomPubRestUrl = new URL(applicationUrl.toString() + "/" + ATOMPUB_URL_PREFIX);
         } catch (MalformedURLException e) {
-            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
-
-            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            // TODO(arjuns) : Handle exception properly.
             throw new RuntimeException(e);
         }
     }
@@ -260,10 +243,9 @@ public class CnxAtomPubConstants {
     /** Get AtomPub List of Contents from CNXMl and ResourceMappingDoc. */
     public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc) {
 
-        StringBuilder contentValueBuilder = new StringBuilder()
-            .append(cnxmlDoc)
-            .append(DELIMITER_CONTENT)
-            .append(resourceMappingDoc);
+        StringBuilder contentValueBuilder =
+            new StringBuilder().append(cnxmlDoc).append(DELIMITER_CONTENT).append(
+                resourceMappingDoc);
 
         Content content = new Content();
         // TODO(arjuns) : Fix this to common media type.
@@ -273,8 +255,8 @@ public class CnxAtomPubConstants {
         return Lists.newArrayList(content);
 
         // TODO(arjuns) : Fix this.
-//        return Lists.newArrayList(getCnxmlContent(cnxmlDoc),
-//            getResourceMappingContent(resourceMappingDoc));
+        // return Lists.newArrayList(getCnxmlContent(cnxmlDoc),
+        // getResourceMappingContent(resourceMappingDoc));
     }
 
     /** Get CNXML Doc from Content */

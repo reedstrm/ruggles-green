@@ -59,7 +59,7 @@ public class GetResourceInfoResult {
 
         // Has content only IFF state say so.
         checkArgument((resourceState.hasContent()) == (contentInfo != null), "State: %s",
-            resourceState);
+                resourceState);
     }
 
     public boolean hasContent() {

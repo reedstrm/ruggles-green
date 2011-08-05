@@ -35,20 +35,20 @@
         <mkdir dir="${output.jars}" />
 
         <!-- Add dependent jars to be copied. before classes are compiled. -->
-        <ant antfile="asm/build.xml"
+        <!--ant antfile="asm/build.xml"
              inheritAll="true"
              target="default"
-             dir="${third_party}" />
+             dir="${third_party}" /-->
 
         <ant antfile="jdom/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="appengine/build.xml"
+        <!--ant antfile="appengine/build.xml"
              inheritAll="true"
              target="default"
-             dir="${third_party}" />
+             dir="${third_party}" /-->
 
         <ant antfile="guava/build.xml"
              inheritAll="true"
@@ -74,7 +74,7 @@
              inheritAll="true"
              target="default"
              dir="${third_party}" />
-        
+
         <ant antfile="xerces/build.xml"
              inheritAll="true"
              target="default"
@@ -103,7 +103,7 @@
         </javac>
     </target>
 
-    <target name="test" description="Run unit tests" depends="jar">
+    <target name="test-compile" description="Run unit tests" depends="jar">
         <mkdir dir="${test.dir}" />
         <mkdir dir="${test.outdir}" />
 
@@ -127,7 +127,9 @@
                 <pathelement location="${dest-common-jar}" />
             </classpath>
         </javac>
+    </target>
 
+    <target name="test" description="Run unit tests" depends="test-compile">
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
             <jvmarg value="-enableassertions" />
             <classpath>
@@ -169,6 +171,7 @@
         <mkdir dir="${libdir}" />
         <jar destfile="${dest-common-jar}">
             <fileset dir="${classdir}" />
+            <fileset dir="${srcdir}" />
             <resources refid="resources" />
         </jar>
     </target>
@@ -179,4 +182,8 @@
         <copy file="${dest-common-jar}"
               tofile="${target_dir}/${common-jar-name}.latest.jar" />
     </target>
+
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="compile, jar, test-compile" />
 </project>

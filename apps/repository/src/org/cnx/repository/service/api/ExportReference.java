@@ -39,8 +39,8 @@ public class ExportReference {
     private final String exportTypeId;
 
     /**
-     * TODO(tal): make the notion of 'latest version' more explicit? Currently we overload
-     * the null value.
+     * TODO(tal): make the notion of 'latest version' more explicit? Currently we overload the null
+     * value.
      * 
      * @param scopeType The type of the object to which the export can be attached.
      * @param objectId The id of the object to which this object is attached. The interpretation of
@@ -59,7 +59,7 @@ public class ExportReference {
         this.exportTypeId = checkNotNull(exportTypeId);
 
         checkArgument(scopeType.isVersion() || versionNumber == null,
-            "Non null version number for non version scope: %s", scopeType);
+                "Non null version number for non version scope: %s", scopeType);
     }
 
     public ExportScopeType getScopeType() {
@@ -82,6 +82,6 @@ public class ExportReference {
     @Override
     public String toString() {
         return String.format("scope=%s, id=%s, version=%s, type=%s", scopeType, objectId,
-            versionNumber, exportTypeId);
+                versionNumber, exportTypeId);
     }
 }

@@ -27,7 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 
@@ -46,18 +46,20 @@ public class CnxCategoriesDocumentServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(CATEGORY_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
-        @Context HttpServletResponse response) {
+            @Context HttpServletResponse response) {
         // TODO(arjuns) : Add caching and exception handling.
 
-        CnxAtomPubConstants constants =
-            new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
+        // TODO(arjuns) : Fix this.
+        CnxAtomPubConstants constants = new CnxAtomPubConstants(null);
+        // new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
         Categories categories = new Categories();
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));
         categories.addCategory(getCnxCollectionCategoryEle(constants
             .getCollectionCnxCollectionScheme()));
 
-        return Response.ok().entity(
-            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
+        return Response.ok()
+            .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
+            .build();
     }
 }

@@ -23,8 +23,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 
@@ -40,18 +40,18 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 public class CnxServiceDocumentServlet {
     private final String SERVICE_DOCUMENT_GET = "/";
 
-    @GET
     // @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-                    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-                    @Path(SERVICE_DOCUMENT_GET)
-                    public
-                    Response getServiceDocument(@Context HttpServletRequest req,
-                        @Context HttpServletResponse res) {
+    @GET
+    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
+    @Path(SERVICE_DOCUMENT_GET)
+    public Response getServiceDocument(@Context HttpServletRequest req,
+            @Context HttpServletResponse res) {
         // TODO(arjuns) : Add caching and exception handling.
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomService = new CnxAtomService(req);
 
-        return Response.ok().entity(
-            PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument())).build();
+        return Response.ok()
+            .entity(PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument()))
+            .build();
     }
 }

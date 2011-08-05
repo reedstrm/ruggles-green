@@ -38,7 +38,9 @@
     </target>
 
     <target name="test">
-        <fileset id="jersey-test-1.8" dir="jersey/jersey-test-1.8" includes="*.jar" />
+        <fileset id="jersey-test-1.8"
+                 dir="jersey/jersey-test-1.8"
+                 includes="*.jar" />
         <fail message="Target path for test_lig_dir is not set.">
             <condition>
                 <not>
@@ -50,7 +52,7 @@
         </fail>
 
         <copy todir="${test_lib_dir}">
-            <fileset refid="jersey-1.8" />
+            <fileset refid="jersey-test-1.8" />
         </copy>
     </target>
 </project>

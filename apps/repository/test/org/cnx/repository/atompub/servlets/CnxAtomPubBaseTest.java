@@ -18,7 +18,7 @@ package org.cnx.repository.atompub.servlets;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
@@ -27,7 +27,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 /**
  * BaseTest for all tests for CNX AtomPub API.
- * 
+ *
  * @author Arjun Satyapal
  */
 public abstract class CnxAtomPubBaseTest extends JerseyTest {
@@ -75,9 +75,9 @@ public abstract class CnxAtomPubBaseTest extends JerseyTest {
         SystemProperty.environment.set(Environment.Value.Development);
 
         // Initializing CnxAtomPub Service.
+        // TODO(arjuns) : Fix this.
         constants =
         // new CnxAtomPubConstants(webResource.getURI().toString(), webResource.getURI().getPort());
-            new CnxAtomPubConstants(cnxServerAtomPubUrl.toString(),
-                CnxAtomPubConstants.LOCAL_SERVER_PORT);
+            new CnxAtomPubConstants(cnxServerAtomPubUrl);
     }
 }

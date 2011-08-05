@@ -116,7 +116,7 @@ public class JdoResourceEntity extends CnxJdoEntity {
             return null;
         }
         checkState(SchemaConsts.RESOURCE_KEY_KIND.equals(key.getKind()),
-            "Unexpected kind: %s at key %s", key.getKind(), key);
+                "Unexpected kind: %s at key %s", key.getKind(), key);
         return KeyUtil.idToString(SchemaConsts.RESOURCE_ID_PREFIX, key.getId());
     }
 
@@ -153,6 +153,6 @@ public class JdoResourceEntity extends CnxJdoEntity {
     public static Key resourceIdToKey(String resourceId) {
         final Long resourceIdLong = KeyUtil.stringToId(SchemaConsts.RESOURCE_ID_PREFIX, resourceId);
         return (resourceIdLong == null) ? null : KeyFactory.createKey(
-            SchemaConsts.RESOURCE_KEY_KIND, resourceIdLong);
+                SchemaConsts.RESOURCE_KEY_KIND, resourceIdLong);
     }
 }

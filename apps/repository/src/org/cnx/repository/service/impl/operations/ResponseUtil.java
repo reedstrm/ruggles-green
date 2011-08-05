@@ -45,7 +45,7 @@ class ResponseUtil {
      * @return A logged repository error response
      */
     private static <T> RepositoryResponse<T> internalLoggedError(RepositoryStatus status,
-        String statusDescription, Logger log, Level level, @Nullable Throwable e) {
+            String statusDescription, Logger log, Level level, @Nullable Throwable e) {
         final String message;
         if (e != null) {
             message = statusDescription + " (" + e.getMessage() + ")";
@@ -73,12 +73,12 @@ class ResponseUtil {
     }
 
     static <T> RepositoryResponse<T> loggedError(RepositoryStatus status, String statusDescription,
-        Logger log, Throwable e) {
+            Logger log, Throwable e) {
         return internalLoggedError(status, statusDescription, log, statusLogLevel(status), e);
     }
 
     static <T> RepositoryResponse<T> loggedError(RepositoryStatus status, String statusDescription,
-        Logger log) {
+            Logger log) {
         return internalLoggedError(status, statusDescription, log, statusLogLevel(status), null);
     }
 
@@ -92,7 +92,7 @@ class ResponseUtil {
      * @return the logged repository response.
      */
     public static <T> RepositoryResponse<T>
-                    loggedOk(String statusDescription, T result, Logger log) {
+            loggedOk(String statusDescription, T result, Logger log) {
         log.info(statusDescription);
         return RepositoryResponse.newOk(statusDescription, result);
     }

@@ -16,6 +16,13 @@
 
 package org.cnx.web;
 
+import java.io.File;
+
+import org.cnx.html.LinkProcessor;
+import org.cnx.html.Processor;
+import org.cnx.html.RenderTime;
+import org.cnx.html.ResourceResolver;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -24,11 +31,6 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
-import java.io.File;
-import org.cnx.html.LinkProcessor;
-import org.cnx.html.Processor;
-import org.cnx.html.RenderTime;
-import org.cnx.html.ResourceResolver;
 
 /**
  *  WebViewModule is the Guice configuration for the web view application.

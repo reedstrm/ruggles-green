@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -24,8 +24,6 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 
 import org.cnx.util.Nullable;
-
-import com.google.apphosting.api.ApiProxy;
 
 /**
  * Common context that is passed to each repository operation.
@@ -93,13 +91,14 @@ public class RepositoryRequestContext {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Could not construct host url", e);
         }
-        
-//        ApiProxy.Environment env =  ApiProxy.getCurrentEnvironment();
-//        Object value = env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
-//        System.out.println("**** value: " + value);
-//        for (Object key: env.getAttributes().keySet()) {
-//            System.out.println("  [" + key + "]");
-//        }
+
+        // ApiProxy.Environment env = ApiProxy.getCurrentEnvironment();
+        // Object value =
+        // env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
+        // System.out.println("**** value: " + value);
+        // for (Object key: env.getAttributes().keySet()) {
+        // System.out.println("  [" + key + "]");
+        // }
 
         return url.toString();
     }

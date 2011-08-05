@@ -78,7 +78,7 @@ public class JdoCollectionEntity extends CnxJdoEntity {
             return null;
         }
         checkState(SchemaConsts.COLLECTION_KEY_KIND.equals(key.getKind()),
-            "Unexpected kind: %s at key %s", key.getKind(), key);
+                "Unexpected kind: %s at key %s", key.getKind(), key);
         return KeyUtil.idToString(SchemaConsts.COLLECTION_ID_PREFIX, key.getId());
     }
 
@@ -101,6 +101,6 @@ public class JdoCollectionEntity extends CnxJdoEntity {
         final Long collectionIdLong =
             KeyUtil.stringToId(SchemaConsts.COLLECTION_ID_PREFIX, collectionId);
         return (collectionIdLong == null) ? null : KeyFactory.createKey(
-            SchemaConsts.COLLECTION_KEY_KIND, collectionIdLong);
+                SchemaConsts.COLLECTION_KEY_KIND, collectionIdLong);
     }
 }

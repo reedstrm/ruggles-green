@@ -55,11 +55,10 @@ public class PrettyXmlOutputter {
         return writer.toString();
     }
 
-    public static String prettyXmlOutputMyEntry(Entry entry) throws IllegalArgumentException,
-        FeedException, IOException {
-        StringWriter writer = new StringWriter();
-        CnxAtomPubConstants.serializeEntry(entry, writer);
-        return writer.toString();
-    }
-
+    // public static String prettyXmlOutputMyEntry(Entry entry) throws IllegalArgumentException,
+    // FeedException, IOException {
+    // StringWriter writer = new StringWriter();
+    // CnxAtomPubConstants.serializeEntry(entry, writer);
+    // return writer.toString();
+    // }
 }

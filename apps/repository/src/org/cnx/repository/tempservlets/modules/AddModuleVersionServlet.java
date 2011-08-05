@@ -54,7 +54,7 @@ public class AddModuleVersionServlet extends HttpServlet {
             checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
 
         checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
-            req.getParameterMap().size());
+                req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
         final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
@@ -64,16 +64,16 @@ public class AddModuleVersionServlet extends HttpServlet {
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {
                 case BAD_REQUEST:
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            repositoryResponse.getExtendedDescription());
                     return;
                 case NOT_FOUND:
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            repositoryResponse.getExtendedDescription());
                     return;
                 default:
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            repositoryResponse.getExtendedDescription());
                     return;
             }
         }

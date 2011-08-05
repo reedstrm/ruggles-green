@@ -15,13 +15,13 @@
  */
 package org.cnx.repository.atompub.servlets;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
 
 /**
  * Test for {@link CnxCategoriesDocumentServlet}

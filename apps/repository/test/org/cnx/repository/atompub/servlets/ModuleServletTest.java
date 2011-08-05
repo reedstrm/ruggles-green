@@ -17,18 +17,18 @@ package org.cnx.repository.atompub.servlets;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
-import org.cnx.repository.atompub.client.CnxAtomPubClient;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.net.MalformedURLException;
 
 /**
  * Test for {@link CnxAtomModuleServlet}

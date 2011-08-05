@@ -18,9 +18,9 @@ package org.cnx.repository.common;
 import java.io.Serializable;
 
 /**
- * Since Java does not provide any KeyValue/Pair classs, this is to fill that gap.
- * Key and value both are strings.
- *
+ * Since Java does not provide any KeyValue/Pair classs, this is to fill that gap. Key and value
+ * both are strings.
+ * 
  * @author Arjun Satyapal
  */
 public class KeyValue implements Serializable {

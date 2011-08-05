@@ -45,7 +45,7 @@ public class ExportTypesConfiguration {
      * Internal utility method to add an export type to a map builder.
      */
     private static void addType(ImmutableMap.Builder<String, ExportType> builder, String id,
-        String contentType, ExportScopeType... allowedScopeTypes) {
+            String contentType, ExportScopeType... allowedScopeTypes) {
         builder.put(id, new ExportType(id, contentType, Sets.newHashSet(allowedScopeTypes)));
     }
 
@@ -60,13 +60,13 @@ public class ExportTypesConfiguration {
 
         // Canonical PDF
         addType(builder, "pdf_std", "application/pdf", ExportScopeType.MODULE,
-            ExportScopeType.MODULE_VERSION, ExportScopeType.COLLECTION,
-            ExportScopeType.COLLECTION_VERSION);
+                ExportScopeType.MODULE_VERSION, ExportScopeType.COLLECTION,
+                ExportScopeType.COLLECTION_VERSION);
 
         // Canonical EPUB
         addType(builder, "epub_std", "application/xhtml+xml", ExportScopeType.MODULE,
-            ExportScopeType.MODULE_VERSION, ExportScopeType.COLLECTION,
-            ExportScopeType.COLLECTION_VERSION);
+                ExportScopeType.MODULE_VERSION, ExportScopeType.COLLECTION,
+                ExportScopeType.COLLECTION_VERSION);
 
         return builder.build();
     }

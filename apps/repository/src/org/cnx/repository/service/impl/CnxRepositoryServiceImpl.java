@@ -62,19 +62,19 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateResourceResult>
-                    createResource(RepositoryRequestContext context) {
+            createResource(RepositoryRequestContext context) {
         return ResourceOperations.createResource(context);
     }
 
     @Override
     public RepositoryResponse<GetResourceInfoResult> getResourceInfo(
-        RepositoryRequestContext context, String resourceId) {
+            RepositoryRequestContext context, String resourceId) {
         return ResourceOperations.getResourceInfo(context, resourceId);
     }
 
     @Override
     public RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
-        String resourceId, HttpServletResponse httpResponse) {
+            String resourceId, HttpServletResponse httpResponse) {
         return ResourceOperations.serveResource(context, resourceId, httpResponse);
     }
 
@@ -85,57 +85,59 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
-        String moduleId) {
+            String moduleId) {
         return ModuleOperations.getModuleInfo(context, moduleId);
     }
 
     @Override
     public RepositoryResponse<AddModuleVersionResult> addModuleVersion(
-        RepositoryRequestContext context, String moduleId, String cnxmlDoc, String resourceMapDoc) {
+            RepositoryRequestContext context, String moduleId, String cnxmlDoc,
+            String resourceMapDoc) {
         return ModuleOperations.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
     }
 
     @Override
     public RepositoryResponse<GetModuleVersionResult> getModuleVersion(
-        RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
+            RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
         return ModuleOperations.getModuleVersion(context, moduleId, moduleVersion);
     }
 
     @Override
     public RepositoryResponse<GetModuleVersionInfoResult> getModuleVersionInfo(
-        RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
+            RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
         return ModuleOperations.getModuleVersionInfo(context, moduleId, moduleVersion);
     }
 
     @Override
     public RepositoryResponse<CreateCollectionResult> createCollection(
-        RepositoryRequestContext context) {
+            RepositoryRequestContext context) {
         return CollectionOperations.createCollection(context);
     }
 
     @Override
     public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
-        RepositoryRequestContext context, String collectionId) {
+            RepositoryRequestContext context, String collectionId) {
         return CollectionOperations.getCollectionInfo(context, collectionId);
     }
 
     @Override
     public RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-        RepositoryRequestContext context, String collectionId, String colxmlDoc) {
+            RepositoryRequestContext context, String collectionId, String colxmlDoc) {
         return CollectionOperations.addCollectionVersion(context, collectionId, colxmlDoc);
     }
 
     @Override
     public RepositoryResponse<GetCollectionVersionResult> getCollectionVersion(
-        RepositoryRequestContext context, String collectionId, @Nullable Integer collectionVersion) {
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer collectionVersion) {
         return CollectionOperations.getCollectionVersion(context, collectionId, collectionVersion);
     }
 
     @Override
     public RepositoryResponse<GetCollectionVersionInfoResult> getCollectionVersionInfo(
-        RepositoryRequestContext context, String collectionId, Integer collectionVersion) {
+            RepositoryRequestContext context, String collectionId, Integer collectionVersion) {
         return CollectionOperations.getCollectionVersionInfo(context, collectionId,
-            collectionVersion);
+                collectionVersion);
     }
 
     @Override
@@ -145,19 +147,19 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
-        RepositoryRequestContext context, ExportReference exportReference) {
+            RepositoryRequestContext context, ExportReference exportReference) {
         return ExportOperations.getExportUploadUrl(context, exportReference);
     }
 
     @Override
     public RepositoryResponse<ServeExportResult> serveExport(RepositoryRequestContext context,
-        ExportReference exportReference, HttpServletResponse httpResponse) {
+            ExportReference exportReference, HttpServletResponse httpResponse) {
         return ExportOperations.serveExport(context, exportReference, httpResponse);
     }
 
     @Override
     public RepositoryResponse<DeleteExportResult> deleteExport(RepositoryRequestContext context,
-        ExportReference exportReference) {
+            ExportReference exportReference) {
         return ExportOperations.deleteExport(context, exportReference);
     }
 

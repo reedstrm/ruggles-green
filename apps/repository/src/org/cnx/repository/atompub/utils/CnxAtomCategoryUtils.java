@@ -17,6 +17,8 @@ package org.cnx.repository.atompub.utils;
 
 import java.net.URL;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+
 import com.sun.syndication.feed.atom.Category;
 
 /**
@@ -36,7 +38,7 @@ public class CnxAtomCategoryUtils {
      */
     public static Category getCnxResourceCategoryEle(URL resourceScheme) {
         return getCnxCategoryEle(resourceScheme, CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH,
-            CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH);
+                CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH);
     }
 
     /**
@@ -46,7 +48,7 @@ public class CnxAtomCategoryUtils {
      */
     public static Category getCnxModuleCategoryEle(URL moduleScheme) {
         return getCnxCategoryEle(moduleScheme, CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH,
-            CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH);
+                CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH);
     }
 
     /**
@@ -56,8 +58,8 @@ public class CnxAtomCategoryUtils {
      */
     public static Category getCnxCollectionCategoryEle(URL cnxCollectionScheme) {
         return getCnxCategoryEle(cnxCollectionScheme,
-            CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH,
-            CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH);
+                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH,
+                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH);
     }
 
     private static Category getCnxCategoryEle(URL scheme, String label, String term) {

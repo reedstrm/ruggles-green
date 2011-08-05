@@ -86,10 +86,6 @@
                debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
-                <resources id="test1234">
-                    <fileset dir="build/jars" includes="xm*.jar" />
-                </resources>
-
                 <fileset refid="depend_lib" />
             </classpath>
         </javac>

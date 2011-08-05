@@ -24,7 +24,12 @@
                      inheritAll="true"
                      target="default"
                      dir="${third.party.jars}" />
-        
+
+        <ant antfile="commons-codec/build.xml"
+                     inheritAll="true"
+                     target="default"
+                     dir="${third.party.jars}" />
+
         <ant antfile="commons-httpclient/build.xml"
                      inheritAll="true"
                      target="default"

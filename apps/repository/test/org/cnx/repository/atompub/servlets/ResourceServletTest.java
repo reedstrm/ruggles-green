@@ -15,12 +15,17 @@
  */
 package org.cnx.repository.atompub.servlets;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
 
 import org.cnx.repository.atompub.client.CnxAtomPubClient;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
@@ -28,7 +33,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomResourceServlet}
- * 
+ *
  * @author Arjun Satyapal
  */
 public class ResourceServletTest extends CnxAtomPubBaseTest {
@@ -56,7 +61,7 @@ public class ResourceServletTest extends CnxAtomPubBaseTest {
         assertEquals(expectedResourceUrl, createResourceEntry.getEditURI());
 
         /*
-         * There should be two links in following order :<br> 
+         * There should be two links in following order :<br>
          * 1. Link for Blobstore.<br>
          * 2. Link for Resource.<br>
          */

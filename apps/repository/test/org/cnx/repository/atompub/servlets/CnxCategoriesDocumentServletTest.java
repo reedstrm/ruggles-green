@@ -21,10 +21,11 @@ import java.net.MalformedURLException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
 
 /**
  * Test for {@link CnxCategoriesDocumentServlet}
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxCategoriesDocumentServletTest extends CnxAtomPubBaseTest {

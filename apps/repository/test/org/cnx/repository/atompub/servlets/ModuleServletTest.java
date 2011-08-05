@@ -15,11 +15,15 @@
  */
 package org.cnx.repository.atompub.servlets;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.net.MalformedURLException;
 
 import org.cnx.repository.atompub.client.CnxAtomPubClient;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
@@ -28,7 +32,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomModuleServlet}
- * 
+ *
  * @author Arjun Satyapal
  */
 public class ModuleServletTest extends CnxAtomPubBaseTest {

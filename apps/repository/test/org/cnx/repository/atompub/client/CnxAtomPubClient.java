@@ -97,6 +97,7 @@ public class CnxAtomPubClient {
         service =
             AtomClientFactory.getAtomService(serviceDocumentUri.toString(), new NoAuthStrategy());
 
+        @SuppressWarnings("unchecked")
         List<ClientWorkspace> listOfWorkspaces = service.getWorkspaces();
         checkArgument(1 == listOfWorkspaces.size(),
             "CNX ServiceDocument should have only one workspace.");

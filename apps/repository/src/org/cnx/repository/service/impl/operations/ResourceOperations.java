@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ResourceOperations {

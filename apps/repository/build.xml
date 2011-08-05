@@ -21,13 +21,14 @@
     <property file="build.properties" />
 
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
-    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml"/>
+    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml" />
 
-    <target name="war" depends="compile" 
-                    description="Assemble the application directory">
-        <mkdir dir="${war.dir}/WEB-INF"/>
-        <mkdir dir="${war.dir}/WEB-INF/classes"/>
-        <mkdir dir="${war.dir}/WEB-INF/lib"/>
+    <target name="war"
+            depends="compile"
+            description="Assemble the application directory">
+        <mkdir dir="${war.dir}/WEB-INF" />
+        <mkdir dir="${war.dir}/WEB-INF/classes" />
+        <mkdir dir="${war.dir}/WEB-INF/lib" />
         <!--copy todir="${war.dir}/static">
             <fileset dir="static"/>
         </copy-->
@@ -42,7 +43,7 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
-        <enhance_war war="${war.dir}"/>
+        <enhance_war war="${war.dir}" />
     </target>
 
     <property name="target_dir" value="${basedir}/${output.jars}" />
@@ -50,8 +51,8 @@
     <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
 
     <target name="compile" description="Compile the application servlet code">
-        <mkdir dir="${classdir}"/>
-        <mkdir dir="${output.jars}"/>
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${output.jars}" />
 
         <ant antfile="appengine/build.xml"
              inheritAll="true"
@@ -59,10 +60,15 @@
              dir="${third_party}" />
 
         <!-- TODO(arjuns) : Remove asm from third_party. -->
+        <ant antfile="asm/build.xml"
+        inheritall="true"
+                target="default"
+                dir="${third_party}" />
+
         <ant antfile="commons-logging/build.xml"
-            inheritall="true"
-            target="default"
-            dir="${third_party}" />
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
 
         <ant antfile="guava/build.xml"
              inheritAll="true"
@@ -80,19 +86,19 @@
              dir="${third_party}" />
 
         <ant antfile="rome/build.xml"
-            inheritall="true"
-            target="default"
-            dir="${third_party}" />
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
 
         <ant antfile="rome-propono/build.xml"
-            inheritall="true"
-            target="default"
-            dir="${third_party}" />
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
 
         <ant antfile="xerces/build.xml"
-            inheritall="true"
-            target="default"
-            dir="${third_party}" />
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
 
         <!-- Non third-party dependencies. -->
         <!-- TODO(arjuns) : Common is bringing in libhtml and libutil. -->
@@ -103,60 +109,123 @@
              dir="${basedir}/${commondir}" />
 
         <ant antfile="build.xml"
-            inheritall="true"
-            target="copyjar"
-            dir="${basedir}/${cnxclientdir}" />
+             inheritall="true"
+             target="copyjar"
+             dir="${basedir}/${cnxclientdir}" />
 
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
-            <compilerarg line="${javac.flags}"/>
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="on">
+            <compilerarg line="${javac.flags}" />
             <classpath>
-                <resources refid="depend_lib"/>
+                <resources refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
+    <target name="test-compile" description="Compile Unit Tests." depends="compile">
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
+
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jersey/build.xml"
+             inheritAll="true"
+             target="test"
+             dir="${third_party}" />
+
+        <!-- TODO(arjuns) : Optimize classpaths. -->
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+        <javac srcdir="${test.src}"
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="${classdir}" />
+            </classpath>
+        </javac>
+    </target>
+    
+    <target name="test" description="Run unit tests" depends="test-compile">
+        <junit fork="yes" printsummary="yes" failureproperty="test.failed">
+            <jvmarg value="-enableassertions" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="${test.dir}" />
+                <pathelement location="${classdir}" />
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed" />
+            </condition>
+        </fail>
+    </target>
+
     <target name="clean" description="Force a clean slate to rebuild">
-        <delete dir="${buildir}"/>
-        <delete dir="${war.dir}"/>
+        <delete dir="${buildir}" />
+        <delete dir="${war.dir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
-        <ant antfile="build.xml" target="clean" dir="${basedir}/${cnxclientdir}" />
+        <ant antfile="build.xml"
+             target="clean"
+             dir="${basedir}/${cnxclientdir}" />
 
     </target>
 
     <target name="runserver" depends="war" description="Run the dev_appserver">
-        <dev_appserver war="${war.dir}" port="${http.port}"/>
+        <dev_appserver war="${war.dir}" port="${http.port}" />
     </target>
 
-    <target name="dev_appserver" depends="runserver"/>
+    <target name="dev_appserver" depends="runserver" />
 
-    <target name="debug" depends="war" 
-                    description="Launches dev_appserver with remote debugging enabled">
-        <echo message="Launching dev_appserver on Web port ${http.port}, Java remote debug port ${debug.port}"/>
+    <target name="debug"
+            depends="war"
+            description="Launches dev_appserver with remote debugging enabled">
+        <echo message="Launching dev_appserver on Web port ${http.port}, Java remote debug port ${debug.port}" />
         <dev_appserver war="${war.dir}" port="${http.port}">
             <options>
-                <arg value="--jvm_flag=-Xdebug"/>
-                <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${debug.port}"/>
+                <arg value="--jvm_flag=-Xdebug" />
+                <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${debug.port}" />
             </options>
         </dev_appserver>
     </target>
 
-    <target name="update" depends="war" 
-                    description="Uploads the application, including indexes">
-        <appcfg action="update" war="${war.dir}"/>
+    <target name="update"
+            depends="war"
+            description="Uploads the application, including indexes">
+        <appcfg action="update" war="${war.dir}" />
     </target>
 
-    <target name="update_indexes" depends="war" 
-                    description="Uploads only the application's indexes">
-        <appcfg action="update_indexes" war="${war.dir}"/>
+    <target name="update_indexes"
+            depends="war"
+            description="Uploads only the application's indexes">
+        <appcfg action="update_indexes" war="${war.dir}" />
     </target>
 
-    <target name="rollback" depends="war" 
-                    description="Rolls back any in-progress application update">
-        <appcfg action="rollback" war="${war.dir}"/>
+    <target name="rollback"
+            depends="war"
+            description="Rolls back any in-progress application update">
+        <appcfg action="rollback" war="${war.dir}" />
     </target>
 
-    <target name="request_logs" 
-                    description="Downloads the application's logs">
+    <target name="request_logs" description="Downloads the application's logs">
         <appcfg action="request_logs" war="${war.dir}">
             <options>
                 <arg value="--num_days=${log.days}"/>
@@ -167,4 +236,7 @@
         </appcfg>
     </target>
 
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="compile, war, test-compile" />
 </project>

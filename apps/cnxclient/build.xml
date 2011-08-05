@@ -24,7 +24,12 @@
                      inheritAll="true"
                      target="default"
                      dir="${third.party.jars}" />
-        
+
+        <ant antfile="commons-codec/build.xml"
+                     inheritAll="true"
+                     target="default"
+                     dir="${third.party.jars}" />
+
         <ant antfile="commons-httpclient/build.xml"
                      inheritAll="true"
                      target="default"
@@ -55,9 +60,7 @@
 
     <target name="clean" description="Remove built files">
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
-        <delete dir="${classdir}" />
-        <delete dir="${output.jars}" />
-        <delete dir="${libdir}" />
+        <delete dir="${builddir}" />
     </target>
 
     <tstamp>
@@ -80,4 +83,8 @@
         depends="jar">
         <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar"/>
     </target>
+    
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="compile, jar" />
 </project>

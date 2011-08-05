@@ -33,10 +33,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
@@ -54,7 +55,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Jersey Servlets for Cnx Resources.
- * 
+ *
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH)
@@ -76,8 +77,7 @@ public class CnxAtomResourceServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<CreateResourceResult> createdResource =
-            repositoryService.createResource(atomPubService.getConstants()
-                .getRepositoryContext(req));
+            repositoryService.createResource(RepositoryUtils.getRepositoryContext(req));
 
         if (createdResource.isOk()) {
             /*
@@ -129,8 +129,8 @@ public class CnxAtomResourceServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-            repositoryService.serveResouce(atomPubService.getConstants().getRepositoryContext(req),
-                    resourceId, res);
+            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(req),
+                resourceId, res);
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();

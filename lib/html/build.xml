@@ -86,32 +86,28 @@
                debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
-                <resources id="test1234">
-                    <fileset dir="build/jars" includes="xm*.jar" />
-                </resources>
-
                 <fileset refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
-    <target name="test" description="Run unit tests" depends="jar">
+    <target name="test-compile" description="compile tests." depends="jar">
         <mkdir dir="${test.dir}" />
         <mkdir dir="${test.outdir}" />
 
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
 
         <ant antfile="junit/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
+                 inheritAll="true"
+                 target="default"
+                 dir="${third_party}" />
 
         <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
 
         <javac srcdir="${test.src}"
-               destdir="${test.dir}"
-               includeantruntime="false"
-               debug="true">
+                   destdir="${test.dir}"
+                   includeantruntime="false"
+                   debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
@@ -119,7 +115,9 @@
                 <pathelement location="build/lib/org.cnx.html.jar" />
             </classpath>
         </javac>
+    </target>
 
+    <target name="test" description="Run unit tests" depends="test-compile">
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
             <jvmarg value="-enableassertions" />
             <classpath>
@@ -131,7 +129,7 @@
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*Tests.java" />
+                    <include name="**/*Test*.java" />
                 </fileset>
             </batchtest>
         </junit>
@@ -163,4 +161,7 @@
         <copy file="build/lib/org.cnx.html.jar"
               tofile="${target_dir}/org.cnx.html.latest.jar" />
     </target>
+
+    <target name="all" description="all targets in this build file for repository build."
+        depends="compile, test-compile, jar" />
 </project>

@@ -23,8 +23,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 
@@ -33,7 +33,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
- * 
+ *
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)

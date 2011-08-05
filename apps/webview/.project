@@ -16,28 +16,38 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
 			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
 			<triggers>full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.jdt.core.javabuilder.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/com.google.gdt.eclipse.core.webAppProjectValidator (1).launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.google.gdt.eclipse.core.webAppProjectValidator</name>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
 			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/com.google.appengine.eclipse.core.projectValidator (1).launch</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.google.appengine.eclipse.core.enhancerbuilder</name>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
 			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>com.google.appengine.eclipse.core.projectValidator</name>
-			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/com.google.appengine.eclipse.core.enhancerbuilder (1).launch</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>

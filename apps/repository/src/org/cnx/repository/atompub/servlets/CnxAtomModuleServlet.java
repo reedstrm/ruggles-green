@@ -36,10 +36,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
@@ -60,7 +61,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Servlet to Handle CNX Resources.
- * 
+ *
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH)
@@ -84,7 +85,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<CreateModuleResult> createdModule =
-            repositoryService.createModule(atomPubService.getConstants().getRepositoryContext(req));
+            repositoryService.createModule(RepositoryUtils.getRepositoryContext(req));
 
         if (createdModule.isOk()) {
             /*
@@ -196,9 +197,8 @@ public class CnxAtomModuleServlet {
                 .getContents().get(0));
 
         RepositoryResponse<AddModuleVersionResult> createdModule =
-            repositoryService.addModuleVersion(
-                    atomPubService.getConstants().getRepositoryContext(req), moduleId, cnxmlDoc,
-                    resourceMappingDoc);
+            repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(
+                req), moduleId, cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -258,9 +258,8 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(
-                    atomPubService.getConstants().getRepositoryContext(req), moduleId,
-                    Integer.parseInt(version));
+            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(
+                req), moduleId, Integer.parseInt(version));
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult result = moduleVersionResult.getResult();
@@ -275,7 +274,8 @@ public class CnxAtomModuleServlet {
 
             String stringEntry;
             try {
-                stringEntry = PrettyXmlOutputter.prettyXmlOutputMyEntry(entry);
+                // TODO(arjuns) : See if original hack is required.
+                stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
                 return Response.ok().entity(stringEntry).build();
             } catch (IllegalArgumentException e) {
                 // TODO(arjuns): Auto-generated catch block

@@ -16,6 +16,12 @@
 
 package org.cnx.web;
 
+import java.io.File;
+
+import org.cnx.html.LinkProcessor;
+import org.cnx.html.Processor;
+import org.cnx.html.RenderTime;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -24,11 +30,6 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
-import java.io.File;
-import org.cnx.html.LinkProcessor;
-import org.cnx.html.Processor;
-import org.cnx.html.RenderTime;
-import org.cnx.html.ResourceResolver;
 
 /**
  *  WebViewModule is the Guice configuration for the web view application.
@@ -38,7 +39,8 @@ public class WebViewModule extends AbstractModule {
         bind(String.class)
                 .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
                 .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
-        bind(ResourceResolver.class).to(DemoResourceResolver.class);
+        // TODO(light) : Fix this.
+//        bind(ResourceResolver.class).to(DemoResourceResolver.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);

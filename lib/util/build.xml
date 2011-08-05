@@ -74,4 +74,7 @@
             depends="jar">
         <copy file="build/lib/org.cnx.util.jar" tofile="${target_dir}/org.cnx.util.latest.jar" />
     </target>
+    
+    <target name="all" description="Refers to all the targets in this file other then test."
+        depends="compile, jar" />
 </project>

@@ -16,19 +16,13 @@ package org.cnx.atompubclient;
  * the License.
  */
 
-import com.google.common.base.Preconditions;
-
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.impl.Atom10Parser;
-import com.sun.syndication.propono.atom.client.AtomClientFactory;
-import com.sun.syndication.propono.atom.client.ClientAtomService;
-import com.sun.syndication.propono.atom.client.ClientCollection;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.atom.client.ClientWorkspace;
-import com.sun.syndication.propono.atom.client.NoAuthStrategy;
-import com.sun.syndication.propono.utils.ProponoException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
@@ -42,13 +36,18 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.jdom.JDOMException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
+import com.google.common.base.Preconditions;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
+import com.sun.syndication.propono.atom.client.AtomClientFactory;
+import com.sun.syndication.propono.atom.client.ClientAtomService;
+import com.sun.syndication.propono.atom.client.ClientCollection;
+import com.sun.syndication.propono.atom.client.ClientEntry;
+import com.sun.syndication.propono.atom.client.ClientWorkspace;
+import com.sun.syndication.propono.atom.client.NoAuthStrategy;
+import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * AtomPub client for CNX Repository.
@@ -78,7 +77,7 @@ public class CnxAtomPubClient {
         return constants;
     }
 
-    public CnxAtomPubClient(URL atomPubServerUrl) throws ProponoException, MalformedURLException {
+    public CnxAtomPubClient(URL serverUrl) throws ProponoException, MalformedURLException {
         /*
          * rome library uses Apache Commons BeanUtils. With atom1.0 created data is optoinal. But
          * Beantuils fails when it is not set. So following is a way to bypass that.
@@ -88,17 +87,18 @@ public class CnxAtomPubClient {
         ConvertUtils.register(converter, java.util.Date.class);
 
         httpClient = new HttpClient();
-        constants =
-            new CnxAtomPubConstants(atomPubServerUrl.toString(), atomPubServerUrl.getPort());
+        constants = new CnxAtomPubConstants(serverUrl);
 
-        this.atomPubServerUrl = atomPubServerUrl;
+        // TODO(arjuns) : Fix the atompub ur.
+//        this.atomPubServerUrl = serverUrl.toString() + CnxAtomPubConstants.ATOMPUB_URL_PREFIX;
 
         URL serviceDocumentUri =
-            new URL(atomPubServerUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
+            new URL(serverUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
 
         service =
             AtomClientFactory.getAtomService(serviceDocumentUri.toString(), new NoAuthStrategy());
 
+        @SuppressWarnings("unchecked")
         List<ClientWorkspace> listOfWorkspaces = service.getWorkspaces();
         Preconditions.checkArgument(1 == listOfWorkspaces.size(),
             "CNX ServiceDocument should have only one workspace.");

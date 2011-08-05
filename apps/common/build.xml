@@ -35,20 +35,20 @@
         <mkdir dir="${output.jars}" />
 
         <!-- Add dependent jars to be copied. before classes are compiled. -->
-        <!--ant antfile="asm/build.xml"
+        <ant antfile="asm/build.xml"
              inheritAll="true"
              target="default"
-             dir="${third_party}" /-->
+             dir="${third_party}" />
 
         <ant antfile="jdom/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
 
-        <!--ant antfile="appengine/build.xml"
+        <ant antfile="appengine/build.xml"
              inheritAll="true"
              target="default"
-             dir="${third_party}" /-->
+             dir="${third_party}" />
 
         <ant antfile="guava/build.xml"
              inheritAll="true"

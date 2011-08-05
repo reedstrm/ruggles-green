@@ -20,6 +20,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.template.soy.SoyModule;
+import org.cnx.common.collxml.CollxmlModule;
 import org.cnx.html.DefaultModule;
 import org.cnx.html.DefaultProcessorModule;
 import org.cnx.util.UtilModule;
@@ -27,12 +28,13 @@ import org.cnx.util.UtilModule;
 public class GuiceConfig extends GuiceServletContextListener {
     @Override protected Injector getInjector() {
         return Guice.createInjector(
-                new SoyModule(),
-                new UtilModule(),
+                new CollxmlModule(),
                 new DefaultModule(),
                 new DefaultProcessorModule(),
-                new WebViewModule(),
-                new ServletModule()
+                new ServletModule(),
+                new SoyModule(),
+                new UtilModule(),
+                new WebViewModule()
         );
     }
 }

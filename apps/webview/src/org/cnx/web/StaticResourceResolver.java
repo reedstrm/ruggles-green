@@ -18,7 +18,7 @@ package org.cnx.web;
 
 import com.google.inject.Singleton;
 import java.net.URI;
-import org.cnx.html.ResourceResolver;
+import org.cnx.cnxml.ResourceResolver;
 
 @Singleton public class StaticResourceResolver implements ResourceResolver {
     private static final String BASE = "/staticxml/";

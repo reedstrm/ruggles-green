@@ -14,14 +14,15 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
-import org.w3c.dom.Node;
+import java.net.URI;
 
 /**
- *  Processor is an interface for a single pass operation on a DOM tree before it is passed to the
- *  HTML generator.
+ *  A ResourceResolver looks up resources and returns URIs.
  */
-public interface Processor {
-    public Node process(Node node) throws Exception;
+public interface ResourceResolver {
+    public URI resolveURI(URI uri) throws Exception;
+    public URI resolveDocument(String document, String version) throws Exception;
+    public URI resolveResource(String document, String version, String resource) throws Exception;
 }

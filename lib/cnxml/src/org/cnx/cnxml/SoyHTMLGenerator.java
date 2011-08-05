@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.BindingAnnotation;
@@ -24,6 +24,8 @@ import com.google.template.soy.tofu.SoyTofu;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Set;
+
+import org.cnx.util.RenderTime;
 import org.w3c.dom.Node;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -34,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *  SoyHTMLGenerator converts a CNXML file to HTML using Closure Templates.
  */
 @RenderTime public class SoyHTMLGenerator implements ModuleHTMLGenerator {
-    public static final String SOY_NAMESPACE = "org.cnx.html.SoyHTMLGenerator";
+    public static final String SOY_NAMESPACE = "org.cnx.cnxml.SoyHTMLGenerator";
 
     @BindingAnnotation
     @Target({ FIELD, PARAMETER, METHOD })

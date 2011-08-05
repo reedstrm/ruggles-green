@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import com.google.inject.ImplementedBy;
 import com.google.template.soy.data.SoyData;

@@ -14,22 +14,17 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
-import org.w3c.dom.Node;
+import com.google.inject.BindingAnnotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- *  Implementors of the ModuleHTMLGenerator interface can convert CNXML to HTML.
- */
-public interface ModuleHTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
-     *  node passed into generate is usually the XML document node, but it can be a particular
-     *  element.
-     *
-     *  @param node The CNXML node to render
-     *  @param p The writer to output to
-     *  @return The rendered HTML string
-     */
-    public String generate(Node node) throws Exception;
-}
+@BindingAnnotation
+@Target({ FIELD, PARAMETER, METHOD })
+@Retention(RUNTIME)
+public @interface CnxmlNamespace {}

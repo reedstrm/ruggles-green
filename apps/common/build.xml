@@ -89,7 +89,7 @@
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"
-             dir="${basedir}/${libhtmldir}" />
+             dir="${basedir}/${libcnxmldir}" />
 
 
         <javac srcdir="src"

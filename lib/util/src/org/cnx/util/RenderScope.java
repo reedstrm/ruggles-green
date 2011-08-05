@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.util;
 
 import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.Maps;

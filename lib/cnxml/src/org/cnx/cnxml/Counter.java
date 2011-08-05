@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
  *  Counter provides monotonically increasing numbers for CNXML elements like list, equation, and
  *  proof.
  *
- *  This class is package-private; it should not be used outside of org.cnx.html.
+ *  This class is package-private; it should not be used outside of org.cnx.cnxml.
  */
 class Counter {
     /**

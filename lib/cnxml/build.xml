@@ -14,9 +14,9 @@
     limitations under the License.
 -->
 
-<!-- Ant build file for the CNX HTML library. -->
+<!-- Ant build file for the CNXML library. -->
 
-<project name="html" default="jar">
+<project name="cnxml" default="jar">
     <property file="build.properties" />
     <property file="local.properties" />
 
@@ -112,7 +112,7 @@
             <classpath>
                 <resources refid="depend_lib" />
                 <resources refid="depend_test_lib" />
-                <pathelement location="build/lib/org.cnx.html.jar" />
+                <pathelement location="build/lib/org.cnx.cnxml.jar" />
             </classpath>
         </javac>
     </target>
@@ -123,7 +123,7 @@
             <classpath>
                 <resources refid="depend_lib" />
                 <resources refid="depend_test_lib" />
-                <pathelement location="build/lib/org.cnx.html.jar" />
+                <pathelement location="build/lib/org.cnx.cnxml.jar" />
                 <pathelement location="${test.dir}" />
             </classpath>
             <formatter type="plain" />
@@ -149,7 +149,7 @@
             description="Build a JAR of the classes"
             depends="compile">
         <mkdir dir="build/lib" />
-        <jar destfile="build/lib/org.cnx.html.jar">
+        <jar destfile="build/lib/org.cnx.cnxml.jar">
             <fileset dir="${classdir}" />
             <resources refid="resources" />
         </jar>
@@ -158,8 +158,8 @@
     <target name="copyjar"
             description="Copy jar to calling build file"
             depends="jar">
-        <copy file="build/lib/org.cnx.html.jar"
-              tofile="${target_dir}/org.cnx.html.latest.jar" />
+        <copy file="build/lib/org.cnx.cnxml.jar"
+              tofile="${target_dir}/org.cnx.cnxml.latest.jar" />
     </target>
 
     <target name="all" description="all targets in this build file for repository build."

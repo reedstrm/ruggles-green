@@ -14,15 +14,21 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.util;
 
-import java.net.URI;
+import com.google.inject.ScopeAnnotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- *  A ResourceResolver looks up resources and returns URIs.
+ *  RenderTime is the annotation for {@link RenderScope}.
+ *
+ *  @see RenderTime
  */
-public interface ResourceResolver {
-    public URI resolveURI(URI uri) throws Exception;
-    public URI resolveDocument(String document, String version) throws Exception;
-    public URI resolveResource(String document, String version, String resource) throws Exception;
-}
+@Target({ TYPE, METHOD })
+@Retention(RUNTIME)
+@ScopeAnnotation
+public @interface RenderTime {}

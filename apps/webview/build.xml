@@ -116,7 +116,7 @@
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"
-             dir="${basedir}/${libhtmldir}" />
+             dir="${basedir}/${libcnxmldir}" />
 
         <ant antfile="build.xml"
              inheritAll="true"
@@ -141,7 +141,7 @@
         <delete dir="${buildir}"/>
         <delete dir="${war.dir}"/>
         <ant antfile="build.xml" target="clean" dir="${basedir}/${libutildir}" />
-        <ant antfile="build.xml" target="clean" dir="${basedir}/${libhtmldir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${libcnxmldir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${cnxclientdir}" />
 

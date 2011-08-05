@@ -21,15 +21,15 @@ import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.template.soy.SoyModule;
 import org.cnx.common.collxml.CollxmlModule;
-import org.cnx.html.DefaultModule;
-import org.cnx.html.DefaultProcessorModule;
+import org.cnx.cnxml.CnxmlModule;
+import org.cnx.cnxml.DefaultProcessorModule;
 import org.cnx.util.UtilModule;
 
 public class GuiceConfig extends GuiceServletContextListener {
     @Override protected Injector getInjector() {
         return Guice.createInjector(
+                new CnxmlModule(),
                 new CollxmlModule(),
-                new DefaultModule(),
                 new DefaultProcessorModule(),
                 new ServletModule(),
                 new SoyModule(),

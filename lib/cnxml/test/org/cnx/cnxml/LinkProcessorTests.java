@@ -14,9 +14,12 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import java.net.URI;
+
+import org.cnx.cnxml.LinkProcessor;
+import org.cnx.cnxml.ResourceResolver;
 import org.cnx.util.DocumentBuilderProvider;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;

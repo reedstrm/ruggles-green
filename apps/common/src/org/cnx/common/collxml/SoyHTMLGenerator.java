@@ -24,7 +24,7 @@ import com.google.template.soy.tofu.SoyTofu;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URI;
-import org.cnx.html.ResourceResolver;
+import org.cnx.cnxml.ResourceResolver;
 import org.cnx.util.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

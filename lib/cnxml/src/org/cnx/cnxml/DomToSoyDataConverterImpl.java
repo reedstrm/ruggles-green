@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;

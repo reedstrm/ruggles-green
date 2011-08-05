@@ -18,10 +18,10 @@ package org.cnx.web;
 
 import java.io.File;
 
-import org.cnx.html.LinkProcessor;
-import org.cnx.html.Processor;
-import org.cnx.html.RenderTime;
-import org.cnx.html.ResourceResolver;
+import org.cnx.cnxml.LinkProcessor;
+import org.cnx.cnxml.Processor;
+import org.cnx.cnxml.ResourceResolver;
+import org.cnx.util.RenderTime;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;

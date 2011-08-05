@@ -14,21 +14,21 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
-import com.google.inject.ScopeAnnotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.w3c.dom.Node;
 
 /**
- *  RenderTime is the annotation for {@link RenderScope}.
- *
- *  @see RenderTime
+ *  Implementors of the ModuleHTMLGenerator interface can convert CNXML to HTML.
  */
-@Target({ TYPE, METHOD })
-@Retention(RUNTIME)
-@ScopeAnnotation
-public @interface RenderTime {}
+public interface ModuleHTMLGenerator {
+    /**
+     *  The generate method outputs HTML that corresponds to the given CNXML node to a string.  The
+     *  node passed into generate is usually the XML document node, but it can be a particular
+     *  element.
+     *
+     *  @param node The CNXML node to render
+     *  @return The rendered HTML string
+     */
+    public String generate(Node node) throws Exception;
+}

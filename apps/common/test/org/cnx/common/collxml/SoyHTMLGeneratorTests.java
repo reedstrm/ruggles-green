@@ -20,7 +20,7 @@ import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
 import java.net.URI;
-import org.cnx.html.ResourceResolver;
+import org.cnx.cnxml.ResourceResolver;
 import org.cnx.util.DocumentBuilderProvider;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;

@@ -16,7 +16,7 @@
     
     <target name="compile-all" description="Compile All builds.">
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${libutildir}" />
-        <ant antfile="build.xml" inheritAll="false" target="all" dir="${libhtmldir}" />
+        <ant antfile="build.xml" inheritAll="false" target="all" dir="${libcnxmldir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${appscommondir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${cnxclientdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${webviewdir}" />
@@ -25,7 +25,7 @@
 
     <target name="clean" description="Remove built files">
         <ant antfile="build.xml" target="clean" dir="${libutildir}" />
-        <ant antfile="build.xml" target="clean" dir="${libhtmldir}" />
+        <ant antfile="build.xml" target="clean" dir="${libcnxmldir}" />
         <ant antfile="build.xml" target="clean" dir="${appscommondir}" />
         <ant antfile="build.xml" target="clean" dir="${cnxclientdir}" />
         <ant antfile="build.xml" target="clean" dir="${webviewdir}" />

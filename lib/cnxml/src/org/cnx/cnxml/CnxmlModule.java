@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -28,11 +28,12 @@ import com.google.template.soy.tofu.SoyTofu;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
+import org.cnx.util.RenderTime;
 
 /**
- *  DefaultModule is the default configuration for the HTML generator.
+ *  CnxmlModule is the default configuration for the HTML generator.
  */
-public class DefaultModule extends AbstractModule {
+public class CnxmlModule extends AbstractModule {
     @Override protected void configure() {
         bind(ModuleHTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
         bind(String.class)
@@ -42,10 +43,6 @@ public class DefaultModule extends AbstractModule {
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
-
-        RenderScope scope = new RenderScope();
-        bindScope(RenderTime.class, scope);
-        bind(RenderScope.class).toInstance(scope);
     }
 
     @Provides @Singleton @SoyHTMLGenerator.Template

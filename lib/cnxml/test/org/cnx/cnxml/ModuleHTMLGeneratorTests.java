@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.cnx.html;
+package org.cnx.cnxml;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
@@ -29,6 +29,11 @@ import java.io.StringWriter;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.cnx.cnxml.CnxmlModule;
+import org.cnx.cnxml.CnxmlNamespace;
+import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.util.RenderScope;
 import org.cnx.util.UtilModule;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
@@ -47,7 +52,7 @@ public class ModuleHTMLGeneratorTests {
 
     @BeforeClass public static void createInjector() {
         injector = Guice.createInjector(
-                new DefaultModule(),
+                new CnxmlModule(),
                 new SoyModule(),
                 new UtilModule()
         );

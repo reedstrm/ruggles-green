@@ -22,7 +22,7 @@
     <resources id="appengine-1.5.2">
         <fileset dir="appengine/appengine-1.5.2/lib/user" includes="*.jar" />
         <fileset dir="appengine/appengine-1.5.2/lib/shared" includes="*.jar" />
-        <fileset dir="appengine/appengine-1.5.2/lib/tools/orm" includes="*.jar" />
+        <fileset dir="appengine/appengine-1.5.2/lib/user/orm" includes="*.jar" />
     </resources>
 
     <resources id="appengine-1.5.2.testing" >

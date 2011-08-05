@@ -19,9 +19,9 @@
         Copies Jersey jar to ${target_dir}.
     </description>
 
-    <fileset id="jersey-1.8" dir="jersey/jersey-1.8" includes="*.jar" />
 
     <target name="default">
+        <fileset id="jersey-1.8" dir="jersey/jersey-1.8" includes="*.jar" />
         <fail message="Target path for jars is not set.">
             <condition>
                 <not>
@@ -33,6 +33,23 @@
         </fail>
 
         <copy todir="${target_dir}">
+            <fileset refid="jersey-1.8" />
+        </copy>
+    </target>
+
+    <target name="test">
+        <fileset id="jersey-test-1.8" dir="jersey/jersey-test-1.8" includes="*.jar" />
+        <fail message="Target path for test_lig_dir is not set.">
+            <condition>
+                <not>
+                    <and>
+                        <isset property="test_lib_dir" />
+                    </and>
+                </not>
+            </condition>
+        </fail>
+
+        <copy todir="${test_lib_dir}">
             <fileset refid="jersey-1.8" />
         </copy>
     </target>

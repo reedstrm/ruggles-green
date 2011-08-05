@@ -37,6 +37,9 @@
         <copy todir="${war.dir}/static">
             <fileset dir="static"/>
         </copy>
+        <copy todir="${war.dir}/staticxml">
+            <fileset dir="staticxml"/>
+        </copy>
         <copy todir="${war.dir}/WEB-INF">
             <fileset dir="src/WEB-INF">
                 <include name="*.xml"/>

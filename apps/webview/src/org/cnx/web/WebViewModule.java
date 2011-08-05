@@ -38,7 +38,8 @@ public class WebViewModule extends AbstractModule {
         bind(String.class)
                 .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
                 .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
-        bind(ResourceResolver.class).to(DemoResourceResolver.class);
+        bind(XmlFetcher.class).to(StaticXmlFetcher.class);
+        bind(ResourceResolver.class).to(StaticResourceResolver.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);

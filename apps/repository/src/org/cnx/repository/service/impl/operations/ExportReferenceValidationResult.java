@@ -129,7 +129,8 @@ public class ExportReferenceValidationResult {
     /**
      * Validate an export reference.
      */
-    public static ExportReferenceValidationResult validateReference(ExportReference exportReference) {
+    public static ExportReferenceValidationResult
+                    validateReference(ExportReference exportReference) {
         // Lookup export type by id.
         final ExportType exportType =
             ExportTypesConfiguration.getExportTypes().get(exportReference.getExportTypeId());

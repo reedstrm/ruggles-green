@@ -9,8 +9,6 @@
 	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-local-runtime-shared.jar"/>
-	<classpathentry kind="lib" path="build/jars/appengine-remote-api.jar"/>
-	<classpathentry kind="lib" path="build/jars/appengine-tools-api.jar"/>
 	<classpathentry kind="lib" path="build/jars/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>

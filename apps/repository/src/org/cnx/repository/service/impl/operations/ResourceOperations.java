@@ -24,14 +24,7 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.blobstore.BlobInfo;
-import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Key;
-import com.google.common.collect.Lists;
-
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.cnx.repository.common.KeyValue;
-
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -45,6 +38,7 @@ import org.cnx.repository.service.impl.schema.JdoResourceEntity;
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
+import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
@@ -186,10 +180,10 @@ public class ResourceOperations {
         }
 
         /*
-         * Appengine uses Blobstore for storing big blobs. Upload and download from Blobstores
-         * is done separately from normal App. At the time of serving the blob, Blobstore service
-         * sets a header with "BlobKey = <value>" and then App Engine replaces the body of the
-         * response with the content of the blob.
+         * Appengine uses Blobstore for storing big blobs. Upload and download from Blobstores is
+         * done separately from normal App. At the time of serving the blob, Blobstore service sets
+         * a header with "BlobKey = <value>" and then App Engine replaces the body of the response
+         * with the content of the blob.
          */
         final KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
         ServeResourceResult result = new ServeResourceResult(Lists.newArrayList(blobkeyHeader));

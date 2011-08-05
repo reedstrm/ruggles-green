@@ -15,8 +15,13 @@
  */
 package org.cnx.repository.atompub.servlets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+
+import org.cnx.repository.atompub.client.CnxAtomPubClient;
+import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.utils.CustomMediaTypes;
 
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.client.ClientWorkspace;
@@ -24,19 +29,9 @@ import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
 import com.sun.syndication.propono.utils.ProponoException;
 
-import org.cnx.repository.atompub.client.CnxAtomPubClient;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
 /**
  * Test for {@link CnxServiceDocumentServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxServiceDocumentServletTest extends CnxAtomPubBaseTest {
@@ -73,7 +68,8 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBaseTest {
     }
 
     private void
-            validateCollection(Collection collection, String collectionTermAndLabel, URL scheme) {
+                    validateCollection(Collection collection, String collectionTermAndLabel,
+                        URL scheme) {
         assertNotNull(collection);
 
         @SuppressWarnings("unchecked")

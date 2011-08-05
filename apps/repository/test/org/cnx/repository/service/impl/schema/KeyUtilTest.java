@@ -2,12 +2,7 @@ package org.cnx.repository.service.impl.schema;
 
 // TODO(tal): move test to a parallel source directory structure.
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Random;
-
-import org.cnx.repository.service.impl.schema.KeyUtil;
-import org.junit.Test;
 
 public class KeyUtilTest {
     @Test
@@ -31,8 +26,9 @@ public class KeyUtilTest {
 
     @Test
     public void compatability() {
-        final long values[] = { 0, 1, -1, 0x9876543210123456L, Long.MAX_VALUE, Long.MIN_VALUE,
-                0xffffffffffffffffL, 0x8000000000000000L, 0x7fffffffffffffffL };
+        final long values[] =
+            { 0, 1, -1, 0x9876543210123456L, Long.MAX_VALUE, Long.MIN_VALUE, 0xffffffffffffffffL,
+                0x8000000000000000L, 0x7fffffffffffffffL };
 
         for (Long value : values) {
             assertEquals(value, KeyUtil.stringToId("X", KeyUtil.idToString("X", value)));

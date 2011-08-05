@@ -39,8 +39,8 @@ public class ExportReference {
     private final String exportTypeId;
 
     /**
-     * TODO(tal): make the notion of 'latest version' more explicit? Currently we overload
-     * the null value.
+     * TODO(tal): make the notion of 'latest version' more explicit? Currently we overload the null
+     * value.
      * 
      * @param scopeType The type of the object to which the export can be attached.
      * @param objectId The id of the object to which this object is attached. The interpretation of

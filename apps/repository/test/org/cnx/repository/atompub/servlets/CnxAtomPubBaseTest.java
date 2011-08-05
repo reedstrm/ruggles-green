@@ -22,8 +22,6 @@ import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
 
 /**
  * BaseTest for all tests for CNX AtomPub API.

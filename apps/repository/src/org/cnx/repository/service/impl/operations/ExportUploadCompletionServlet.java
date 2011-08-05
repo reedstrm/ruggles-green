@@ -19,15 +19,6 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.appengine.api.blobstore.BlobKey;
-
-import org.cnx.repository.service.api.ExportReference;
-import org.cnx.repository.service.api.ExportScopeType;
-import org.cnx.repository.service.api.ExportType;
-import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
-import org.cnx.repository.service.impl.schema.CnxJdoEntity;
-import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
@@ -39,15 +30,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.service.api.ExportReference;
+import org.cnx.repository.service.api.ExportScopeType;
+import org.cnx.repository.service.api.ExportType;
+import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
+import org.cnx.repository.service.impl.schema.CnxJdoEntity;
+import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
+
+import com.google.appengine.api.blobstore.BlobKey;
+
 /**
  * An internal API servlet to handle the completion call back of a resource upload to the blobstore.
- *
+ * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- *
+ * 
  * TODO(tal): validate the blob (e.g. against max size and reject if does not pass).
- *
+ * 
  * TODO(tal): verify the uploading user against the URL creating user and reject if failed.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -97,8 +97,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             // Verify within a transaction that the parent entity still exists.
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
-                (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(), validationResult
-                    .getParentKey());
+                (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
+                    validationResult.getParentKey());
 
             // TODO(tal): if export already exists, delete old blob. Currently we orphan it.
             // TODO(tal): verify blob param and delete if bad (type mismatch, size, etc).

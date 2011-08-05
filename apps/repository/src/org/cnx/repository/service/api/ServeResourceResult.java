@@ -16,15 +16,15 @@
 
 package org.cnx.repository.service.api;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
 
 import org.cnx.repository.common.KeyValue;
 
-import java.util.List;
+import com.google.common.base.Preconditions;
 
 /**
  * Result of a successful serveResource() operation.
- *
+ * 
  * @author Tal Dayan
  */
 public class ServeResourceResult {

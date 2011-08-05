@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.cnx.util.Nullable;
 
-import com.google.apphosting.api.ApiProxy;
-
 /**
  * Common context that is passed to each repository operation.
  * 
@@ -93,13 +91,6 @@ public class RepositoryRequestContext {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Could not construct host url", e);
         }
-        
-//        ApiProxy.Environment env =  ApiProxy.getCurrentEnvironment();
-//        Object value = env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
-//        System.out.println("**** value: " + value);
-//        for (Object key: env.getAttributes().keySet()) {
-//            System.out.println("  [" + key + "]");
-//        }
 
         return url.toString();
     }

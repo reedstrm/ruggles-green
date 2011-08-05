@@ -15,17 +15,16 @@
  */
 package org.cnx.repository.atompub.servlets;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.methods.GetMethod;
+
 /**
  * Test for {@link CnxCategoriesDocumentServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxCategoriesDocumentServletTest extends CnxAtomPubBaseTest {

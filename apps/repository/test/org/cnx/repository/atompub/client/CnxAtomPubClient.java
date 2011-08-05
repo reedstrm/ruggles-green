@@ -17,17 +17,13 @@ package org.cnx.repository.atompub.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.impl.Atom10Parser;
-import com.sun.syndication.propono.atom.client.AtomClientFactory;
-import com.sun.syndication.propono.atom.client.ClientAtomService;
-import com.sun.syndication.propono.atom.client.ClientCollection;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.atom.client.ClientWorkspace;
-import com.sun.syndication.propono.atom.client.NoAuthStrategy;
-import com.sun.syndication.propono.utils.ProponoException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
@@ -41,16 +37,20 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
 import org.jdom.JDOMException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
+import com.sun.syndication.propono.atom.client.AtomClientFactory;
+import com.sun.syndication.propono.atom.client.ClientAtomService;
+import com.sun.syndication.propono.atom.client.ClientCollection;
+import com.sun.syndication.propono.atom.client.ClientEntry;
+import com.sun.syndication.propono.atom.client.ClientWorkspace;
+import com.sun.syndication.propono.atom.client.NoAuthStrategy;
+import com.sun.syndication.propono.utils.ProponoException;
 
 /**
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomPubClient {
@@ -147,7 +147,7 @@ public class CnxAtomPubClient {
     }
 
     public ClientEntry uploadFileToBlobStore(File file) throws ProponoException, HttpException,
-            IOException {
+        IOException {
         ClientEntry resourceEntry = createUploadUrl();
 
         @SuppressWarnings("unchecked")
@@ -158,7 +158,8 @@ public class CnxAtomPubClient {
         return resourceEntry;
     }
 
-    public void uploadFileToBlobStore(String blobstoreUrl, File file) throws HttpException, IOException {
+    public void uploadFileToBlobStore(String blobstoreUrl, File file) throws HttpException,
+        IOException {
         PostMethod postMethod = new PostMethod(blobstoreUrl);
         Part[] parts = { new FilePart(file.getName(), file) };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
@@ -175,7 +176,7 @@ public class CnxAtomPubClient {
     }
 
     public ClientEntry createNewModuleVersion(ClientEntry moduleEntry, String cnxmlDoc,
-            String resourceMappingDoc) throws ProponoException {
+        String resourceMappingDoc) throws ProponoException {
         moduleEntry.setContents(constants.getAtomPubListOfContent(cnxmlDoc, resourceMappingDoc));
         moduleEntry.update();
 
@@ -193,7 +194,7 @@ public class CnxAtomPubClient {
     }
 
     public Entry getModuleVersion(String moduleId, String version) throws HttpException,
-            IOException {
+        IOException {
         URL moduleVersionUrl = constants.getModuleVersionAbsPath(moduleId, version);
         GetMethod getMethod = new GetMethod(moduleVersionUrl.toString());
 

@@ -24,6 +24,7 @@ import com.google.inject.name.Names;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ import org.w3c.dom.Element;
         try {
             module = fetcher.fetchModuleVersion(moduleId, version);
         } catch (Exception e) {
-            log.warning("Fetch error: " + e);
+            log.log(Level.WARNING, "Error while fetching", e);
             // TODO: 404 or 500
             return;
         }
@@ -80,7 +81,7 @@ import org.w3c.dom.Element;
             title = getTitle(module.getModuleDocument());
             contentHtml = renderContent(moduleId, module);
         } catch (Exception e) {
-            log.warning("Render error: " + e);
+            log.log(Level.WARNING, "Error while rendering", e);
             // TODO: 500
             return;
         }

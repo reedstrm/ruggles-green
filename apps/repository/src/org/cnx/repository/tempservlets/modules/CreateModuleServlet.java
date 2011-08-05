@@ -49,8 +49,8 @@ public class CreateModuleServlet extends HttpServlet {
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
-                .getExtendedDescription());
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    repositoryResponse.getExtendedDescription());
             return;
         }
 

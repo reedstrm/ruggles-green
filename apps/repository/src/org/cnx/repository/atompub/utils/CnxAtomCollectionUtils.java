@@ -33,22 +33,22 @@ public class CnxAtomCollectionUtils {
 
     public static Collection getCollectionForCnxResource(URL resourceScheme) {
         return getCnxCollection(CnxAtomPubConstants.COLLECTION_RESOURCE_TITLE, resourceScheme,
-            CnxAtomCategoryUtils.getCnxResourceCategoryEle(resourceScheme));
+                CnxAtomCategoryUtils.getCnxResourceCategoryEle(resourceScheme));
     }
 
     public static Collection getCollectionForCnxModule(URL moduleScheme) {
         return getCnxCollection(CnxAtomPubConstants.COLLECTION_MODULE_TITLE, moduleScheme,
-            CnxAtomCategoryUtils.getCnxModuleCategoryEle(moduleScheme));
+                CnxAtomCategoryUtils.getCnxModuleCategoryEle(moduleScheme));
     }
 
     public static Collection getCollectionForCnxCollection(URL cnxCollectionScheme) {
         return getCnxCollection(CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_TITLE,
-            cnxCollectionScheme, CnxAtomCategoryUtils
-                .getCnxCollectionCategoryEle(cnxCollectionScheme));
+                cnxCollectionScheme,
+                CnxAtomCategoryUtils.getCnxCollectionCategoryEle(cnxCollectionScheme));
     }
 
     private static Collection getCnxCollection(String collectionName, URL collectionPath,
-        Category category) {
+            Category category) {
         Collection collection = new Collection(collectionName, null, collectionPath.toString());
 
         Categories categories = new Categories();

@@ -46,7 +46,7 @@ public class CnxCategoriesDocumentServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(CATEGORY_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
-        @Context HttpServletResponse response) {
+            @Context HttpServletResponse response) {
         // TODO(arjuns) : Add caching and exception handling.
 
         CnxAtomPubConstants constants =
@@ -57,7 +57,8 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxCollectionCategoryEle(constants
             .getCollectionCnxCollectionScheme()));
 
-        return Response.ok().entity(
-            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
+        return Response.ok()
+            .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
+            .build();
     }
 }

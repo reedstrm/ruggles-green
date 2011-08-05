@@ -280,8 +280,8 @@ public class CnxAtomPubConstants {
     public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc) {
 
         StringBuilder contentValueBuilder =
-            new StringBuilder().append(cnxmlDoc).append(DELIMITER_CONTENT).append(
-                resourceMappingDoc);
+            new StringBuilder().append(cnxmlDoc).append(DELIMITER_CONTENT)
+                .append(resourceMappingDoc);
 
         Content content = new Content();
         content.setType(CustomMediaTypes.APPLICATION_ATOM_XML);

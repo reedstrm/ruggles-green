@@ -79,7 +79,7 @@ public class CnxAtomModuleServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_MODULE_POST)
     public Response createNewModule(@Context HttpServletRequest req,
-        @Context HttpServletResponse res) {
+            @Context HttpServletResponse res) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
@@ -99,7 +99,7 @@ public class CnxAtomModuleServlet {
             // TODO(arjuns) : Refactor this to a function.
             URL editUrl =
                 atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    Integer.toString(CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION));
+                        Integer.toString(CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION));
             Link link = new Link();
             link.setRel(CnxAtomPubConstants.LINK_RELATION_EDIT_TAG);
             link.setHref(editUrl.toString());
@@ -136,8 +136,8 @@ public class CnxAtomModuleServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response createNewModule(@Context HttpServletRequest req,
-        @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-        @PathParam(VERSION_PATH_PARAM) String version) {
+            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(VERSION_PATH_PARAM) String version) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
@@ -163,8 +163,9 @@ public class CnxAtomModuleServlet {
         Entry postedEntry = null;
         try {
             postedEntry =
-                Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
-                    .getInputStream(), "UTF-8")), null);
+                Atom10Parser.parseEntry(
+                        new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8")),
+                        null);
         } catch (IllegalArgumentException e1) {
             // TODO(arjuns): Auto-generated catch block
             e1.printStackTrace();
@@ -195,8 +196,9 @@ public class CnxAtomModuleServlet {
                 .getContents().get(0));
 
         RepositoryResponse<AddModuleVersionResult> createdModule =
-            repositoryService.addModuleVersion(atomPubService.getConstants().getRepositoryContext(
-                req), moduleId, cnxmlDoc, resourceMappingDoc);
+            repositoryService.addModuleVersion(
+                    atomPubService.getConstants().getRepositoryContext(req), moduleId, cnxmlDoc,
+                    resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -213,7 +215,7 @@ public class CnxAtomModuleServlet {
             // TODO(arjuns) : Refactor this to a function.
             URL editUrl =
                 atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    Integer.toString(result.getNewVersionNumber()));
+                        Integer.toString(result.getNewVersionNumber()));
             Link link = new Link();
             link.setRel(CnxAtomPubConstants.LINK_RELATION_EDIT_TAG);
             link.setHref(editUrl.toString());
@@ -224,7 +226,7 @@ public class CnxAtomModuleServlet {
             try {
                 URL moduleVersionPath =
                     atomPubService.getConstants().getModuleVersionAbsPath(moduleId,
-                        Integer.toString(result.getNewVersionNumber()));
+                            Integer.toString(result.getNewVersionNumber()));
                 createdLocation = new URI(moduleVersionPath.toString());
 
                 String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
@@ -250,14 +252,15 @@ public class CnxAtomModuleServlet {
     @GET
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response getModuleVersion(@Context HttpServletRequest req,
-        @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-        @PathParam(VERSION_PATH_PARAM) String version) {
+            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(VERSION_PATH_PARAM) String version) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(atomPubService.getConstants().getRepositoryContext(
-                req), moduleId, Integer.parseInt(version));
+            repositoryService.getModuleVersion(
+                    atomPubService.getConstants().getRepositoryContext(req), moduleId,
+                    Integer.parseInt(version));
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult result = moduleVersionResult.getResult();
@@ -267,7 +270,7 @@ public class CnxAtomModuleServlet {
             Entry entry = new Entry();
             entry.setId(moduleId + ":" + version);
             entry.setContents(atomPubService.getConstants().getAtomPubListOfContent(cnxmlDoc,
-                resourceMappingDoc));
+                    resourceMappingDoc));
             // TODO(arjuns): Refactor this.
 
             String stringEntry;

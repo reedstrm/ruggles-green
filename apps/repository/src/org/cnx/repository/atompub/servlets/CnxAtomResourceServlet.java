@@ -71,7 +71,7 @@ public class CnxAtomResourceServlet {
     @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_RESOURCE_POST)
     public Response postNewResource(@Context HttpServletRequest req,
-        @Context HttpServletResponse res) {
+            @Context HttpServletResponse res) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
@@ -122,14 +122,15 @@ public class CnxAtomResourceServlet {
 
     @GET
     @Path(RESOURCE_GET_URL_PATTERN)
-    public Response postNewResource(@Context HttpServletRequest req,
-        @Context HttpServletResponse res, @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
+    public Response
+            postNewResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
+                    @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
         AtomRequest areq = new AtomRequestImpl(req);
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
             repositoryService.serveResouce(atomPubService.getConstants().getRepositoryContext(req),
-                resourceId, res);
+                    resourceId, res);
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();

@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/datanucleus-core-1.1.5.jar"/>
-	<classpathentry kind="lib" path="build/jars/datanucleus-enhancer-1.1.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/datanucleus-jpa-1.1.5.jar"/>
 	<classpathentry kind="lib" path="build/jars/el-api.jar"/>
 	<classpathentry kind="lib" path="build/jars/geronimo-jpa_3.0_spec-1.1.1.jar"/>

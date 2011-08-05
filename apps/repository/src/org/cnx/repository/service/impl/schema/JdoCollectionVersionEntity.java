@@ -98,9 +98,9 @@ public class JdoCollectionVersionEntity extends CnxJdoEntity {
     public static Key collectionVersionKey(Key collectionKey, long versionNumber) {
         checkNotNull(collectionKey, "null collection key");
         checkArgument(SchemaConsts.COLLECTION_KEY_KIND.equals(collectionKey.getKind()),
-            "Not a collectionKey: %s", collectionKey);
+                "Not a collectionKey: %s", collectionKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
         return KeyFactory.createKey(collectionKey, SchemaConsts.COLLECTION_VERSION_KEY_KIND,
-            versionNumber);
+                versionNumber);
     }
 }

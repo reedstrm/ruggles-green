@@ -59,14 +59,14 @@ public class ExportOperations {
      * See description in {@link CnxRepositoryService#getExportUploadUrl}
      */
     public static RepositoryResponse<GetExportUploadUrlResult> getExportUploadUrl(
-        RepositoryRequestContext context, ExportReference exportReference) {
+            RepositoryRequestContext context, ExportReference exportReference) {
 
         // Validate the export reference
         final ExportReferenceValidationResult validationResult =
             ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
-                validationResult.getStatusDescription(), log);
+                    validationResult.getStatusDescription(), log);
         }
 
         // Verify that the parent entity exist.
@@ -75,10 +75,10 @@ public class ExportOperations {
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
                 (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
-                    validationResult.getParentKey());
+                        validationResult.getParentKey());
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                "Export parent object not found: " + exportReference, log, e);
+                    "Export parent object not found: " + exportReference, log, e);
         } finally {
             pm.close();
         }
@@ -101,23 +101,23 @@ public class ExportOperations {
 
         // All done OK.
         return ResponseUtil.loggedOk("Created upload URL for export: " + exportReference,
-            new GetExportUploadUrlResult(uploadUrl, validationResult.getExportType()
-                .getContentType()), log);
+                new GetExportUploadUrlResult(uploadUrl, validationResult.getExportType()
+                    .getContentType()), log);
     }
 
     /**
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<ServeExportResult> serveExport(
-        RepositoryRequestContext context, ExportReference exportReference,
-        HttpServletResponse httpResponse) {
+            RepositoryRequestContext context, ExportReference exportReference,
+            HttpServletResponse httpResponse) {
 
         // Validate the export reference.
         final ExportReferenceValidationResult validationResult =
             ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
-                validationResult.getStatusDescription(), log);
+                    validationResult.getStatusDescription(), log);
         }
 
         // Lookup the export entity and fetch the blob key.
@@ -139,26 +139,26 @@ public class ExportOperations {
             Services.blobstore.serve(blobKey, httpResponse);
         } catch (IOException e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Error serving the resource content: " + exportReference, log, e);
+                    "Error serving the resource content: " + exportReference, log, e);
         }
 
         // TODO(tal): should do here the same header trick as in serving a resource?
         return ResponseUtil.loggedOk("Resource served: " + exportReference.toString(),
-            new ServeExportResult(), log);
+                new ServeExportResult(), log);
     }
 
     /**
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<DeleteExportResult> deleteExport(
-        RepositoryRequestContext context, ExportReference exportReference) {
+            RepositoryRequestContext context, ExportReference exportReference) {
 
         // Validate the export reference.
         final ExportReferenceValidationResult validationResult =
             ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
-                validationResult.getStatusDescription(), log);
+                    validationResult.getStatusDescription(), log);
         }
 
         PersistenceManager pm = Services.datastore.getPersistenceManager();
@@ -185,7 +185,7 @@ public class ExportOperations {
         } catch (Throwable e) {
             tx.rollback();
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                "Error when deleting export" + exportReference, log, e);
+                    "Error when deleting export" + exportReference, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active");
             pm.close();

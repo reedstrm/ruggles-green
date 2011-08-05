@@ -80,7 +80,6 @@ public class SoyHTMLGenerator implements CollectionHTMLGenerator {
      *  @param doc The CollXML DOM document
      */
     public SoyListData extractItemsFromCollection(final Document doc) throws Exception {
-        final SoyListData items = new SoyListData();
         final Element contentElement = DOMUtils.findFirstChild(doc.getDocumentElement(),
                 collxmlNamespace, contentTag);
         return extractItems(contentElement);
@@ -96,11 +95,11 @@ public class SoyHTMLGenerator implements CollectionHTMLGenerator {
             if (child.getNodeType() == Node.ELEMENT_NODE &&
                     collxmlNamespace.equals(child.getNamespaceURI())) {
                 final Element elem = (Element)child;
-                final String nodeName = child.getNodeName();
+                final String localName = child.getLocalName();
 
-                if (moduleTag.equals(nodeName)) {
+                if (moduleTag.equals(localName)) {
                     items.add(extractModuleItem(elem));
-                } else if (subcollectionTag.equals(nodeName)) {
+                } else if (subcollectionTag.equals(localName)) {
                     items.add(extractSubcollectionItem(elem));
                 }
             }

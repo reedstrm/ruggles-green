@@ -18,9 +18,8 @@ package org.cnx.repository.service.api;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
-
-import org.cnx.util.Nullable;
 
 /**
  * Java interface for a CNX repository. Implementations of this interface should be

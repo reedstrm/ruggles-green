@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.annotation.Nullable;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
@@ -38,7 +39,6 @@ import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
 import org.cnx.repository.service.impl.schema.JdoModuleEntity;
 import org.cnx.repository.service.impl.schema.JdoModuleVersionEntity;
-import org.cnx.util.Nullable;
 
 import com.google.appengine.api.datastore.Key;
 

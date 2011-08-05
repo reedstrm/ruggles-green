@@ -19,6 +19,8 @@ package org.cnx.repository.service.impl.operations;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.annotation.Nullable;
+
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryStatus;
@@ -28,7 +30,6 @@ import org.cnx.repository.service.impl.schema.JdoCollectionVersionEntity;
 import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
 import org.cnx.repository.service.impl.schema.JdoModuleEntity;
 import org.cnx.repository.service.impl.schema.JdoModuleVersionEntity;
-import org.cnx.util.Nullable;
 
 import com.google.appengine.api.datastore.Key;
 

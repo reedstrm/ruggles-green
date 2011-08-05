@@ -22,8 +22,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import org.cnx.repository.atompub.client.CnxAtomPubClient;
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.junit.Before;
 import org.junit.Test;
 

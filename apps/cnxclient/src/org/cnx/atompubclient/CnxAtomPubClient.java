@@ -77,7 +77,7 @@ public class CnxAtomPubClient {
         return constants;
     }
 
-    public CnxAtomPubClient(URL atomPubServerUrl) throws ProponoException, MalformedURLException {
+    public CnxAtomPubClient(URL serverUrl) throws ProponoException, MalformedURLException {
         /*
          * rome library uses Apache Commons BeanUtils. With atom1.0 created data is optoinal. But
          * Beantuils fails when it is not set. So following is a way to bypass that.
@@ -87,13 +87,13 @@ public class CnxAtomPubClient {
         ConvertUtils.register(converter, java.util.Date.class);
 
         httpClient = new HttpClient();
-        constants =
-            new CnxAtomPubConstants(atomPubServerUrl.toString(), atomPubServerUrl.getPort());
+        constants = new CnxAtomPubConstants(serverUrl);
 
-        this.atomPubServerUrl = atomPubServerUrl;
+        // TODO(arjuns) : Fix the atompub ur.
+//        this.atomPubServerUrl = serverUrl.toString() + CnxAtomPubConstants.ATOMPUB_URL_PREFIX;
 
         URL serviceDocumentUri =
-            new URL(atomPubServerUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
+            new URL(serverUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
 
         service =
             AtomClientFactory.getAtomService(serviceDocumentUri.toString(), new NoAuthStrategy());

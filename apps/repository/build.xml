@@ -124,7 +124,7 @@
         </javac>
     </target>
 
-    <target name="test" description="Run unit tests" depends="compile">
+    <target name="test-compile" description="Compile Unit Tests." depends="compile">
         <mkdir dir="${test.dir}" />
         <mkdir dir="${test.outdir}" />
 
@@ -153,7 +153,9 @@
                 <pathelement location="${classdir}" />
             </classpath>
         </javac>
-
+    </target>
+    
+    <target name="test" description="Run unit tests" depends="test-compile">
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
             <jvmarg value="-enableassertions" />
             <classpath>
@@ -165,7 +167,7 @@
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*Tests.java" />
+                    <include name="**/*.java" />
                 </fileset>
             </batchtest>
         </junit>
@@ -234,4 +236,7 @@
         </appcfg>
     </target>
 
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="compile, test-compile" />
 </project>

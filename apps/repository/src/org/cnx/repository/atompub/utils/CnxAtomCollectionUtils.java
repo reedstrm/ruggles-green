@@ -17,13 +17,15 @@ package org.cnx.repository.atompub.utils;
 
 import java.net.URL;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
 
 /**
  * Utility class for CNX AtomCollections.
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxAtomCollectionUtils {

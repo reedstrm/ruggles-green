@@ -85,4 +85,8 @@
         depends="jar">
         <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar"/>
     </target>
+    
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="compile, jar" />
 </project>

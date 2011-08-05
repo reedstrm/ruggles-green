@@ -21,7 +21,7 @@ import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollect
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -31,7 +31,7 @@ import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
  * Cnx AtomPub Service.
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxAtomService extends AtomService {
@@ -42,8 +42,10 @@ public class CnxAtomService extends AtomService {
         return constants;
     }
 
+
     public CnxAtomService(HttpServletRequest req) {
-        constants = new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
+        // TODO(arjuns) : Fix this.
+        constants = new CnxAtomPubConstants(null);
 
         /*
          * For Connexions repository, there is only one workspace. Each workspace will have three

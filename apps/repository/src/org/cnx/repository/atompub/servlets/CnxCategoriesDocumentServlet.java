@@ -27,7 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.cnx.repository.atompub.utils.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 
@@ -35,7 +35,7 @@ import com.sun.syndication.propono.atom.common.Categories;
 
 /**
  * REST Resource for fetching ServiceDocument.
- * 
+ *
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
@@ -49,8 +49,9 @@ public class CnxCategoriesDocumentServlet {
         @Context HttpServletResponse response) {
         // TODO(arjuns) : Add caching and exception handling.
 
-        CnxAtomPubConstants constants =
-            new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
+        // TODO(arjuns) : Fix this.
+        CnxAtomPubConstants constants = new CnxAtomPubConstants(null);
+//            new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
         Categories categories = new Categories();
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));

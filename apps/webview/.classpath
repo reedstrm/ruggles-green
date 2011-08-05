@@ -2,107 +2,47 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/aopalliance.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/el-api.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-r09.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-3.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-assistedinject-3.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-multibindings-3.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/javax.inject.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jsp-api.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr107cache-1.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr305.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.html.latest.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.util.latest.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-1.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/serializer.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/soy-excluding-deps-20100708.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/xalan.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-beanutils-1.8.3.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.cnxclient.latest.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/org.cnx.common.latest.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-propono-1.0.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-core-1.8.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-server-1.8.jar"/>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/jsp/repackaged-appengine-ant-launcher-1.7.1.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/jsp/repackaged-appengine-ant-1.7.1.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/jsp/repackaged-appengine-jasper-el-6.0.29.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/jsp/repackaged-appengine-tomcat-juli-6.0.29.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/jsp/repackaged-appengine-jasper-6.0.29.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/el-api.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/servlet-api.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/shared/jsp-api.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/jsr107cache-1.1.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/orm/datanucleus-appengine-1.0.9.final.jar" sourcepath="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/src/orm/datanucleus-appengine-1.0.9.final-src.zip">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/orm/jdo2-api-2.3-eb.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/orm/geronimo-jta_1.1_spec-1.1.1.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/orm/geronimo-jpa_3.0_spec-1.1.1.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/orm/datanucleus-core-1.1.5.jar" sourcepath="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/src/orm/datanucleus-core-1.1.5-src.zip">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/lib/user/orm/datanucleus-jpa-1.1.5.jar" sourcepath="/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/src/orm/datanucleus-jpa-1.1.5-src.zip">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/local/google/users/arjuns/eclipse37/stable/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r37v201107211953/appengine-java-sdk-1.5.2/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-api-1.0-sdk-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-local-runtime-shared.jar"/>
+	<classpathentry kind="lib" path="build/jars/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-appengine-1.0.9.final.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-core-1.1.5.jar"/>
+	<classpathentry kind="lib" path="build/jars/datanucleus-jpa-1.1.5.jar"/>
+	<classpathentry kind="lib" path="build/jars/el-api.jar"/>
+	<classpathentry kind="lib" path="build/jars/geronimo-jpa_3.0_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/geronimo-jta_1.1_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-assistedinject-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-multibindings-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/guice-servlet-3.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/javax.inject.jar"/>
+	<classpathentry kind="lib" path="build/jars/jdo2-api-2.3-eb.jar"/>
+	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
+	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsp-api.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsr107cache-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.cnxclient.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.common.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.html.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/resolver.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/serializer.jar"/>
+	<classpathentry kind="lib" path="build/jars/servlet-api.jar"/>
+	<classpathentry kind="lib" path="build/jars/soy-excluding-deps-20100708.jar"/>
+	<classpathentry kind="lib" path="build/jars/xalan-2.7.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="build/jars/xml-apis.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

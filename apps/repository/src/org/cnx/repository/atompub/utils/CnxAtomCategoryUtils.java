@@ -17,11 +17,13 @@ package org.cnx.repository.atompub.utils;
 
 import java.net.URL;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+
 import com.sun.syndication.feed.atom.Category;
 
 /**
  * Utility class for AtomCategories.
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxAtomCategoryUtils {
@@ -31,7 +33,7 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Resources.
-     * 
+     *
      * @param resourceScheme Scheme for Cnx Resources.
      */
     public static Category getCnxResourceCategoryEle(URL resourceScheme) {
@@ -41,7 +43,7 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Modules..
-     * 
+     *
      * @param moduleScheme Scheme for Cnx Modules..
      */
     public static Category getCnxModuleCategoryEle(URL moduleScheme) {
@@ -51,7 +53,7 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Collection..
-     * 
+     *
      * @param cnxCollectionScheme Scheme for Cnx Collections.
      */
     public static Category getCnxCollectionCategoryEle(URL cnxCollectionScheme) {

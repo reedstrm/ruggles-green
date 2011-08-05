@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="testlib/" kind="src" path="test"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-api-1.0-sdk-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-local-runtime-shared.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
@@ -52,5 +52,5 @@
 	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-core-1.8.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-grizzly-1.8.jar"/>
 	<classpathentry kind="lib" path="config"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

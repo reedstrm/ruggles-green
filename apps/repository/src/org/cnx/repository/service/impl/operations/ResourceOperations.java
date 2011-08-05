@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ResourceOperations {

@@ -61,7 +61,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Servlet to Handle CNX Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH)
@@ -197,8 +197,8 @@ public class CnxAtomModuleServlet {
                 .getContents().get(0));
 
         RepositoryResponse<AddModuleVersionResult> createdModule =
-            repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(
-                req), moduleId, cnxmlDoc, resourceMappingDoc);
+            repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,
+                    cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -258,8 +258,8 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(
-                req), moduleId, Integer.parseInt(version));
+            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,
+                    Integer.parseInt(version));
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult result = moduleVersionResult.getResult();

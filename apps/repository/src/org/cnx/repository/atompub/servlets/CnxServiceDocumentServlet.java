@@ -33,7 +33,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)

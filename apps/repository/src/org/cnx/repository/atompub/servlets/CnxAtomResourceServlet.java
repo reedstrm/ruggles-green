@@ -55,7 +55,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Jersey Servlets for Cnx Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH)
@@ -129,8 +129,8 @@ public class CnxAtomResourceServlet {
         CnxAtomService atomPubService = new CnxAtomService(req);
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(req),
-                resourceId, res);
+            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(req), resourceId,
+                    res);
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();

@@ -31,7 +31,7 @@ import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
  * Cnx AtomPub Service.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomService extends AtomService {
@@ -41,7 +41,6 @@ public class CnxAtomService extends AtomService {
     public CnxAtomPubConstants getConstants() {
         return constants;
     }
-
 
     public CnxAtomService(HttpServletRequest req) {
         // TODO(arjuns) : Fix this.

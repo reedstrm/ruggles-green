@@ -35,7 +35,7 @@ import com.sun.syndication.propono.atom.common.Categories;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
@@ -51,7 +51,7 @@ public class CnxCategoriesDocumentServlet {
 
         // TODO(arjuns) : Fix this.
         CnxAtomPubConstants constants = new CnxAtomPubConstants(null);
-//            new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
+        // new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
         Categories categories = new Categories();
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));

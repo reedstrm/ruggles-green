@@ -25,7 +25,7 @@ import com.sun.syndication.propono.atom.common.Collection;
 
 /**
  * Utility class for CNX AtomCollections.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomCollectionUtils {

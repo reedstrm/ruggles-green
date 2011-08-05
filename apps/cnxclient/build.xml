@@ -60,9 +60,7 @@
 
     <target name="clean" description="Remove built files">
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
-        <delete dir="${classdir}" />
-        <delete dir="${output.jars}" />
-        <delete dir="${libdir}" />
+        <delete dir="${build}" />
     </target>
 
     <tstamp>

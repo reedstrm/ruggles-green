@@ -35,6 +35,7 @@ import org.cnx.util.RenderTime;
  */
 public class CnxmlModule extends AbstractModule {
     @Override protected void configure() {
+        bind(ModuleFactory.class).to(ModuleFactoryImpl.class);
         bind(ModuleHTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
         bind(String.class)
                 .annotatedWith(CnxmlNamespace.class)

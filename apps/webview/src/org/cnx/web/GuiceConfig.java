@@ -23,6 +23,7 @@ import com.google.template.soy.SoyModule;
 import org.cnx.common.collxml.CollxmlModule;
 import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.DefaultProcessorModule;
+import org.cnx.mdml.MdmlModule;
 import org.cnx.util.UtilModule;
 
 public class GuiceConfig extends GuiceServletContextListener {
@@ -31,6 +32,7 @@ public class GuiceConfig extends GuiceServletContextListener {
                 new CnxmlModule(),
                 new CollxmlModule(),
                 new DefaultProcessorModule(),
+		new MdmlModule(),
                 new ServletModule(),
                 new SoyModule(),
                 new UtilModule(),

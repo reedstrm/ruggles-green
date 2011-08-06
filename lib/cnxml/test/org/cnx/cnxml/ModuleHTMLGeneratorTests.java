@@ -33,6 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.mdml.MdmlModule;
 import org.cnx.util.RenderScope;
 import org.cnx.util.UtilModule;
 import org.cnx.util.testing.DOMBuilder;
@@ -46,6 +47,7 @@ import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
 public class ModuleHTMLGeneratorTests {
+    private static final String moduleId = "m123";
     private static Injector injector;
     private Document doc;
     private DOMBuilder builder;
@@ -53,6 +55,7 @@ public class ModuleHTMLGeneratorTests {
     @BeforeClass public static void createInjector() {
         injector = Guice.createInjector(
                 new CnxmlModule(),
+                new MdmlModule(),
                 new SoyModule(),
                 new UtilModule()
         );
@@ -66,10 +69,23 @@ public class ModuleHTMLGeneratorTests {
     }
 
     private String generate(final Node node) throws Exception {
+        if (node instanceof Document) {
+            return generate((Document)node);
+        }
+        builder.child(builder.element("document").child(
+                    builder.element("content").child(node)
+        ));
+        final String result = generate(doc);
+        doc.removeChild(doc.getDocumentElement());
+        return result;
+    }
+
+    private String generate(final Document d) throws Exception {
         final RenderScope scope = injector.getInstance(RenderScope.class);
         scope.enter();
         try {
-            return injector.getInstance(ModuleHTMLGenerator.class).generate(node);
+            return injector.getInstance(ModuleHTMLGenerator.class).generate(
+                    new Module(moduleId, d, d, null));
         } finally {
             scope.exit();
         }

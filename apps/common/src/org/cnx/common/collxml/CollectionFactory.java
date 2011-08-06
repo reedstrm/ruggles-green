@@ -14,18 +14,10 @@
  *  limitations under the License.
  */
 
-package org.cnx.cnxml;
+package org.cnx.common.collxml;
 
+import org.w3c.dom.Document;
 
-/**
- *  Implementors of the ModuleHTMLGenerator interface can convert modules to HTML.
- */
-public interface ModuleHTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given module to a string.
-     *
-     *  @param module The module to render
-     *  @return The rendered HTML string
-     */
-    public String generate(Module module) throws Exception;
+public interface CollectionFactory {
+    public Collection create(String id, Document collxml);
 }

@@ -19,9 +19,9 @@ package org.cnx.cnxml;
 import org.w3c.dom.Node;
 
 /**
- *  Processor is an interface for a single pass operation on a DOM tree before it is passed to the
+ *  Processor is an interface for a single pass operation on a Module before it is passed to the
  *  HTML generator.
  */
 public interface Processor {
-    public Node process(Node node) throws Exception;
+    public Module process(Module module) throws Exception;
 }

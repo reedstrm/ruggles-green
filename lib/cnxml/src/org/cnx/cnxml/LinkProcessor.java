@@ -28,9 +28,9 @@ import org.w3c.dom.NodeList;
  *  LinkProcessor traverses the DOM tree given to it and bakes the final URI into the
  *  <code>src</code> or <code>url</code> attributes of any link or media elements.
  *  <p>
- *  The final URI is discovered using a {@link ResourceResolver}.
+ *  The final URI is discovered using a {@link LinkResolver}.
  *
- *  @see ResourceResolver
+ *  @see LinkResolver
  */
 public class LinkProcessor implements Processor {
     private static final ImmutableSet<String> LINK_ELEMENT_NAMES = ImmutableSet.<String>of(
@@ -54,51 +54,42 @@ public class LinkProcessor implements Processor {
     private static String versionAttribute = "version";
     private static String targetIdAttribute = "target-id";
 
-    private final ResourceResolver resolver;
+    private final LinkResolver resolver;
     private final String cnxmlNamespace;
 
-    @Inject public LinkProcessor(ResourceResolver resolver,
-            @CnxmlNamespace String cnxmlNamespace) {
+    @Inject public LinkProcessor(LinkResolver resolver, @CnxmlNamespace String cnxmlNamespace) {
         this.resolver = resolver;
         this.cnxmlNamespace = cnxmlNamespace;
     }
 
-    public Node process(final Node node) throws Exception {
-        final short nodeType = node.getNodeType();
-        NodeList children;
-
-        switch (node.getNodeType()) {
-        case Node.DOCUMENT_NODE:
-            children = node.getChildNodes();
-            for (int i = 0; i < children.getLength(); i++) {
-                process(children.item(i));
-            }
-            break;
-        case Node.ELEMENT_NODE:
-            // Process, if necessary.
-            final Element elem = (Element)node;
-            if (cnxmlNamespace.equals(elem.getNamespaceURI())) {
-                final String localName = elem.getLocalName();
-                URI uri;
-
-                if (LINK_ELEMENT_NAMES.contains(localName)) {
-                    resolveLink(elem);
-                } else if (MEDIA_ELEMENT_NAMES.contains(localName)) {
-                    resolveMedia(elem);
-                }
-            }
-
-            // Recurse to children
-            children = node.getChildNodes();
-            for (int i = 0; i < children.getLength(); i++) {
-                process(children.item(i));
-            }
-            break;
-        }
-        return node;
+    public Module process(final Module module) throws Exception {
+        processElement(module.getCnxml().getDocumentElement());
+        return module;
     }
 
-    private void resolveLink(Element elem) throws Exception {
+    protected void processElement(final Element elem) throws Exception {
+        NodeList children;
+        if (cnxmlNamespace.equals(elem.getNamespaceURI())) {
+            final String localName = elem.getLocalName();
+            URI uri;
+
+            if (LINK_ELEMENT_NAMES.contains(localName)) {
+                resolveLink(elem);
+            } else if (MEDIA_ELEMENT_NAMES.contains(localName)) {
+                resolveMedia(elem);
+            }
+        }
+
+        // Recurse to children
+        children = elem.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                processElement((Element)children.item(i));
+            }
+        }
+    }
+
+    private void resolveLink(final Element elem) throws Exception {
         URI target = null;
 
         if (elem.hasAttribute(urlAttribute)) {
@@ -135,7 +126,7 @@ public class LinkProcessor implements Processor {
         }
     }
 
-    private void resolveMedia(Element elem) throws Exception {
+    private void resolveMedia(final Element elem) throws Exception {
         URI src, target;
 
         src = new URI(elem.getAttribute("src"));
@@ -145,7 +136,7 @@ public class LinkProcessor implements Processor {
         }
     }
 
-    private static String getAttributeOrNull(Element elem, String name) {
+    private static String getAttributeOrNull(final Element elem, final String name) {
         if (!elem.hasAttribute(name)) {
             return null;
         }

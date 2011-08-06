@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.cnx.cnxml.CnxmlNamespace;
+import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
@@ -66,7 +67,7 @@ import org.w3c.dom.Element;
         final String version = components[1];
 
         // Fetch module
-        XmlFetcher.Module module;
+        Module module;
         try {
             module = fetcher.fetchModuleVersion(moduleId, version);
         } catch (Exception e) {
@@ -78,8 +79,8 @@ import org.w3c.dom.Element;
         // Render content
         String title, contentHtml;
         try {
-            title = getTitle(module.getModuleDocument());
-            contentHtml = renderContent(moduleId, module);
+            title = module.getMetadata().getTitle();
+            contentHtml = renderContent(module);
         } catch (Exception e) {
             log.log(Level.WARNING, "Error while rendering", e);
             // TODO: 500
@@ -102,11 +103,11 @@ import org.w3c.dom.Element;
         return new String[]{components[0], components[1]};
     }
 
-    private String renderContent(String moduleId, XmlFetcher.Module module) throws Exception {
+    private String renderContent(Module module) throws Exception {
         renderScope.enter();
         try {
-            renderScope.seed(Key.get(String.class, Names.named("moduleId")), moduleId);
-            return generatorProvider.get().generate(module.getModuleDocument());
+            renderScope.seed(Module.class, module);
+            return generatorProvider.get().generate(module);
         } finally {
             renderScope.exit();
         }

@@ -18,9 +18,9 @@ package org.cnx.web;
 
 import com.google.inject.Singleton;
 import java.net.URI;
-import org.cnx.cnxml.ResourceResolver;
+import org.cnx.cnxml.LinkResolver;
 
-@Singleton public class StaticResourceResolver implements ResourceResolver {
+@Singleton public class StaticLinkResolver implements LinkResolver {
     private static final String BASE = "/staticxml/";
     private static final String DOCUMENT_BASE = "/light/module/";
 

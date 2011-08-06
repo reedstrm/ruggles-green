@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
 import java.util.Set;
 
 import org.cnx.util.RenderTime;
-import org.w3c.dom.Node;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -54,15 +53,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         this.soyDataConverter = soyDataConverter;
     }
 
-    @Override public String generate(Node node) throws Exception {
+    @Override public String generate(Module module) throws Exception {
         // Apply processors
         for (Processor processor : processors) {
-            node = processor.process(node);
+            module = processor.process(module);
         }
 
         // Render to HTML
         final SoyMapData params = new SoyMapData(
-                "node", soyDataConverter.convertDomToSoyData(node)
+                "node", soyDataConverter.convertDomToSoyData(module.getCnxml())
         );
         return tofu.render(SOY_NAMESPACE + ".main", params, null);
     }

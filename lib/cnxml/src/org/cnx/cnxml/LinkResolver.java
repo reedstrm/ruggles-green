@@ -16,16 +16,13 @@
 
 package org.cnx.cnxml;
 
+import java.net.URI;
 
 /**
- *  Implementors of the ModuleHTMLGenerator interface can convert modules to HTML.
+ *  A LinkResolver looks up abstract links and returns URIs.
  */
-public interface ModuleHTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given module to a string.
-     *
-     *  @param module The module to render
-     *  @return The rendered HTML string
-     */
-    public String generate(Module module) throws Exception;
+public interface LinkResolver {
+    public URI resolveURI(URI uri) throws Exception;
+    public URI resolveDocument(String document, String version) throws Exception;
+    public URI resolveResource(String document, String version, String resource) throws Exception;
 }

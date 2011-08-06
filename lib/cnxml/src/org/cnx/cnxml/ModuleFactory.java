@@ -16,13 +16,8 @@
 
 package org.cnx.cnxml;
 
-import java.net.URI;
+import org.w3c.dom.Document;
 
-/**
- *  A ResourceResolver looks up resources and returns URIs.
- */
-public interface ResourceResolver {
-    public URI resolveURI(URI uri) throws Exception;
-    public URI resolveDocument(String document, String version) throws Exception;
-    public URI resolveResource(String document, String version, String resource) throws Exception;
+public interface ModuleFactory {
+    public Module create(String id, Document cnxml, Document resourceMapping);
 }

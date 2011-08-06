@@ -28,8 +28,8 @@ import com.google.template.soy.tofu.SoyTofu;
 public class CollxmlModule extends AbstractModule {
     @Override protected void configure() {
         bind(CollectionHTMLGenerator.class).to(SoyHTMLGenerator.class);
+        bind(CollectionFactory.class).to(CollectionFactoryImpl.class);
         bind(String.class).annotatedWith(CollxmlNamespace.class).toInstance("http://cnx.rice.edu/collxml");
-        bind(String.class).annotatedWith(MetadataNamespace.class).toInstance("http://cnx.rice.edu/mdml");
     }
 
     @Provides @Singleton @SoyHTMLGenerator.Template

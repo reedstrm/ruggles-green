@@ -14,18 +14,11 @@
  *  limitations under the License.
  */
 
-package org.cnx.cnxml;
-
+package org.cnx.mdml;
 
 /**
- *  Implementors of the ModuleHTMLGenerator interface can convert modules to HTML.
+ *  Metadata provides accessors for common metadata fields.
  */
-public interface ModuleHTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given module to a string.
-     *
-     *  @param module The module to render
-     *  @return The rendered HTML string
-     */
-    public String generate(Module module) throws Exception;
+public interface Metadata {
+    public String getTitle() throws Exception;
 }

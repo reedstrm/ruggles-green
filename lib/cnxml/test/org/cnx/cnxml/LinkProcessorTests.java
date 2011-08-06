@@ -19,7 +19,7 @@ package org.cnx.cnxml;
 import java.net.URI;
 
 import org.cnx.cnxml.LinkProcessor;
-import org.cnx.cnxml.ResourceResolver;
+import org.cnx.cnxml.LinkResolver;
 import org.cnx.util.DocumentBuilderProvider;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
@@ -33,7 +33,7 @@ public class LinkProcessorTests {
     private LinkProcessor processor;
     private DOMBuilder builder;
 
-    private static class MockResourceResolver implements ResourceResolver {
+    private static class MockLinkResolver implements LinkResolver {
         @Override public URI resolveURI(URI uri) throws Exception {
             return new URI("test", "uri", uri.toString());
         }
@@ -61,18 +61,15 @@ public class LinkProcessorTests {
     }
 
     @Before public void createLinkProcessor() {
-        processor = new LinkProcessor(new MockResourceResolver(), "cnxml");
+        processor = new LinkProcessor(new MockLinkResolver(), "cnxml");
     }
 
     @Before public void createBuilder() throws Exception {
         builder = new DOMBuilder(new DocumentBuilderProvider().get().newDocument(), "cnxml");
     }
 
-    private URI processLink(final Node node) throws Exception {
-        final Node output = processor.process(node);
-        assertSame(node, output);
-        assertTrue(output instanceof Element);
-        final Element elem = (Element)output;
+    private URI processLink(final Element elem) throws Exception {
+        processor.processElement(elem);
         assertTrue(elem.hasAttribute("url"));
         assertFalse(elem.hasAttribute("target-id"));
         assertFalse(elem.hasAttribute("document"));
@@ -81,31 +78,18 @@ public class LinkProcessorTests {
         return new URI(elem.getAttribute("url"));
     }
 
-    private URI processMedia(final Node node) throws Exception {
-        final Node output = processor.process(node);
-        assertSame(node, output);
-        assertTrue(output instanceof Element);
-        final Element elem = (Element)output;
+    private URI processMedia(final Element elem) throws Exception {
+        processor.processElement(elem);
         assertTrue(elem.hasAttribute("src"));
         return new URI(elem.getAttribute("src"));
     }
 
     private URI processLink(final DOMBuilder builder) throws Exception {
-        return processLink(builder.build());
+        return processLink((Element)builder.build());
     }
 
     private URI processMedia(final DOMBuilder builder) throws Exception {
-        return processMedia(builder.build());
-    }
-
-    @Test public void normalNodeShouldPassThrough() throws Exception {
-        final Node node = builder.element("para").attr("id", "foo").text("Hello").build();
-        assertSame(node, processor.process(node));
-    }
-
-    @Test public void linkNodeShouldPassThrough() throws Exception {
-        final Node node = builder.element("link").attr("url", "#foo").text("Bar").build();
-        assertSame(node, processor.process(node));
+        return processMedia((Element)builder.build());
     }
 
     @Test public void linkURLShouldBeResolved() throws Exception {

@@ -14,18 +14,21 @@
  *  limitations under the License.
  */
 
-package org.cnx.cnxml;
+package org.cnx.mdml;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /**
- *  Implementors of the ModuleHTMLGenerator interface can convert modules to HTML.
+ *  MdmlModule configures the org.cnx.mdml package for Guice.
  */
-public interface ModuleHTMLGenerator {
-    /**
-     *  The generate method outputs HTML that corresponds to the given module to a string.
-     *
-     *  @param module The module to render
-     *  @return The rendered HTML string
-     */
-    public String generate(Module module) throws Exception;
+public class MdmlModule extends AbstractModule {
+    @Override protected void configure() {
+        bind(String.class)
+                .annotatedWith(MdmlNamespace.class)
+                .toInstance("http://cnx.rice.edu/mdml");
+        install(new FactoryModuleBuilder()
+                .implement(MdmlMetadata.class, MdmlMetadata.class)
+                .build(MdmlMetadata.Factory.class));
+    }
 }

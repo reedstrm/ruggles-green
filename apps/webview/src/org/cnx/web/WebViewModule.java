@@ -19,8 +19,9 @@ package org.cnx.web;
 import java.io.File;
 
 import org.cnx.cnxml.LinkProcessor;
+import org.cnx.cnxml.Module;
 import org.cnx.cnxml.Processor;
-import org.cnx.cnxml.ResourceResolver;
+import org.cnx.cnxml.LinkResolver;
 import org.cnx.util.RenderTime;
 
 import com.google.inject.AbstractModule;
@@ -41,7 +42,7 @@ public class WebViewModule extends AbstractModule {
                 .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
                 .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
         bind(XmlFetcher.class).to(StaticXmlFetcher.class);
-        bind(ResourceResolver.class).to(StaticResourceResolver.class);
+        bind(LinkResolver.class).to(StaticLinkResolver.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
@@ -55,8 +56,8 @@ public class WebViewModule extends AbstractModule {
         return builder.build().compileToJavaObj();
     }
 
-    @Provides @RenderTime @Named("moduleId") String provideModuleId() {
-        // Placeholder to make Guice happy. The real module ID is seeded in-scope.
+    @Provides @RenderTime Module provideModule() {
+        // Placeholder to make Guice happy. The real module is seeded in-scope.
         return null;
     }
 }

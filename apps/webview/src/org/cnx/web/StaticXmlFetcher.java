@@ -20,6 +20,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
+import org.cnx.cnxml.Module;
+import org.cnx.cnxml.ModuleFactory;
+import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.CollectionFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -35,21 +39,27 @@ import org.w3c.dom.Document;
     private static final String VERSION_SEP = "_";
 
     private final DocumentBuilder docBuilder;
+    private final ModuleFactory moduleFactory;
+    private final CollectionFactory collectionFactory;
 
-    @Inject public StaticXmlFetcher(DocumentBuilder docBuilder) {
+    @Inject public StaticXmlFetcher(final DocumentBuilder docBuilder,
+            final ModuleFactory moduleFactory, final CollectionFactory collectionFactory) {
         this.docBuilder = docBuilder;
+        this.moduleFactory = moduleFactory;
+        this.collectionFactory = collectionFactory;
     }
 
     public Module fetchModuleVersion(String moduleId, String version) throws Exception {
         Document module = docBuilder.parse(
                 new File(PREFIX + moduleId + VERSION_SEP + version + MODULE_SUFFIX));
-        Document manifest = docBuilder.parse(
+        Document mapping = docBuilder.parse(
                 new File(PREFIX + moduleId + VERSION_SEP + version + RESOURCE_MAPPING_SUFFIX));
-        return new XmlFetcher.Module(module, manifest);
+        return moduleFactory.create(moduleId, module, mapping);
     }
 
-    public Document fetchCollectionVersion(String collectionId, String version) throws Exception {
-        return docBuilder.parse(
+    public Collection fetchCollectionVersion(String collectionId, String version) throws Exception {
+        Document doc = docBuilder.parse(
                 new File(PREFIX + collectionId + VERSION_SEP + version + COLLECTION_SUFFIX));
+        return collectionFactory.create(collectionId, doc);
     }
 }

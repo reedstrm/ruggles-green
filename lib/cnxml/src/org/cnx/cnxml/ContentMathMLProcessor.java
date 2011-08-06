@@ -40,9 +40,9 @@ import org.w3c.dom.Node;
         this.transformer = transformer;
     }
 
-    public Node process(Node node) throws Exception {
+    public Module process(Module module) throws Exception {
         final Document doc = documentBuilder.newDocument();
-        transformer.transform(new DOMSource(node), new DOMResult(doc));
-        return doc;
+        transformer.transform(new DOMSource(module.getCnxml()), new DOMResult(doc));
+        return new Module(module.getId(), doc, module.getResourceMapping(), module.getMetadata());
     }
 }

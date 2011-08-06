@@ -24,7 +24,8 @@ import com.google.template.soy.tofu.SoyTofu;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URI;
-import org.cnx.cnxml.ResourceResolver;
+import org.cnx.cnxml.LinkResolver;
+import org.cnx.mdml.MdmlMetadata;
 import org.cnx.util.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,22 +55,21 @@ public class SoyHTMLGenerator implements CollectionHTMLGenerator {
     public @interface Template {}
 
     private final SoyTofu tofu;
-    private final ResourceResolver resourceResolver;
+    private final LinkResolver linkResolver;
     private final String collxmlNamespace;
-    private final String metadataNamespace;
+    private final MdmlMetadata.Factory metadataFactory;
 
-    @Inject public SoyHTMLGenerator(@Template SoyTofu tofu, ResourceResolver resourceResolver,
-            @CollxmlNamespace String collxmlNamespace,
-            @MetadataNamespace String metadataNamespace) {
+    @Inject public SoyHTMLGenerator(@Template SoyTofu tofu, LinkResolver linkResolver,
+            MdmlMetadata.Factory metadataFactory, @CollxmlNamespace String collxmlNamespace) {
         this.tofu = tofu;
-        this.resourceResolver = resourceResolver;
+        this.linkResolver = linkResolver;
+        this.metadataFactory = metadataFactory;
         this.collxmlNamespace = collxmlNamespace;
-        this.metadataNamespace = metadataNamespace;
     }
 
-    @Override public String generate(final Document doc) throws Exception {
+    @Override public String generate(final Collection coll) throws Exception {
         final SoyMapData params = new SoyMapData(
-                "items", extractItemsFromCollection(doc)
+                "items", extractItemsFromCollxml(coll.getCollxml())
         );
         return tofu.render(SOY_NAMESPACE + ".main", params, null);
     }
@@ -79,7 +79,7 @@ public class SoyHTMLGenerator implements CollectionHTMLGenerator {
      *
      *  @param doc The CollXML DOM document
      */
-    public SoyListData extractItemsFromCollection(final Document doc) throws Exception {
+    public SoyListData extractItemsFromCollxml(final Document doc) throws Exception {
         final Element contentElement = DOMUtils.findFirstChild(doc.getDocumentElement(),
                 collxmlNamespace, contentTag);
         return extractItems(contentElement);
@@ -110,27 +110,29 @@ public class SoyHTMLGenerator implements CollectionHTMLGenerator {
     private SoyMapData extractModuleItem(final Element elem) throws Exception {
         URI uri;
         if (elem.hasAttribute(uriAttribute)) {
-            uri = resourceResolver.resolveURI(new URI(elem.getAttribute(uriAttribute)));
+            uri = linkResolver.resolveURI(new URI(elem.getAttribute(uriAttribute)));
         } else if (elem.hasAttribute(documentAttribute) &&
                 elem.hasAttribute(versionAttribute)) {
-            uri = resourceResolver.resolveDocument(
+            uri = linkResolver.resolveDocument(
                     elem.getAttribute(documentAttribute),
                     elem.getAttribute(versionAttribute));
         } else {
             throw new IllegalArgumentException("No valid reference found");
         }
+        final MdmlMetadata metadata = metadataFactory.create(elem);
 
         return new SoyMapData(
                 "type", "module",
-                "title", DOMUtils.findFirstChild(elem, metadataNamespace, "title").getTextContent(),
+                "title", metadata.getTitle(),
                 "uri", uri.toString()
         );
     }
 
     private SoyMapData extractSubcollectionItem(final Element elem) throws Exception {
+        final MdmlMetadata metadata = metadataFactory.create(elem);
         return new SoyMapData(
                 "type", "subcollection",
-                "title", DOMUtils.findFirstChild(elem, metadataNamespace, "title").getTextContent(),
+                "title", metadata.getTitle(),
                 "items", extractItems(DOMUtils.findFirstChild(elem, collxmlNamespace, "content"))
         );
     }

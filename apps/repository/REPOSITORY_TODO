@@ -1,8 +1,5 @@
 Repository global todo items
 
-* When overwriting an existing export, make sure to delete the old blob
-* Validate uploaded export mime type against the expected mime type of this export type.
-
 * Use same parameter mecanism in the upload completion servlets of resources and exports.
 * Migrate the entities to non JDO API an use ancestor queries for exports (transactional).
 
@@ -34,5 +31,7 @@ Done
 + Replace @Nullable with java standard @Nullable
 + Verify the safety and consistency of the handling of transactions that left opened.
 + When looking up an entity, distinguish between 'not found' JDOObjectNotFoundException JDO exception and all others.
++ When overwriting an existing export, make sure to delete the old blob
++ Validate uploaded export mime type against the expected mime type of this export type.
 
 

@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,6 +15,8 @@
  */
 
 package org.cnx.repository.service.impl.operations;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
 import java.util.Map;
@@ -95,8 +97,8 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         BlobKey blobKey = (BlobKey) blobs.values().toArray()[0];
 
         // Promote the entity to UPLOADED state.
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        Transaction tx = pm.currentTransaction();
+        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final Transaction tx = pm.currentTransaction();
         try {
 
             tx.begin();
@@ -113,17 +115,15 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             entity.pendingToUploadedTransition(blobKey);
             tx.commit();
         } catch (Throwable e) {
-            if (tx.isActive()) {
-                log.severe("Transaction level active");
-                tx.rollback();
-            }
             final String message =
-                "Resource factory completion handle encountered an exception: [" + e.getMessage()
+                "Resource upload completion handler encountered an exception: [" + e.getMessage()
                     + "]";
             log.log(Level.SEVERE, message, e);
             resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, message);
+            tx.rollback();
             return;
         } finally {
+            checkArgument(!tx.isActive(), "Transaction left active: %s", requestURI);
             pm.close();
         }
 

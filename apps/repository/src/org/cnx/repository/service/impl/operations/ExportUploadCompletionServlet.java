@@ -90,11 +90,13 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         final BlobKey blobKey = (BlobKey) blobs.values().toArray()[0];
         checkNotNull(blobKey);
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        Transaction tx = pm.currentTransaction();
+        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final Transaction tx = pm.currentTransaction();
         tx.begin();
         try {
             // Verify within a transaction that the parent entity still exists.
+            // This throws an exception of it does not. We don't consider this
+            // to be a user error since we already verified when providing the upload URL.
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
                 (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
@@ -115,6 +117,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
             return;
         } finally {
+            checkArgument(!tx.isActive(), "Transaction left active: %s", exportReference);
             pm.close();
         }
 

@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,6 +16,7 @@
 
 package org.cnx.repository.service.impl.operations;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
@@ -92,7 +94,7 @@ public class ModuleOperations {
         try {
             try {
                 moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
-            } catch (Throwable e) {
+            } catch (JDOObjectNotFoundException e) {
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                         "Could not find module " + moduleId, log, e);
             }
@@ -134,7 +136,7 @@ public class ModuleOperations {
             final JdoModuleEntity moduleEntity;
             try {
                 moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
-            } catch (Throwable e) {
+            } catch (JDOObjectNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                         "Cannot add module version, module not found: " + moduleId, log, e);
@@ -157,10 +159,7 @@ public class ModuleOperations {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error while trying to add a version to module " + moduleId, log, e);
         } finally {
-            if (tx.isActive()) {
-                log.severe("Transaction left opened when adding module version:  " + moduleId);
-                tx.rollback();
-            }
+            checkArgument(!tx.isActive(), "Transaction left active: %s", moduleId);
             pm.close();
         }
 
@@ -201,7 +200,7 @@ public class ModuleOperations {
                 final JdoModuleEntity moduleEntity;
                 try {
                     moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
-                } catch (Throwable e) {
+                } catch (JDOObjectNotFoundException e) {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                             "Could not locate module " + moduleId, log);
                 }
@@ -218,16 +217,14 @@ public class ModuleOperations {
             // Fetch module version entity
             final Key moduleVersionKey =
                 JdoModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
-            try {
-                versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, moduleVersionKey);
-                checkState(versionEntity.getVersionNumber() == versionToServe,
-                        "Inconsistent version in module %s, expected %s found %s", moduleId,
-                        versionToServe, versionEntity.getVersionNumber());
-            } catch (Throwable e) {
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Error while looking module version " + moduleId + "/" + versionToServe,
-                        log, e);
-            }
+
+            versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, moduleVersionKey);
+            checkState(versionEntity.getVersionNumber() == versionToServe,
+                    "Inconsistent version in module %s, expected %s found %s", moduleId,
+                    versionToServe, versionEntity.getVersionNumber());
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error while looking module version " + moduleId + "/" + moduleVersion, log, e);
         } finally {
             pm.close();
         }
@@ -273,7 +270,7 @@ public class ModuleOperations {
                 final JdoModuleEntity moduleEntity;
                 try {
                     moduleEntity = pm.getObjectById(JdoModuleEntity.class, moduleKey);
-                } catch (Throwable e) {
+                } catch (JDOObjectNotFoundException e) {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                             "Could not locate module " + moduleId, log);
                 }
@@ -287,24 +284,22 @@ public class ModuleOperations {
                 versionToServe = moduleVersion;
             }
 
-            // Fetch module version entity its exports
+            // Fetch the child export entities of the module version entity.
             final Key moduleVersionKey =
                 JdoModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
-            try {
-                versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, moduleVersionKey);
-                checkState(versionEntity.getVersionNumber() == versionToServe,
-                        "Inconsistent version in module %s, expected %s found %s", moduleId,
-                        versionToServe, versionEntity.getVersionNumber());
 
-                final List<JdoExportItemEntity> exportEntities =
-                    ExportUtil.queryChildExports(pm, moduleVersionKey);
-                exports = ExportUtil.exportInfoList(exportEntities);
+            versionEntity = pm.getObjectById(JdoModuleVersionEntity.class, moduleVersionKey);
+            checkState(versionEntity.getVersionNumber() == versionToServe,
+                    "Inconsistent version in module %s, expected %s found %s", moduleId,
+                    versionToServe, versionEntity.getVersionNumber());
 
-            } catch (Throwable e) {
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Error while looking module version " + moduleId + "/" + versionToServe,
-                        log, e);
-            }
+            final List<JdoExportItemEntity> exportEntities =
+                ExportUtil.queryChildExports(pm, moduleVersionKey);
+            exports = ExportUtil.exportInfoList(exportEntities);
+
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error while looking module version " + moduleId + "/" + moduleVersion, log, e);
         } finally {
             pm.close();
         }

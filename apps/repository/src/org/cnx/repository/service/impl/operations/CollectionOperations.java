@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,6 +16,7 @@
 
 package org.cnx.repository.service.impl.operations;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
@@ -91,7 +93,7 @@ public class CollectionOperations {
         try {
             try {
                 collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
-            } catch (Throwable e) {
+            } catch (JDOObjectNotFoundException e) {
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                         "Could not find collection " + collectionId, log, e);
             }
@@ -135,7 +137,7 @@ public class CollectionOperations {
             final JdoCollectionEntity collectionEntity;
             try {
                 collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
-            } catch (Throwable e) {
+            } catch (JDOObjectNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                         "Cannot add collection version, collection not found: " + collectionId,
@@ -159,11 +161,7 @@ public class CollectionOperations {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error while trying to add a version to collection " + collectionId, log, e);
         } finally {
-            if (tx.isActive()) {
-                log.severe("Transaction left opened when adding collection version:  "
-                    + collectionId);
-                tx.rollback();
-            }
+            checkArgument(!tx.isActive(), "Transaction left active: %s", collectionId);
             pm.close();
         }
 
@@ -206,13 +204,13 @@ public class CollectionOperations {
                 final JdoCollectionEntity collectionEntity;
                 try {
                     collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
-                } catch (Throwable e) {
+                } catch (JDOObjectNotFoundException e) {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                             "Could not locate collection " + collectionId, log);
                 }
                 // If collection has no versions than there is not latest version.
                 if (collectionEntity.getVersionCount() < 1) {
-                    ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                    return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                             "Collection has no versions: " + collectionId, log);
                 }
                 versionToServe = collectionEntity.getVersionCount();
@@ -223,17 +221,26 @@ public class CollectionOperations {
             // Fetch collection version entity
             final Key collectionVersionKey =
                 JdoCollectionVersionEntity.collectionVersionKey(collectionKey, versionToServe);
+
+            // NOTE(tal): if we read the collectionEntity and versiontToServe is in its
+            // valid version range than this is actually a server error.
             try {
                 versionEntity =
                     pm.getObjectById(JdoCollectionVersionEntity.class, collectionVersionKey);
-                checkState(versionEntity.getVersionNumber() == versionToServe,
-                        "Inconsistent version in collection %s, expected %s found %s",
-                        collectionId, versionToServe, versionEntity.getVersionNumber());
-            } catch (Throwable e) {
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Error while looking collection version " + collectionId + "/"
-                            + versionToServe, log, e);
+            } catch (JDOObjectNotFoundException e) {
+                return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                        "Could not locate collection version " + collectionId + "/"
+                            + versionToServe, log);
             }
+
+            checkState(versionEntity.getVersionNumber() == versionToServe,
+                    "Inconsistent version in collection %s, expected %s found %s", collectionId,
+                    versionToServe, versionEntity.getVersionNumber());
+
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error while looking collection version " + collectionId + "/"
+                        + collectionVersion, log, e);
         } finally {
             pm.close();
         }
@@ -278,7 +285,7 @@ public class CollectionOperations {
                 final JdoCollectionEntity collectionEntity;
                 try {
                     collectionEntity = pm.getObjectById(JdoCollectionEntity.class, collectionKey);
-                } catch (Throwable e) {
+                } catch (JDOObjectNotFoundException e) {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                             "Could not locate collection " + collectionId, log);
                 }
@@ -298,18 +305,25 @@ public class CollectionOperations {
             try {
                 versionEntity =
                     pm.getObjectById(JdoCollectionVersionEntity.class, collectionVersionKey);
-                checkState(versionEntity.getVersionNumber() == versionToServe,
-                        "Inconsistent version in collection %s, expected %s found %s",
-                        collectionId, versionToServe, versionEntity.getVersionNumber());
-            } catch (Throwable e) {
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Error while looking collection version " + collectionId + "/"
-                            + versionToServe, log, e);
+            } catch (JDOObjectNotFoundException e) {
+                // NOTE(tal): if we read the collection entity and versionToServe is within its
+                // valid version range that this is actually a server error.
+                return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                        "Collection version not found" + collectionId + "/" + versionToServe, log,
+                        e);
             }
+
+            checkState(versionEntity.getVersionNumber() == versionToServe,
+                    "Inconsistent version in collection %s, expected %s found %s", collectionId,
+                    versionToServe, versionEntity.getVersionNumber());
 
             final List<JdoExportItemEntity> exportEntities =
                 ExportUtil.queryChildExports(pm, collectionVersionKey);
             exports = ExportUtil.exportInfoList(exportEntities);
+        } catch (Throwable e) {
+            return ResponseUtil
+                .loggedError(RepositoryStatus.SERVER_ERRROR, "Collection version not found"
+                    + collectionId + "/" + collectionVersion, log, e);
         } finally {
             pm.close();
         }

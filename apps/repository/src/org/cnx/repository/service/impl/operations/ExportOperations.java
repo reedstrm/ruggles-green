@@ -42,9 +42,9 @@ import com.google.appengine.api.blobstore.BlobKey;
 
 /**
  * Implementation of the export related operations of the repository service.
- * 
+ *
  * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- * 
+ *
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -96,7 +96,7 @@ public class ExportOperations {
 
         // Workaround for runs locally in eclipse.
         //
-        // TODO(tal): share the prefix logic with resource creation.
+        // TODO(tal): remove after blobstore get fixed (ETA Aug 15 2011)
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
             log.warning("Prefexing resource upload url with '" + context.hostUrl + "'");

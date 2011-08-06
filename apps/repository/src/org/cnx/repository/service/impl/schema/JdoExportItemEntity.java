@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -18,6 +18,7 @@ package org.cnx.repository.service.impl.schema;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -31,7 +32,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * JDO representing an export item attached to a repository object.
- * 
+ *
  * @author Tal Dayan
  */
 @PersistenceCapable(table = SchemaConsts.EXPORT_ITEM_KEY_KIND)
@@ -76,13 +77,18 @@ public class JdoExportItemEntity extends CnxJdoEntity {
         return blobKey;
     }
 
+    public void setBlobKey(BlobKey blobKey) {
+        this.blobKey = checkNotNull(blobKey);
+        JDOHelper.makeDirty(this, "blobKey");
+    }
+
     public Key getParentKey() {
         return parentKey;
     }
 
     /**
      * Construct an export item key.
-     * 
+     *
      * @param parentKey the key of the object to which this export is attached.
      * @param exportType the type of this export.
      * @return the export item key.

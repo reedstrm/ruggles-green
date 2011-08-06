@@ -38,19 +38,20 @@ import com.google.appengine.api.datastore.Key;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
- * 
+ *
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- * 
+ *
  * TODO(tal): validate the blob (e.g. against max size and reject if does not pass).
- * 
+ *
  * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
- * 
+ *
  * @author Tal Dayan
- * 
+ *
  */
 
 @SuppressWarnings("serial")
 public class ResourceUploadCompletionServlet extends HttpServlet {
+
     private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
         .getName());
 

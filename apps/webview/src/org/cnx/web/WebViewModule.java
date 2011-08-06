@@ -52,12 +52,18 @@ public class WebViewModule extends AbstractModule {
     @Provides @Singleton @WebViewTemplate
             SoyTofu provideTofu(SoyFileSet.Builder builder) {
         builder.add(new File("base.soy"));
+        builder.add(new File("collection.soy"));
         builder.add(new File("module.soy"));
         return builder.build().compileToJavaObj();
     }
 
     @Provides @RenderTime Module provideModule() {
         // Placeholder to make Guice happy. The real module is seeded in-scope.
+        return null;
+    }
+
+    @Provides @RenderTime @Named("collectionId") String provideCollectionId() {
+        // Placeholder to make Guice happy. The real collection ID is seeded in-scope.
         return null;
     }
 }

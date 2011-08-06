@@ -14,14 +14,24 @@
  *  limitations under the License.
  */
 
-package org.cnx.web;
+{namespace org.cnx.web}
 
 /**
- *  ServletModule configures the URLs for the web view servlets.
+ *  Collection page.
+ *
+ *  @param id Collection ID
+ *  @param version Collection version
+ *  @param title Collection title
+ *  @param contentHtml Content
  */
-public class ServletModule extends com.google.inject.servlet.ServletModule {
-    @Override protected void configureServlets() {
-        serveRegex("^/light/module/[^/]+/[^/]+/").with(RenderModuleServlet.class);
-        serveRegex("^/light/collection/[^/]+/[^/]+/").with(RenderCollectionServlet.class);
-    }
-}
+{template .collection}
+    {call .page}
+        {param title}{$title}{/param}
+        {param content}
+            <p style="color:red">Collection {$id}, version {$version}</p>
+            <div class="copy">
+                {$contentHtml|noAutoescape}
+            </div>
+        {/param}
+    {/call}
+{/template}

@@ -29,58 +29,69 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.cnx.cnxml.CnxmlNamespace;
-import org.cnx.cnxml.Module;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.CollectionHTMLGenerator;
+import org.cnx.common.collxml.CollxmlNamespace;
+import org.cnx.mdml.Metadata;
+import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
-import org.cnx.util.DOMUtils;
 import org.w3c.dom.Element;
 
-@Singleton public class RenderModuleServlet extends HttpServlet {
-    private static final String TEMPLATE_NAME = "org.cnx.web.module";
-    private static final String PREFIX = "/light/module/";
+@Singleton public class RenderCollectionServlet extends HttpServlet {
+    private static final String TEMPLATE_NAME = "org.cnx.web.collection";
+    private static final String PREFIX = "/light/collection/";
     private static final String MIME_TYPE = "text/html; charset=utf-8";
 
-    private static final Logger log = Logger.getLogger(RenderModuleServlet.class.getName());
+    private static final Logger log = Logger.getLogger(RenderCollectionServlet.class.getName());
 
     private final SoyTofu tofu;
     private final XmlFetcher fetcher;
-    private final Provider<ModuleHTMLGenerator> generatorProvider;
+    private final Provider<CollectionHTMLGenerator> generatorProvider;
     private final RenderScope renderScope;
-    private final String cnxmlNamespace;
+    private final String collxmlNamespace;
 
-    @Inject public RenderModuleServlet(@WebViewTemplate SoyTofu tofu, XmlFetcher fetcher,
-            Provider<ModuleHTMLGenerator> generatorProvider, RenderScope renderScope,
-            @CnxmlNamespace String cnxmlNamespace) {
+    @Inject public RenderCollectionServlet(@WebViewTemplate SoyTofu tofu, XmlFetcher fetcher,
+            Provider<CollectionHTMLGenerator> generatorProvider, RenderScope renderScope,
+            @CollxmlNamespace String collxmlNamespace) {
         this.tofu = tofu;
         this.fetcher = fetcher;
         this.generatorProvider = generatorProvider;
         this.renderScope = renderScope;
-        this.cnxmlNamespace = cnxmlNamespace;
+        this.collxmlNamespace = collxmlNamespace;
     }
 
     @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         final String[] components = parsePath(req.getServletPath());
-        final String moduleId = components[0];
+        final String collectionId = components[0];
         final String version = components[1];
 
-        // Fetch module
-        Module module;
+        // Fetch collection
+        Collection coll;
         try {
-            module = fetcher.fetchModuleVersion(moduleId, version);
+            coll = fetcher.fetchCollectionVersion(collectionId, version);
         } catch (Exception e) {
             log.log(Level.WARNING, "Error while fetching", e);
             // TODO(light): 404 or 500
             return;
         }
 
-        // Render content
-        String title, contentHtml;
+        // Get title
+        String title = "";
+        final Metadata metadata = coll.getMetadata();
         try {
-            title = module.getMetadata().getTitle();
-            contentHtml = renderContent(module);
+            title = metadata.getTitle();
+        } catch (Exception e) {
+            log.log(Level.WARNING, "Error while getting title", e);
+            // TODO(light): 500
+            return;
+        }
+
+        // Render content
+        String contentHtml;
+        try {
+            contentHtml = renderContent(coll);
         } catch (Exception e) {
             log.log(Level.WARNING, "Error while rendering", e);
             // TODO(light): 500
@@ -89,9 +100,9 @@ import org.w3c.dom.Element;
 
         resp.setContentType(MIME_TYPE);
         final SoyMapData params = new SoyMapData(
-                "id", moduleId,
-                "version", version,
+                "id", collectionId,
                 "title", title,
+                "version", version,
                 "contentHtml", contentHtml
         );
         resp.getWriter().print(tofu.render(TEMPLATE_NAME, params, null));
@@ -103,22 +114,13 @@ import org.w3c.dom.Element;
         return new String[]{components[0], components[1]};
     }
 
-    private String renderContent(Module module) throws Exception {
+    private String renderContent(Collection coll) throws Exception {
         renderScope.enter();
         try {
-            renderScope.seed(Module.class, module);
-            return generatorProvider.get().generate(module);
+            renderScope.seed(Collection.class, coll);
+            return generatorProvider.get().generate(coll);
         } finally {
             renderScope.exit();
         }
-    }
-
-    private String getTitle(Document moduleDocument) throws Exception {
-        Element titleElement = DOMUtils.findFirstChild(moduleDocument.getDocumentElement(),
-                cnxmlNamespace, "title");
-        if (titleElement == null) {
-            throw new IllegalArgumentException("CNXML document has no title");
-        }
-        return titleElement.getTextContent();
     }
 }

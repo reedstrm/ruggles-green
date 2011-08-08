@@ -1,0 +1,307 @@
+<?xml version="1.0"?>
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
+
+<title>Discrete Time Impulse Function</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml"
+          mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+  <md:repository>http://cnx.org/content</md:repository>
+  <md:content-url>http://cnx.org/content/m34566/latest</md:content-url>
+  <md:content-id>m34566</md:content-id>
+  <md:title>Discrete Time Impulse Function</md:title>
+  <md:version>1.1</md:version>
+  <md:created>2010/06/02 13:51:41 GMT-5</md:created>
+  <md:revised>2010/06/10 16:06:58 GMT-5</md:revised>
+  <md:actors>
+    <md:person userid="dcwill">
+      <md:firstname>Daniel</md:firstname>
+      <md:surname>Williamson</md:surname>
+      <md:fullname>Daniel Williamson</md:fullname>
+      <md:email>dcwill@cnx.org</md:email>
+    </md:person>
+    <md:person userid="skruzick">
+      <md:firstname>Stephen</md:firstname>
+      <md:surname>Kruzick</md:surname>
+      <md:fullname>Stephen Kruzick</md:fullname>
+      <md:email>skruzick@rice.edu</md:email>
+    </md:person>
+    <md:person userid="slycaldron">
+      <md:firstname>Dan</md:firstname>
+      <md:surname>Calderon</md:surname>
+      <md:fullname>Dan Calderon</md:fullname>
+      <md:email>slycaldron@netscape.net</md:email>
+    </md:person>
+  </md:actors>
+  <md:roles>
+    <md:role type="author">slycaldron</md:role>
+    <md:role type="maintainer">slycaldron skruzick dcwill</md:role>
+    <md:role type="licensor">slycaldron</md:role>
+  </md:roles>
+  <md:license url="http://creativecommons.org/licenses/by/3.0/" />
+  <!-- For information on license requirements for use or modification, see license url in the
+       above <md:license> element.
+       For information on formatting required attribution, see the URL:
+         CONTENT_URL/content_info#cnx_cite_header
+       where CONTENT_URL is the value provided above in the <md:content-url> element.
+  -->
+  <md:keywordlist>
+    <md:keyword>Impulse</md:keyword>
+    <md:keyword>Signals</md:keyword>
+    <md:keyword>Unit Sample</md:keyword>
+  </md:keywordlist>
+  <md:subjectlist>
+    <md:subject>Mathematics and Statistics</md:subject>
+    <md:subject> Science and Technology</md:subject>
+  </md:subjectlist>
+  <md:abstract>Explains the use of the Discrete-time impulse function.</md:abstract>
+  <md:language>en</md:language>
+  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
+       Changes to the metadata section in the source will not be saved. -->
+</metadata>
+
+<content>
+
+
+
+<section id="eip-80" class="in"><title>Introduction</title><para id="eip-276">In engineering, we often deal with the idea of an action
+      occurring at a point.  Whether it be a force at a point in space
+      or some other signal at a point in time, it becomes worth while to
+      develop some way of quantitatively defining this.  This leads us
+      to the idea of a unit impulse, probably the second most
+      important function, next to the complex exponential, in this systems and signals
+      course.</para></section>
+<section id="eip-231" class="th"><title>Unit Sample Function</title><para id="para8">The <term>unit sample function</term>, often referred to as the unit impulse or delta function, is the function that
+	defines the idea of a unit impulse in discrete time.  There are not nearly as many intricacies involved in its definition as there are in the definition of the Dirac delta function, the continuous time impulse function.  The unit sample function simply takes a value of one at n=0 and a value of zero elsewhere.  The impulse function is often written as 
+	<m:math>
+	  <m:apply>
+	    <m:ci type="fn">δ</m:ci><m:ci>n</m:ci>
+	  </m:apply>
+	</m:math>.
+      
+
+	<equation id="eq3">
+	  <m:math>
+	    <m:apply>
+	      <m:eq/>
+	      <m:apply>
+		<m:ci type="fn">δ</m:ci>
+		<m:ci>n</m:ci>
+	      </m:apply>
+	      <m:piecewise>
+		<m:piece>
+		  <m:cn>1</m:cn>
+		  <m:apply>
+		    <m:eq/>
+		    <m:ci>n</m:ci>
+		    <m:cn>0</m:cn>
+		  </m:apply>
+		</m:piece>
+		<m:otherwise>
+		  <m:cn>0</m:cn>
+		</m:otherwise>
+	      </m:piecewise>
+	    </m:apply>
+	  </m:math>
+	</equation>
+      </para>
+
+
+      <figure id="fig2">
+	<title>Unit Sample</title>
+	<media id="id3619168" alt="">
+          <image src="unitsample.png" mime-type="image/png"/>
+          <image for="pdf" src="unitsample.eps" mime-type="application/postscript"/>
+        </media>
+	<caption>The unit sample.</caption>
+      </figure><para id="eip-277">Below we will briefly list a few important properties of
+	  the unit impulse without going into detail of their proofs.
+
+	  <list id="props2"><title>Unit Impulse Properties</title><item>
+	      <m:math>
+		<m:apply>
+		  <m:eq/>
+		  <m:apply>
+		    <m:ci type="fn">δ</m:ci>
+		    <m:apply>
+		      <m:times/>
+		      <m:ci>α</m:ci>
+		      <m:ci>n</m:ci>
+		    </m:apply>
+		  </m:apply>
+		  <m:apply>
+		    <m:times/>
+		    <m:apply>
+		      <m:divide/>
+		      <m:cn>1</m:cn>
+		      <m:apply>
+			<m:abs/>
+			<m:ci>α</m:ci>
+		      </m:apply>
+		    </m:apply>
+		    <m:apply>
+		      <m:ci type="fn">δ</m:ci>
+		      <m:ci>n</m:ci>
+		    </m:apply>
+		  </m:apply>
+		</m:apply>
+	      </m:math>
+	    </item>
+	
+	    <item>
+	      <m:math>
+		<m:apply>
+		  <m:eq/>
+		  <m:apply>
+		    <m:ci type="fn">δ</m:ci>
+		    <m:ci>n</m:ci>
+		  </m:apply>
+		  <m:apply>
+		    <m:ci type="fn">δ</m:ci>
+		    <m:apply>
+		      <m:minus/>
+		      <m:ci>n</m:ci>
+		    </m:apply>
+		  </m:apply>
+		</m:apply>
+	      </m:math>
+	    </item>
+
+	    <item>
+<m:math overflow="scroll" mode="display">
+        <m:mrow>
+          <m:mi>δ</m:mi>
+          <m:mo>(</m:mo>
+          <m:mi>n</m:mi>
+          <m:mo>)</m:mo>
+          <m:mo>=</m:mo>
+          <m:mi>u</m:mi>
+          <m:mo>(</m:mo>
+          <m:mi>n</m:mi>
+          <m:mo>)</m:mo>
+          <m:mo>-</m:mo>
+          <m:mi>u</m:mi>
+          <m:mo>(</m:mo>
+          <m:mi>n</m:mi>
+          <m:mo>-</m:mo>
+          <m:mn>1</m:mn>
+          <m:mo>)</m:mo>
+        </m:mrow>
+      </m:math>
+    
+    
+	    </item>
+
+    
+	    <item>
+<m:math overflow="scroll" mode="display">
+        <m:mrow>
+          <m:mi>f</m:mi>
+          <m:mo>(</m:mo>
+          <m:mi>n</m:mi>
+          <m:mo>)</m:mo>
+          <m:mi>δ</m:mi>
+          <m:mo>(</m:mo>
+          <m:mi>n</m:mi>
+          <m:mo>)</m:mo>
+          <m:mo>=</m:mo>
+          <m:mi>f</m:mi>
+          <m:mo>(</m:mo>
+          <m:mn>0</m:mn>
+          <m:mo>)</m:mo>
+          <m:mi>δ</m:mi>
+          <m:mo>(</m:mo>
+          <m:mi>n</m:mi>
+          <m:mo>)</m:mo>
+        </m:mrow>
+      </m:math>
+            </item></list>	  
+The last of these is especially important as it gives rise to the sifting property of the unit sample function, which selects the value of a function at a specific time and is especially important in studying the relationship of an operation called convolution to time domain analysis of linear time invariant systems.  The sifting property is shown and derived below.
+<equation id="eqn">
+<m:math overflow="scroll" mode="display">
+        <m:mrow>
+          <m:munderover>
+            <m:mo>∑</m:mo>
+            <m:mrow>
+              <m:mi>n</m:mi>
+              <m:mo>=</m:mo>
+              <m:mo>-</m:mo>
+              <m:mi>∞</m:mi>
+            </m:mrow>
+            <m:mi>∞</m:mi>
+          </m:munderover>
+          <m:mi>f</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>n</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mi>δ</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>n</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mo>=</m:mo>
+          <m:munderover>
+            <m:mo>∑</m:mo>
+            <m:mrow>
+              <m:mi>n</m:mi>
+              <m:mo>=</m:mo>
+              <m:mo>-</m:mo>
+              <m:mi>∞</m:mi>
+            </m:mrow>
+            <m:mi>∞</m:mi>
+          </m:munderover>
+          <m:mi>f</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mn>0</m:mn>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mi>δ</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>n</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mo>=</m:mo>
+          <m:mi>f</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mn>0</m:mn>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:munderover>
+            <m:mo>∑</m:mo>
+            <m:mrow>
+              <m:mi>n</m:mi>
+              <m:mo>=</m:mo>
+              <m:mo>-</m:mo>
+              <m:mi>∞</m:mi>
+            </m:mrow>
+            <m:mi>∞</m:mi>
+          </m:munderover>
+          <m:mi>δ</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>n</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mo>=</m:mo>
+          <m:mi>f</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mn>0</m:mn>
+            <m:mo>)</m:mo>
+          </m:mrow>
+        </m:mrow>
+      </m:math>
+</equation></para>
+
+</section><section id="eip-541" class="cn"><title>Discrete Time Unit Impulse Summary</title><para id="eip-848">The discrete time unit impulse function, also known as the unit sample function, is of great importance to the study of signals and systems.  The function takes a value of one at time n=0 and a value of zero elsewhere.  It has several important properties that will appear again when studying systems.</para></section>
+
+
+</content>
+
+</document>

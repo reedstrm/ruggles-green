@@ -191,7 +191,7 @@
 
   <servlet-mapping>
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <url-pattern>/resource_factory/uploaded/*</url-pattern>
+    <url-pattern>/resource_factory/uploaded</url-pattern>
   </servlet-mapping> 
   
    <!--  CNX EXPORTS API -->

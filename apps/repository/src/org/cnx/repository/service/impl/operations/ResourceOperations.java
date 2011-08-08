@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ResourceOperations {
@@ -78,7 +78,8 @@ public class ResourceOperations {
             pm.close();
         }
 
-        final String completionUrl = UPLOAD_COMPLETION_SERVLET_PATH + "/" + resourceId;
+        final String completionUrl = UPLOAD_COMPLETION_SERVLET_PATH + "?" + 
+                ResourceUtil.encodeUploadCompletionParameters(resourceId);
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {

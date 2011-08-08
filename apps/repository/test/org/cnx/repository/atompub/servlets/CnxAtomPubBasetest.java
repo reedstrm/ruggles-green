@@ -30,7 +30,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  *
  * @author Arjun Satyapal
  */
-public abstract class CnxAtomPubBaseTest extends JerseyTest {
+public abstract class CnxAtomPubBasetest extends JerseyTest {
     // TODO(arjuns) : Move this to parent folder.
 
     private final static String PACKAGE = "org.cnx.repository.atompub.servlets";
@@ -55,7 +55,7 @@ public abstract class CnxAtomPubBaseTest extends JerseyTest {
      * Remember that Port is binded once the construction phase is over. So derived classes want to
      * access URI created for CNX Server, they should not rely on constructor.
      */
-    public CnxAtomPubBaseTest() throws MalformedURLException {
+    public CnxAtomPubBasetest() throws MalformedURLException {
         super(new WebAppDescriptor.Builder(PACKAGE).contextPath(
             CnxAtomPubConstants.ATOMPUB_URL_PREFIX).build());
 

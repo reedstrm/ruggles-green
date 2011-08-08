@@ -35,12 +35,16 @@ import org.cnx.util.RenderTime;
         this.collectionProvider = collectionProvider;
     }
 
-    public URI resolveURI(URI uri) throws Exception {
+    @Override public URI resolveURI(URI uri) throws Exception {
         return new URI(BASE).resolve(uri);
     }
 
-    public URI resolveDocument(String document, String version) throws Exception {
+    @Override public URI resolveDocument(String document, @Nullable String version)
+            throws Exception {
         final Collection collection = collectionProvider.get();
+        if (version == null) {
+            version = "latest";
+        }
         if (collection != null && collection.hasModule(document)) {
             // TODO(light): collection version
             final String collectionVersion = "latest";
@@ -51,7 +55,8 @@ import org.cnx.util.RenderTime;
         return new URI(DOCUMENT_BASE).resolve(new URI(document + "/" + version + "/"));
     }
 
-    public URI resolveResource(String document, String version, String resource) throws Exception {
+    @Override public URI resolveResource(@Nullable String document, @Nullable String version,
+            String resource) throws Exception {
         return new URI(BASE).resolve(new URI(resource));
     }
 }

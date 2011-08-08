@@ -17,12 +17,14 @@
 package org.cnx.cnxml;
 
 import java.net.URI;
+import javax.annotation.Nullable;
 
 /**
  *  A LinkResolver looks up abstract links and returns URIs.
  */
 public interface LinkResolver {
     public URI resolveURI(URI uri) throws Exception;
-    public URI resolveDocument(String document, String version) throws Exception;
-    public URI resolveResource(String document, String version, String resource) throws Exception;
+    public URI resolveDocument(String document, @Nullable String version) throws Exception;
+    public URI resolveResource(@Nullable String document, @Nullable String version, String resource)
+            throws Exception;
 }

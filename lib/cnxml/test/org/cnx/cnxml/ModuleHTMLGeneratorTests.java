@@ -84,8 +84,10 @@ public class ModuleHTMLGeneratorTests {
         final RenderScope scope = injector.getInstance(RenderScope.class);
         scope.enter();
         try {
+            final String cnxmlNamespace = injector.getInstance(
+                    Key.get(String.class, CnxmlNamespace.class));
             return injector.getInstance(ModuleHTMLGenerator.class).generate(
-                    new Module(moduleId, d, d, null));
+                    new Module(moduleId, d, d, null, cnxmlNamespace));
         } finally {
             scope.exit();
         }

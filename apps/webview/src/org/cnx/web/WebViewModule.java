@@ -22,6 +22,7 @@ import org.cnx.cnxml.LinkProcessor;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.Processor;
 import org.cnx.cnxml.LinkResolver;
+import org.cnx.common.collxml.Collection;
 import org.cnx.util.RenderTime;
 
 import com.google.inject.AbstractModule;
@@ -62,8 +63,8 @@ public class WebViewModule extends AbstractModule {
         return null;
     }
 
-    @Provides @RenderTime @Named("collectionId") String provideCollectionId() {
-        // Placeholder to make Guice happy. The real collection ID is seeded in-scope.
+    @Provides @RenderTime Collection provideCollection() {
+        // Placeholder to make Guice happy. The real collection is seeded in-scope.
         return null;
     }
 }

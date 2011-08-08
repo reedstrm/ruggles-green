@@ -43,6 +43,7 @@ import org.w3c.dom.Node;
     public Module process(Module module) throws Exception {
         final Document doc = documentBuilder.newDocument();
         transformer.transform(new DOMSource(module.getCnxml()), new DOMResult(doc));
-        return new Module(module.getId(), doc, module.getResourceMapping(), module.getMetadata());
+        return new Module(module.getId(), doc, module.getResourceMapping(), module.getMetadata(),
+                module.getCnxmlNamespace());
     }
 }

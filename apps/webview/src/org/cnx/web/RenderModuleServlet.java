@@ -32,9 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.common.collxml.Collection;
+import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
-import org.cnx.util.DOMUtils;
 import org.w3c.dom.Element;
 
 @Singleton public class RenderModuleServlet extends HttpServlet {
@@ -44,11 +45,11 @@ import org.w3c.dom.Element;
 
     private static final Logger log = Logger.getLogger(RenderModuleServlet.class.getName());
 
-    private final SoyTofu tofu;
-    private final XmlFetcher fetcher;
-    private final Provider<ModuleHTMLGenerator> generatorProvider;
-    private final RenderScope renderScope;
-    private final String cnxmlNamespace;
+    protected final SoyTofu tofu;
+    protected final XmlFetcher fetcher;
+    protected final Provider<ModuleHTMLGenerator> generatorProvider;
+    protected final RenderScope renderScope;
+    protected final String cnxmlNamespace;
 
     @Inject public RenderModuleServlet(@WebViewTemplate SoyTofu tofu, XmlFetcher fetcher,
             Provider<ModuleHTMLGenerator> generatorProvider, RenderScope renderScope,
@@ -78,21 +79,27 @@ import org.w3c.dom.Element;
 
         // Render content
         String title, contentHtml;
+        renderScope.enter();
         try {
-            title = module.getMetadata().getTitle();
-            contentHtml = renderContent(module);
+            renderScope.seed(Module.class, module);
+            title = module.getTitle();
+            contentHtml = renderModuleContent(module);
         } catch (Exception e) {
             log.log(Level.WARNING, "Error while rendering", e);
             // TODO(light): 500
             return;
+        } finally {
+            renderScope.exit();
         }
 
         resp.setContentType(MIME_TYPE);
         final SoyMapData params = new SoyMapData(
-                "id", moduleId,
-                "version", version,
-                "title", title,
-                "contentHtml", contentHtml
+                "module", new SoyMapData(
+                        "id", moduleId,
+                        "version", version,
+                        "title", title,
+                        "contentHtml", contentHtml
+                )
         );
         resp.getWriter().print(tofu.render(TEMPLATE_NAME, params, null));
     }
@@ -103,22 +110,7 @@ import org.w3c.dom.Element;
         return new String[]{components[0], components[1]};
     }
 
-    private String renderContent(Module module) throws Exception {
-        renderScope.enter();
-        try {
-            renderScope.seed(Module.class, module);
-            return generatorProvider.get().generate(module);
-        } finally {
-            renderScope.exit();
-        }
-    }
-
-    private String getTitle(Document moduleDocument) throws Exception {
-        Element titleElement = DOMUtils.findFirstChild(moduleDocument.getDocumentElement(),
-                cnxmlNamespace, "title");
-        if (titleElement == null) {
-            throw new IllegalArgumentException("CNXML document has no title");
-        }
-        return titleElement.getTextContent();
+    protected String renderModuleContent(Module module) throws Exception {
+        return generatorProvider.get().generate(module);
     }
 }

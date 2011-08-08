@@ -42,6 +42,7 @@ import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
@@ -60,7 +61,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
     /**
      * Max allowed export size in bytes. This is an arbitrary limit.
      */
-    private static final long MAX_EXPORT_SIZE = 100000000;
+    private static final long MAX_EXPORT_SIZE = 100 * 1024 * 1024;
 
     private static final Logger log = Logger.getLogger(ExportUploadCompletionServlet.class
         .getName());
@@ -73,9 +74,10 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         final PersistenceManager pm = Services.datastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
 
-        // List of blobs to delete upon return. We update it as we go. At any point that
-        // can cause an exception or return, it is set to contains exactly the (possibly empty)
-        // list of blobs that should be deleted.
+        // List of blobs to delete upon return, each associated with a reason describing
+        // why it is deleted. We update it as we go. At any point that can cause an exception
+        // or return, it is set to contains exactly the (possibly empty) list of blobs that
+        // should be deleted.
         //
         // TODO(tal): since blob deletion and data store entity update cannot be done in
         // one atomic transaction, we err on the safe side and prefer to leave garbage blobs
@@ -83,14 +85,17 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         // number of garbage blobs, consider to implement a garbage collection or another safe
         // mechanism.
         //
-        final List<BlobKey> blobsToDeleteOnExit = Lists.newArrayList(incomingBlobs.values());
+        final List<Pair<BlobKey, String>> blobsToDeleteOnExit = Lists.newArrayList();
+        for (BlobKey blobKey : incomingBlobs.values()) {
+            blobsToDeleteOnExit.add(Pair.of(blobKey, "Unused incoming export blob"));
+        }
 
         ExportReference exportReference;
 
-        // NOTE(tal): this try/catch/finaly clause is used not only to handle exception but also
+        // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
         // to delete unused blobs when leaving the method.
         try {
-            exportReference = parseExportReference(req);
+            exportReference = ExportUtil.exportReferenceFromRequestParameters(req);
 
             // Validate incoming export reference
             final ExportReferenceValidationResult validationResult =
@@ -101,8 +106,11 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
             // We expect exactly one blob
             if (incomingBlobs.size() != 1) {
-                setServletError(resp, HttpServletResponse.SC_BAD_REQUEST,
-                        "Resource upload completion handler expected to find exactly one blob but found ["
+                setServletError(
+                        resp,
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Resource upload completion handler "
+                            + "expected to find exactly one blob but found ["
                             + incomingBlobs.size() + "]", null, log, Level.WARNING);
                 return;
             }
@@ -168,7 +176,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             // one if found.
             blobsToDeleteOnExit.clear();
             if (oldBlobKey != null) {
-                blobsToDeleteOnExit.add(oldBlobKey);
+                blobsToDeleteOnExit.add(Pair.of(oldBlobKey, "Overwritten old export blob"));
             }
         } catch (Throwable e) {
             tx.rollback();
@@ -179,33 +187,15 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", req.getQueryString());
             pm.close();
-            for (BlobKey key : blobsToDeleteOnExit) {
-                log.info("Deleting blob: " + key);
-                Services.blobstore.delete(key);
+            for (Pair<BlobKey, String> item : blobsToDeleteOnExit) {
+                log.info("Deleting blob: " + item.first + " (" + item.second + ")");
+                Services.blobstore.delete(item.first);
             }
         }
 
         log.info("Written export " + exportReference);
         // TODO(tal): is this is where we want to redirect to?
         resp.sendRedirect("/");
-    }
-
-    /**
-     * Construct export reference from the incoming request.
-     */
-    private static ExportReference parseExportReference(HttpServletRequest req) {
-        final ExportScopeType scopeType =
-            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
-        final String objectId = req.getParameter("id");
-        final ExportType exportType =
-            ExportTypesConfiguration.getExportTypes().get(req.getParameter("type"));
-        final String versionNumberParam = req.getParameter("version");
-        final Integer versionNumber =
-            versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
-
-        final ExportReference exportReference =
-            new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
-        return exportReference;
     }
 
     /**

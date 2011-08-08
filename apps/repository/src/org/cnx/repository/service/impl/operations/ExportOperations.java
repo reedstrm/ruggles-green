@@ -87,12 +87,8 @@ public class ExportOperations {
             pm.close();
         }
 
-        // Construct completion URL that includes the export reference. This will triger
-        // the completion servlet when the blob upload is completed.
-        final String completionUrl =
-            UPLOAD_COMPLETION_SERVLET_PATH + "?scope=" + exportReference.getScopeType() + "&id="
-                + exportReference.getObjectId() + "&version=" + exportReference.getVersionNumber()
-                + "&type=" + exportReference.getExportTypeId();
+        final String completionUrl = ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?" +
+        ExportUtil.exportReferenceToRequestParameters(exportReference);
 
         // Workaround for runs locally in eclipse.
         //

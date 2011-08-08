@@ -1,5 +1,5 @@
 <!--
-    Copyright 2011 Google Inc.
+     Copyright (C) 2011 The CNX Authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
     limitations under the License.
 -->
 
-<!-- Ant build file for the CNX web view. -->
-
 <project name="repository" default="war">
+    <description>
+        Build file for CNX Repository.
+    </description>
     <property file="local.properties" />
     <property file="build.properties" />
 
@@ -29,9 +30,6 @@
         <mkdir dir="${war.dir}/WEB-INF" />
         <mkdir dir="${war.dir}/WEB-INF/classes" />
         <mkdir dir="${war.dir}/WEB-INF/lib" />
-        <!--copy todir="${war.dir}/static">
-            <fileset dir="static"/>
-        </copy-->
         <copy todir="${war.dir}/WEB-INF">
             <fileset dir="src/WEB-INF">
                 <include name="*.*" />

@@ -40,20 +40,4 @@
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/content/*</url-pattern>
     </servlet-mapping>
-    <!-- Mapping for REST Servlets for serving content. -->
-    <servlet>
-        <servlet-name>Jersey Web Application</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.cnx.web;</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Jersey Web Application</servlet-name>
-        <url-pattern>/content/*</url-pattern>
-    </servlet-mapping>
-
 </web-app>

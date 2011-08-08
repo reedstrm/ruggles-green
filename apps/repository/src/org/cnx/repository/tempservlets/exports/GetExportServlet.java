@@ -37,9 +37,9 @@ import org.cnx.repository.service.impl.operations.ParamUtil;
 
 /**
  * A temp API servlet to serve a resource using a GET request.
- *
+ * 
  * TODO(tal): delete this servlet after implementing the real API.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -68,16 +68,16 @@ public class GetExportServlet extends HttpServlet {
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {
                 case BAD_REQUEST:
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            repositoryResponse.getExtendedDescription());
                     return;
                 case NOT_FOUND:
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            repositoryResponse.getExtendedDescription());
                     return;
                 default:
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            repositoryResponse.getExtendedDescription());
                     return;
             }
         }

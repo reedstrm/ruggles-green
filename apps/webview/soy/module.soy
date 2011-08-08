@@ -28,9 +28,9 @@
     {call .page}
         {param title}{$title}{/param}
         {param content}
-            <p>Module {$id}, version {$version}</p>
+            <p style="color:red">Module {$id}, version {$version}</p>
             <div class="copy">
-                {$contentHtml}
+                {$contentHtml|noAutoescape}
             </div>
         {/param}
     {/call}

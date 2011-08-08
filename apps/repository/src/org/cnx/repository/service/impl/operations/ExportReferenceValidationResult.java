@@ -130,7 +130,7 @@ public class ExportReferenceValidationResult {
      * Validate an export reference.
      */
     public static ExportReferenceValidationResult
-                    validateReference(ExportReference exportReference) {
+            validateReference(ExportReference exportReference) {
         // Lookup export type by id.
         final ExportType exportType =
             ExportTypesConfiguration.getExportTypes().get(exportReference.getExportTypeId());
@@ -175,8 +175,8 @@ public class ExportReferenceValidationResult {
                 if (exportReference.getScopeType().isVersion()) {
                     parentEntityClass = JdoModuleVersionEntity.class;
                     parentKey =
-                        JdoModuleVersionEntity.moduleVersionKey(moduleKey, exportReference
-                            .getVersionNumber());
+                        JdoModuleVersionEntity.moduleVersionKey(moduleKey,
+                                exportReference.getVersionNumber());
                 } else {
                     parentEntityClass = JdoModuleEntity.class;
                     parentKey = moduleKey;
@@ -194,7 +194,7 @@ public class ExportReferenceValidationResult {
                     parentEntityClass = JdoCollectionVersionEntity.class;
                     parentKey =
                         JdoCollectionVersionEntity.collectionVersionKey(collectionKey,
-                            exportReference.getVersionNumber());
+                                exportReference.getVersionNumber());
                 } else {
                     parentEntityClass = JdoCollectionEntity.class;
                     parentKey = collectionKey;

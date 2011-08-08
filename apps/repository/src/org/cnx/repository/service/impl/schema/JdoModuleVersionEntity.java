@@ -108,7 +108,7 @@ public class JdoModuleVersionEntity extends CnxJdoEntity {
     public static Key moduleVersionKey(Key moduleKey, long versionNumber) {
         checkNotNull(moduleKey, "null module key");
         checkArgument(SchemaConsts.MODULE_KEY_KIND.equals(moduleKey.getKind()),
-            "Not a moduleKey: %s", moduleKey);
+                "Not a moduleKey: %s", moduleKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
         return KeyFactory.createKey(moduleKey, SchemaConsts.MODULE_VERSION_KEY_KIND, versionNumber);
     }

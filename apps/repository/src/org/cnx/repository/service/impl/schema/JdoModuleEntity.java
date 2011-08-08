@@ -78,7 +78,7 @@ public class JdoModuleEntity extends CnxJdoEntity {
             return null;
         }
         checkState(SchemaConsts.MODULE_KEY_KIND.equals(key.getKind()),
-            "Unexpected kind: %s at key %s", key.getKind(), key);
+                "Unexpected kind: %s at key %s", key.getKind(), key);
         return KeyUtil.idToString(SchemaConsts.MODULE_ID_PREFIX, key.getId());
     }
 
@@ -100,6 +100,6 @@ public class JdoModuleEntity extends CnxJdoEntity {
     public static Key moduleIdToKey(String moduleId) {
         final Long moduleIdLong = KeyUtil.stringToId(SchemaConsts.MODULE_ID_PREFIX, moduleId);
         return (moduleIdLong == null) ? null : KeyFactory.createKey(SchemaConsts.MODULE_KEY_KIND,
-            moduleIdLong);
+                moduleIdLong);
     }
 }

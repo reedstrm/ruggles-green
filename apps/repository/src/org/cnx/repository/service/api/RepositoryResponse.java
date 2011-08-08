@@ -102,7 +102,7 @@ public class RepositoryResponse<T> {
      * @return a new response.
      */
     public static <T> RepositoryResponse<T> newError(RepositoryStatus status,
-        String statusDescription) {
+            String statusDescription) {
         checkNotNull(status);
         checkArgument(status.isError(), "%s", status);
         checkNotNull(statusDescription);

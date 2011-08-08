@@ -64,16 +64,16 @@ public class GetExportUploadUrlServlet extends HttpServlet {
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {
                 case BAD_REQUEST:
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            repositoryResponse.getExtendedDescription());
                     return;
                 case NOT_FOUND:
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            repositoryResponse.getExtendedDescription());
                     return;
                 default:
-                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, repositoryResponse
-                        .getExtendedDescription());
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            repositoryResponse.getExtendedDescription());
                     return;
             }
         }

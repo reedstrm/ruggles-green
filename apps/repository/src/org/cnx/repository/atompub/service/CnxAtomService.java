@@ -32,7 +32,7 @@ import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
  * Cnx AtomPub Service.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomService extends AtomService {

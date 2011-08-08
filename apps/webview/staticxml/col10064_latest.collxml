@@ -1,0 +1,1701 @@
+<?xml version="1.0"?>
+<col:collection xmlns="http://cnx.rice.edu/collxml"
+                xmlns:cnx="http://cnx.rice.edu/cnxml"
+                xmlns:cnxorg="http://cnx.rice.edu/system-info"
+                xmlns:md="http://cnx.rice.edu/mdml"
+                xmlns:col="http://cnx.rice.edu/collxml"
+                xmlns:cnxml="http://cnx.rice.edu/cnxml"
+                xmlns:m="http://www.w3.org/1998/Math/MathML"
+                xmlns:q="http://cnx.rice.edu/qml/1.0"
+                xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                xmlns:bib="http://bibtexml.sf.net/"
+                xmlns:cc="http://web.resource.org/cc/"
+                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                xml:lang="en" type="Course">
+  <metadata xmlns:md="http://cnx.rice.edu/mdml"
+          mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+
+  <md:repository>http://cnx.org/content</md:repository>
+  <md:content-url>http://cnx.org/content/col10064/1.12</md:content-url>
+  <md:content-id>col10064</md:content-id>
+  <md:title>Signals and Systems</md:title>
+  
+  
+  <md:version>1.12</md:version>
+  <md:created>2001/06/21</md:created>
+  <md:revised>2010/08/02 10:32:07.934 GMT-5</md:revised>
+
+  <md:actors>
+    
+    
+    <md:person userid="skruzick">
+      <md:firstname>Stephen</md:firstname>
+      <md:surname>Kruzick</md:surname>
+      <md:fullname>Stephen Kruzick</md:fullname>
+      <md:email>skruzick@rice.edu</md:email>
+    </md:person>
+    
+    
+    
+    <md:person userid="mhutch">
+      <md:firstname>Matthew</md:firstname>
+      <md:surname>Hutchinson</md:surname>
+      <md:fullname>Matthew Hutchinson</md:fullname>
+      <md:email>mhutch85@gmail.com</md:email>
+    </md:person>
+    
+    
+    
+    <md:person userid="richb">
+      <md:firstname>Richard</md:firstname>
+      <md:surname>Baraniuk</md:surname>
+      <md:fullname>Richard Baraniuk</md:fullname>
+      <md:email>richb@rice.edu</md:email>
+    </md:person>
+    
+    
+    
+    <md:person userid="Markpanzee">
+      <md:firstname>Mark</md:firstname>
+      <md:surname>Davenport</md:surname>
+      <md:fullname>Mark Davenport</md:fullname>
+      <md:email>md@rice.edu</md:email>
+    </md:person>
+    
+    
+    
+    <md:person userid="mariyah">
+      <md:firstname>Mariyah</md:firstname>
+      <md:surname>Poonawala</md:surname>
+      <md:fullname>Mariyah Poonawala</md:fullname>
+      <md:email>mariyah@rice.edu</md:email>
+    </md:person>
+    
+    
+    
+    <md:person userid="prash">
+      <md:firstname>Prashant</md:firstname>
+      <md:surname>Singh</md:surname>
+      <md:fullname>Prashant Singh</md:fullname>
+      <md:email>prash@ece.rice.edu</md:email>
+    </md:person>
+    
+  </md:actors>
+  <md:roles>
+    <md:role type="author">richb</md:role>
+    <md:role type="maintainer">richb prash mariyah mhutch Markpanzee skruzick</md:role>
+    <md:role type="licensor">richb</md:role>
+    
+    
+  </md:roles>
+
+  <md:license url="http://creativecommons.org/licenses/by/1.0" />
+  <!-- For information on license requirements for use or modification, see license url in the
+       above <md:license> element.
+       For information on formatting required attribution, see the URL:
+         CONTENT_URL/content_info#cnx_cite_header
+       where CONTENT_URL is the value provided above in the <md:content-url> element.
+  -->
+  
+  
+  
+  
+
+  
+
+  <md:keywordlist>
+    <md:keyword>continuous time</md:keyword>
+    <md:keyword>convolution</md:keyword>
+    <md:keyword>discrete time</md:keyword>
+    <md:keyword>elec 301</md:keyword>
+    <md:keyword>fast fourier transform</md:keyword>
+    <md:keyword>FFT</md:keyword>
+    <md:keyword>fourier series</md:keyword>
+    <md:keyword>fourier transform</md:keyword>
+    <md:keyword>frequency domain</md:keyword>
+    <md:keyword>impulse response</md:keyword>
+    <md:keyword>labview</md:keyword>
+    <md:keyword>laplace transform</md:keyword>
+    <md:keyword>linear algebra</md:keyword>
+    <md:keyword>reconstruction</md:keyword>
+    <md:keyword>rice university</md:keyword>
+    <md:keyword>sampling</md:keyword>
+    <md:keyword>signal</md:keyword>
+    <md:keyword>signal processing</md:keyword>
+    <md:keyword>system</md:keyword>
+    <md:keyword>time domain</md:keyword>
+    <md:keyword>transform</md:keyword>
+    <md:keyword>z-transform</md:keyword>
+  </md:keywordlist>
+
+  <md:subjectlist>
+    <md:subject>Science and Technology</md:subject>
+  </md:subjectlist>
+
+  <md:abstract>This course deals with signals, systems, and transforms, from their theoretical mathematical foundations to practical implementation in circuits and computer algorithms.  At the conclusion of ELEC 301, you should have a deep understanding of the mathematics and practical issues of signals in continuous and discrete time, linear time invariant systems, convolution, and Fourier transforms.
+</md:abstract>
+
+  <md:language>en</md:language>
+
+  
+
+  
+  
+  <md:institution>Rice University</md:institution>
+  <md:course-code>Elec 301</md:course-code>
+  <md:instructor>Richard Baraniuk</md:instructor>
+
+  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
+       Changes to the metadata section in the source will not be saved. -->
+</metadata>
+
+  <col:parameters>
+    <col:param name="real-imaginary-notation" value="text"/>
+    <col:param name="and-or-notation" value="text"/>
+    <col:param name="gradient-notation" value="symbolic"/>
+    <col:param name="mean-notation" value="bar"/>
+    <col:param name="remainder-notation" value="text"/>
+    <col:param name="conjugate-notation" value="star"/>
+    <col:param name="imaginary-i-notation" value="j"/>
+    <col:param name="scalar-product-notation"
+               value="angle-bracket"/>
+    <col:param name="print-font-size" value="10pt"/>
+    <col:param name="curl-notation" value="symbolic"/>
+    <col:param name="for-all-equation-layout" value="text"/>
+    <col:param name="vector-notation" value="bold"/>
+    <col:param name="print-paper-size" value="8.5x11"/>
+    <col:param name="print-font" value="computer-modern"/>
+    <col:param name="print-paragraph-spacing"
+               value="compact"/>
+  </col:parameters>
+  
+  <col:content>
+    
+      
+        
+      <col:subcollection>
+        <md:title>Introduction to Signals</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10057" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.21">
+        <md:title>Signal Classifications and Properties</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m12363" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.4">
+        <md:title>Signal Size and Norms</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10125" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.10">
+        <md:title>Signal Operations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10058" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.15">
+        <md:title>Common Continuous Time Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34575" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Common Discrete Time Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10059" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.21">
+        <md:title>Continuous Time Impulse Function</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34566" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Discrete Time Impulse Function</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10060" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.22">
+        <md:title>Continuous Time Complex Exponential</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34573" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Discrete Time Complex Exponential</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Introduction to Systems</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10084" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.21">
+        <md:title>System Classifications and Properties</md:title>
+        
+        
+        <col:featured-links>
+          
+            <cnxml:link-group type="example">
+              <cnxml:link url="http://cnx.rice.edu/content/m0006/latest/">Simple Systems</cnxml:link>
+            </cnxml:link-group>
+          
+          
+            <cnxml:link-group type="supplemental">
+              <cnxml:link url="http://cnx.rice.edu/content/m10057/latest/">Signal Classifications and Properties</cnxml:link>
+              <cnxml:link url="http://cnx.rice.edu/content/m10113/latest/">BIBO Stability</cnxml:link>
+              <cnxml:link url="http://cnx.rice.edu/content/m10057/latest/">Signal Classification</cnxml:link>
+            </cnxml:link-group>
+          
+        </col:featured-links>
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m2102" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.18">
+        <md:title>Linear Time Invariant Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Time Domain Analysis of Continuous Time Systems</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10855" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Continuous Time Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34629" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Continuous Time Impulse Response</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10085" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.31">
+        <md:title>Continuous Time Convolution</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10088" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.17">
+        <md:title>Properties of Continuous Time Convolution</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34639" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Eigenfunctions of Continuous Time LTI Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10113" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.11">
+        <md:title>BIBO Stability of Continuous Time Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34501" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.4">
+        <md:title>Linear Constant Coefficient Differential Equations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34506" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.4">
+        <md:title>Solving Linear Constant Coefficient Differential Equations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Time Domain Analysis of Discrete Time Systems</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34614" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Discrete Time Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34626" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Discrete Time Impulse Response</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10087" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.21">
+        <md:title>Discrete Time Convolution</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34625" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Properties of Discrete Time Convolution</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34640" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Eigenfunctions of Discrete Time LTI Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34515" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>BIBO Stability of Discrete Time Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m12325" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.4">
+        <md:title>Linear Constant Coefficient Difference Equations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m12326" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.5">
+        <md:title>Solving Linear Constant Coefficient Difference Equations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Introduction to Fourier Analysis</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10096" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.12">
+        <md:title>Introduction to Fourier Analysis</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Continuous Time Fourier Series (CTFS)</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10744" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Continuous Time Periodic Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34531" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.5">
+        <md:title>Continuous Time Fourier Series (CTFS)</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34770" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.3">
+        <md:title>Common Fourier Series</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10740" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.9">
+        <md:title>Properties of the CTFS</md:title>
+        
+        
+        <col:featured-links>
+          
+            <cnxml:link-group type="prerequisite">
+              <cnxml:link url="http://cnx.rice.edu/content/m10496/latest/">Fourier Series</cnxml:link>
+            </cnxml:link-group>
+          
+        </col:featured-links>
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10839" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Continuous Time Circular Convolution and the CTFS</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10745" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.5">
+        <md:title>Convergence of Fourier Series</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10092" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.10">
+        <md:title>Gibbs Phenomena</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Discrete Time Fourier Series (DTFS)</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34824" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Discrete Time Periodic Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10784" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.9">
+        <md:title>Discrete Time Fourier Series (DTFS)</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34509" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.3">
+        <md:title>Common Discrete Fourier Series</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34508" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.3">
+        <md:title>Properties of the DTFS</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10786" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.10">
+        <md:title>Discrete Time Circular Convolution and the DTFS</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Continuous Time Fourier Transform (CTFT)</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34848" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Continuous Time Aperiodic Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10098" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.12">
+        <md:title>Continuous Time Fourier Transform (CTFT)</md:title>
+        
+        
+        <col:featured-links>
+          
+            <cnxml:link-group type="supplemental">
+              <cnxml:link url="http://cnx.rice.edu/content/m10100/latest/">Properties of the Fourier Transform</cnxml:link>
+              <cnxml:link url="http://cnx.rice.edu/content/m10099/latest/">Table of Common Fourier Transforms</cnxml:link>
+            </cnxml:link-group>
+          
+        </col:featured-links>
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10099" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.11">
+        <md:title>Common Fourier Transforms</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10100" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.15">
+        <md:title>Properties of the CTFT</md:title>
+        
+        
+        <col:featured-links>
+          
+            <cnxml:link-group type="supplemental">
+              <cnxml:link url="http://cnx.rice.edu/content/m0045/latest/">Expanded Table of FT Properties</cnxml:link>
+              <cnxml:link url="http://cnx.rice.edu/content/m0046/latest/">Derivation of Fourier Transfrom with Properties</cnxml:link>
+            </cnxml:link-group>
+          
+        </col:featured-links>
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34849" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Continuous Time Convolution and the CTFT</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Discrete Time Fourier Transform (DTFT)</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34850" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Discrete Time Aperiodic Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10108" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.14">
+        <md:title>Discrete Time Fourier Transform (DTFT)</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34771" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Common Discrete Time Fourier Transforms</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m0506" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Properties of the DTFT</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34851" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Discrete Convolution and the DTFT</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Sampling and Reconstruction</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10798" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Signal Sampling</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10791" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Sampling Theorem</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10788" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Signal Reconstruction</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10790" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Perfect Reconstruction</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34847" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Aliasing Phenomena</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10794" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Anti-Aliasing Filters</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10797" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.11">
+        <md:title>Discrete Time Processing of Continuous Time Signals</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Laplace Transform and Continuous Time System Design</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10110" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.14">
+        <md:title>Laplace Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10111" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.13">
+        <md:title>Common Laplace Transforms</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10117" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.11">
+        <md:title>Properties of the Laplace Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34857" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Inverse Laplace Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34855" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Poles and Zeros in the S-Plane</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10114" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.10">
+        <md:title>Region of Convergence for the Laplace Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34530" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Rational Functions and the Laplace Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34510" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.3">
+        <md:title>Differential Equations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34921" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Continuous Time Filter Design</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Z-Transform and Discrete Time System Design</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34858" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Z-Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34859" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.1">
+        <md:title>Common Z-Transforms</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34477" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Properties of the Z-Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10651" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.5">
+        <md:title>Inverse Z-Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10556" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.9">
+        <md:title>Poles and Zeros in the Z-Plane</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10622" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Region of Convergence for the Z-transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10593" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Rational Functions and the Z-Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10595" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Difference Equations</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10548" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.10">
+        <md:title>Discrete Time Filter Design</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Capstone Signal Processing Topics</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m0504" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>DFT: Fast Fourier Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10783" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>The Fast Fourier Transform (FFT)</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m0528" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Deriving the Fast Fourier Transform</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m34670" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.5">
+        <md:title>Matched Filter Detector</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Appendix A:  Linear Algebra Overview</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m10734" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Basic Linear Algebra</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10736" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.9">
+        <md:title>Eigenvectors and Eigenvalues</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10738" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Matrix Diagonalization</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10742" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Eigen-stuff in a Nutshell</md:title>
+        
+        
+        <col:featured-links>
+          
+            <cnxml:link-group type="supplemental">
+              <cnxml:link url="http://cnx.rice.edu/modules/m10496/latest/">Fourier Series: Eigenfunction Approach</cnxml:link>
+            </cnxml:link-group>
+          
+          
+            <cnxml:link-group type="prerequisite">
+              <cnxml:link url="http://cnx.rice.edu/modules/m10734/latest/">Basics of Linear Algebra</cnxml:link>
+              <cnxml:link url="http://cnx.rice.edu/modules/m10736/latest/">Eigenvectors and Eigenvalues</cnxml:link>
+            </cnxml:link-group>
+          
+        </col:featured-links>
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10500" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.9">
+        <md:title>Eigenfunctions of LTI Systems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Appendix B: Hilbert Spaces Overview</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34514" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.4">
+        <md:title>Fields and Complex Numbers</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10767" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Vector Spaces</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10768" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Norms</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10755" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Inner Products</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10840" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Hilbert Spaces</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10757" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Cauchy-Schwarz Inequality</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10759" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Common Hilbert Spaces</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10772" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Types of Bases</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10760" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Orthonormal Basis Expansions</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10770" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Function Space</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10764" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Haar Wavelet Basis</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10765" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.8">
+        <md:title>Orthonormal Bases in Real and Complex Spaces</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10769" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Plancharel and Parseval's Theorems</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10766" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.9">
+        <md:title>Approximation and Projections in Hilbert Space</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Appendix C:  Analysis Topics Overview</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34616" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.2">
+        <md:title>Introduction to Metric Spaces</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10883" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.6">
+        <md:title>Convergence of Sequences</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10894" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.4">
+        <md:title>Convergence of Sequences of Vectors</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+    
+      <col:module document="m10895" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Uniform Convergence of Function Sequences</md:title>
+        
+        
+        
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+    
+      
+        
+      <col:subcollection>
+        <md:title>Appendix D:  Viewing Embedded LabVIEW Content</md:title>
+        
+        
+        
+
+        <col:content>
+          
+    
+      <col:module document="m34460" version="latest"
+                  repository="http://cnx.org/content"
+                  cnxorg:version-at-this-collection-version="1.4">
+        <md:title>Viewing Embedded LabVIEW Content in Connexions</md:title>
+        
+        
+        <col:featured-links>
+          
+            <cnxml:link-group type="supplemental">
+              <cnxml:link url="http://www.cnx.org/content/m13768/latest/">Including LabVIEW Content in Connexions Modules</cnxml:link>
+            </cnxml:link-group>
+          
+        </col:featured-links>
+      </col:module>
+        
+      
+    
+        </col:content>
+      </col:subcollection>
+    
+  </col:content>
+</col:collection>

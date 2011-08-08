@@ -90,7 +90,7 @@ public class JdoExportItemEntity extends CnxJdoEntity {
     public static Key exportEntityKey(Key parentKey, ExportType exportType) {
         checkNotNull(parentKey, "null parent key");
         checkNotNull(exportType, "null export type");
-        return KeyFactory.createKey(parentKey, SchemaConsts.EXPORT_ITEM_KEY_KIND, exportType
-            .getId());
+        return KeyFactory.createKey(parentKey, SchemaConsts.EXPORT_ITEM_KEY_KIND,
+                exportType.getId());
     }
 }

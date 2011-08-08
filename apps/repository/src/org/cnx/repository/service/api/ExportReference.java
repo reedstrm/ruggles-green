@@ -59,7 +59,7 @@ public class ExportReference {
         this.exportTypeId = checkNotNull(exportTypeId);
 
         checkArgument(scopeType.isVersion() || versionNumber == null,
-            "Non null version number for non version scope: %s", scopeType);
+                "Non null version number for non version scope: %s", scopeType);
     }
 
     public ExportScopeType getScopeType() {
@@ -82,6 +82,6 @@ public class ExportReference {
     @Override
     public String toString() {
         return String.format("scope=%s, id=%s, version=%s, type=%s", scopeType, objectId,
-            versionNumber, exportTypeId);
+                versionNumber, exportTypeId);
     }
 }

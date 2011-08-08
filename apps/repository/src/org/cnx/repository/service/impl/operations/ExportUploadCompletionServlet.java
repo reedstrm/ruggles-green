@@ -73,8 +73,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         final ExportReferenceValidationResult validationResult =
             ExportReferenceValidationResult.validateReference(exportReference);
         checkArgument(validationResult.getRepositoryStatus().isOk(),
-            "Invalid export reference: %s, error: %s", exportReference, validationResult
-                .getStatusDescription());
+                "Invalid export reference: %s, error: %s", exportReference,
+                validationResult.getStatusDescription());
 
         // Get blob id from the request
         // TODO(tal): move to common place and share with resource uploader
@@ -98,7 +98,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
                 (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
-                    validationResult.getParentKey());
+                        validationResult.getParentKey());
 
             // TODO(tal): if export already exists, delete old blob. Currently we orphan it.
             // TODO(tal): verify blob param and delete if bad (type mismatch, size, etc).

@@ -24,8 +24,6 @@ public class KeyUtilTest {
         assertEquals("XJQdSUGIIBENCW", KeyUtil.idToString("X", -7460683158697921450L));
         assertEquals("XHffffffffffff", KeyUtil.idToString("X", 9223372036854775807L));
         assertEquals("XIAAAAAAAAAAAA", KeyUtil.idToString("X", -9223372036854775808L));
-
-        assertEquals("CnxLiveawesome", KeyUtil.idToString("C", -8597248582506601250L));
     }
 
     @Test

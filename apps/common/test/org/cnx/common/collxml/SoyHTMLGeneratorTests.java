@@ -20,12 +20,14 @@ import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
 import java.net.URI;
-import org.cnx.html.ResourceResolver;
+import org.cnx.cnxml.LinkResolver;
+import org.cnx.mdml.MdmlMetadata;
 import org.cnx.util.DocumentBuilderProvider;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
@@ -34,12 +36,12 @@ import static org.junit.Assert.*;
  */
 public class SoyHTMLGeneratorTests {
     private static final String COLLECTION_NAMESPACE = "collection";
-    private static final String METADATA_NAMESPACE = "metadata";
+    private static final String MDML_NAMESPACE = "mdml";
 
     private DOMBuilder builder;
     private SoyHTMLGenerator generator;
 
-    private static class MockResourceResolver implements ResourceResolver {
+    private static class MockLinkResolver implements LinkResolver {
         @Override public URI resolveURI(URI uri) throws Exception {
             assertNotNull(uri);
             return uri;
@@ -58,23 +60,38 @@ public class SoyHTMLGeneratorTests {
         }
     }
 
+    private static class MockMetadataFactory implements MdmlMetadata.Factory {
+        @Override public MdmlMetadata create(Element elem) {
+            return new MdmlMetadata(elem, MDML_NAMESPACE);
+        }
+    }
+
     @Before public void createBuilder() {
         builder = new DOMBuilder(new DocumentBuilderProvider().get().newDocument(),
                 COLLECTION_NAMESPACE);
     }
 
     @Before public void createGenerator() {
-        generator = new SoyHTMLGenerator(null, new MockResourceResolver(),
-                COLLECTION_NAMESPACE, METADATA_NAMESPACE);
+        generator = new SoyHTMLGenerator(null, new MockLinkResolver(), new MockMetadataFactory(),
+                COLLECTION_NAMESPACE);
+    }
+
+    @Test public void itemExtractionShouldAllowEmpty() throws Exception {
+        final Document doc = (Document)builder.child(builder.element("collection").child(
+                    builder.element("content")
+        )).build();
+        final SoyListData itemList = generator.extractItemsFromCollxml(doc);
+
+        assertEquals(0, itemList.length());
     }
 
     @Test public void itemExtractionShouldFindModule() throws Exception {
         final Document doc = (Document)builder.child(builder.element("collection").wrapContent(
                 builder.element("module")
                         .attr("url", "http://www.example.com/")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("My Module"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("My Module"))
         )).build();
-        final SoyListData itemList = generator.extractItemsFromCollection(doc);
+        final SoyListData itemList = generator.extractItemsFromCollxml(doc);
 
         assertEquals(1, itemList.length());
         assertTrue(itemList.get(0) instanceof SoyMapData);
@@ -88,9 +105,9 @@ public class SoyHTMLGeneratorTests {
                 builder.element("module")
                         .attr("document", "mymod")
                         .attr("version", "abc123")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("My Module"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("My Module"))
         )).build();
-        final SoyListData itemList = generator.extractItemsFromCollection(doc);
+        final SoyListData itemList = generator.extractItemsFromCollxml(doc);
 
         assertEquals(1, itemList.length());
         assertTrue(itemList.get(0) instanceof SoyMapData);
@@ -103,15 +120,15 @@ public class SoyHTMLGeneratorTests {
         final Document doc = (Document)builder.child(builder.element("collection").wrapContent(
                 builder.element("module")
                         .attr("url", "one.cnxml")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("First")),
+                        .child(builder.element(MDML_NAMESPACE, "title").text("First")),
                 builder.element("module")
                         .attr("url", "two.cnxml")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("Second")),
+                        .child(builder.element(MDML_NAMESPACE, "title").text("Second")),
                 builder.element("module")
                         .attr("url", "three.cnxml")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("Third"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("Third"))
         )).build();
-        final SoyListData itemList = generator.extractItemsFromCollection(doc);
+        final SoyListData itemList = generator.extractItemsFromCollxml(doc);
 
         assertEquals(3, itemList.length());
         for (SoyData data : itemList) {
@@ -131,16 +148,16 @@ public class SoyHTMLGeneratorTests {
     @Test public void itemExtractionShouldFindFlatSubcollections() throws Exception {
         final Document doc = (Document)builder.child(builder.element("collection").wrapContent(
                 builder.element("subcollection")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("First"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("First"))
                         .child(builder.element("content")),
                 builder.element("subcollection")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("Second"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("Second"))
                         .child(builder.element("content")),
                 builder.element("subcollection")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("Third"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("Third"))
                         .child(builder.element("content"))
         )).build();
-        final SoyListData itemList = generator.extractItemsFromCollection(doc);
+        final SoyListData itemList = generator.extractItemsFromCollxml(doc);
 
         assertEquals(3, itemList.length());
         for (SoyData data : itemList) {
@@ -159,18 +176,18 @@ public class SoyHTMLGeneratorTests {
     @Test public void itemExtractionShouldFindTree() throws Exception {
         final Document doc = (Document)builder.child(builder.element("collection").wrapContent(
                 builder.element("subcollection")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("First"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("First"))
                         .wrapContent(
                                 builder.element("module")
                                         .attr("url", "sub.cnxml")
-                                        .child(builder.element(METADATA_NAMESPACE, "title")
+                                        .child(builder.element(MDML_NAMESPACE, "title")
                                                 .text("Submodule"))
                         ),
                 builder.element("module")
                         .attr("url", "two.cnxml")
-                        .child(builder.element(METADATA_NAMESPACE, "title").text("Second"))
+                        .child(builder.element(MDML_NAMESPACE, "title").text("Second"))
         )).build();
-        final SoyListData itemList = generator.extractItemsFromCollection(doc);
+        final SoyListData itemList = generator.extractItemsFromCollxml(doc);
 
         assertEquals(2, itemList.length());
         for (SoyData data : itemList) {

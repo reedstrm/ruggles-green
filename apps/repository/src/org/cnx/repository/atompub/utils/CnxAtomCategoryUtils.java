@@ -23,7 +23,7 @@ import com.sun.syndication.feed.atom.Category;
 
 /**
  * Utility class for AtomCategories.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomCategoryUtils {
@@ -33,33 +33,33 @@ public class CnxAtomCategoryUtils {
 
     /**
      * Get Category for Cnx Resources.
-     *
+     * 
      * @param resourceScheme Scheme for Cnx Resources.
      */
     public static Category getCnxResourceCategoryEle(URL resourceScheme) {
         return getCnxCategoryEle(resourceScheme, CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH,
-            CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH);
+                CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH);
     }
 
     /**
      * Get Category for Cnx Modules..
-     *
+     * 
      * @param moduleScheme Scheme for Cnx Modules..
      */
     public static Category getCnxModuleCategoryEle(URL moduleScheme) {
         return getCnxCategoryEle(moduleScheme, CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH,
-            CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH);
+                CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH);
     }
 
     /**
      * Get Category for Cnx Collection..
-     *
+     * 
      * @param cnxCollectionScheme Scheme for Cnx Collections.
      */
     public static Category getCnxCollectionCategoryEle(URL cnxCollectionScheme) {
         return getCnxCategoryEle(cnxCollectionScheme,
-            CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH,
-            CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH);
+                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH,
+                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH);
     }
 
     private static Category getCnxCategoryEle(URL scheme, String label, String term) {

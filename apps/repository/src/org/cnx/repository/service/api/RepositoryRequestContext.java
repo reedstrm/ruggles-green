@@ -27,7 +27,7 @@ import org.cnx.util.Nullable;
 
 /**
  * Common context that is passed to each repository operation.
- *
+ * 
  * @author Tal Dayan
  */
 public class RepositoryRequestContext {
@@ -43,7 +43,7 @@ public class RepositoryRequestContext {
      * @param hostUrl the prefix of the server URL up to the path (not including). Examples:
      *            "http://localhost:8888", "http://my_app-appstope.com". Used to construct URLs
      *            returned in repository responses.
-     *
+     * 
      * @param authenticatedUserId an optional string with the user id. Null if no user id is
      *            associated with this request. It is the responsibility of the caller to
      *            authenticate the user. The repository service uses this value to authorize the
@@ -73,7 +73,7 @@ public class RepositoryRequestContext {
 
     /**
      * Compute local host base url from an incoming httpRequest.
-     *
+     * 
      * @param httpRequest an incoming HTTP request.
      * @return host URL (e.g. "http://myserver.com" or "http://localhost:8888"
      */
@@ -92,12 +92,13 @@ public class RepositoryRequestContext {
             throw new RuntimeException("Could not construct host url", e);
         }
 
-//        ApiProxy.Environment env =  ApiProxy.getCurrentEnvironment();
-//        Object value = env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
-//        System.out.println("**** value: " + value);
-//        for (Object key: env.getAttributes().keySet()) {
-//            System.out.println("  [" + key + "]");
-//        }
+        // ApiProxy.Environment env = ApiProxy.getCurrentEnvironment();
+        // Object value =
+        // env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
+        // System.out.println("**** value: " + value);
+        // for (Object key: env.getAttributes().keySet()) {
+        // System.out.println("  [" + key + "]");
+        // }
 
         return url.toString();
     }

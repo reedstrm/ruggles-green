@@ -35,27 +35,27 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)
 public class CnxServiceDocumentServlet {
     private final String SERVICE_DOCUMENT_GET = "/";
 
-    @GET
     // @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-                    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
-                    @Path(SERVICE_DOCUMENT_GET)
-                    public
-                    Response getServiceDocument(@Context HttpServletRequest req,
-                        @Context HttpServletResponse res) {
+    @GET
+    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
+    @Path(SERVICE_DOCUMENT_GET)
+    public Response getServiceDocument(@Context HttpServletRequest req,
+            @Context HttpServletResponse res) {
         // TODO(arjuns) : Add caching and exception handling.
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
         CnxAtomService atomService = new CnxAtomService(repositoryContext.getHostUrl());
 
-        return Response.ok().entity(
-            PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument())).build();
+        return Response.ok()
+            .entity(PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument()))
+            .build();
     }
 }

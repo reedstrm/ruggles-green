@@ -24,20 +24,25 @@ import com.google.inject.name.Names;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.cnx.html.CnxmlNamespace;
-import org.cnx.html.ModuleHTMLGenerator;
-import org.cnx.html.RenderScope;
+import org.cnx.cnxml.CnxmlNamespace;
+import org.cnx.cnxml.Module;
+import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
 import org.cnx.util.DOMUtils;
 import org.w3c.dom.Element;
 
 @Singleton public class RenderModuleServlet extends HttpServlet {
     private static final String TEMPLATE_NAME = "org.cnx.web.module";
-    private static final String PREFIX = "/module/";
+    private static final String PREFIX = "/light/module/";
     private static final String MIME_TYPE = "text/html; charset=utf-8";
+
+    private static final Logger log = Logger.getLogger(RenderModuleServlet.class.getName());
 
     private final SoyTofu tofu;
     private final XmlFetcher fetcher;
@@ -62,23 +67,23 @@ import org.w3c.dom.Element;
         final String version = components[1];
 
         // Fetch module
-        XmlFetcher.Module module;
+        Module module;
         try {
             module = fetcher.fetchModuleVersion(moduleId, version);
         } catch (Exception e) {
-            // TODO: Log exception
-            // TODO: 404 or 500
+            log.log(Level.WARNING, "Error while fetching", e);
+            // TODO(light): 404 or 500
             return;
         }
 
         // Render content
         String title, contentHtml;
         try {
-            title = getTitle(module.getModuleDocument());
-            contentHtml = renderContent(moduleId, module);
+            title = module.getMetadata().getTitle();
+            contentHtml = renderContent(module);
         } catch (Exception e) {
-            // TODO: Log exception
-            // TODO: 500
+            log.log(Level.WARNING, "Error while rendering", e);
+            // TODO(light): 500
             return;
         }
 
@@ -98,11 +103,11 @@ import org.w3c.dom.Element;
         return new String[]{components[0], components[1]};
     }
 
-    private String renderContent(String moduleId, XmlFetcher.Module module) throws Exception {
+    private String renderContent(Module module) throws Exception {
         renderScope.enter();
         try {
-            renderScope.seed(Key.get(String.class, Names.named("moduleId")), moduleId);
-            return generatorProvider.get().generate(module.getModuleDocument());
+            renderScope.seed(Module.class, module);
+            return generatorProvider.get().generate(module);
         } finally {
             renderScope.exit();
         }

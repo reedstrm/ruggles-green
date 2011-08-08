@@ -88,7 +88,7 @@ public class ExportOperations {
         }
 
         final String completionUrl = ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?" +
-        ExportUtil.exportReferenceToRequestParameters(exportReference);
+                ExportUtil.exportReferenceToRequestParameters(exportReference);
 
         // Workaround for runs locally in eclipse.
         //

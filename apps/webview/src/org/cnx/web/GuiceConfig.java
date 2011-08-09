@@ -16,8 +16,10 @@
 
 package org.cnx.web;
 
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.template.soy.SoyModule;
 import org.cnx.common.collxml.CollxmlModule;
@@ -28,7 +30,11 @@ import org.cnx.util.UtilModule;
 
 public class GuiceConfig extends GuiceServletContextListener {
     @Override protected Injector getInjector() {
-        return Guice.createInjector(
+        Stage stage = Stage.DEVELOPMENT;
+        if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+            stage = Stage.PRODUCTION;
+        }
+        return Guice.createInjector(stage,
                 new CnxmlModule(),
                 new CollxmlModule(),
                 new DefaultProcessorModule(),

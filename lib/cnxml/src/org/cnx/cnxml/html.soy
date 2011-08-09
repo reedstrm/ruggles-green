@@ -745,7 +745,15 @@
     {/if}
 
     <figure id="{$node.attributes.id}">
-        {call .children data="all"/}
+        {if findElem($node, 'subfigure')}
+            {if $node.attributes.orient == 'vertical'}
+                {call .verticalSubfigures data="all"/}
+            {else}
+                {call .horizontalSubfigures data="all"/}
+            {/if}
+        {else}
+            {call .children data="all"/}
+        {/if}
         <figcaption>
             {if findElem($node, 'label')}
                 {innerText(findElem($node, 'label'))}
@@ -756,6 +764,42 @@
             {if findElem($node, 'caption')}: {innerText(findElem($node, 'caption'))}{/if}
         </figcaption>
     </figure>
+{/template}
+
+/**
+ *  Show subfigures in a vertical configuration.
+ *
+ *  @param node The figure DOM element node
+ */
+{template .verticalSubfigures private="true"}
+    <table class="verticalSubfigureContainer">
+        <tbody>
+            {foreach $child in $node.childNodes}
+                {if $child.nodeType == 'element' and $child.localName == 'subfigure'}
+                    <tr><td>{call .children}{param node: $child/}{/call}</tr></td>
+                {/if}
+            {/foreach}
+        </tbody>
+    </table>
+{/template}
+
+/**
+ *  Show subfigures in a horizontal configuration.
+ *
+ *  @param node The figure DOM element node
+ */
+{template .horizontalSubfigures private="true"}
+    <table class="horizontalSubfigureContainer">
+        <tbody>
+            <tr>
+                {foreach $child in $node.childNodes}
+                    {if $child.nodeType == 'element' and $child.localName == 'subfigure'}
+                        <td>{call .children}{param node: $child/}{/call}</td>
+                    {/if}
+                {/foreach}
+            </tr>
+        </tbody>
+    </table>
 {/template}
 
 /**

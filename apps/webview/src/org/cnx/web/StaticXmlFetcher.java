@@ -19,6 +19,7 @@ package org.cnx.web;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.io.File;
+import java.util.zip.ZipFile;
 import javax.xml.parsers.DocumentBuilder;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
@@ -32,34 +33,43 @@ import org.w3c.dom.Document;
  *  This is for testing purposes only.
  */
 @Singleton public class StaticXmlFetcher implements XmlFetcher {
-    private static final String PREFIX = "staticxml/";
-    private static final String MODULE_SUFFIX = ".cnxml";
-    private static final String RESOURCE_MAPPING_SUFFIX = "-mapping.xml";
-    private static final String COLLECTION_SUFFIX = ".collxml";
-    private static final String VERSION_SEP = "_";
+    private static final String ZIP_FILE = "col10064_1.12_complete.zip";
+    private static final String PREFIX = "col10064_1.12_complete/";
+    private static final String MODULE_PREFIX = PREFIX;
+    private static final String MODULE_SUFFIX = "/index_auto_generated.cnxml";
+    private static final String COLLECTION_NAME = PREFIX + "collection.xml";
 
     private final DocumentBuilder docBuilder;
     private final ModuleFactory moduleFactory;
     private final CollectionFactory collectionFactory;
+    private final ZipFile collectionZip;
 
     @Inject public StaticXmlFetcher(final DocumentBuilder docBuilder,
             final ModuleFactory moduleFactory, final CollectionFactory collectionFactory) {
         this.docBuilder = docBuilder;
         this.moduleFactory = moduleFactory;
         this.collectionFactory = collectionFactory;
+        try {
+            this.collectionZip = new ZipFile(new File(ZIP_FILE));
+        } catch (Exception e) {
+            throw new IllegalStateException("Your zip file could not be loaded.", e);
+        }
     }
 
     public Module fetchModuleVersion(String moduleId, String version) throws Exception {
+        String subpath = MODULE_PREFIX + moduleId + MODULE_SUFFIX;
         Document module = docBuilder.parse(
-                new File(PREFIX + moduleId + VERSION_SEP + version + MODULE_SUFFIX));
-        Document mapping = docBuilder.parse(
-                new File(PREFIX + moduleId + VERSION_SEP + version + RESOURCE_MAPPING_SUFFIX));
+                collectionZip.getInputStream(collectionZip.getEntry(subpath)));
+
+        // TODO(light): Parse actual mapping
+        Document mapping = docBuilder.newDocument();
+
         return moduleFactory.create(moduleId, module, mapping);
     }
 
     public Collection fetchCollectionVersion(String collectionId, String version) throws Exception {
         Document doc = docBuilder.parse(
-                new File(PREFIX + collectionId + VERSION_SEP + version + COLLECTION_SUFFIX));
+                collectionZip.getInputStream(collectionZip.getEntry(COLLECTION_NAME)));
         return collectionFactory.create(collectionId, doc);
     }
 }

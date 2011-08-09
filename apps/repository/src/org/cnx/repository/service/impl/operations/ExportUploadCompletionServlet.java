@@ -66,7 +66,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
         final Map<String, BlobKey> incomingBlobs = Services.blobstore.getUploadedBlobs(req);
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
 
         // List of blobs to delete upon return, each associated with a reason describing

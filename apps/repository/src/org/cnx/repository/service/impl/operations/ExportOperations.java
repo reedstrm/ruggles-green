@@ -71,7 +71,7 @@ public class ExportOperations {
         }
 
         // Verify that the parent entity exist.
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         try {
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
@@ -121,7 +121,7 @@ public class ExportOperations {
         }
 
         // Lookup the export entity and fetch the blob key.
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final BlobKey blobKey;
         try {
             final JdoExportItemEntity entity =
@@ -164,7 +164,7 @@ public class ExportOperations {
                     validationResult.getStatusDescription(), log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
         final BlobKey blobKey;
         tx.begin();

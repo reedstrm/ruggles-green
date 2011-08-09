@@ -17,6 +17,7 @@
 package org.cnx.repository.service.impl.operations;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,16 +25,21 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
+//import javax.jdo.PersistenceManager;
+//import javax.jdo.Transaction;
+//import javax.jdo.Transaction;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.google.appengine.api.datastore.Transaction;
 
-import org.cnx.repository.service.impl.schema.JdoResourceEntity;
+import org.cnx.repository.service.impl.schema.OrmResourceEntity;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
@@ -80,8 +86,10 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             blobsToDeleteOnExit.add(Pair.of(blobKey, "Unused incoming resource blob"));
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
-        final Transaction tx = pm.currentTransaction();
+        // TODO(tal): *** move this to Services class.
+        final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        Transaction tx = null;
+
         final String resourceId = ResourceUtil.getResourceIdParam(req, "");
 
 
@@ -89,14 +97,15 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         // to delete unused blobs when leaving the method.
         try {
             // Convert encoded resource id to internal resource id
-            final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
-            // NOTE(tal): this can happen only due to programming error.
+            final Key resourceKey = OrmResourceEntity.resourceIdToKey(resourceId);
+            // NOTE(tal): this can happen only due to programming error since it is a callback
+            // from blobstore.
             checkArgument(resourceKey != null, "Invalid resource id: [%s]", resourceId);
 
             // Get blob id from the request
             if (incomingBlobs.size() != 1) {
                 final String message =
-                    "Resource factory completion handler expected to find exactly one blob but found ["
+                    "Resource factory completion handler expected to find " + "exactly one blob but found ["
                         + incomingBlobs.size() + "]";
                 log.severe(message);
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
@@ -125,17 +134,22 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             // TODO(tal): if needed, add here validation of resource content type (available from
             // blobkInfo). We can use whitelist or blacklist of content types.
 
+            // We are done with blob info access. Start the update transaction.
+            tx = checkNotNull(datastore.beginTransaction());
+
             // Promote the resource entity to UPLOADED state with the incoming blob.
-            tx.begin();
-            final JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
-            if (entity.getState() != JdoResourceEntity.State.PENDING_UPLOAD) {
+            Entity entity = datastore.get(resourceKey);
+            final OrmResourceEntity ormEntity = new OrmResourceEntity(entity);
+
+            if (ormEntity.getState() != OrmResourceEntity.State.PENDING_UPLOAD) {
                 tx.rollback();
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_BAD_REQUEST, "Resource "
-                    + resourceId + " is not in pending upload state: " + entity.getState(), null,
+                    + resourceId + " is not in pending upload state: " + ormEntity.getState(), null,
                         log, Level.WARNING);
                 return;
             }
-            entity.pendingToUploadedTransition(blobKey);
+            ormEntity.pendingToUploadedTransition(blobKey);
+            datastore.put(ormEntity.toEntity());
             tx.commit();
             // New blob is now in use. Make sure we don't delete it upon exit.
             blobsToDeleteOnExit.clear();
@@ -143,12 +157,14 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                     "Resource upload completion handler encountered an error. id = " + resourceId,
                     e, log, Level.SEVERE);
-            tx.rollback();
+            if (tx != null) {
+                tx.rollback();
+            }
             return;
         } finally {
-            checkArgument(!tx.isActive(), "Transaction left active: %s", req.getRequestURI());
-            pm.close();
-            // Delete on exit blobs
+            checkArgument(tx == null || !tx.isActive(), "Transaction left active: %s", req.getRequestURI());
+
+            // Delete on exit blobs, if any
             for (Pair<BlobKey, String> item : blobsToDeleteOnExit) {
                 log.info("Deleting blob: " + item.first + " (" + item.second + ")");
                 Services.blobstore.delete(item.first);

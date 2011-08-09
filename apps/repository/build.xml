@@ -125,7 +125,6 @@
     </target>
 
     <target name="test-compile" description="Compile Unit Tests." depends="compile">
-        <mkdir dir="${test.dir}" />
         <mkdir dir="${test.outdir}" />
 
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
@@ -143,7 +142,7 @@
         <!-- TODO(arjuns) : Optimize classpaths. -->
         <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
         <javac srcdir="${test.src}"
-               destdir="${test.dir}"
+               destdir="${classdir}"
                includeantruntime="false"
                debug="true">
             <compilerarg line="${javac.flags}" />
@@ -161,13 +160,12 @@
             <classpath>
                 <resources refid="depend_lib" />
                 <resources refid="depend_test_lib" />
-                <pathelement location="${test.dir}" />
                 <pathelement location="${classdir}" />
             </classpath>
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*.java" />
+                    <include name="**/*Test*.java" />
                 </fileset>
             </batchtest>
         </junit>

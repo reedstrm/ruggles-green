@@ -13,6 +13,7 @@
     // TODO(tal): is there a better way to control the appstat or its logging using a
     // runtime switch?
     -->
+    <!--
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
@@ -43,6 +44,7 @@
             <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
+    -->
   
   <!-- CNX RESOURCE API -->
 
@@ -189,7 +191,7 @@
 
   <servlet-mapping>
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <url-pattern>/resource_factory/uploaded/*</url-pattern>
+    <url-pattern>/resource_factory/uploaded</url-pattern>
   </servlet-mapping> 
   
    <!--  CNX EXPORTS API -->

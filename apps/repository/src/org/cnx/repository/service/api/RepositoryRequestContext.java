@@ -21,9 +21,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-
-import org.cnx.util.Nullable;
 
 /**
  * Common context that is passed to each repository operation.

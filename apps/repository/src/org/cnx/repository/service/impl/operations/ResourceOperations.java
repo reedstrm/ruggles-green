@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,7 +43,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ResourceOperations {
@@ -77,7 +78,8 @@ public class ResourceOperations {
             pm.close();
         }
 
-        final String completionUrl = UPLOAD_COMPLETION_SERVLET_PATH + "/" + resourceId;
+        final String completionUrl = UPLOAD_COMPLETION_SERVLET_PATH + "?" + 
+                ResourceUtil.encodeUploadCompletionParameters(resourceId);
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
@@ -107,9 +109,12 @@ public class ResourceOperations {
         final JdoResourceEntity entity;
         try {
             entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
+        } catch (JDOObjectNotFoundException e) {
+            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
+                + resourceId + "]", log, e);
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                    "Could not locate resource [" + resourceId + "]", log, e);
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error when trying to retrieve resource: [" + resourceId + "]", log, e);
         } finally {
             pm.close();
         }
@@ -164,9 +169,12 @@ public class ResourceOperations {
                         "Resource content has not been uploaded yet: " + resourceId, log);
             }
             blobKey = entity.getBlobKey();
+        } catch (JDOObjectNotFoundException e) {
+            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
+                + resourceId + "]", log, e);
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                    "Could not locate resources: " + resourceId, log, e);
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error when trying to retrieve resource: " + resourceId, log, e);
         } finally {
             pm.close();
         }

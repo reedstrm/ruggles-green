@@ -30,19 +30,14 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  *
  * @author Arjun Satyapal
  */
-public abstract class CnxAtomPubBaseTest extends JerseyTest {
+public abstract class CnxAtomPubBasetest extends JerseyTest {
     // TODO(arjuns) : Move this to parent folder.
 
     private final static String PACKAGE = "org.cnx.repository.atompub.servlets";
 
-    // private WebResource webResource;
     private CnxAtomPubConstants constants;
     private URL cnxServerAtomPubUrl;
     private int cnxServerPort;
-
-    // public WebResource getWebResource() {
-    // return webResource;
-    // }
 
     public CnxAtomPubConstants getConstants() {
         return constants;
@@ -60,24 +55,19 @@ public abstract class CnxAtomPubBaseTest extends JerseyTest {
      * Remember that Port is binded once the construction phase is over. So derived classes want to
      * access URI created for CNX Server, they should not rely on constructor.
      */
-    public CnxAtomPubBaseTest() throws MalformedURLException {
+    public CnxAtomPubBasetest() throws MalformedURLException {
         super(new WebAppDescriptor.Builder(PACKAGE).contextPath(
             CnxAtomPubConstants.ATOMPUB_URL_PREFIX).build());
 
-        // webResource = resource();// .path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
-        // cnxServerAtomPubUrl = webResource.getURI().toURL();
-
         // TODO(arjuns) : Temp override as junit is not working with datastore.
         cnxServerAtomPubUrl =
-            new URL("http://localhost:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
+            new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
 
         // Initializing AppEngine environment.
         SystemProperty.environment.set(Environment.Value.Development);
 
         // Initializing CnxAtomPub Service.
         // TODO(arjuns) : Fix this.
-        constants =
-        // new CnxAtomPubConstants(webResource.getURI().toString(), webResource.getURI().getPort());
-            new CnxAtomPubConstants(cnxServerAtomPubUrl);
+        constants = new CnxAtomPubConstants(cnxServerAtomPubUrl);
     }
 }

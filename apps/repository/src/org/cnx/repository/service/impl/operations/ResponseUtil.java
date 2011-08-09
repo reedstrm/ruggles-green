@@ -21,9 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nullable;
+
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
-import org.cnx.util.Nullable;
 
 /**
  * Internal utilities related to repository responses.

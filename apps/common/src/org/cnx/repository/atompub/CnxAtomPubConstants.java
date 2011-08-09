@@ -30,9 +30,6 @@ import com.sun.syndication.feed.atom.Content;
  */
 public class CnxAtomPubConstants {
     Logger logger = Logger.getLogger(CnxAtomPubConstants.class.getName());
-    /** URL for the Application. */
-    public final URL applicationUrl;
-
     /** Subdomain for AtomPub relative to {@link #applicationUrl} */
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
@@ -42,15 +39,9 @@ public class CnxAtomPubConstants {
     // TODO(arjuns) : Fix this.
     public final static int LOCAL_SERVER_PORT = 8888;
 
-    public CnxAtomPubConstants(URL applicationUrl) {
+    public CnxAtomPubConstants(URL atomPubRestUrl) {
         // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
-        this.applicationUrl = applicationUrl;
-        try {
-            atomPubRestUrl = new URL(applicationUrl.toString() + "/" + ATOMPUB_URL_PREFIX);
-        } catch (MalformedURLException e) {
-            // TODO(arjuns) : Handle exception properly.
-            throw new RuntimeException(e);
-        }
+        this.atomPubRestUrl = atomPubRestUrl;
     }
 
     /**

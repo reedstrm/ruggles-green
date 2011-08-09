@@ -1,17 +1,15 @@
 Repository global todo items
 
-* Remove repository servier relative blobstore URL prefixing when app engine 1.3.5 will be available.
-* When overwriting an existing export, make sure to delete the old blob
-* Validate uploaded export mime type against the expected mime type of this export type.
 * Migrate the entities to non JDO API an use ancestor queries for exports (transactional).
+
 * Clean up all compilations and startup warnings
+* Add module/collection method version param for version conflict detection
+* (ETA Aug 15 2011) Remove repository servier relative blobstore URL prefixing when app engine 1.3.5 will be available.
+* Delete the temp servlets as soon as the actual API will be ready.
 
-* Add to add module/collection method version param for version conflict detection
-* Delete the temp servlets when the actual API will be ready.
-* Incoming XML update/validation (modify incoming XML with repository values (e.g. version)).
+Post Pilot
 * (Security) Add verifications that uploaded completion method are actually called from blobstore and not directly by a user.
-
-Others
+* Incoming XML update/validation (modify incoming XML with repository values (e.g. version)).
 * parameter validations (in the servlets and the service)
 * User authentication (in servlets)
 * User authorization (in service)
@@ -27,3 +25,11 @@ Done
 + Refactor common code (e.g. module version key construction).
 + Proper logging
 + Basic support for exports
++ Replace @Nullable with java standard @Nullable
++ Verify the safety and consistency of the handling of transactions that left opened.
++ When looking up an entity, distinguish between 'not found' JDOObjectNotFoundException JDO exception and all others.
++ When overwriting an existing export, make sure to delete the old blob
++ Validate uploaded export mime type against the expected mime type of this export type.
++ Use same parameter mecanism in the upload completion servlets of resources and exports.
+
+

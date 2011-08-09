@@ -18,6 +18,7 @@ package org.cnx.repository.service.impl;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.AddCollectionVersionResult;
@@ -46,7 +47,6 @@ import org.cnx.repository.service.impl.operations.CollectionOperations;
 import org.cnx.repository.service.impl.operations.ExportOperations;
 import org.cnx.repository.service.impl.operations.ModuleOperations;
 import org.cnx.repository.service.impl.operations.ResourceOperations;
-import org.cnx.util.Nullable;
 
 /**
  * Implementation of the repository service for Google App Engine.

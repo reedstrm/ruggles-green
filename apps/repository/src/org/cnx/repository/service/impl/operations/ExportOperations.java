@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 import javax.servlet.http.HttpServletResponse;
@@ -41,9 +42,9 @@ import com.google.appengine.api.blobstore.BlobKey;
 
 /**
  * Implementation of the export related operations of the repository service.
- * 
+ *
  * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- * 
+ *
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -76,23 +77,22 @@ public class ExportOperations {
             final CnxJdoEntity parentEntity =
                 (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
                         validationResult.getParentKey());
-        } catch (Throwable e) {
+        } catch (JDOObjectNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                     "Export parent object not found: " + exportReference, log, e);
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error when looking up parent entity of export: " + exportReference, log, e);
         } finally {
             pm.close();
         }
 
-        // Construct completion URL that includes the export reference. This will triger
-        // the completion servlet when the blob upload is completed.
-        final String completionUrl =
-            UPLOAD_COMPLETION_SERVLET_PATH + "?scope=" + exportReference.getScopeType() + "&id="
-                + exportReference.getObjectId() + "&version=" + exportReference.getVersionNumber()
-                + "&type=" + exportReference.getExportTypeId();
+        final String completionUrl = ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?" +
+                ExportUtil.exportReferenceToRequestParameters(exportReference);
 
         // Workaround for runs locally in eclipse.
         //
-        // TODO(tal): share the prefix logic with resource creation.
+        // TODO(tal): remove after blobstore get fixed (ETA Aug 15 2011)
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
         if (uploadUrl.startsWith("/")) {
             log.warning("Prefexing resource upload url with '" + context.hostUrl + "'");
@@ -127,9 +127,12 @@ public class ExportOperations {
             final JdoExportItemEntity entity =
                 pm.getObjectById(JdoExportItemEntity.class, validationResult.getExportKey());
             blobKey = checkNotNull(entity.getBlobKey(), "null blobkey");
-        } catch (Throwable e) {
+        } catch (JDOObjectNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
                 + exportReference, log, e);
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error when looking up export: " + exportReference, log, e);
         } finally {
             pm.close();
         }
@@ -161,17 +164,17 @@ public class ExportOperations {
                     validationResult.getStatusDescription(), log);
         }
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        Transaction tx = pm.currentTransaction();
-        tx.begin();
+        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final Transaction tx = pm.currentTransaction();
         final BlobKey blobKey;
+        tx.begin();
         try {
             // Lookup export, return NOT FOUND it not found.
             final JdoExportItemEntity entity;
             try {
                 entity =
                     pm.getObjectById(JdoExportItemEntity.class, validationResult.getExportKey());
-            } catch (Throwable e) {
+            } catch (JDOObjectNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Export not found: "
                     + exportReference, log, e);
@@ -187,7 +190,7 @@ public class ExportOperations {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error when deleting export" + exportReference, log, e);
         } finally {
-            checkArgument(!tx.isActive(), "Transaction left active");
+            checkArgument(!tx.isActive(), "Transaction left active: %s", exportReference);
             pm.close();
         }
 

@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,12 +16,13 @@
 
 package org.cnx.repository.service.impl.operations;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
@@ -31,104 +32,130 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.impl.schema.JdoResourceEntity;
 
+import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.repackaged.com.google.common.base.Pair;
+import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
- * 
+ *
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- * 
- * TODO(tal): validate the blob (e.g. against max size and reject if does not pass).
- * 
+ *
  * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
- * 
+ *
  * @author Tal Dayan
- * 
+ *
  */
 
 @SuppressWarnings("serial")
 public class ResourceUploadCompletionServlet extends HttpServlet {
+    /**
+     * Max allowed resource size in bytes. This is an arbitrary limit.
+     */
+    private static final long MAX_RESOURCE_SIZE = 50 * 1024 * 1024;
+
     private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
         .getName());
 
-    /**
-     * This path must match the servlet registration in web.xml.
-     */
-    // TODO(tal): change the parameter passing to CGI args rather than path.
-    private static final Pattern uriPattern = Pattern
-        .compile("/resource_factory/uploaded/([a-zA-Z0-9_-]+)");
-
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Parse encoded resource id from the request
-        final String requestURI = req.getRequestURI();
-        Matcher matcher = uriPattern.matcher(requestURI);
-        if (!matcher.matches()) {
-            final String message =
-                "Resource factory completion handler could not match request URI: " + requestURI;
-            log.severe(message);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
-            return;
-        }
-        final String resourceId = matcher.group(1);
 
-        // Convert encoded resource id to internal resource id
-        final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
-        if (resourceKey == null) {
-            final String message = "Invalid resource id format: [" + resourceId + "]";
-            log.severe(message);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-            return;
+        final Map<String, BlobKey> incomingBlobs = Services.blobstore.getUploadedBlobs(req);
+
+        // List of blobs to delete upon return, each associated with a reason describing
+        // why it is deleted. We update it as we go. At any point that can cause an exception
+        // or return, it is set to contains exactly the (possibly empty) list of blobs that
+        // should be deleted.
+        //
+        // TODO(tal): since blob deletion and data store entity update cannot be done in
+        // one atomic transaction, we err on the safe side and prefer to leave garbage blobs
+        // rather than breaking blob references in active exports. If we will have a significant
+        // number of garbage blobs, consider to implement a garbage collection or another safe
+        // mechanism.
+        //
+        final List<Pair<BlobKey, String>> blobsToDeleteOnExit = Lists.newArrayList();
+        for (BlobKey blobKey : incomingBlobs.values()) {
+            blobsToDeleteOnExit.add(Pair.of(blobKey, "Unused incoming resource blob"));
         }
 
-        // Get blob id from the request
-        Map<String, BlobKey> blobs = Services.blobstore.getUploadedBlobs(req);
-        if (blobs.size() != 1) {
-            final String message =
-                "Resource factory completion handler expected to find exactly one blob but found ["
-                    + blobs.size() + "]";
-            log.severe(message);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-            return;
-        }
-        BlobKey blobKey = (BlobKey) blobs.values().toArray()[0];
+        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final Transaction tx = pm.currentTransaction();
+        final String resourceId = ResourceUtil.getResourceIdParam(req, "");
 
-        // Promote the entity to UPLOADED state.
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
-        Transaction tx = pm.currentTransaction();
+
+        // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
+        // to delete unused blobs when leaving the method.
         try {
+            // Convert encoded resource id to internal resource id
+            final Key resourceKey = JdoResourceEntity.resourceIdToKey(resourceId);
+            // NOTE(tal): this can happen only due to programming error.
+            checkArgument(resourceKey != null, "Invalid resource id: [%s]", resourceId);
 
-            tx.begin();
-            final JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
-            if (entity.getState() != JdoResourceEntity.State.PENDING_UPLOAD) {
-                tx.rollback();
+            // Get blob id from the request
+            if (incomingBlobs.size() != 1) {
                 final String message =
-                    "Resource factory completion handler expected resource [" + resourceId
-                        + "] to be in state PENDING_UPLOAD but found [" + entity.getState() + "]";
+                    "Resource factory completion handler expected to find exactly one blob but found ["
+                        + incomingBlobs.size() + "]";
                 log.severe(message);
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                 return;
             }
+            BlobKey blobKey = (BlobKey) incomingBlobs.values().toArray()[0];
+
+            // Validate blob info
+            //
+            // NOTE(tal): it is important to fetch the blob info outside of the transaction
+            // since it is not in the same entity group as the resource entity we fetch below.
+            final BlobInfo blobInfo = Services.blobInfoFactory.loadBlobInfo(blobKey);
+            if (blobInfo == null) {
+                ServletUtil.setServletError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Could not find info of incoming resource blob: " + blobKey.toString(),
+                        null, log, Level.SEVERE);
+                return;
+            }
+            if (blobInfo.getSize() > MAX_RESOURCE_SIZE) {
+                ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
+                        "Export too large: " + blobInfo + " vs. " + MAX_RESOURCE_SIZE, null, log,
+                        Level.WARNING);
+                return;
+            }
+
+            // TODO(tal): if needed, add here validation of resource content type (available from
+            // blobkInfo). We can use whitelist or blacklist of content types.
+
+            // Promote the resource entity to UPLOADED state with the incoming blob.
+            tx.begin();
+            final JdoResourceEntity entity = pm.getObjectById(JdoResourceEntity.class, resourceKey);
+            if (entity.getState() != JdoResourceEntity.State.PENDING_UPLOAD) {
+                tx.rollback();
+                ServletUtil.setServletError(resp, HttpServletResponse.SC_BAD_REQUEST, "Resource "
+                    + resourceId + " is not in pending upload state: " + entity.getState(), null,
+                        log, Level.WARNING);
+                return;
+            }
             entity.pendingToUploadedTransition(blobKey);
             tx.commit();
+            // New blob is now in use. Make sure we don't delete it upon exit.
+            blobsToDeleteOnExit.clear();
         } catch (Throwable e) {
-            if (tx.isActive()) {
-                log.severe("Transaction level active");
-                tx.rollback();
-            }
-            final String message =
-                "Resource factory completion handle encountered an exception: [" + e.getMessage()
-                    + "]";
-            log.log(Level.SEVERE, message, e);
-            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, message);
+            ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
+                    "Resource upload completion handler encountered an error. id = " + resourceId,
+                    e, log, Level.SEVERE);
+            tx.rollback();
             return;
         } finally {
+            checkArgument(!tx.isActive(), "Transaction left active: %s", req.getRequestURI());
             pm.close();
+            // Delete on exit blobs
+            for (Pair<BlobKey, String> item : blobsToDeleteOnExit) {
+                log.info("Deleting blob: " + item.first + " (" + item.second + ")");
+                Services.blobstore.delete(item.first);
+            }
         }
 
         log.info("Uploaded content of resource " + resourceId);
-        // TODO(tal): is this is where we want to redirect?
         resp.sendRedirect("/");
     }
 }

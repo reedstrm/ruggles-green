@@ -19,7 +19,8 @@ import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollect
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxModule;
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxResource;
 
-import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
@@ -42,9 +43,19 @@ public class CnxAtomService extends AtomService {
         return constants;
     }
 
-    public CnxAtomService(HttpServletRequest req) {
+
+    public CnxAtomService(String hostUrl) {
         // TODO(arjuns) : Fix this.
-        constants = new CnxAtomPubConstants(null);
+
+        URL atomPubUrl = null;
+        try {
+            atomPubUrl = new URL(hostUrl + "/" + CnxAtomPubConstants.ATOMPUB_URL_PREFIX);
+        } catch (MalformedURLException e) {
+            // TODO(arjuns) : Handle exception properly.
+            throw new RuntimeException(e);
+        }
+
+        constants = new CnxAtomPubConstants(atomPubUrl);
 
         /*
          * For Connexions repository, there is only one workspace. Each workspace will have three

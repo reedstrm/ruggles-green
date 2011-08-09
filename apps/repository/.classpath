@@ -2,32 +2,23 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="testlib/" kind="src" path="test"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
-	<classpathentry kind="lib" path="build/jars/appengine-api-1.0-sdk-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-api-labs-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-jsr107cache-1.5.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/appengine-local-runtime-shared.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
-	<classpathentry kind="lib" path="build/jars/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="build/jars/datanucleus-appengine-1.0.9.final.jar"/>
-	<classpathentry kind="lib" path="build/jars/datanucleus-core-1.1.5.jar"/>
-	<classpathentry kind="lib" path="build/jars/datanucleus-jpa-1.1.5.jar"/>
 	<classpathentry kind="lib" path="build/jars/el-api.jar"/>
-	<classpathentry kind="lib" path="build/jars/geronimo-jpa_3.0_spec-1.1.1.jar"/>
-	<classpathentry kind="lib" path="build/jars/geronimo-jta_1.1_spec-1.1.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
 	<classpathentry kind="lib" path="build/jars/guice-3.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/guice-assistedinject-3.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/guice-multibindings-3.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/guice-servlet-3.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/javax.inject.jar"/>
-	<classpathentry kind="lib" path="build/jars/jdo2-api-2.3-eb.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
@@ -52,5 +43,7 @@
 	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-core-1.8.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-grizzly-1.8.jar"/>
 	<classpathentry kind="lib" path="config"/>
+	<classpathentry kind="lib" path="build/classes"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

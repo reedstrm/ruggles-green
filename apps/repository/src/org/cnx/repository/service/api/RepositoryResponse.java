@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.cnx.util.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Base class for repository operation responses. Each operation is expected to return a subclass of

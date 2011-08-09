@@ -19,7 +19,7 @@ package org.cnx.repository.service.api;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.cnx.util.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Represents an immutable reference to an export.

@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.cnx.util.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Result of a successful getResourceInfo operation.

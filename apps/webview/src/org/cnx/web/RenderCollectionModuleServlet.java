@@ -28,6 +28,8 @@ import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
@@ -39,6 +41,7 @@ import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
+import org.cnx.mdml.Actor;
 import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
@@ -108,6 +111,7 @@ import org.w3c.dom.Element;
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml;
+        List<Actor> moduleAuthors;
         final String moduleContentHtmlCacheKey = "moduleContentHtml "
                 + collectionId + " " + moduleId;
 
@@ -137,6 +141,13 @@ import org.w3c.dom.Element;
                 moduleTitle = module.getTitle();
             }
 
+            // Get module authors
+            if (module.getMetadata() != null) {
+                moduleAuthors = module.getMetadata().getAuthors();
+            } else {
+                moduleAuthors = Collections.<Actor>emptyList();
+            }
+
             // Get collection previous/next links
             final LinkResolver linkResolver = linkResolverProvider.get();
             if (links[0] != null) {
@@ -164,6 +175,7 @@ import org.w3c.dom.Element;
                         "id", moduleId,
                         "version", moduleVersion,
                         "title", moduleTitle,
+                        "authors", convertActorListToSoyData(moduleAuthors),
                         "contentHtml", moduleContentHtml
                 ),
                 "previousModule", convertModuleLinkToSoyData(links[0], previousModuleUri),

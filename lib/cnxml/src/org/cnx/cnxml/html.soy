@@ -81,6 +81,8 @@
                 {call .solution data="all"/}
             {case 'equation'}
                 {call .equation data="all"/}
+            {case 'figure'}
+                {call .figure data="all"/}
         {/switch}
     {elseif $node.nodeType == 'document'}
         {call .document}{param node: findElem($node, 'document')/}{/call}
@@ -729,6 +731,31 @@
             {/if}
         {/param}
     {/call}
+{/template}
+
+/**
+ *  Render a figure element.
+ *
+ *  @param node DOM element node
+ */
+{template .figure}
+    {if findElem($node, 'title')}
+        // TODO(light): Use proper heading levels
+        <h3>{innerText(findElem($node, 'title'))}</h3>
+    {/if}
+
+    <figure id="{$node.attributes.id}">
+        {call .children data="all"/}
+        <figcaption>
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                Figure
+            {/if}
+            {sp}{$node.number}
+            {if findElem($node, 'caption')}: {innerText(findElem($node, 'caption'))}{/if}
+        </figcaption>
+    </figure>
 {/template}
 
 /**

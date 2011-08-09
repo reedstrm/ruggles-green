@@ -16,6 +16,8 @@
 
 package org.cnx.web;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -71,6 +73,8 @@ import org.w3c.dom.Element;
         final String moduleId = components[2];
         final String moduleVersion = components[3];
 
+        final MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
+
         // Fetch collection
         Collection collection;
         try {
@@ -104,12 +108,22 @@ import org.w3c.dom.Element;
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml;
+        final String moduleContentHtmlCacheKey = "moduleContentHtml "
+                + collectionId + " " + moduleId;
+
         renderScope.enter();
         try {
             renderScope.seed(Collection.class, collection);
             renderScope.seed(Module.class, module);
 
-            moduleContentHtml = renderModuleContent(module);
+            moduleContentHtml = (String)cache.get(moduleContentHtmlCacheKey);
+            if (moduleContentHtml == null) {
+                log.info("moduleContentHtml missed cache");
+                moduleContentHtml = renderModuleContent(module);
+                cache.put(moduleContentHtmlCacheKey, moduleContentHtml);
+            } else {
+                log.info("moduleContentHtml hit cache");
+            }
 
             // Get collection title
             if (collection.getMetadata() != null) {

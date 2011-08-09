@@ -14,7 +14,7 @@
     <property file="build.properties" />
     <property file="local.properties" />
     <property name="target_dir" value="${basedir}/${output.jars}" />
-    
+
     <target name="compile" description="Compile the classes">
         <mkdir dir="${classdir}" />
         <mkdir dir="${libdir}" />
@@ -47,9 +47,9 @@
             dir="${basedir}/${commondir}" >
             <property name="target_dir" value="${target_dir}" />
         </ant>
-        
+
         <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
-        
+
         <javac srcdir="${srcdir}" destdir="${classdir}" includeantruntime="false" debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
@@ -66,24 +66,25 @@
     <tstamp>
         <format property="timenow" pattern="ddMMyyyyHHmm" />
     </tstamp>
-            
+
     <property name="client-jar-name" value="org.cnx.cnxclient" />
     <property name="dest-client-jar" value="${libdir}/${client-jar-name}.${timenow}.jar" />
-        
+
     <target name="jar"
             description="Build a JAR of the classes"
             depends="compile">
         <jar destfile="${dest-client-jar}">
             <fileset dir="${classdir}" />
+            <fileset dir="${srcdir}" />
         </jar>
     </target>
-    
+
     <target name="copyjar"
         description="Copy jar to calling Build file."
         depends="jar">
         <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar"/>
     </target>
-    
+
     <target name="all"
             description="Refers to all the targets in this file other then test."
             depends="compile, jar" />

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<resources>
+    <resource name="index.cnxml">
+        <variant type="application/cnxml+xml" local="true">
+            <url>/staticxml/m0504_latest.cnxml</url>
+            <id>m0504</id>
+        </variant>
+    </resource>
+</resources>

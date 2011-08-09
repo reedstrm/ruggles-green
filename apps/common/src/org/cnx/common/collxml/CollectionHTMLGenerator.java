@@ -19,14 +19,14 @@ package org.cnx.common.collxml;
 import org.w3c.dom.Document;
 
 /**
- *  Implementors of the CollectionHTMLGenerator interface can convert CollXML to HTML.
+ *  Implementors of the CollectionHTMLGenerator interface can convert a collection to HTML.
  */
 public interface CollectionHTMLGenerator {
     /**
-     *  The generate method outputs HTML that corresponds to the given CollXML into a string.
+     *  The generate method outputs HTML that corresponds to the given collection into a string.
      *
-     *  @param node The CollXML document to render
+     *  @param collection The collection to render
      *  @return The rendered HTML string
      */
-    public String generate(Document doc) throws Exception;
+    public String generate(Collection coll) throws Exception;
 }

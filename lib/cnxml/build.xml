@@ -1,0 +1,167 @@
+<!--
+    Copyright 2011 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!-- Ant build file for the CNXML library. -->
+
+<project name="cnxml" default="jar">
+    <property file="build.properties" />
+    <property file="local.properties" />
+
+
+    <resources id="resources">
+        <fileset dir="src" includes="**/*.soy" />
+        <fileset dir="src" includes="**/*.xsl" />
+    </resources>
+
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+    <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+
+    <target name="compile" description="Compile the classes">
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${output.jars}" />
+
+        <ant antfile="jsr/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="soy/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xalan/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-apis/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xml-serializer/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xerces/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+
+        <!-- Non third-party dependencies. -->
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../util" />
+
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <fileset refid="depend_lib" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test-compile" description="compile tests." depends="jar">
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
+
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+
+        <ant antfile="junit/build.xml"
+                 inheritAll="true"
+                 target="default"
+                 dir="${third_party}" />
+
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+
+        <javac srcdir="${test.src}"
+                   destdir="${test.dir}"
+                   includeantruntime="false"
+                   debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.cnxml.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" description="Run unit tests" depends="test-compile">
+        <junit fork="yes" printsummary="yes" failureproperty="test.failed">
+            <jvmarg value="-enableassertions" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.cnxml.jar" />
+                <pathelement location="${test.dir}" />
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed" />
+            </condition>
+        </fail>
+    </target>
+
+    <target name="clean" description="Remove built files">
+        <delete dir="build" />
+    </target>
+
+    <target name="jar"
+            description="Build a JAR of the classes"
+            depends="compile">
+        <mkdir dir="build/lib" />
+        <jar destfile="build/lib/org.cnx.cnxml.jar">
+            <fileset dir="${classdir}" />
+            <resources refid="resources" />
+        </jar>
+    </target>
+
+    <target name="copyjar"
+            description="Copy jar to calling build file"
+            depends="jar">
+        <copy file="build/lib/org.cnx.cnxml.jar"
+              tofile="${target_dir}/org.cnx.cnxml.latest.jar" />
+    </target>
+
+    <target name="all" description="all targets in this build file for repository build."
+        depends="compile, test-compile, jar" />
+</project>

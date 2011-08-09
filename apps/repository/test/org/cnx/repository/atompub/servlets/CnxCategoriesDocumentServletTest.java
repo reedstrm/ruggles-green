@@ -28,7 +28,7 @@ import org.junit.Test;
  *
  * @author Arjun Satyapal
  */
-public class CnxCategoriesDocumentServletTest extends CnxAtomPubBaseTest {
+public class CnxCategoriesDocumentServletTest extends CnxAtomPubBasetest {
 
     public CnxCategoriesDocumentServletTest() throws MalformedURLException {
         super();

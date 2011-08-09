@@ -45,6 +45,7 @@ import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 import org.jdom.JDOMException;
@@ -82,7 +83,10 @@ public class CnxAtomModuleServlet {
     public Response createNewModule(@Context HttpServletRequest req,
             @Context HttpServletResponse res) {
         AtomRequest areq = new AtomRequestImpl(req);
-        CnxAtomService atomPubService = new CnxAtomService(req);
+
+        // TODO(arjuns) : See better way of getting URL.
+        RepositoryRequestContext context = RepositoryUtils.getRepositoryContext(req);
+        CnxAtomService atomPubService = new CnxAtomService(context.getHostUrl());
 
         RepositoryResponse<CreateModuleResult> createdModule =
             repositoryService.createModule(RepositoryUtils.getRepositoryContext(req));
@@ -140,7 +144,10 @@ public class CnxAtomModuleServlet {
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(VERSION_PATH_PARAM) String version) {
         AtomRequest areq = new AtomRequestImpl(req);
-        CnxAtomService atomPubService = new CnxAtomService(req);
+
+        // TODO(arjuns) : get a better way to get the context.
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
+        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
 
         // TODO(arjuns) : get cnxml and resource map from client.
         // TODO(arjuns) : repository should accept version.
@@ -255,7 +262,9 @@ public class CnxAtomModuleServlet {
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(VERSION_PATH_PARAM) String version) {
         AtomRequest areq = new AtomRequestImpl(req);
-        CnxAtomService atomPubService = new CnxAtomService(req);
+        // TODO(arjuns) : get a better way to get the context.
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
+        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
             repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,

@@ -18,9 +18,11 @@ package org.cnx.web;
 
 import java.io.File;
 
-import org.cnx.html.LinkProcessor;
-import org.cnx.html.Processor;
-import org.cnx.html.RenderTime;
+import org.cnx.cnxml.LinkProcessor;
+import org.cnx.cnxml.Module;
+import org.cnx.cnxml.Processor;
+import org.cnx.cnxml.LinkResolver;
+import org.cnx.util.RenderTime;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -39,8 +41,8 @@ public class WebViewModule extends AbstractModule {
         bind(String.class)
                 .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
                 .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
-        // TODO(light) : Fix this.
-//        bind(ResourceResolver.class).to(DemoResourceResolver.class);
+        bind(XmlFetcher.class).to(StaticXmlFetcher.class);
+        bind(LinkResolver.class).to(StaticLinkResolver.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
@@ -50,12 +52,18 @@ public class WebViewModule extends AbstractModule {
     @Provides @Singleton @WebViewTemplate
             SoyTofu provideTofu(SoyFileSet.Builder builder) {
         builder.add(new File("base.soy"));
+        builder.add(new File("collection.soy"));
         builder.add(new File("module.soy"));
         return builder.build().compileToJavaObj();
     }
 
-    @Provides @RenderTime @Named("moduleId") String provideModuleId() {
-        // Placeholder to make Guice happy. The real module ID is seeded in-scope.
+    @Provides @RenderTime Module provideModule() {
+        // Placeholder to make Guice happy. The real module is seeded in-scope.
+        return null;
+    }
+
+    @Provides @RenderTime @Named("collectionId") String provideCollectionId() {
+        // Placeholder to make Guice happy. The real collection ID is seeded in-scope.
         return null;
     }
 }

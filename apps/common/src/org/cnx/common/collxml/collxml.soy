@@ -24,7 +24,7 @@
 {template .main}
     <ol class="collection">
         {foreach $item in $items}
-            {call .item data="$item"/}
+            {call .item}{param item: $item/}{/call}
         {/foreach}
     </ol>
 {/template}
@@ -59,10 +59,10 @@
  */
 {template .subcollection private="true"}
     <li class="subcollection">
-        <span class="title">{$subcollection.title}</a>
+        <span class="title">{$subcollection.title}</span>
         <ol class="subcollection">
             {foreach $item in $subcollection.items}
-                {call .item data="$item"/}
+                {call .item}{param item: $item/}{/call}
             {/foreach}
         </ol>
     </li>

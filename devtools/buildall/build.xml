@@ -13,19 +13,24 @@
 
     <property file="build.properties" />
     <property file="local.properties" />
-    
+
     <target name="compile-all" description="Compile All builds.">
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${libutildir}" />
-        <ant antfile="build.xml" inheritAll="false" target="all" dir="${libhtmldir}" />
+        <ant antfile="build.xml" inheritAll="false" target="all" dir="${libcnxmldir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${appscommondir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${cnxclientdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${webviewdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${repositorydir}" />
     </target>
 
+    <target name="test" description="Run tests." depends="compile-all">
+        <ant antfile="build.xml" inheritall="false" target="test" dir="${libhtmldir}" />
+        <ant antfile="build.xml" inheritall="false" target="test" dir="${repositorydir}" />
+    </target>
+
     <target name="clean" description="Remove built files">
         <ant antfile="build.xml" target="clean" dir="${libutildir}" />
-        <ant antfile="build.xml" target="clean" dir="${libhtmldir}" />
+        <ant antfile="build.xml" target="clean" dir="${libcnxmldir}" />
         <ant antfile="build.xml" target="clean" dir="${appscommondir}" />
         <ant antfile="build.xml" target="clean" dir="${cnxclientdir}" />
         <ant antfile="build.xml" target="clean" dir="${webviewdir}" />

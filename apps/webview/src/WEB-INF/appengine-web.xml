@@ -23,6 +23,7 @@
 
     <static-files>
         <include path="/static/**" />
+        <include path="/staticxml/**" />
     </static-files>
 
 </appengine-web-app>

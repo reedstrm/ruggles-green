@@ -31,5 +31,9 @@ public class UtilModule extends AbstractModule {
         bind(TransformerFactory.class)
                 .toProvider(TransformerFactoryProvider.class)
                 .asEagerSingleton();
+
+        RenderScope scope = new RenderScope();
+        bindScope(RenderTime.class, scope);
+        bind(RenderScope.class).toInstance(scope);
     }
 }

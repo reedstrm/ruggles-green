@@ -40,7 +40,7 @@ import com.sun.syndication.propono.utils.ProponoException;
  *
  * @author Arjun Satyapal
  */
-public class CnxServiceDocumentServletTest extends CnxAtomPubBaseTest {
+public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     private CnxAtomPubClient cnxClient;
 
     public CnxServiceDocumentServletTest() throws Exception {

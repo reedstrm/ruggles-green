@@ -16,6 +16,8 @@
 
 package org.cnx.web;
 
+import org.cnx.cnxml.Module;
+import org.cnx.common.collxml.Collection;
 import org.w3c.dom.Document;
 
 /**
@@ -24,23 +26,6 @@ import org.w3c.dom.Document;
  *  These may be locally cached, stored on another server, etc.
  */
 public interface XmlFetcher {
-    public static class Module {
-        private final Document moduleDocument, mappingDocument;
-
-        public Module(Document moduleDocument, Document mappingDocument) {
-            this.moduleDocument = moduleDocument;
-            this.mappingDocument = mappingDocument;
-        }
-
-        public Document getModuleDocument() {
-            return moduleDocument;
-        }
-
-        public Document getMappingDocument() {
-            return mappingDocument;
-        }
-    }
-
     public Module fetchModuleVersion(String moduleId, String version) throws Exception;
-    public Document fetchCollectionVersion(String collectionId, String version) throws Exception;
+    public Collection fetchCollectionVersion(String collectionId, String version) throws Exception;
 }

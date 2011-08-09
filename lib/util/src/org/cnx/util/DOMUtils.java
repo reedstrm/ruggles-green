@@ -39,7 +39,7 @@ public class DOMUtils {
             if (child.getNodeType() == Node.ELEMENT_NODE &&
                     ((namespace == null && childNamespace == null) ||
                             (namespace != null && namespace.equals(childNamespace)))
-                    && name.equals(child.getNodeName())) {
+                    && name.equals(child.getLocalName())) {
                 return (Element)child;
             }
         }

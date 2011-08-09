@@ -36,7 +36,7 @@ import com.sun.syndication.propono.utils.ProponoException;
  *
  * @author Arjun Satyapal
  */
-public class ResourceServletTest extends CnxAtomPubBaseTest {
+public class ResourceServletTest extends CnxAtomPubBasetest {
     private CnxAtomPubClient cnxClient;
 
     // TODO(arjuns) : Create file dynamically.

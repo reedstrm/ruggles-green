@@ -93,24 +93,3 @@
         {if $module.title}: <span class="moduleTitle">{$module.title}</span>{/if}
     </a>
 {/template}
-
-/**
- *  Render a list of authors as inline text.
- *
- *  @param actors A list of actor objects
- */
-{template .actorList private="true"}
-    {switch length($actors)}
-    {case 0}
-    {case 1}
-        {$actors.0.fullName}
-    {case 2}
-        {$actors.0.fullName} and {$actors.1.fullName}
-    {default}
-        {foreach $act in $actors}
-            {if isLast($act)}and {/if}
-            {$act.fullName}
-            {if not isLast($act)}, {/if}
-        {/foreach}
-    {/switch}
-{/template}

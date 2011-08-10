@@ -175,7 +175,7 @@ import org.w3c.dom.Element;
                         "id", moduleId,
                         "version", moduleVersion,
                         "title", moduleTitle,
-                        "authors", convertActorListToSoyData(moduleAuthors),
+                        "authors", Utils.convertActorListToSoyData(moduleAuthors),
                         "contentHtml", moduleContentHtml
                 ),
                 "previousModule", convertModuleLinkToSoyData(links[0], previousModuleUri),

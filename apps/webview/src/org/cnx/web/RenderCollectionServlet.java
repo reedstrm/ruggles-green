@@ -24,6 +24,7 @@ import com.google.inject.name.Names;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.cnx.common.collxml.Collection;
 import org.cnx.common.collxml.CollectionHTMLGenerator;
 import org.cnx.common.collxml.CollxmlNamespace;
+import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
@@ -77,15 +79,19 @@ import org.w3c.dom.Element;
             return;
         }
 
-        // Get title
+        // Get metadata
         String title = "";
+        List<Actor> authors = null;
         final Metadata metadata = coll.getMetadata();
-        try {
-            title = metadata.getTitle();
-        } catch (Exception e) {
-            log.log(Level.WARNING, "Error while getting title", e);
-            // TODO(light): 500
-            return;
+        if (metadata != null) {
+            try {
+                title = metadata.getTitle();
+                authors = metadata.getAuthors();
+            } catch (Exception e) {
+                log.log(Level.WARNING, "Error while getting metadata", e);
+                // TODO(light): 500
+                return;
+            }
         }
 
         // Render content
@@ -100,10 +106,13 @@ import org.w3c.dom.Element;
 
         resp.setContentType(MIME_TYPE);
         final SoyMapData params = new SoyMapData(
-                "id", collectionId,
-                "title", title,
-                "version", version,
-                "contentHtml", contentHtml
+                "collection", new SoyMapData(
+                        "id", collectionId,
+                        "version", version,
+                        "title", title,
+                        "authors", Utils.convertActorListToSoyData(authors),
+                        "contentHtml", contentHtml
+                )
         );
         resp.getWriter().print(tofu.render(TEMPLATE_NAME, params, null));
     }

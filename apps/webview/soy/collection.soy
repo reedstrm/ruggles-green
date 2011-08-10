@@ -19,18 +19,16 @@
 /**
  *  Collection page.
  *
- *  @param id Collection ID
- *  @param version Collection version
- *  @param title Collection title
- *  @param contentHtml Content
+ *  @param collection Collection object
  */
 {template .collection}
     {call .page}
-        {param title}{$title}{/param}
+        {param title}{$collection.title}{/param}
         {param content}
-            <p style="color:red">Collection {$id}, version {$version}</p>
+            <p>By {call .actorList}{param actors: $collection.authors/}{/call}</p>
+            <p style="color:red">Collection {$collection.id}, version {$collection.version}</p>
             <div class="copy">
-                {$contentHtml|noAutoescape}
+                {$collection.contentHtml|noAutoescape}
             </div>
         {/param}
     {/call}

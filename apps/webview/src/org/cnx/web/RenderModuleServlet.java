@@ -16,14 +16,11 @@
 
 package org.cnx.web;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-import com.google.template.soy.data.SoyData;
-import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
@@ -39,8 +36,6 @@ import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
 import org.cnx.mdml.Actor;
-import org.cnx.mdml.Organization;
-import org.cnx.mdml.Person;
 import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
@@ -112,7 +107,7 @@ import org.w3c.dom.Element;
                         "id", moduleId,
                         "version", version,
                         "title", title,
-                        "authors", convertActorListToSoyData(authors),
+                        "authors", Utils.convertActorListToSoyData(authors),
                         "contentHtml", contentHtml
                 )
         );
@@ -127,40 +122,5 @@ import org.w3c.dom.Element;
 
     protected String renderModuleContent(Module module) throws Exception {
         return generatorProvider.get().generate(module);
-    }
-
-    protected SoyData convertActorListToSoyData(List<Actor> actors) {
-        final SoyListData data = new SoyListData();
-        for (Actor actor : actors) {
-            if (actor instanceof Person) {
-                data.add(convertPersonToSoyData((Person)actor));
-            } else if (actor instanceof Organization) {
-                data.add(convertOrganizationToSoyData((Organization)actor));
-            }
-        }
-        return data;
-    }
-
-    protected SoyData convertPersonToSoyData(Person person) {
-        Preconditions.checkNotNull(person);
-        return new SoyMapData(
-                "type", "person",
-                "fullName", person.getFullName(),
-                "firstName", person.getFirstName(),
-                "surname", person.getSurname(),
-                "emailAddress", person.getEmailAddress(),
-                "homepage", person.getHomepage()
-        );
-    }
-
-    protected SoyData convertOrganizationToSoyData(Organization org) {
-        Preconditions.checkNotNull(org);
-        return new SoyMapData(
-                "type", "organization",
-                "fullName", org.getFullName(),
-                "shortName", org.getShortName(),
-                "emailAddress", org.getEmailAddress(),
-                "homepage", org.getHomepage()
-        );
     }
 }

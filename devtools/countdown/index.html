@@ -58,7 +58,7 @@
 <body>
     <div id="launchDaysContainer">
         <div id="launchDays"></div>
-        days until launch
+        work days until launch
     </div>
     <p id="dates">
         Current Date: <span id="currentDate"></span><br>
@@ -73,8 +73,15 @@
 
         function days(from, to)
         {
-            var milliDelta = to.getTime() - from.getTime();
-            return Math.ceil(milliDelta / 1000 / 60 / 60 / 24);
+            var d = from;
+            var numDays = 0;
+            while (d.getTime() < to.getTime()) {
+                if (d.getDay() != 0 && d.getDay() != 6) {
+                    numDays++;
+                }
+                d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+            }
+            return numDays;
         }
         function isoDate(d)
         {

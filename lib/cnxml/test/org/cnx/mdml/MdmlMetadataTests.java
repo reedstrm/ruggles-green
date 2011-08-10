@@ -73,7 +73,8 @@ public class MdmlMetadataTests {
         final List<Actor> actors = metadata.getAuthors();
         assertNotNull(actors);
         assertEquals(2, actors.size());
-        assertEquals(new Person("John Doe", "John", "Doe", "john@example.com", null), actors.get(0));
+        assertEquals(new Person("John Doe", "John", "Doe", "john@example.com", null),
+                actors.get(0));
         assertEquals(new Person("Jacob", "Jacob", "Doe", null, null), actors.get(1));
     }
 }

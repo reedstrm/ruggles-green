@@ -25,6 +25,7 @@
     {call .page}
         {param title}{$module.title}{/param}
         {param content}
+            <p>By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
         {/param}
     {/call}
@@ -43,6 +44,7 @@
     {call .page}
         {param title}{$module.title}{/param}
         {param content}
+            <p>By {call .actorList}{param actors: $module.authors/}{/call}</p>
             <div>
                 <div>Part of <a href="/light/collection/{$collection.id}/{$collection.version}/">{$collection.title}</a></div>
                 {if $previousModule}

@@ -16,9 +16,12 @@
 
 package org.cnx.mdml;
 
+import java.util.List;
+
 /**
  *  Metadata provides accessors for common metadata fields.
  */
 public interface Metadata {
     public String getTitle() throws Exception;
+    public List<Actor> getAuthors() throws Exception;
 }

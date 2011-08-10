@@ -24,6 +24,8 @@ import com.google.inject.name.Names;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +35,7 @@ import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
+import org.cnx.mdml.Actor;
 import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
 import org.w3c.dom.Document;
@@ -79,10 +82,16 @@ import org.w3c.dom.Element;
 
         // Render content
         String title, contentHtml;
+        List<Actor> authors;
         renderScope.enter();
         try {
             renderScope.seed(Module.class, module);
             title = module.getTitle();
+            if (module.getMetadata() != null) {
+                authors = module.getMetadata().getAuthors();
+            } else {
+                authors = Collections.<Actor>emptyList();
+            }
             contentHtml = renderModuleContent(module);
         } catch (Exception e) {
             log.log(Level.WARNING, "Error while rendering", e);
@@ -98,6 +107,7 @@ import org.w3c.dom.Element;
                         "id", moduleId,
                         "version", version,
                         "title", title,
+                        "authors", Utils.convertActorListToSoyData(authors),
                         "contentHtml", contentHtml
                 )
         );

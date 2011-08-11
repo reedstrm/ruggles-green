@@ -46,13 +46,13 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
- *
+ * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- *
+ * 
  * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
- *
+ * 
  * @author Tal Dayan
- *
+ * 
  */
 
 @SuppressWarnings("serial")
@@ -92,7 +92,6 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
 
         final String resourceId = ResourceUtil.getResourceIdParam(req, "");
 
-
         // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
         // to delete unused blobs when leaving the method.
         try {
@@ -105,8 +104,8 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             // Get blob id from the request
             if (incomingBlobs.size() != 1) {
                 final String message =
-                    "Resource factory completion handler expected to find " + "exactly one blob but found ["
-                        + incomingBlobs.size() + "]";
+                    "Resource factory completion handler expected to find "
+                        + "exactly one blob but found [" + incomingBlobs.size() + "]";
                 log.severe(message);
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                 return;
@@ -141,11 +140,11 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             Entity entity = datastore.get(resourceKey);
             final OrmResourceEntity ormEntity = new OrmResourceEntity(entity);
 
-            if (ormEntity.getState() != OrmResourceEntity.State.PENDING_UPLOAD) {
+            if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_PENDING) {
                 tx.rollback();
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_BAD_REQUEST, "Resource "
-                    + resourceId + " is not in pending upload state: " + ormEntity.getState(), null,
-                        log, Level.WARNING);
+                    + resourceId + " is not in pending upload state: " + ormEntity.getState(),
+                        null, log, Level.WARNING);
                 return;
             }
             ormEntity.pendingToUploadedTransition(blobKey);
@@ -162,7 +161,8 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             }
             return;
         } finally {
-            checkArgument(tx == null || !tx.isActive(), "Transaction left active: %s", req.getRequestURI());
+            checkArgument(tx == null || !tx.isActive(), "Transaction left active: %s",
+                    req.getRequestURI());
 
             // Delete on exit blobs, if any
             for (Pair<BlobKey, String> item : blobsToDeleteOnExit) {

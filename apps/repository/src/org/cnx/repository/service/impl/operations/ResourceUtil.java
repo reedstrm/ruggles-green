@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Resource related utils.
- *
+ * 
  * @author Tal Dayan
  */
 public class ResourceUtil {
@@ -35,10 +35,10 @@ public class ResourceUtil {
     /**
      * Return a resource id parameter from a request encoded by
      * {@link #encodeUploadCompletionParameters}.
-     *
+     * 
      * @param the incoming request
      * @param defaultValue a String to return if param not found
-     *
+     * 
      * @return the param value or defaultValue if param not found.
      */
     public static String getResourceIdParam(HttpServletRequest req, @Nullable String defaultValue) {
@@ -48,7 +48,7 @@ public class ResourceUtil {
 
     /**
      * Construct request parameters representing a given export reference.
-     *
+     * 
      * @return a string with the encoded parameters in the form name=value&name=value&... This
      *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
      */

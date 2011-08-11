@@ -43,7 +43,6 @@ public class CnxAtomService extends AtomService {
         return constants;
     }
 
-
     public CnxAtomService(String hostUrl) {
         // TODO(arjuns) : Fix this.
 

@@ -18,9 +18,9 @@ package org.cnx.repository.service.impl.schema;
 
 /**
  * Global schema related constants.
- *
+ * 
  * TODO(tal): delete this file after migrating off JDO
- *
+ * 
  * @author Tal Dayan
  */
 public class SchemaConsts {

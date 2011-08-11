@@ -114,10 +114,10 @@ public class ResourceOperations {
         // Construct result.
         final GetResourceInfoResult result;
         switch (ormEntity.getState()) {
-            case PENDING_UPLOAD:
+            case UPLOAD_PENDING:
                 result = GetResourceInfoResult.newPendingUploac();
                 break;
-            case UPLOADED:
+            case UPLOAD_COMPLETE:
                 // NOTE(tal): blob info could be cased in the resource entity when completing
                 // the content upload.
                 final BlobInfo blobInfo =
@@ -156,7 +156,7 @@ public class ResourceOperations {
             final Entity entity = Services.ormDatastore.get(resourceKey);
             final OrmResourceEntity ormEntity = new OrmResourceEntity(entity);
 
-            if (ormEntity.getState() != OrmResourceEntity.State.UPLOADED) {
+            if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_COMPLETE) {
                 return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                         "Resource content has not been uploaded yet: " + resourceId, log);
             }

@@ -32,7 +32,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * JDO representing an export item attached to a repository object.
- *
+ * 
  * @author Tal Dayan
  */
 @PersistenceCapable(table = SchemaConsts.EXPORT_ITEM_KEY_KIND)
@@ -88,7 +88,7 @@ public class JdoExportItemEntity extends CnxJdoEntity {
 
     /**
      * Construct an export item key.
-     *
+     * 
      * @param parentKey the key of the object to which this export is attached.
      * @param exportType the type of this export.
      * @return the export item key.

@@ -27,7 +27,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
 /**
  * Provide access to singleton service clients.
- *
+ * 
  * @author Tal Dayan
  */
 public class Services {
@@ -43,8 +43,8 @@ public class Services {
         .getPersistenceManagerFactory("default");
 
     // TODO(tal): rename to datastore after migrating from JDO.
-    public static final DatastoreService ormDatastore =
-            DatastoreServiceFactory.getDatastoreService();
+    public static final DatastoreService ormDatastore = DatastoreServiceFactory
+        .getDatastoreService();
 
     // TODO(tal): should we create an instance on the fly for each use?
     public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();

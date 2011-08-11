@@ -33,7 +33,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomResourceServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class ResourceServletTest extends CnxAtomPubBasetest {
@@ -61,9 +61,8 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         assertEquals(expectedResourceUrl, createResourceEntry.getEditURI());
 
         /*
-         * There should be two links in following order :<br>
-         * 1. Link for Blobstore.<br>
-         * 2. Link for Resource.<br>
+         * There should be two links in following order :<br> 1. Link for Blobstore.<br> 2. Link for
+         * Resource.<br>
          */
         @SuppressWarnings("unchecked")
         List<Link> listOfLinks = createResourceEntry.getOtherLinks();

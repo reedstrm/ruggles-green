@@ -30,6 +30,9 @@ import com.google.appengine.api.datastore.KeyFactory;
 /**
  * A Java class representing a datastore resource entity.
  *
+ * This class does not perform any persistence operations, just data
+ * mapping to/from datastore Entity.
+ *
  * @author Tal Dayan
  */
 public class OrmResourceEntity extends CnxJdoEntity {
@@ -40,17 +43,21 @@ public class OrmResourceEntity extends CnxJdoEntity {
     /** Resources ids are prefixed with this string */
     public static final String ID_PREFIX = "R";
 
-    /** Each resource must be in one of these states. */
+    /**
+     * Each resource must be in one of these states.
+     *
+     * NOTE(tal): the enum value names are used to persist the state.
+     */
     public static enum State {
         /** Resource ID allocated and entity persisted, pending blob upload. */
-        PENDING_UPLOAD,
+        UPLOAD_PENDING,
 
         /** Blob has been uploaded and is ready to be served. */
-        UPLOADED;
+        UPLOAD_COMPLETE;
 
         /** Do resources in this state have blob key? */
         public boolean hasBlobKey() {
-            return this == UPLOADED;
+            return this == UPLOAD_COMPLETE;
         }
     }
 
@@ -66,7 +73,7 @@ public class OrmResourceEntity extends CnxJdoEntity {
     /**
      * The state of this resource. This is a required attribute.
      */
-    private State state = State.PENDING_UPLOAD;
+    private State state = State.UPLOAD_PENDING;
 
     /**
      * The blob key of this resource. Exists in states where hasBlobKey() is true, null otherwise.
@@ -74,11 +81,11 @@ public class OrmResourceEntity extends CnxJdoEntity {
     private BlobKey blobKey;
 
     /**
-     * Construct an entity in the {@link State#PENDING_UPLOAD} state with null key.
+     * Construct an entity in the {@link State#UPLOAD_PENDING} state with null key.
      */
     public OrmResourceEntity() {
         this.key = null;
-        this.state = State.PENDING_UPLOAD;
+        this.state = State.UPLOAD_PENDING;
         this.blobKey = null;
     }
 
@@ -128,18 +135,18 @@ public class OrmResourceEntity extends CnxJdoEntity {
     }
 
     /**
-     * Transition the entity from {@link State#PENDING_UPLOAD} state to {@link State#UPLOADED}
+     * Transition the entity from {@link State#UPLOAD_PENDING} state to {@link State#UPLOADED}
      * state.
      *
-     * Asserts that the entity has key and is in {@link State#PENDING_UPLOAD} state.
+     * Asserts that the entity has key and is in {@link State#UPLOAD_PENDING} state.
      *
      * @param newBlobKey key of the resource blob.
      */
     public void pendingToUploadedTransition(BlobKey newBlobKey) {
-        checkState(state == State.PENDING_UPLOAD, "Encountered %s", state);
+        checkState(state == State.UPLOAD_PENDING, "Encountered %s", state);
         checkState(key != null, "Resource entity has no key");
         blobKey = checkNotNull(newBlobKey, "Null blob key");
-        state = State.UPLOADED;
+        state = State.UPLOAD_COMPLETE;
     }
 
     /**

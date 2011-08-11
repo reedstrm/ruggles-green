@@ -32,7 +32,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomModuleServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class ModuleServletTest extends CnxAtomPubBasetest {

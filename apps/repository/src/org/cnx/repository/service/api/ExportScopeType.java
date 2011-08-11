@@ -18,7 +18,7 @@ package org.cnx.repository.service.api;
 
 /**
  * Represent the type of object to which an export can be attach.
- *
+ * 
  * @author Tal Dayan
  */
 public enum ExportScopeType {

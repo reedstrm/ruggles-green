@@ -42,9 +42,9 @@ import com.google.appengine.api.blobstore.BlobKey;
 
 /**
  * Implementation of the export related operations of the repository service.
- *
+ * 
  * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -87,8 +87,9 @@ public class ExportOperations {
             pm.close();
         }
 
-        final String completionUrl = ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?" +
-                ExportUtil.exportReferenceToRequestParameters(exportReference);
+        final String completionUrl =
+            ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                + ExportUtil.exportReferenceToRequestParameters(exportReference);
 
         // Workaround for runs locally in eclipse.
         //

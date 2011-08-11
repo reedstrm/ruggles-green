@@ -735,7 +735,9 @@ public class ModuleHTMLGeneratorTests {
                 )
                 .build();
         assertEquals("<object id=\"thing\" "
-                     + "data=\"http://www.example.com/my-widget\" width=\"128\" height=\"42\">"
+                     + "data=\"http://www.example.com/my-widget\" "
+                     + "type=\"application/x-widget\" "
+                     + "width=\"128\" height=\"42\">"
                      + "Epic widget</object>",
                      generate(node));
     }
@@ -754,9 +756,33 @@ public class ModuleHTMLGeneratorTests {
                                 .attr("mime-type", "application/x-widget")
                 )
                 .build();
-        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\">"
-                     + "Epic widget</object>",
-                     generate(node));
+        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\">Epic widget</object>",
+                generate(node));
+    }
+
+    @Test public void mathematicaTest() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "mycdf")
+                .attr("alt", "Mathematica Test")
+                .child(builder.element("object")
+                        .attr("src", "MYFILENAME.cdf")
+                        .attr("mime-type", "application/vnd.wolfram.cdf.text")
+                        .attr("height", "42")
+                        .attr("width", "128")
+                )
+                .build();
+        assertEquals("<object id=\"mycdf\" "
+                + "data=\"MYFILENAME.cdf\" "
+                + "type=\"application/vnd.wolfram.cdf.text\" "
+                + "classid=\"clsid:612AB921-E294-41AA-8E98-87E7E057EF33\" "
+                + "width=\"128\" height=\"42\">"
+                + "<param name=\"src\" value=\"MYFILENAME.cdf\">"
+                + "<embed src=\"MYFILENAME.cdf\" "
+                + "type=\"application/vnd.wolfram.cdf.text\" "
+                + "width=\"128\" height=\"42\">"
+                + "</object>",
+                generate(node));
     }
 
     @Test public void basicTableTest() throws Exception {

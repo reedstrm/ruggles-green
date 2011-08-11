@@ -474,7 +474,12 @@
         {case 'image'}
             {call .image data="all"/}
         {case 'object'}
-            {call .object data="all"/}
+            {switch $node.attributes.mime_type}
+                {case 'application/vnd.wolfram.cdf.text'}
+                    {call .mathematica data="all"/}
+                {default}
+                    {call .object data="all"/}
+            {/switch}
     {/switch}
 {/template}
 
@@ -495,15 +500,35 @@
  *  Render an object inside a media tag.
  *
  *  @param id The id from <media>
- *  @param alt The alternate text from <media>
+ *  @param? alt The alternate text from <media>
+ *  @param? altHtml An HTML-version of alt.
  *  @param node The object DOM element node
  */
 {template .object private="true"}
-    <object id="{$id}" data="{$node.attributes.src}"
+    <object id="{$id}" data="{$node.attributes.src}" type="{$node.attributes.mime_type}"
         {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
         {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
-        {if $alt}{$alt}{/if}
+        {if $altHtml}{$altHtml|noAutoescape}{elseif $alt}{$alt}{/if}
     </object>
+{/template}
+
+/**
+ *  Render an Mathematica object inside a media tag.
+ *
+ *  @param id The id from <media>
+ *  @param node The object DOM element node
+ */
+{template .mathematica private="true"}
+    {call .object}
+        {param id: $id/}
+        {param node: $node/}
+        {param altHtml}
+            <param name="src" value="{$node.attributes.src}">
+            <embed src="{$node.attributes.src}" type="{$node.attributes.mime_type}"
+                {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
+                {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
+        {/param}
+    {/call}
 {/template}
 
 /**

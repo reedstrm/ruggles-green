@@ -34,7 +34,8 @@ public class DomToSoyDataConverterImpl implements DomToSoyDataConverter {
             "exercise",
             "figure",
             "note",
-            "rule"
+            "rule",
+            "table"
     );
     private final String cnxmlNamespace;
 

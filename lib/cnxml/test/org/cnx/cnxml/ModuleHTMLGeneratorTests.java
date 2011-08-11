@@ -759,8 +759,7 @@ public class ModuleHTMLGeneratorTests {
                      generate(node));
     }
 
-    // TODO(light): For table compliance, this unit test should pass.
-    @Ignore @Test public void basicTableTest() throws Exception {
+    @Test public void basicTableTest() throws Exception {
         final Node node = builder.element("table")
                 .attr("id", "1000")
                 .attr("summary", "A data table")
@@ -790,7 +789,7 @@ public class ModuleHTMLGeneratorTests {
                 )
         .build();
         assertEquals("<table id=\"1000\">"
-                + "<caption>Table 1: Information<details>A data table</details></caption>"
+                + "<caption>Table 1: Information\n<details>A data table</details></caption>"
                 + "<thead><tr><th>Name</th><th>Type</th><th>Value</th></tr></thead>"
                 + "<tbody>"
                 + "<tr><td>answer</td><td>int</td><td>42</td></tr>"

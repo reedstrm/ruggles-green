@@ -41,6 +41,6 @@ public class ModuleFactoryImpl implements ModuleFactory {
         if (elem != null) {
             metadata = metadataFactory.create(elem);
         }
-        return new Module(id, cnxml, resourceMapping, metadata);
+        return new Module(id, cnxml, resourceMapping, metadata, cnxmlNamespace);
     }
 }

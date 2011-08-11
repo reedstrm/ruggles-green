@@ -17,22 +17,46 @@
 package org.cnx.web;
 
 import com.google.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.net.URI;
+import javax.annotation.Nullable;
 import org.cnx.cnxml.LinkResolver;
+import org.cnx.common.collxml.Collection;
+import org.cnx.util.RenderTime;
 
 @Singleton public class StaticLinkResolver implements LinkResolver {
     private static final String BASE = "/staticxml/";
     private static final String DOCUMENT_BASE = "/light/module/";
+    private static final String COLLECTION_BASE = "/light/collection/";
+    private final Provider<Collection> collectionProvider;
 
-    public URI resolveURI(URI uri) throws Exception {
+    @Inject public StaticLinkResolver(Provider<Collection> collectionProvider) {
+        this.collectionProvider = collectionProvider;
+    }
+
+    @Override public URI resolveURI(URI uri) throws Exception {
         return new URI(BASE).resolve(uri);
     }
 
-    public URI resolveDocument(String document, String version) throws Exception {
+    @Override public URI resolveDocument(String document, @Nullable String version)
+            throws Exception {
+        final Collection collection = collectionProvider.get();
+        if (version == null) {
+            version = "latest";
+        }
+        if (collection != null && collection.hasModule(document)) {
+            // TODO(light): collection version
+            final String collectionVersion = "latest";
+            return new URI(COLLECTION_BASE).resolve(new URI(
+                        collection.getId() + "/" + collectionVersion +
+                        "/module/" + document + "/" + version + "/"));
+        }
         return new URI(DOCUMENT_BASE).resolve(new URI(document + "/" + version + "/"));
     }
 
-    public URI resolveResource(String document, String version, String resource) throws Exception {
+    @Override public URI resolveResource(@Nullable String document, @Nullable String version,
+            String resource) throws Exception {
         return new URI(BASE).resolve(new URI(resource));
     }
 }

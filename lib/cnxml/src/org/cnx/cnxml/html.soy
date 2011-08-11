@@ -81,6 +81,8 @@
                 {call .solution data="all"/}
             {case 'equation'}
                 {call .equation data="all"/}
+            {case 'figure'}
+                {call .figure data="all"/}
         {/switch}
     {elseif $node.nodeType == 'document'}
         {call .document}{param node: findElem($node, 'document')/}{/call}
@@ -729,6 +731,75 @@
             {/if}
         {/param}
     {/call}
+{/template}
+
+/**
+ *  Render a figure element.
+ *
+ *  @param node DOM element node
+ */
+{template .figure}
+    {if findElem($node, 'title')}
+        // TODO(light): Use proper heading levels
+        <h3>{innerText(findElem($node, 'title'))}</h3>
+    {/if}
+
+    <figure id="{$node.attributes.id}">
+        {if findElem($node, 'subfigure')}
+            {if $node.attributes.orient == 'vertical'}
+                {call .verticalSubfigures data="all"/}
+            {else}
+                {call .horizontalSubfigures data="all"/}
+            {/if}
+        {else}
+            {call .children data="all"/}
+        {/if}
+        <figcaption>
+            {if findElem($node, 'label')}
+                {innerText(findElem($node, 'label'))}
+            {else}
+                Figure
+            {/if}
+            {sp}{$node.number}
+            {if findElem($node, 'caption')}: {innerText(findElem($node, 'caption'))}{/if}
+        </figcaption>
+    </figure>
+{/template}
+
+/**
+ *  Show subfigures in a vertical configuration.
+ *
+ *  @param node The figure DOM element node
+ */
+{template .verticalSubfigures private="true"}
+    <table class="verticalSubfigureContainer">
+        <tbody>
+            {foreach $child in $node.childNodes}
+                {if $child.nodeType == 'element' and $child.localName == 'subfigure'}
+                    <tr><td>{call .children}{param node: $child/}{/call}</tr></td>
+                {/if}
+            {/foreach}
+        </tbody>
+    </table>
+{/template}
+
+/**
+ *  Show subfigures in a horizontal configuration.
+ *
+ *  @param node The figure DOM element node
+ */
+{template .horizontalSubfigures private="true"}
+    <table class="horizontalSubfigureContainer">
+        <tbody>
+            <tr>
+                {foreach $child in $node.childNodes}
+                    {if $child.nodeType == 'element' and $child.localName == 'subfigure'}
+                        <td>{call .children}{param node: $child/}{/call}</td>
+                    {/if}
+                {/foreach}
+            </tr>
+        </tbody>
+    </table>
 {/template}
 
 /**

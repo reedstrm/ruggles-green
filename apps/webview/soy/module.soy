@@ -19,19 +19,77 @@
 /**
  *  Module page outside of a collection.
  *
- *  @param id Module id
- *  @param version Module version
- *  @param title Module title
- *  @param contentHtml Content
+ *  @param module Module object
  */
 {template .module}
     {call .page}
-        {param title}{$title}{/param}
+        {param title}{$module.title}{/param}
         {param content}
-            <p style="color:red">Module {$id}, version {$version}</p>
-            <div class="copy">
-                {$contentHtml|noAutoescape}
-            </div>
+            <p>By {call .actorList}{param actors: $module.authors/}{/call}</p>
+            {call .moduleContent data="all"/}
         {/param}
     {/call}
+{/template}
+
+/**
+ *  Module page inside a collection.
+ *
+ *  @param module Module object
+ *  @param collection Collection object
+ *  @param? previousModule A partial Module object for the previous module, or null if there isn't
+ *                         one.
+ *  @param? nextModule A partial Module object for the previous module, or null if there isn't one.
+ */
+{template .collectionModule}
+    {call .page}
+        {param title}{$module.title}{/param}
+        {param content}
+            <p>By {call .actorList}{param actors: $module.authors/}{/call}</p>
+            <div>
+                <div>Part of <a href="/light/collection/{$collection.id}/{$collection.version}/">{$collection.title}</a></div>
+                {if $previousModule}
+                    <div>
+                        {call .collectionNavLink}
+                            {param text}Previous{/param}
+                            {param module: $previousModule/}
+                        {/call}
+                    </div>
+                {/if}
+                {if $nextModule}
+                    <div>
+                        {call .collectionNavLink}
+                            {param text}Next{/param}
+                            {param module: $nextModule/}
+                        {/call}
+                    </div>
+                {/if}
+            </div>
+            {call .moduleContent data="all"/}
+        {/param}
+    {/call}
+{/template}
+
+/**
+ *  Render module content.
+ *
+ *  @param module Module object
+ */
+{template .moduleContent}
+    <p style="color:red">Module {$module.id}, version {$module.version}</p>
+    <div class="copy">
+        {$module.contentHtml|noAutoescape}
+    </div>
+{/template}
+
+/**
+ *  Renders a previous or next link.
+ *
+ *  @param text The link label
+ *  @param module A partial Module object
+ */
+{template .collectionNavLink}
+    <a href="{$module.uri}">
+        {$text}
+        {if $module.title}: <span class="moduleTitle">{$module.title}</span>{/if}
+    </a>
 {/template}

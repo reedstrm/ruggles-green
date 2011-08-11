@@ -16,11 +16,46 @@
 
 package org.cnx.util;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.AbstractIterator;
+import java.util.Iterator;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class DOMUtils {
+    private static class ElementIterator extends AbstractIterator<Element> {
+        private final NodeList list;
+        private int index = -1;
+
+        public ElementIterator(Element parent) {
+            Preconditions.checkNotNull(parent);
+            this.list = parent.getChildNodes();
+        }
+
+        @Override protected Element computeNext() {
+            for (; index < list.getLength(); index++) {
+                final Node child = list.item(index);
+                if (child instanceof Element) {
+                    // Skip this index on the next call to findNext.
+                    index++;
+                    return (Element)child;
+                }
+            }
+            return endOfData();
+        }
+    }
+
+    /** Create an iterable that yields all direct descendents of a given element. */
+    public static Iterable<Element> iterElements(final Element parent) {
+        return new Iterable<Element>() {
+            @Override public Iterator<Element> iterator() {
+                return new ElementIterator(parent);
+            }
+        };
+    }
+
     /**
      *  Find the first direct descendant element with the given name.
      *
@@ -31,18 +66,26 @@ public class DOMUtils {
      */
     public static Element findFirstChild(final Element parent, final String namespace,
             final String name) {
-        final NodeList childList = parent.getChildNodes();
-        final int length = childList.getLength();
-        for (int i = 0; i < length; i++) {
-            final Node child = childList.item(i);
+        for (Element child : iterElements(parent)) {
             final String childNamespace = child.getNamespaceURI();
-            if (child.getNodeType() == Node.ELEMENT_NODE &&
-                    ((namespace == null && childNamespace == null) ||
-                            (namespace != null && namespace.equals(childNamespace)))
-                    && name.equals(child.getLocalName())) {
-                return (Element)child;
+            if (Objects.equal(namespace, childNamespace) && name.equals(child.getLocalName())) {
+                return child;
             }
         }
         return null;
+    }
+
+    /**
+     *  Retrieve the text inside the direct descendent element with the given name.
+     *
+     *  @param parent The element to search in
+     *  @param namespace The namespace URI to search for
+     *  @param name The element local name to search for
+     *  @return The text inside the first element found, or null if no such element exists.
+     */
+    public static String getElementText(final Element parent, final String namespace,
+            final String name) {
+        final Element child = findFirstChild(parent, namespace, name);
+        return (child != null ? child.getTextContent() : null);
     }
 }

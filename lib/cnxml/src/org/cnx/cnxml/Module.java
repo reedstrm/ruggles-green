@@ -19,27 +19,34 @@ package org.cnx.cnxml;
 import com.google.common.base.Preconditions;
 import javax.annotation.Nullable;
 import org.cnx.mdml.Metadata;
+import org.cnx.util.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *  A Module is a POJO container for CNXML modules.
+ *
+ *  The XML files given to Module are assumed to be valid.
  */
 public class Module {
     private final String id;
     private final Document cnxml;
     private final Document resourceMapping;
     private final Metadata metadata;
+    private final String cnxmlNamespace;
 
     public Module(String id, Document cnxml, Document resourceMapping,
-            @Nullable Metadata metadata) {
+            @Nullable Metadata metadata, @CnxmlNamespace String cnxmlNamespace) {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(cnxml);
         Preconditions.checkNotNull(resourceMapping);
+        Preconditions.checkNotNull(cnxmlNamespace);
 
         this.id = id;
         this.cnxml= cnxml;
         this.resourceMapping = resourceMapping;
         this.metadata = metadata;
+        this.cnxmlNamespace = cnxmlNamespace;
     }
 
     public String getId() {
@@ -56,5 +63,18 @@ public class Module {
 
     public Metadata getMetadata() {
         return metadata;
+    }
+
+    public String getCnxmlNamespace() {
+        return cnxmlNamespace;
+    }
+
+    public String getTitle() {
+        final Element elem = DOMUtils.findFirstChild(cnxml.getDocumentElement(),
+                cnxmlNamespace, "title");
+        if (elem == null) {
+            throw new IllegalArgumentException("CNXML document has no title");
+        }
+        return elem.getTextContent();
     }
 }

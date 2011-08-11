@@ -37,3 +37,24 @@
 </body>
 </html>
 {/template}
+
+/**
+ *  Render a list of actors as inline text.
+ *
+ *  @param actors A list of actor objects
+ */
+{template .actorList private="true"}
+    {switch length($actors)}
+    {case 0}
+    {case 1}
+        {$actors.0.fullName}
+    {case 2}
+        {$actors.0.fullName} and {$actors.1.fullName}
+    {default}
+        {foreach $act in $actors}
+            {if isLast($act)}and {/if}
+            {$act.fullName}
+            {if not isLast($act)}, {/if}
+        {/foreach}
+    {/switch}
+{/template}

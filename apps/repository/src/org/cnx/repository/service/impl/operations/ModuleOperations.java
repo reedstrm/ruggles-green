@@ -58,7 +58,7 @@ public class ModuleOperations {
     public static RepositoryResponse<CreateModuleResult> createModule(
             RepositoryRequestContext context) {
         final String moduleId;
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
 
         try {
             final JdoModuleEntity entity = new JdoModuleEntity();
@@ -87,7 +87,7 @@ public class ModuleOperations {
                     "Module id has invalid format: " + moduleId, log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final JdoModuleEntity moduleEntity;
 
         final List<ExportInfo> exports;
@@ -126,7 +126,7 @@ public class ModuleOperations {
                     "Cannot add module version, module id has bad format: [" + moduleId + "]", log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
         final int newVersionNumber;
         try {
@@ -185,7 +185,7 @@ public class ModuleOperations {
                 + moduleId + "]", log);
         }
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
 
         final int versionToServe;
         final JdoModuleVersionEntity versionEntity;
@@ -252,7 +252,7 @@ public class ModuleOperations {
                 + moduleId + "]", log);
         }
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
 
         final int versionToServe;
         final List<ExportInfo> exports;

@@ -2,6 +2,7 @@ Repository global todo items
 
 * Migrate the entities to non JDO API an use ancestor queries for exports (transactional).
 
+* Move all the repository configuration params (exports, max sizes, etc) to a single config class.
 * Clean up all compilations and startup warnings
 * Add module/collection method version param for version conflict detection
 * (ETA Aug 15 2011) Remove repository servier relative blobstore URL prefixing when app engine 1.3.5 will be available.

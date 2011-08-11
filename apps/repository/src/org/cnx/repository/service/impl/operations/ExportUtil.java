@@ -35,7 +35,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * Exports related utils.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportUtil {
@@ -62,10 +62,10 @@ public class ExportUtil {
 
     /**
      * Query the list of child exports.
-     *
+     * 
      * @param pm the PersistenceManager to use.
      * @param parentKey the key of the parent entity (module, module version, etc).
-     *
+     * 
      * @return a list of export entities attached to the parent entity.
      */
     public static List<JdoExportItemEntity> queryChildExports(PersistenceManager pm, Key parentKey) {
@@ -81,7 +81,7 @@ public class ExportUtil {
 
     /**
      * Convert an export entity list to export info list.
-     *
+     * 
      * @param exportEntityList a list of export entities attached to a parent entity.
      * @return a list of matching ExportInfo instances.
      */
@@ -101,7 +101,7 @@ public class ExportUtil {
 
     /**
      * Construct export reference from the parameters of an request.
-     *
+     * 
      * @param an incoming request that contains parameters encoded by
      *            {@link #exportReferenceToRequestParameters}
      */
@@ -126,7 +126,7 @@ public class ExportUtil {
 
     /**
      * Construct request parameters representing a given export reference.
-     *
+     * 
      * @return a string with the encoded parameters in the form name=value&name=value&... This
      *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
      */

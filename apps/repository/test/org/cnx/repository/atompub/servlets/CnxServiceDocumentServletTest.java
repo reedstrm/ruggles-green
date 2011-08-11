@@ -34,10 +34,9 @@ import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
 import com.sun.syndication.propono.utils.ProponoException;
 
-
 /**
  * Test for {@link CnxServiceDocumentServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
@@ -61,21 +60,20 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
 
         // Now validate each collection individually.
         validateCollection(cnxClient.getCollectionResource(),
-            CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH, getConstants()
-                .getCollectionResourceScheme());
+                CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH, getConstants()
+                    .getCollectionResourceScheme());
 
         validateCollection(cnxClient.getCollectionModule(),
-            CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH, getConstants()
-                .getCollectionModuleScheme());
+                CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH, getConstants()
+                    .getCollectionModuleScheme());
 
         validateCollection(cnxClient.getCollectionCnxCollection(),
-            CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH, getConstants()
-                .getCollectionCnxCollectionScheme());
+                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH, getConstants()
+                    .getCollectionCnxCollectionScheme());
     }
 
     private void
-                    validateCollection(Collection collection, String collectionTermAndLabel,
-                        URL scheme) {
+            validateCollection(Collection collection, String collectionTermAndLabel, URL scheme) {
         assertNotNull(collection);
 
         @SuppressWarnings("unchecked")

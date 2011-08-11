@@ -25,14 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * General utils for completion servlets.
- *
+ * 
  * @author Tal Dayan
  */
 public class ServletUtil {
 
     /**
      * Setup to return a servlet error status.
-     *
+     * 
      * @param resp the servlet response.
      * @param httpStatus the http status to return
      * @param message diagnostic text message to return

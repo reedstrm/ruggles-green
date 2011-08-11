@@ -44,11 +44,11 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of a resource upload to the blobstore.
- *
+ * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- *
+ * 
  * TODO(tal): verify the uploading user against the URL creating user and reject if failed.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -66,7 +66,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
         final Map<String, BlobKey> incomingBlobs = Services.blobstore.getUploadedBlobs(req);
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
 
         // List of blobs to delete upon return, each associated with a reason describing
@@ -185,7 +185,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             checkArgument(!tx.isActive(), "Transaction left active: %s", req.getQueryString());
             pm.close();
 
-           // Delete on exit blobs
+            // Delete on exit blobs
             for (Pair<BlobKey, String> item : blobsToDeleteOnExit) {
                 log.info("Deleting blob: " + item.first + " (" + item.second + ")");
                 Services.blobstore.delete(item.first);

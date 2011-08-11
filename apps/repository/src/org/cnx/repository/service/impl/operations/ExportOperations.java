@@ -42,9 +42,9 @@ import com.google.appengine.api.blobstore.BlobKey;
 
 /**
  * Implementation of the export related operations of the repository service.
- *
+ * 
  * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -71,7 +71,7 @@ public class ExportOperations {
         }
 
         // Verify that the parent entity exist.
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         try {
             @SuppressWarnings({ "unused", "unchecked" })
             final CnxJdoEntity parentEntity =
@@ -87,8 +87,9 @@ public class ExportOperations {
             pm.close();
         }
 
-        final String completionUrl = ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?" +
-                ExportUtil.exportReferenceToRequestParameters(exportReference);
+        final String completionUrl =
+            ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                + ExportUtil.exportReferenceToRequestParameters(exportReference);
 
         // Workaround for runs locally in eclipse.
         //
@@ -121,7 +122,7 @@ public class ExportOperations {
         }
 
         // Lookup the export entity and fetch the blob key.
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final BlobKey blobKey;
         try {
             final JdoExportItemEntity entity =
@@ -164,7 +165,7 @@ public class ExportOperations {
                     validationResult.getStatusDescription(), log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
         final BlobKey blobKey;
         tx.begin();

@@ -58,7 +58,7 @@ public class CollectionOperations {
     public static RepositoryResponse<CreateCollectionResult> createCollection(
             RepositoryRequestContext context) {
         final String collectionId;
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
 
         try {
             final JdoCollectionEntity entity = new JdoCollectionEntity();
@@ -87,7 +87,7 @@ public class CollectionOperations {
                     "Collection id has invalid format: " + collectionId, log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final JdoCollectionEntity collectionEntity;
         final List<ExportInfo> exports;
         try {
@@ -127,7 +127,7 @@ public class CollectionOperations {
                         + "]", log);
         }
 
-        final PersistenceManager pm = Services.datastore.getPersistenceManager();
+        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final Transaction tx = pm.currentTransaction();
         final int newVersionNumber;
         try {
@@ -189,7 +189,7 @@ public class CollectionOperations {
                     "Collection id has bad format: [" + collectionId + "]", log);
         }
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
 
         final int versionToServe;
         final JdoCollectionVersionEntity versionEntity;
@@ -269,7 +269,7 @@ public class CollectionOperations {
                     "Collection id has bad format: [" + collectionId + "]", log);
         }
 
-        PersistenceManager pm = Services.datastore.getPersistenceManager();
+        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
 
         final int versionToServe;
         final JdoCollectionVersionEntity versionEntity;

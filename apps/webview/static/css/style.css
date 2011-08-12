@@ -13,3 +13,83 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
+
+html, body {
+    font-family: "Open Sans", sans-serif;
+}
+
+h1 {
+    margin-bottom: 0;
+}
+
+p.authors {
+    margin-top: 0.75ex;
+}
+
+hgroup > h1.collectionTitle {
+    margin-bottom: 0;
+    font-size: 150%;
+}
+
+hgroup > h1.collectionTitle > a {
+    color: gray;
+}
+
+hgroup > h1.moduleTitle {
+    margin-top: 0;
+}
+
+.moduleContent p {
+    text-align: justify;
+}
+
+.collectionNavBar {
+    display: table;
+    width: 100%;
+    border: thin solid black;
+    padding: 0.5ex 1ex;
+}
+
+.collectionNavBar a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.collectionNavBar > .current {
+    display: table-cell;
+    width: 50%;
+    text-align: center;
+    font-size: 115%;
+}
+
+.collectionNavBar > .previous, .collectionNavBar > .next {
+    display: table-cell;
+    width: 25%;
+}
+
+.collectionNavBar > .previous {
+    text-align: left;
+    padding-left: 32px;
+    background: url(../img/arrow-left.png) no-repeat left center;
+}
+
+.collectionNavBar > .next {
+    text-align: right;
+    padding-right: 32px;
+    background: url(../img/arrow-right.png) no-repeat right center;
+}
+
+.collectionNavBar > .previous .moduleTitle, .collectionNavBar > .next .moduleTitle {
+    display: block;
+    font-size: 80%;
+}
+
+.collectionNavNoModule {
+    color: #555;
+}
+
+.subcollection > .title {
+    font-weight: bold;
+}

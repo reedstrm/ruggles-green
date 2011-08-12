@@ -25,9 +25,9 @@
     {call .page}
         {param title}{$collection.title}{/param}
         {param content}
-            <p>By {call .actorList}{param actors: $collection.authors/}{/call}</p>
-            <p style="color:red">Collection {$collection.id}, version {$collection.version}</p>
-            <div class="copy">
+            <h1 class="collectionTitle">{$collection.title}</h1>
+            <p class="authors">{call .actorList}{param actors: $collection.authors/}{/call}</p>
+            <div class="collectionToc">
                 {$collection.contentHtml|noAutoescape}
             </div>
         {/param}

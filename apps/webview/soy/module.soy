@@ -24,8 +24,12 @@
 {template .module}
     {call .page}
         {param title}{$module.title}{/param}
+        {param javascript}
+            {call .mathjax/}
+        {/param}
         {param content}
-            <p>By {call .actorList}{param actors: $module.authors/}{/call}</p>
+            <h1 class="moduleTitle">{$module.title}</h1>
+            <p class="authors">{call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
         {/param}
     {/call}
@@ -43,30 +47,27 @@
 {template .collectionModule}
     {call .page}
         {param title}{$module.title}{/param}
+        {param javascript}
+            {call .mathjax/}
+        {/param}
         {param content}
-            <p>By {call .actorList}{param actors: $module.authors/}{/call}</p>
-            <div>
-                <div>Part of <a href="/light/collection/{$collection.id}/{$collection.version}/">{$collection.title}</a></div>
-                {if $previousModule}
-                    <div>
-                        {call .collectionNavLink}
-                            {param text}Previous{/param}
-                            {param module: $previousModule/}
-                        {/call}
-                    </div>
-                {/if}
-                {if $nextModule}
-                    <div>
-                        {call .collectionNavLink}
-                            {param text}Next{/param}
-                            {param module: $nextModule/}
-                        {/call}
-                    </div>
-                {/if}
-            </div>
+            <hgroup>
+                <h1 class="collectionTitle"><a href="/light/collection/{$collection.id}/{$collection.version}/">{$collection.title}</a></h1>
+                <h1 class="moduleTitle">{$module.title}</h1>
+            </hgroup>
+            <p class="authors">{call .actorList}{param actors: $module.authors/}{/call}</p>
+            {call .collectionNavBar data="all"/}
             {call .moduleContent data="all"/}
+            {call .collectionNavBar data="all"/}
         {/param}
     {/call}
+{/template}
+
+/**
+ *  MathJax JavaScript include.
+ */
+{template .mathjax private="true"}
+    <script type="text/javascript" src="/static/js/mathjax/MathJax.js?config=default"></script>
 {/template}
 
 /**
@@ -75,10 +76,37 @@
  *  @param module Module object
  */
 {template .moduleContent}
-    <p style="color:red">Module {$module.id}, version {$module.version}</p>
-    <div class="copy">
+    <div class="moduleContent">
         {$module.contentHtml|noAutoescape}
     </div>
+{/template}
+
+/**
+ *  Render module-in-a-collection navigation.
+ *
+ *  @param module Module object
+ *  @param? previousModule A partial Module object for the previous module, or null if there isn't
+ *                         one.
+ *  @param? nextModule A partial Module object for the previous module, or null if there isn't one.
+ */
+{template .collectionNavBar}
+    <nav class="collectionNavBar">
+        <div class="previous">
+            {call .collectionNavLink}
+                {param text}Previous{/param}
+                {param module: $previousModule/}
+            {/call}
+        </div>
+        <div class="current moduleTitle">
+            {$module.title}
+        </div>
+        <div class="next">
+            {call .collectionNavLink}
+                {param text}Next{/param}
+                {param module: $nextModule/}
+            {/call}
+        </div>
+    </nav>
 {/template}
 
 /**
@@ -88,8 +116,10 @@
  *  @param module A partial Module object
  */
 {template .collectionNavLink}
-    <a href="{$module.uri}">
-        {$text}
-        {if $module.title}: <span class="moduleTitle">{$module.title}</span>{/if}
-    </a>
+    {if $module}
+        <a href="{$module.uri}">{$text}</a>
+        {if $module.title}{sp}<span class="moduleTitle">{$module.title}</span>{/if}
+    {else}
+        <span class="collectionNavNoModule">{$text}</span>
+    {/if}
 {/template}

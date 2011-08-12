@@ -25,6 +25,15 @@
         <listener-class>org.cnx.web.GuiceConfig</listener-class>
     </listener>
 
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/light/clear-cache</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
     <!-- Mapping for REST Servlets for serving content. -->
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>

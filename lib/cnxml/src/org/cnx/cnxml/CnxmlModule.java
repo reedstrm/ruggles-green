@@ -25,8 +25,11 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 import org.cnx.util.RenderTime;
 
@@ -34,6 +37,9 @@ import org.cnx.util.RenderTime;
  *  CnxmlModule is the default configuration for the HTML generator.
  */
 public class CnxmlModule extends AbstractModule {
+    private static final String CTOP_CNX_NAME = "ctop-cnx.xsl";
+    private static final String CTOP_W3C_NAME = "ctop-w3c.xsl";
+
     @Override protected void configure() {
         bind(ModuleFactory.class).to(ModuleFactoryImpl.class);
         bind(ModuleHTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
@@ -55,10 +61,31 @@ public class CnxmlModule extends AbstractModule {
     @Provides @Singleton @Named("ContentMathMLProcessor.transformer")
             Transformer provideContentMathMLTransformer(TransformerFactory factory) {
         try {
-            return factory.newTransformer(new StreamSource(
-                        ContentMathMLProcessor.class.getResourceAsStream("ctop.xsl")));
+            final Source cnxSource = getXsltSource(CTOP_CNX_NAME);
+            final Source w3cSource = getXsltSource(CTOP_W3C_NAME);
+
+            // TODO(light): This is not thread-safe.
+            factory.setURIResolver(new URIResolver() {
+                @Override public Source resolve(String href, String base)
+                        throws TransformerException {
+                    if (cnxSource.getSystemId().equals(href)) {
+                        return cnxSource;
+                    } else if (w3cSource.getSystemId().equals(href)) {
+                        return w3cSource;
+                    }
+                    return null;
+                }
+            });
+
+            return factory.newTransformer(cnxSource);
         } catch (Exception e) {
-            throw new RuntimeException("ContentMathMLProcessor is invalid", e);
+            throw new RuntimeException("ContentMathMLProcessor XSLT is invalid", e);
         }
+    }
+
+    private Source getXsltSource(String name) {
+        final StreamSource source = new StreamSource(getClass().getResourceAsStream(name));
+        source.setSystemId(name);
+        return source;
     }
 }

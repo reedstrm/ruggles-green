@@ -83,6 +83,8 @@
                 {call .equation data="all"/}
             {case 'figure'}
                 {call .figure data="all"/}
+            {case 'table'}
+                {call .table data="all"/}
         {/switch}
     {elseif $node.nodeType == 'document'}
         {call .document}{param node: findElem($node, 'document')/}{/call}
@@ -472,7 +474,12 @@
         {case 'image'}
             {call .image data="all"/}
         {case 'object'}
-            {call .object data="all"/}
+            {switch $node.attributes.mime_type}
+                {case 'application/vnd.wolfram.cdf.text'}
+                    {call .mathematica data="all"/}
+                {default}
+                    {call .object data="all"/}
+            {/switch}
     {/switch}
 {/template}
 
@@ -493,15 +500,35 @@
  *  Render an object inside a media tag.
  *
  *  @param id The id from <media>
- *  @param alt The alternate text from <media>
+ *  @param? alt The alternate text from <media>
+ *  @param? altHtml An HTML-version of alt.
  *  @param node The object DOM element node
  */
 {template .object private="true"}
-    <object id="{$id}" data="{$node.attributes.src}"
+    <object id="{$id}" data="{$node.attributes.src}" type="{$node.attributes.mime_type}"
         {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
         {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
-        {if $alt}{$alt}{/if}
+        {if $altHtml}{$altHtml|noAutoescape}{elseif $alt}{$alt}{/if}
     </object>
+{/template}
+
+/**
+ *  Render an Mathematica object inside a media tag.
+ *
+ *  @param id The id from <media>
+ *  @param node The object DOM element node
+ */
+{template .mathematica private="true"}
+    {call .object}
+        {param id: $id/}
+        {param node: $node/}
+        {param altHtml}
+            <param name="src" value="{$node.attributes.src}">
+            <embed src="{$node.attributes.src}" type="{$node.attributes.mime_type}"
+                {if $node.attributes.width}{sp}width="{$node.attributes.width}"{/if}
+                {if $node.attributes.height}{sp}height="{$node.attributes.height}"{/if}>
+        {/param}
+    {/call}
 {/template}
 
 /**
@@ -818,4 +845,68 @@
         </h2>
         {call .children data="all"/}
     </div>
+{/template}
+
+/**
+ *  Render a table.
+ *
+ *  @param node DOM node
+ */
+{template .table}
+    <table id="{$node.attributes.id}">
+        <caption>
+            Table {$node.number}
+            {if findElem($node, 'title')}: {innerText(findElem($node, 'title'))}{/if}
+            {if $node.attributes.summary}
+                {\n}
+                <details>{$node.attributes.summary}</details>
+            {/if}
+        </caption>
+        // TODO(light): This does not support multiple tgroups.
+        {call .tableGroup}{param node: findElem($node, 'tgroup')/}{/call}
+    </table>
+{/template}
+
+/**
+ *  Render a CNXML tgroup.
+ *
+ *  @param node CNXML tgroup DOM node
+ */
+{template .tableGroup private="true"}
+    {if findElem($node, 'thead')}
+        <thead>
+            {call .tableRows}
+                {param parent: findElem($node, 'thead')/}
+                {param cellTag: 'th'/}
+            {/call}
+        </thead>
+    {/if}
+    {if findElem($node, 'tbody')}
+        <tbody>{call .tableRows}{param parent: findElem($node, 'tbody')/}{/call}</tbody>
+    {/if}
+    {if findElem($node, 'tfoot')}
+        <tfoot>{call .tableRows}{param parent: findElem($node, 'tfoot')/}{/call}</tfoot>
+    {/if}
+{/template}
+
+/**
+ *  Render a set of CNXML rows.
+ *
+ *  @param parent The container DOM node for CNXML row elements
+ *  @param? cellTag The tag to use for cells in the table. Defaults to 'td'.
+ */
+{template .tableRows private="true"}
+    {foreach $child in $parent.childNodes}
+        {if $child.nodeType == 'element' and $child.localName == 'row'}
+            <tr>
+                {foreach $rowChild in $child.childNodes}
+                    {if $rowChild.nodeType == 'element' and $rowChild.localName == 'entry'}
+                        <{if $cellTag}{$cellTag}{else}td{/if}>
+                            {call .children}{param node: $rowChild/}{/call}
+                        </{if $cellTag}{$cellTag}{else}td{/if}>
+                    {/if}
+                {/foreach}
+            </tr>
+        {/if}
+    {/foreach}
 {/template}

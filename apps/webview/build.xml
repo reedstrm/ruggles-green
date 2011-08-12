@@ -33,6 +33,10 @@
                 <exclude name="**/.hg/**"/>
                 <exclude name="**/*~"/>
             </fileset>
+            <fileset dir="html">
+                <exclude name="**/.hg/**"/>
+                <exclude name="**/*~"/>
+            </fileset>
             <fileset file="col10064_1.12_complete.zip" />
         </copy>
         <copy todir="${war.dir}/static">

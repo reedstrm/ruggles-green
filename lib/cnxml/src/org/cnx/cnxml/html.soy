@@ -116,6 +116,7 @@
  */
 {template .section}
     <section id="{$node.attributes.id}">
+        // TODO(light): proper header-level nesting
         {if findElem($node, 'title')}<h1>{innerText(findElem($node, 'title'))}</h1>{/if}
         {call .children data="all"/}
     </section>
@@ -252,8 +253,7 @@
             {/call}
         {default}
             <div class="note" id="{$node.attributes.id}">
-                // TODO(light): Use proper heading levels
-                <h2>
+                <div class="title">
                     {if findElem($node, 'label')}
                         {innerText(findElem($node, 'label'))}
                     {else}
@@ -272,7 +272,7 @@
                     {/if}
                     :
                     {if findElem($node, 'title')}{sp}{innerText(findElem($node, 'title'))}{/if}
-                </h2>
+                </div>
                 {call .children data="all"/}
             </div>
     {/switch}
@@ -632,8 +632,7 @@
  */
 {template .proof}
     <div class="proof"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
-        // TODO(light): Heading depth
-        <h2>Proof</h2>
+        <div class="title">Proof</div>
         {call .children data="all"/}
     </div>
 {/template}
@@ -663,8 +662,7 @@
  */
 {template .definition}
     <div class="definition"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
-        // TODO(light): Use proper heading levels
-        <h2>
+        <div class="title">
             {if findElem($node, 'label')}
                 {innerText(findElem($node, 'label'))}
             {else}
@@ -672,7 +670,7 @@
             {/if}
             {sp}{$node.number}
             {if findElem($node, 'term')}: {innerText(findElem($node, 'term'))}{/if}
-        </h2>
+        </div>
         <ol>
         // TODO(light): Allow interspersed examples with meanings
         {foreach $child in $node.childNodes}
@@ -767,8 +765,7 @@
  */
 {template .figure}
     {if findElem($node, 'title')}
-        // TODO(light): Use proper heading levels
-        <h3>{innerText(findElem($node, 'title'))}</h3>
+        <div class="title">{innerText(findElem($node, 'title'))}</div>
     {/if}
 
     <figure id="{$node.attributes.id}">
@@ -838,11 +835,10 @@
  */
 {template .numbered private="true"}
     <div class="{$class}"{if $node.attributes.id} id="{$node.attributes.id}"{/if}>
-        // TODO(light): Use proper heading levels
-        <h2>
+        <div class="title">
             {$label} {$node.number}
             {if findElem($node, 'title')}: {innerText(findElem($node, 'title'))}{/if}
-        </h2>
+        </div>
         {call .children data="all"/}
     </div>
 {/template}

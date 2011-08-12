@@ -41,10 +41,6 @@ hgroup > h1.moduleTitle {
     margin-top: 0;
 }
 
-.moduleContent p {
-    text-align: justify;
-}
-
 .collectionNavBar {
     display: table;
     width: 100%;
@@ -92,4 +88,18 @@ hgroup > h1.moduleTitle {
 
 .subcollection > .title {
     font-weight: bold;
+}
+
+.moduleContent p {
+    text-align: justify;
+}
+
+.moduleContent .title, .moduleContent figcaption {
+    font-weight: bold;
+    margin-bottom: 1ex;
+}
+
+.moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement {
+    margin-bottom: 1em;
+    margin-top: 1em;
 }

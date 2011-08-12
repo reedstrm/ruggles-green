@@ -44,17 +44,12 @@
  *  @param actors A list of actor objects
  */
 {template .actorList private="true"}
-    {switch length($actors)}
-    {case 0}
-    {case 1}
-        {$actors.0.fullName}
-    {case 2}
-        {$actors.0.fullName} and {$actors.1.fullName}
-    {default}
-        {foreach $act in $actors}
-            {if isLast($act)}and {/if}
-            {$act.fullName}
-            {if not isLast($act)}, {/if}
-        {/foreach}
-    {/switch}
+    {foreach $actor in $actors}
+        {if $actor.emailAddress}
+            <a href="mailto:{$actor.emailAddress|escapeUri}?cc=cnxv2-feedback@googlegroups.com" class="actor">{$actor.fullName}</a>
+        {else}
+            <span class="actor">{$actor.fullName}</span>
+        {/if}
+        {if not isLast($actor)}, {/if}
+    {/foreach}
 {/template}

@@ -775,7 +775,6 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<object id=\"mycdf\" "
                 + "data=\"MYFILENAME.cdf\" "
                 + "type=\"application/vnd.wolfram.cdf.text\" "
-                + "classid=\"clsid:612AB921-E294-41AA-8E98-87E7E057EF33\" "
                 + "width=\"128\" height=\"42\">"
                 + "<param name=\"src\" value=\"MYFILENAME.cdf\">"
                 + "<embed src=\"MYFILENAME.cdf\" "

@@ -34,7 +34,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * Exports related utils.
- * 
+ *
  * @author Tal Dayan
  */
 public class ExportUtil {
@@ -61,7 +61,7 @@ public class ExportUtil {
 
     /**
      * Construct export reference from the parameters of an request.
-     * 
+     *
      * @param an incoming request that contains parameters encoded by
      *            {@link #exportReferenceToRequestParameters}
      */
@@ -86,8 +86,7 @@ public class ExportUtil {
 
     public static List<OrmExportItemEntity> fetchParentEportList(PersistenceService orm,
             Key parentKey) {
-        return orm.readChildren(OrmExportItemEntity.class, OrmExportItemEntity.ENTITY_SPEC,
-                parentKey);
+        return orm.readChildren(OrmExportItemEntity.class, parentKey);
     }
 
     public static List<ExportInfo> fetchParentEportInfoList(PersistenceService orm, Key parentKey) {
@@ -107,7 +106,7 @@ public class ExportUtil {
 
     /**
      * Construct request parameters representing a given export reference.
-     * 
+     *
      * @return a string with the encoded parameters in the form name=value&name=value&... This
      *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
      */

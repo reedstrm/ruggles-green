@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  *
  * @author Tal Dayan
  */
-public class KeyUtil {
+public class IdUtil {
 
     /**
      * Regex for the post prefix portion of the id. We reject 

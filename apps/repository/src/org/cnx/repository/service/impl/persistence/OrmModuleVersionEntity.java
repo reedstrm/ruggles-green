@@ -35,7 +35,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
     /**
      * Module version do not have an id. The use the module id and version number.
      */
-    static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("ModuleVer", null);
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("ModuleVer", null);
 
     private static final String VERSION_NUMBER = "version";
     private static final String CNXML_DOC = "cnxml";
@@ -94,7 +94,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
      */
     public static Key moduleVersionKey(Key moduleKey, long versionNumber) {
         checkNotNull(moduleKey, "null module key");
-        checkArgument(OrmModuleEntity.ENTITY_SPEC.getKeyKind().equals(moduleKey.getKind()),
+        checkArgument(OrmModuleEntity.getSpec().getKeyKind().equals(moduleKey.getKind()),
                 "Not a moduleKey: %s", moduleKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
         return KeyFactory.createKey(moduleKey, ENTITY_SPEC.getKeyKind(), versionNumber);
@@ -105,5 +105,9 @@ public class OrmModuleVersionEntity extends OrmEntity {
         entity.setProperty(VERSION_NUMBER, versionNumber);  // serialized as Long
         entity.setProperty(CNXML_DOC, new Text(cnxmlDoc));
         entity.setProperty(RESOURCE_MAP_DOC, new Text(resourceMapDoc));
+    }
+
+    public static OrmEntitySpec getSpec() {
+        return ENTITY_SPEC;
     }
 }

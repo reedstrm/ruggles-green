@@ -36,7 +36,7 @@ public class OrmCollectionVersionEntity extends OrmEntity {
     /**
      * Module version do not have an id. The use the module id and version number.
      */
-    static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("CollectionVer", null);
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("CollectionVer", null);
 
     private static final String VERSION_NUMBER = "version";
     private static final String COLXML_DOC = "colxml";
@@ -84,7 +84,7 @@ public class OrmCollectionVersionEntity extends OrmEntity {
      */
     public static Key collectionVersionKey(Key collectionKey, long versionNumber) {
         checkNotNull(collectionKey, "null collection key");
-        checkArgument(OrmCollectionEntity.ENTITY_SPEC.getKeyKind().equals(collectionKey.getKind()),
+        checkArgument(OrmCollectionEntity.getSpec().getKeyKind().equals(collectionKey.getKind()),
                 "Not a collectionKey: %s", collectionKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
         return KeyFactory.createKey(collectionKey, ENTITY_SPEC.getKeyKind(),
@@ -95,5 +95,9 @@ public class OrmCollectionVersionEntity extends OrmEntity {
     protected void serializeToEntity(Entity entity) {
         entity.setProperty(VERSION_NUMBER, versionNumber);  // serialized as Long
         entity.setProperty(COLXML_DOC, new Text(colxmlDoc));
+    }
+
+    public static OrmEntitySpec getSpec() {
+        return ENTITY_SPEC;
     }
 }

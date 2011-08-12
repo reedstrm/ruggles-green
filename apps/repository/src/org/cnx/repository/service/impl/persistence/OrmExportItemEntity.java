@@ -38,7 +38,7 @@ public class OrmExportItemEntity extends OrmEntity {
      * Export entities do not have an external id of their own. They are referenced by their parent
      * and export type.
      */
-    public static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Export", null);
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Export", null);
 
     private static final String BLOB_KEY_PROPERTY = "blob_key";
 
@@ -88,5 +88,9 @@ public class OrmExportItemEntity extends OrmEntity {
     @Override
     protected void serializeToEntity(Entity entity) {
         entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
+    }
+
+    public static OrmEntitySpec getSpec() {
+        return ENTITY_SPEC;
     }
 }

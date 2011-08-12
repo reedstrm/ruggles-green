@@ -31,7 +31,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  */
 public class OrmModuleEntity extends OrmEntity {
 
-    static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Module", "m");
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Module", "m");
 
     private static final String VERSION_COUNT_PROPERTY = "versions";
 
@@ -75,7 +75,7 @@ public class OrmModuleEntity extends OrmEntity {
      */
     @Nullable
     public static Key moduleIdToKey(String moduleId) {
-        final Long moduleIdLong = KeyUtil.stringToId(ENTITY_SPEC.getIdPrefix(), moduleId);
+        final Long moduleIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), moduleId);
         return (moduleIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
                 moduleIdLong);
     }
@@ -83,5 +83,9 @@ public class OrmModuleEntity extends OrmEntity {
     @Override
     protected void serializeToEntity(Entity entity) {
         entity.setProperty(VERSION_COUNT_PROPERTY, versionCount);  // serialized as Long
+    }
+
+    public static OrmEntitySpec getSpec() {
+        return ENTITY_SPEC;
     }
 }

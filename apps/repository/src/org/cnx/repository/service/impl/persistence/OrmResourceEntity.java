@@ -34,7 +34,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  */
 public class OrmResourceEntity extends OrmEntity {
 
-    static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "r");
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "r");
 
     private static final String STATE_PROPERTY = "state";
     private static final String BLOB_KEY_PROPERTY = "blob_key";
@@ -121,7 +121,7 @@ public class OrmResourceEntity extends OrmEntity {
      */
     @Nullable
     public static Key resourceIdToKey(String resourceId) {
-        final Long resourceIdLong = KeyUtil.stringToId(ENTITY_SPEC.getIdPrefix(), resourceId);
+        final Long resourceIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), resourceId);
         return (resourceIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(), resourceIdLong);
     }
 
@@ -130,6 +130,10 @@ public class OrmResourceEntity extends OrmEntity {
         // TODO(tal): can we persist the enum directly, not as a string?
         entity.setProperty(STATE_PROPERTY, state.toString());
         entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
+    }
+
+    public static OrmEntitySpec getSpec() {
+        return ENTITY_SPEC;
     }
 
 }

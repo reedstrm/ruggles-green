@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -23,6 +24,13 @@ public class PersistenceService {
         this.datastore = checkNotNull(datastore);
     }
 
+    /**
+     * Write given entity to the persistence layer.
+     *
+     * If ormEntity has a key than it is stored under this key. If an entity of that key already
+     * exists, it is overwritten. If ormEntity does not have a key, a unique key is assign to it by
+     * this method.
+     */
     public void write(OrmEntity ormEntity) {
         final Entity entity = ormEntity.toEntity();
         datastore.put(entity);
@@ -36,13 +44,13 @@ public class PersistenceService {
         checkState(ormEntity.getKey().equals(entity.getKey()));
     }
 
-    // TODO(tal): add 'extends OrmEntity' everywhere.
-    public <T> T read(Class<T> c, Key key) throws EntityNotFoundException {
+    public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
+        throws EntityNotFoundException {
         final Entity entity = datastore.get(key);
-        return deserialize(c,  entity);
+        return deserialize(entityClass, entity);
     }
 
-    private static <T> T deserialize(Class<T> c, Entity entity)  {
+    private static <T extends OrmEntity> T deserialize(Class<T> c, Entity entity) {
         try {
             final Constructor<T> constructor = c.getConstructor(Entity.class);
             return constructor.newInstance(entity);
@@ -52,28 +60,51 @@ public class PersistenceService {
     }
 
     public Transaction beginTransaction() {
-       return datastore.beginTransaction();
+        return datastore.beginTransaction();
     }
 
-    // TODO(tal): can we get rid of entitySpec or class c args?
-    public <T> List<T> readChildren(Class<T> c, OrmEntitySpec entitySpec, Key parentKey)  {
+    /**
+     * Read the list of direct children entities of a given parent.
+     *
+     * @param entityClass the children entity class. Only children of this class are read.
+     * @param parentKey the parent object key.
+     *
+     * @return a list of the child entities.
+     */
+    public <T extends OrmEntity> List<T> readChildren(Class<T> entityClass, Key parentKey) {
+        final OrmEntitySpec entitySpec = entityClassSpec(entityClass);
 
         final Query query = new Query(entitySpec.getKeyKind());
         query.setAncestor(parentKey);
 
-        final List<Entity> entities = datastore.prepare(query).asList(
-                FetchOptions.Builder.withDefaults());
+        final List<Entity> entities =
+            datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         final List<T> ormEntities = Lists.newArrayList();
 
         for (Entity entity : entities) {
-            ormEntities.add(deserialize(c,  entity));
+            ormEntities.add(deserialize(entityClass, entity));
         }
 
         return ormEntities;
     }
 
-    public void delete(Key...keys) {
+    /**
+     * Invoke the getSpec() method of an entity class to get its spec.
+     */
+    private static <T extends OrmEntity> OrmEntitySpec entityClassSpec(Class<T> entityClass) {
+        try {
+            return (OrmEntitySpec) entityClass.getDeclaredMethod("getSpec").invoke(null);
+        } catch (Throwable e) {
+            throw new RuntimeException("Error involing static method getSpec() of class "
+                + entityClass, e);
+        }
+    }
+
+    /**
+     * Delete entities with given keys.
+     */
+    public void delete(Key... keys) {
         datastore.delete(keys);
     }
 }

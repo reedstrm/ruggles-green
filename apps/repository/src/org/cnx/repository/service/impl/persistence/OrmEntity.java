@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import javax.annotation.Nullable;
 
-import org.cnx.repository.service.impl.persistence.KeyUtil;
+import org.cnx.repository.service.impl.persistence.IdUtil;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
@@ -80,7 +80,7 @@ public abstract class OrmEntity {
                 entitySpec.getKeyKind());
         checkState(getKey() != null, "Entity has no key (kind = %s)", entitySpec.getKeyKind());
         // TODO(tal): assert here that the key has an id and has no name.
-        return KeyUtil.idToString(entitySpec.getIdPrefix(), key.getId());
+        return IdUtil.idToString(entitySpec.getIdPrefix(), key.getId());
     }
 
     public Entity toEntity() {

@@ -22,18 +22,24 @@
  *
  *  @param title Title of page (must not contain markup, just text)
  *  @param content Page content
+ *  @param? javascript JavaScript imports
  */
 {template .page}
 <!DOCTYPE html>
 <html>
 <head>
     <title>{$title}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/layout.css">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
-    <h1>{$title}</h1>
-    {$content|noAutoescape}
-    <script type="text/javascript" src="/static/js/mathjax/MathJax.js?config=default"></script>
+    <header>
+        <h1>CNXv2</h1>
+    </header>
+    <div id="contentArea">
+        {$content|noAutoescape}
+    </div>
+    {if $javascript}{$javascript|noAutoescape}{/if}
 </body>
 </html>
 {/template}

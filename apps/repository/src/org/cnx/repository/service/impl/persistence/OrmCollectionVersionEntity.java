@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -14,70 +14,57 @@
  * the License.
  */
 
-package org.cnx.repository.service.impl.schema;
+package org.cnx.repository.service.impl.persistence;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
+import org.cnx.repository.service.impl.persistence.OrmEntity;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 
 /**
- * A JDO representing a collection version entity.
- * 
+ * A POJO representing a collection version entity.
+ *
  * @author Tal Dayan
  */
-@PersistenceCapable(table = SchemaConsts.COLLECTION_VERSION_KEY_KIND)
-public class JdoCollectionVersionEntity extends CnxJdoEntity {
-
+//@PersistenceCapable(table = SchemaConsts.COLLECTION_VERSION_KEY_KIND)
+public class OrmCollectionVersionEntity extends OrmEntity {
     /**
-     * This key is a child key of the collection entity. Its child id equals the version number of
-     * this version (first is 1).
+     * Module version do not have an id. The use the module id and version number.
      */
-    @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
+    static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("CollectionVer", null);
 
-    /**
-     * The ID of the collection entity to which this version belong.
-     * 
-     * NOTE(tal): this information is encoded in the parent key. We duplicate it as well for better
-     * debugging using the data store viewer.
-     */
-    @SuppressWarnings("unused")
-    @Persistent
-    private Long collectionId;
+    private static final String VERSION_NUMBER = "version";
+    private static final String COLXML_DOC = "colxml";
 
     /**
      * Version number. First version is 1, second is 2, etc.
      */
-    @Persistent
     private Integer versionNumber;
 
-    @Persistent
-    private Text colxmlDoc;
+    private String colxmlDoc;
 
     /**
      * @param collectionKey key of parent collection
      * @param versionNumber version number of this version. Asserted to be >= 1.
      * @param colxmlDoc the COLXML doc of this version.
      */
-    public JdoCollectionVersionEntity(Key collectionKey, int versionNumber, String colxmlDoc) {
-        checkNotNull(collectionKey, "null collection key");
-        this.key = collectionVersionKey(collectionKey, versionNumber);
-        this.collectionId = collectionKey.getId();
+    public OrmCollectionVersionEntity(Key collectionKey, int versionNumber, String colxmlDoc) {
+        super(ENTITY_SPEC, collectionVersionKey(collectionKey, versionNumber));
         this.versionNumber = versionNumber;
-        this.colxmlDoc = new Text(checkNotNull(colxmlDoc));
+        this.colxmlDoc = checkNotNull(colxmlDoc);
     }
 
-    public Key getKey() {
-        return key;
+    /**
+     * Deserialize a collection version entity from a datastore entity.
+     */
+    public OrmCollectionVersionEntity(Entity entity) {
+        this(entity.getKey().getParent(), ((Long) entity.getProperty(VERSION_NUMBER)).intValue(),
+            ((Text) entity.getProperty(COLXML_DOC)).getValue());
     }
 
     public int getVersionNumber() {
@@ -85,22 +72,28 @@ public class JdoCollectionVersionEntity extends CnxJdoEntity {
     }
 
     public String getColxmlDoc() {
-        return colxmlDoc.getValue();
+        return colxmlDoc;
     }
 
     /**
      * Construct a collection version key.
-     * 
+     *
      * @param collectionKey the key of the parent collection entity.
      * @param versionNumber version number (asserted to be >= 1)
      * @return the collection version key.
      */
     public static Key collectionVersionKey(Key collectionKey, long versionNumber) {
         checkNotNull(collectionKey, "null collection key");
-        checkArgument(SchemaConsts.COLLECTION_KEY_KIND.equals(collectionKey.getKind()),
+        checkArgument(OrmCollectionEntity.ENTITY_SPEC.getKeyKind().equals(collectionKey.getKind()),
                 "Not a collectionKey: %s", collectionKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
-        return KeyFactory.createKey(collectionKey, SchemaConsts.COLLECTION_VERSION_KEY_KIND,
+        return KeyFactory.createKey(collectionKey, ENTITY_SPEC.getKeyKind(),
                 versionNumber);
+    }
+
+    @Override
+    protected void serializeToEntity(Entity entity) {
+        entity.setProperty(VERSION_NUMBER, versionNumber);  // serialized as Long
+        entity.setProperty(COLXML_DOC, new Text(colxmlDoc));
     }
 }

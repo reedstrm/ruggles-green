@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 
 import org.cnx.repository.service.api.ExportInfo;
@@ -28,14 +27,15 @@ import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
-import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
+import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
+import org.cnx.repository.service.impl.persistence.PersistenceService;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * Exports related utils.
- * 
+ *
  * @author Tal Dayan
  */
 public class ExportUtil {
@@ -61,47 +61,8 @@ public class ExportUtil {
     }
 
     /**
-     * Query the list of child exports.
-     * 
-     * @param pm the PersistenceManager to use.
-     * @param parentKey the key of the parent entity (module, module version, etc).
-     * 
-     * @return a list of export entities attached to the parent entity.
-     */
-    public static List<JdoExportItemEntity> queryChildExports(PersistenceManager pm, Key parentKey) {
-        javax.jdo.Query query = pm.newQuery(JdoExportItemEntity.class);
-        query.setFilter("parentKey == parentKeyParam");
-        query.declareParameters(Key.class.getName() + " parentKeyParam");
-
-        @SuppressWarnings("unchecked")
-        final List<JdoExportItemEntity> exportEntities =
-            (List<JdoExportItemEntity>) query.execute(parentKey);
-        return exportEntities;
-    }
-
-    /**
-     * Convert an export entity list to export info list.
-     * 
-     * @param exportEntityList a list of export entities attached to a parent entity.
-     * @return a list of matching ExportInfo instances.
-     */
-    public static List<ExportInfo> exportInfoList(List<JdoExportItemEntity> exportEntityList) {
-        final List<ExportInfo> exportInfos = Lists.newArrayList();
-        for (JdoExportItemEntity exportEntity : exportEntityList) {
-            final String exportTypeId = exportEntity.getExportId();
-            final ExportType exportType =
-                ExportTypesConfiguration.getExportTypes().get(exportTypeId);
-            checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
-            // TODO(tal): assert that export type is alloweable for this scope
-            // TODO(tal): assert no duplicate export type ids.
-            exportInfos.add(new ExportInfo(exportType));
-        }
-        return exportInfos;
-    }
-
-    /**
      * Construct export reference from the parameters of an request.
-     * 
+     *
      * @param an incoming request that contains parameters encoded by
      *            {@link #exportReferenceToRequestParameters}
      */
@@ -124,9 +85,29 @@ public class ExportUtil {
         return exportReference;
     }
 
+    public static List<OrmExportItemEntity> fetchParentEportList(PersistenceService orm, Key parentKey) {
+        return  orm.readChildren(OrmExportItemEntity.class, OrmExportItemEntity.ENTITY_SPEC, parentKey);
+    }
+
+    public static List<ExportInfo> fetchParentEportInfoList(PersistenceService orm, Key parentKey) {
+        List<OrmExportItemEntity> entities = fetchParentEportList(orm, parentKey);
+
+        final List<ExportInfo> exportInfos = Lists.newArrayList();
+        for (OrmExportItemEntity exportEntity : entities) {
+            final String exportTypeId = exportEntity.getExportTypeId();
+            final ExportType exportType =
+                ExportTypesConfiguration.getExportTypes().get(exportTypeId);
+            checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
+            // TODO(tal): assert that export type is alloweable for this scope
+            // TODO(tal): assert no duplicate export type ids.
+            exportInfos.add(new ExportInfo(exportType));
+        }
+        return exportInfos;
+    }
+
     /**
      * Construct request parameters representing a given export reference.
-     * 
+     *
      * @return a string with the encoded parameters in the form name=value&name=value&... This
      *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
      */

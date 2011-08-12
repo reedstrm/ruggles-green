@@ -25,34 +25,28 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//import javax.jdo.PersistenceManager;
-//import javax.jdo.Transaction;
-//import javax.jdo.Transaction;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.google.appengine.api.datastore.Transaction;
 
-import org.cnx.repository.service.impl.schema.OrmResourceEntity;
+import org.cnx.repository.service.impl.persistence.OrmResourceEntity;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
- * 
+ *
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- * 
+ *
  * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
- * 
+ *
  * @author Tal Dayan
- * 
+ *
  */
 
 @SuppressWarnings("serial")
@@ -86,14 +80,11 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             blobsToDeleteOnExit.add(Pair.of(blobKey, "Unused incoming resource blob"));
         }
 
-        // TODO(tal): *** move this to Services class.
-        final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        Transaction tx = null;
-
         final String resourceId = ResourceUtil.getResourceIdParam(req, "");
 
         // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
         // to delete unused blobs when leaving the method.
+        Transaction tx = null;
         try {
             // Convert encoded resource id to internal resource id
             final Key resourceKey = OrmResourceEntity.resourceIdToKey(resourceId);
@@ -134,12 +125,12 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             // blobkInfo). We can use whitelist or blacklist of content types.
 
             // We are done with blob info access. Start the update transaction.
-            tx = checkNotNull(datastore.beginTransaction());
+            tx = checkNotNull(Services.persistence.beginTransaction());
 
-            // Promote the resource entity to UPLOADED state with the incoming blob.
-            Entity entity = datastore.get(resourceKey);
-            final OrmResourceEntity ormEntity = new OrmResourceEntity(entity);
+            // Read the resource entity
+            final OrmResourceEntity ormEntity = Services.persistence.read(OrmResourceEntity.class, resourceKey);
 
+           // Promote the resource entity to UPLOADED state with the incoming blob.
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_PENDING) {
                 tx.rollback();
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_BAD_REQUEST, "Resource "
@@ -148,7 +139,8 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
                 return;
             }
             ormEntity.pendingToUploadedTransition(blobKey);
-            datastore.put(ormEntity.toEntity());
+            Services.persistence.write(ormEntity);
+
             tx.commit();
             // New blob is now in use. Make sure we don't delete it upon exit.
             blobsToDeleteOnExit.clear();

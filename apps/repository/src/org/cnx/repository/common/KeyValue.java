@@ -20,9 +20,10 @@ import java.io.Serializable;
 /**
  * Since Java does not provide any KeyValue/Pair classs, this is to fill that gap. Key and value
  * both are strings.
- * 
+ *
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class KeyValue implements Serializable {
     private final String key;
     private final String value;

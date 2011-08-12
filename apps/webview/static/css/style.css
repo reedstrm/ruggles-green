@@ -103,3 +103,65 @@ hgroup > h1.moduleTitle {
     margin-bottom: 1em;
     margin-top: 1em;
 }
+
+table.cals {
+    border-collapse: collapse;
+}
+
+.calsFrameSides {
+    border-left: thin solid black;
+    border-right: thin solid black;
+}
+
+.calsFrameTop {
+    border-top: thin solid black;
+}
+
+.calsFrameBottom {
+    border-bottom: thin solid black;
+}
+
+.calsFrameTopBottom {
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+}
+
+.calsFrameAll {
+    border: thin solid black;
+}
+
+.calsAlignLeft {
+    text-align: left;
+}
+
+.calsAlignRight {
+    text-align: right;
+}
+
+.calsAlignCenter {
+    text-align: center;
+}
+
+.calsAlignJustify {
+    text-align: justify;
+}
+
+.calsColsep th, .calsColsep td, th.calsColsep, td.calsColsep {
+    border-left: thin solid black;
+    border-right: thin solid black;
+}
+
+.calsNoColsep th, .calsNoColsep td, th.calsNoColsep, td.calsNoColsep {
+    border-left: none;
+    border-right: none;
+}
+
+.calsRowsep th, .calsRowsep td, th.calsRowsep, td.calsRowsep {
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+}
+
+.calsNoRowsep th, .calsNoRowsep td, th.calsNoRowsep, td.calsNoRowsep {
+    border-top: none;
+    border-bottom: none;
+}

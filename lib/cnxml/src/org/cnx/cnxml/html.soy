@@ -849,17 +849,37 @@
  *  @param node DOM node
  */
 {template .table}
-    <table id="{$node.attributes.id}">
-        <caption>
-            Table {$node.number}
-            {if findElem($node, 'title')}: {innerText(findElem($node, 'title'))}{/if}
-            {if $node.attributes.summary}
-                {\n}
-                <details>{$node.attributes.summary}</details>
-            {/if}
-        </caption>
+    {call .tableInternal data="all"}
+        {param frame}
+            {switch $node.attributes.frame}
+            {case 'sides'}calsFrameSides
+            {case 'top'}calsFrameTop
+            {case 'bottom'}calsFrameBottom
+            {case 'topbot'}calsFrameTopBottom
+            {default}calsFrameAll
+            {/switch}
+        {/param}
+    {/call}
+{/template}
+
+/**
+ *  Internal version of table.
+ *
+ *  @param node DOM node
+ *  @param frame The frame CSS class to use
+ */
+{template .tableInternal private="true"}
+    <table id="{$node.attributes.id}"
+            class="cals {$frame} {call .tableAttr}{param node: findElem($node, 'tgroup')/}{/call}">
         // TODO(light): This does not support multiple tgroups.
         {call .tableGroup}{param node: findElem($node, 'tgroup')/}{/call}
+        <caption>
+            <div class="title"> 
+                Table {$node.number}
+                {if findElem($node, 'title')}: {innerText(findElem($node, 'title'))}{/if}
+            </div>
+            {if $node.attributes.summary}{$node.attributes.summary}{/if}
+        </caption>
     </table>
 {/template}
 
@@ -870,7 +890,7 @@
  */
 {template .tableGroup private="true"}
     {if findElem($node, 'thead')}
-        <thead>
+        <thead class="{call .tableAttr}{param node: findElem($node, 'thead')/}{/call}">
             {call .tableRows}
                 {param parent: findElem($node, 'thead')/}
                 {param cellTag: 'th'/}
@@ -878,10 +898,14 @@
         </thead>
     {/if}
     {if findElem($node, 'tbody')}
-        <tbody>{call .tableRows}{param parent: findElem($node, 'tbody')/}{/call}</tbody>
+        <tbody class="{call .tableAttr}{param node: findElem($node, 'tbody')/}{/call}">
+            {call .tableRows}{param parent: findElem($node, 'tbody')/}{/call}
+        </tbody>
     {/if}
     {if findElem($node, 'tfoot')}
-        <tfoot>{call .tableRows}{param parent: findElem($node, 'tfoot')/}{/call}</tfoot>
+        <tfoot class="{call .tableAttr}{param node: findElem($node, 'tfoot')/}{/call}">
+            {call .tableRows}{param parent: findElem($node, 'tfoot')/}{/call}
+        </tfoot>
     {/if}
 {/template}
 
@@ -894,10 +918,11 @@
 {template .tableRows private="true"}
     {foreach $child in $parent.childNodes}
         {if $child.nodeType == 'element' and $child.localName == 'row'}
-            <tr>
+            <tr class="{call .tableAttr}{param node: $child/}{/call}">
                 {foreach $rowChild in $child.childNodes}
                     {if $rowChild.nodeType == 'element' and $rowChild.localName == 'entry'}
-                        <{if $cellTag}{$cellTag}{else}td{/if}>
+                        <{if $cellTag}{$cellTag}{else}td{/if}
+                                {sp}class="{call .tableAttr}{param node: $rowChild/}{/call}">
                             {call .children}{param node: $rowChild/}{/call}
                         </{if $cellTag}{$cellTag}{else}td{/if}>
                     {/if}
@@ -905,4 +930,41 @@
             </tr>
         {/if}
     {/foreach}
+{/template}
+
+/**
+ *  Generate a list of CSS classes to apply given CALS attributes.
+ *
+ *  @param node DOM node
+ */
+{template .tableAttr private="true"}
+    {if $node.attributes.align}
+        {switch $node.attributes.align}
+            {case 'left'}calsAlignLeft{sp}
+            {case 'right'}calsAlignRight{sp}
+            {case 'center'}calsAlignCenter{sp}
+            {case 'justify'}calsAlignJustify{sp}
+        {/switch}
+    {/if}
+    {if $node.attributes.valign}
+        {switch $node.attributes.valign}
+            {case 'top'}calsValignTop{sp}
+            {case 'middle'}calsValignMiddle{sp}
+            {case 'bottom'}calsValignBottom{sp}
+        {/switch}
+    {/if}
+    {if $node.attributes.colsep}
+        {if $node.attributes.colsep == '0'}
+            calsNoColsep{sp}
+        {else}
+            calsColsep{sp}
+        {/if}
+    {/if}
+    {if $node.attributes.rowsep}
+        {if $node.attributes.rowsep == '0'}
+            calsNoRowsep{sp}
+        {else}
+            calsRowsep{sp}
+        {/if}
+    {/if}
 {/template}

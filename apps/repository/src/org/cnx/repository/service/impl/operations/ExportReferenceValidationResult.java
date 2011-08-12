@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryStatus;
-import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.persistence.OrmCollectionEntity;
 import org.cnx.repository.service.impl.persistence.OrmCollectionVersionEntity;
 import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
@@ -35,7 +34,7 @@ import com.google.appengine.api.datastore.Key;
 
 /**
  * Result of validating an export reference.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportReferenceValidationResult {
@@ -57,7 +56,7 @@ public class ExportReferenceValidationResult {
 
     /**
      * The key of the parent entity of the export.
-     *
+     * 
      * This is a computed value. The existence of the entity is not verified yet.
      */
     @Nullable
@@ -65,7 +64,7 @@ public class ExportReferenceValidationResult {
 
     /**
      * The export entity key.
-     *
+     * 
      * This is a computed value. The existence of the entity is not verified yet.
      */
     @Nullable
@@ -73,7 +72,7 @@ public class ExportReferenceValidationResult {
 
     /**
      * Constructor for errors.
-     *
+     * 
      * The param repositoryStatus must have isError() true.
      */
     private ExportReferenceValidationResult(RepositoryStatus repositoryStatus,
@@ -134,7 +133,7 @@ public class ExportReferenceValidationResult {
             validateReference(ExportReference exportReference) {
         // Lookup export type by id.
         final ExportType exportType =
-            ExportTypesConfiguration.getExportTypes().get(exportReference.getExportTypeId());
+            Services.config.getExportTypes().get(exportReference.getExportTypeId());
         if (exportType == null) {
             return new ExportReferenceValidationResult(RepositoryStatus.BAD_REQUEST,
                 "Unknown exporty type id: " + exportReference.getExportTypeId());

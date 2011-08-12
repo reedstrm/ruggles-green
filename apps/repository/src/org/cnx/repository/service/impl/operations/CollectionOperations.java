@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the collection related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class CollectionOperations {
@@ -89,7 +89,8 @@ public class CollectionOperations {
         try {
             // Read collection entity
             try {
-                collectionEntity = Services.persistence.read(OrmCollectionEntity.class, collectionKey);
+                collectionEntity =
+                    Services.persistence.read(OrmCollectionEntity.class, collectionKey);
             } catch (EntityNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
@@ -104,8 +105,8 @@ public class CollectionOperations {
             tx.rollback();
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error fetching the info of collection " + collectionId, log, e);
-       } finally {
-           checkArgument(!tx.isActive(), "Transaction left active: %s/%s", collectionId);
+        } finally {
+            checkArgument(!tx.isActive(), "Transaction left active: %s/%s", collectionId);
         }
 
         return ResponseUtil.loggedOk("Retrieved info of collection " + collectionId,
@@ -132,7 +133,8 @@ public class CollectionOperations {
             // Read collection entity
             final OrmCollectionEntity collectionEntity;
             try {
-                collectionEntity = Services.persistence.read(OrmCollectionEntity.class, collectionKey);
+                collectionEntity =
+                    Services.persistence.read(OrmCollectionEntity.class, collectionKey);
             } catch (EntityNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
@@ -197,7 +199,8 @@ public class CollectionOperations {
             if (collectionVersion == null) {
                 final OrmCollectionEntity collectionEntity;
                 try {
-                    collectionEntity = Services.persistence.read(OrmCollectionEntity.class, collectionKey);
+                    collectionEntity =
+                        Services.persistence.read(OrmCollectionEntity.class, collectionKey);
                 } catch (EntityNotFoundException e) {
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                             "Could not locate collection " + collectionId, log);
@@ -219,7 +222,9 @@ public class CollectionOperations {
             // NOTE(tal): if we read the collectionEntity and versiontToServe is in its
             // valid version range than this is actually a server error.
             try {
-                versionEntity = Services.persistence.read(OrmCollectionVersionEntity.class, collectionVersionKey);
+                versionEntity =
+                    Services.persistence.read(OrmCollectionVersionEntity.class,
+                            collectionVersionKey);
             } catch (EntityNotFoundException e) {
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                         "Could not locate collection version " + collectionId + "/"
@@ -274,7 +279,8 @@ public class CollectionOperations {
             if (collectionVersion == null) {
                 final OrmCollectionEntity collectionEntity;
                 try {
-                    collectionEntity = Services.persistence.read(OrmCollectionEntity.class, collectionKey);
+                    collectionEntity =
+                        Services.persistence.read(OrmCollectionEntity.class, collectionKey);
                 } catch (EntityNotFoundException e) {
                     tx.rollback();
                     return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
@@ -294,13 +300,15 @@ public class CollectionOperations {
             final Key collectionVersionKey =
                 OrmCollectionVersionEntity.collectionVersionKey(collectionKey, versionToServe);
             try {
-                versionEntity = Services.persistence.read(OrmCollectionVersionEntity.class, collectionVersionKey);
+                versionEntity =
+                    Services.persistence.read(OrmCollectionVersionEntity.class,
+                            collectionVersionKey);
             } catch (EntityNotFoundException e) {
                 // NOTE(tal): if we read the collection entity and versionToServe is within its
                 // valid version range that this is actually a server error.
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
-                        "Collection version not found: " + collectionId + "/" + versionToServe, log,
-                        e);
+                        "Collection version not found: " + collectionId + "/" + versionToServe,
+                        log, e);
             }
 
             checkState(versionEntity.getVersionNumber() == versionToServe,
@@ -308,7 +316,8 @@ public class CollectionOperations {
                     versionToServe, versionEntity.getVersionNumber());
 
             // Get exports
-            exports = ExportUtil.fetchParentEportInfoList(Services.persistence, collectionVersionKey);
+            exports =
+                ExportUtil.fetchParentEportInfoList(Services.persistence, collectionVersionKey);
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();

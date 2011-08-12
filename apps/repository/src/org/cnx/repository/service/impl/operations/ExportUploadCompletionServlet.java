@@ -43,19 +43,15 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of a resource upload to the blobstore.
- *
+ * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- *
+ * 
  * TODO(tal): verify the uploading user against the URL creating user and reject if failed.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
 public class ExportUploadCompletionServlet extends HttpServlet {
-    /**
-     * Max allowed export size in bytes. This is an arbitrary limit.
-     */
-    private static final long MAX_EXPORT_SIZE = 100 * 1024 * 1024;
 
     private static final Logger log = Logger.getLogger(ExportUploadCompletionServlet.class
         .getName());
@@ -123,10 +119,11 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                         "Could not find info of new blob: " + newBlobKey, null, log, Level.SEVERE);
                 return;
             }
-            if (blobInfo.getSize() > MAX_EXPORT_SIZE) {
+            if (blobInfo.getSize() > validationResult.getExportType().getMaxSizeInBytes()) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
-                        "Export too large: " + blobInfo + " vs. " + MAX_EXPORT_SIZE, null, log,
-                        Level.WARNING);
+                        "Export too large: " + blobInfo + " vs. "
+                            + validationResult.getExportType().getMaxSizeInBytes() + ", export: "
+                            + exportReference, null, log, Level.WARNING);
                 return;
             }
             if (!validationResult.getExportType().getContentType()
@@ -145,8 +142,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             tx = Services.persistence.beginTransaction();
 
             @SuppressWarnings({ "unused", "unchecked" })
-            final OrmEntity parentEntity = (OrmEntity)
-                Services.persistence.read(validationResult.getParentEntityClass(),
+            final OrmEntity parentEntity =
+                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
                         validationResult.getParentKey());
 
             // Lookup for existing export entity, if found then overwrite, otherwise create a
@@ -156,7 +153,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             OrmExportItemEntity exportItemEntity;
             try {
                 exportItemEntity =
-                    Services.persistence.read(OrmExportItemEntity.class, validationResult.getExportKey());
+                    Services.persistence.read(OrmExportItemEntity.class,
+                            validationResult.getExportKey());
 
                 // Keep around the old blob key and overwrite with the new one.
                 oldBlobKey = checkNotNull(exportItemEntity.getBlobKey());

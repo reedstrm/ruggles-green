@@ -40,21 +40,17 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
- *
+ * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- *
+ * 
  * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
- *
+ * 
  * @author Tal Dayan
- *
+ * 
  */
 
 @SuppressWarnings("serial")
 public class ResourceUploadCompletionServlet extends HttpServlet {
-    /**
-     * Max allowed resource size in bytes. This is an arbitrary limit.
-     */
-    private static final long MAX_RESOURCE_SIZE = 50 * 1024 * 1024;
 
     private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
         .getName());
@@ -114,10 +110,12 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
                         null, log, Level.SEVERE);
                 return;
             }
-            if (blobInfo.getSize() > MAX_RESOURCE_SIZE) {
-                ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
-                        "Export too large: " + blobInfo + " vs. " + MAX_RESOURCE_SIZE, null, log,
-                        Level.WARNING);
+            if (blobInfo.getSize() > Services.config.getMaxResourceSize()) {
+                ServletUtil.setServletError(
+                        resp,
+                        HttpServletResponse.SC_NOT_ACCEPTABLE,
+                        "Export too large: " + blobInfo + " vs. "
+                            + Services.config.getMaxResourceSize(), null, log, Level.WARNING);
                 return;
             }
 
@@ -128,9 +126,10 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             tx = checkNotNull(Services.persistence.beginTransaction());
 
             // Read the resource entity
-            final OrmResourceEntity ormEntity = Services.persistence.read(OrmResourceEntity.class, resourceKey);
+            final OrmResourceEntity ormEntity =
+                Services.persistence.read(OrmResourceEntity.class, resourceKey);
 
-           // Promote the resource entity to UPLOADED state with the incoming blob.
+            // Promote the resource entity to UPLOADED state with the incoming blob.
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_PENDING) {
                 tx.rollback();
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_BAD_REQUEST, "Resource "

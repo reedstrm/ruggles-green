@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl.operations;
 
+import org.cnx.repository.service.api.CnxRepositoryConfiguration;
+import org.cnx.repository.service.impl.configuration.CnxRepositoryConfigurationImpl;
 import org.cnx.repository.service.impl.persistence.PersistenceService;
 
 import com.google.appengine.api.blobstore.BlobInfoFactory;
@@ -25,7 +27,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
 /**
  * Provide access to singleton service clients.
- *
+ * 
  * @author Tal Dayan
  */
 public class Services {
@@ -34,9 +36,12 @@ public class Services {
     public static final BlobstoreService blobstore = BlobstoreServiceFactory.getBlobstoreService();
 
     // A single instance used by all queries of all threads.
-    public static final PersistenceService persistence = new PersistenceService(DatastoreServiceFactory
-            .getDatastoreService());
+    public static final PersistenceService persistence = new PersistenceService(
+        DatastoreServiceFactory.getDatastoreService());
 
     // TODO(tal): should we create an instance on the fly for each use?
     public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
+
+    public static final CnxRepositoryConfiguration config = CnxRepositoryConfigurationImpl
+        .getInstance();
 }

@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ResourceOperations {
@@ -151,7 +151,8 @@ public class ResourceOperations {
 
         final BlobKey blobKey;
         try {
-            final OrmResourceEntity ormEntity = Services.persistence.read(OrmResourceEntity.class, resourceKey);
+            final OrmResourceEntity ormEntity =
+                Services.persistence.read(OrmResourceEntity.class, resourceKey);
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_COMPLETE) {
                 return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                         "Resource content has not been uploaded yet: " + resourceId, log);

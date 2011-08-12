@@ -41,9 +41,9 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the export related operations of the repository service.
- *
+ * 
  * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -72,8 +72,8 @@ public class ExportOperations {
         // Verify that the parent entity exist.
         try {
             @SuppressWarnings({ "unused", "unchecked" })
-            final OrmEntity parentEntity = (OrmEntity)
-                Services.persistence.read(validationResult.getParentEntityClass(),
+            final OrmEntity parentEntity =
+                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
                         validationResult.getParentKey());
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
@@ -121,7 +121,8 @@ public class ExportOperations {
         final BlobKey blobKey;
         try {
             final OrmExportItemEntity entity =
-                Services.persistence.read(OrmExportItemEntity.class, validationResult.getExportKey());
+                Services.persistence.read(OrmExportItemEntity.class,
+                        validationResult.getExportKey());
             blobKey = checkNotNull(entity.getBlobKey(), "null blobkey");
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
@@ -165,7 +166,8 @@ public class ExportOperations {
             final OrmExportItemEntity entity;
             try {
                 entity =
-                    Services.persistence.read(OrmExportItemEntity.class, validationResult.getExportKey());
+                    Services.persistence.read(OrmExportItemEntity.class,
+                            validationResult.getExportKey());
             } catch (EntityNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Export not found: "

@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -31,14 +31,14 @@ import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.ParamUtil;
+import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to delete an export.
- * 
+ *
  * TODO(tal): delete this servlet after implementing the real API.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -51,7 +51,7 @@ public class DeleteExportServlet extends HttpServlet {
             ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
         final String objectId = req.getParameter("id");
         final ExportType exportType =
-            ExportTypesConfiguration.getExportTypes().get(req.getParameter("type"));
+            Services.config.getExportTypes().get(req.getParameter("type"));
         final String versionNumberParam = req.getParameter("version");
         final Integer versionNumber =
             (versionNumberParam == null || versionNumberParam.equals("null")) ? null : Integer

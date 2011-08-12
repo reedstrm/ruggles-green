@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the module related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ModuleOperations {
@@ -220,7 +220,8 @@ public class ModuleOperations {
             final Key moduleVersionKey =
                 OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
 
-            versionEntity = Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
+            versionEntity =
+                Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
@@ -289,7 +290,8 @@ public class ModuleOperations {
             final Key moduleVersionKey =
                 OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
 
-            versionEntity = Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
+            versionEntity =
+                Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());

@@ -26,7 +26,6 @@ import org.cnx.repository.service.api.ExportInfo;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
-import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 import org.cnx.repository.service.impl.persistence.PersistenceService;
 
@@ -35,7 +34,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * Exports related utils.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportUtil {
@@ -62,7 +61,7 @@ public class ExportUtil {
 
     /**
      * Construct export reference from the parameters of an request.
-     *
+     * 
      * @param an incoming request that contains parameters encoded by
      *            {@link #exportReferenceToRequestParameters}
      */
@@ -77,16 +76,18 @@ public class ExportUtil {
             versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
 
         final ExportType exportType =
-            ExportTypesConfiguration.getExportTypes().get(
-                    req.getParameter(ExportParams.EXPORT_TYPE_ID.name));
+            Services.config.getExportTypes()
+                .get(req.getParameter(ExportParams.EXPORT_TYPE_ID.name));
 
         final ExportReference exportReference =
             new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
         return exportReference;
     }
 
-    public static List<OrmExportItemEntity> fetchParentEportList(PersistenceService orm, Key parentKey) {
-        return  orm.readChildren(OrmExportItemEntity.class, OrmExportItemEntity.ENTITY_SPEC, parentKey);
+    public static List<OrmExportItemEntity> fetchParentEportList(PersistenceService orm,
+            Key parentKey) {
+        return orm.readChildren(OrmExportItemEntity.class, OrmExportItemEntity.ENTITY_SPEC,
+                parentKey);
     }
 
     public static List<ExportInfo> fetchParentEportInfoList(PersistenceService orm, Key parentKey) {
@@ -95,8 +96,7 @@ public class ExportUtil {
         final List<ExportInfo> exportInfos = Lists.newArrayList();
         for (OrmExportItemEntity exportEntity : entities) {
             final String exportTypeId = exportEntity.getExportTypeId();
-            final ExportType exportType =
-                ExportTypesConfiguration.getExportTypes().get(exportTypeId);
+            final ExportType exportType = Services.config.getExportTypes().get(exportTypeId);
             checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
             // TODO(tal): assert that export type is alloweable for this scope
             // TODO(tal): assert no duplicate export type ids.
@@ -107,7 +107,7 @@ public class ExportUtil {
 
     /**
      * Construct request parameters representing a given export reference.
-     *
+     * 
      * @return a string with the encoded parameters in the form name=value&name=value&... This
      *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
      */

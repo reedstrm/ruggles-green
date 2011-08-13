@@ -19,8 +19,6 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.cnx.repository.service.impl.persistence.OrmEntity;
-
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -28,10 +26,9 @@ import com.google.appengine.api.datastore.Text;
 
 /**
  * A POJO representing a collection version entity.
- *
+ * 
  * @author Tal Dayan
  */
-//@PersistenceCapable(table = SchemaConsts.COLLECTION_VERSION_KEY_KIND)
 public class OrmCollectionVersionEntity extends OrmEntity {
     /**
      * Module version do not have an id. The use the module id and version number.
@@ -77,7 +74,7 @@ public class OrmCollectionVersionEntity extends OrmEntity {
 
     /**
      * Construct a collection version key.
-     *
+     * 
      * @param collectionKey the key of the parent collection entity.
      * @param versionNumber version number (asserted to be >= 1)
      * @return the collection version key.
@@ -87,13 +84,12 @@ public class OrmCollectionVersionEntity extends OrmEntity {
         checkArgument(OrmCollectionEntity.getSpec().getKeyKind().equals(collectionKey.getKind()),
                 "Not a collectionKey: %s", collectionKey);
         checkArgument(versionNumber > 0, "Invalid version number: %s", versionNumber);
-        return KeyFactory.createKey(collectionKey, ENTITY_SPEC.getKeyKind(),
-                versionNumber);
+        return KeyFactory.createKey(collectionKey, ENTITY_SPEC.getKeyKind(), versionNumber);
     }
 
     @Override
     protected void serializeToEntity(Entity entity) {
-        entity.setProperty(VERSION_NUMBER, versionNumber);  // serialized as Long
+        entity.setProperty(VERSION_NUMBER, versionNumber); // serialized as Long
         entity.setProperty(COLXML_DOC, new Text(colxmlDoc));
     }
 

@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the module related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ModuleOperations {
@@ -167,10 +167,8 @@ public class ModuleOperations {
             // TODO(tal): If a module version with this key already exists (due to server data
             // inconsistency), return an error rather than overwriting it.
 
-            // TODO(tal): extend write() to write multiple entities.
-            Services.persistence.write(moduleEntity);
-            Services.persistence.write(versionEntity);
-
+            // Update the persistence
+            Services.persistence.write(moduleEntity, versionEntity);
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();

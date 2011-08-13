@@ -26,7 +26,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a collection entity.
- *
+ * 
  * @author Tal Dayan
  */
 public class OrmCollectionEntity extends OrmEntity {
@@ -44,7 +44,7 @@ public class OrmCollectionEntity extends OrmEntity {
 
     /**
      * Construct an collection entity with zero versions.
-     *
+     * 
      * Useful when creating new collections.
      */
     public OrmCollectionEntity() {
@@ -75,15 +75,14 @@ public class OrmCollectionEntity extends OrmEntity {
      */
     @Nullable
     public static Key collectionIdToKey(String collectionId) {
-        final Long collectionIdLong =
-            IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), collectionId);
-        return (collectionIdLong == null) ? null : KeyFactory.createKey(
-                ENTITY_SPEC.getKeyKind(), collectionIdLong);
+        final Long collectionIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), collectionId);
+        return (collectionIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
+                collectionIdLong);
     }
 
     @Override
     protected void serializeToEntity(Entity entity) {
-        entity.setProperty(VERSION_COUNT_PROPERTY, versionCount);  // serialized as Long
+        entity.setProperty(VERSION_COUNT_PROPERTY, versionCount); // serialized as Long
     }
 
     public static OrmEntitySpec getSpec() {

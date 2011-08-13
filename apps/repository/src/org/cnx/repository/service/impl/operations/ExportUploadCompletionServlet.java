@@ -43,11 +43,11 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of a resource upload to the blobstore.
- *
+ * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- *
+ * 
  * TODO(tal): verify the uploading user against the URL creating user and reject if failed.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

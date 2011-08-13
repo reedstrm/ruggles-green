@@ -22,18 +22,15 @@ import static com.google.common.base.Preconditions.checkState;
 
 import javax.annotation.Nullable;
 
-import org.cnx.repository.service.impl.persistence.IdUtil;
-
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 
 /**
  * Base class of all orm entities.
- *
- * Orm entities are POJO's representing respective datastore entities.
- * They do not perform any persistence operations, and just provides data
- * mapping to/from datastore Entity.
- *
+ * 
+ * Orm entities are POJO's representing respective datastore entities. They do not perform any
+ * persistence operations, and just provides data mapping to/from datastore Entity.
+ * 
  * @author Tal Dayan
  */
 public abstract class OrmEntity {
@@ -59,7 +56,7 @@ public abstract class OrmEntity {
 
     /**
      * Set entity key.
-     *
+     * 
      * Asserts that the entity does not have already a key. Useful for setting keys assigned by the
      * data store after first persistence.
      */

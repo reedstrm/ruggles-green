@@ -29,7 +29,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a datastore resource entity.
- *
+ * 
  * @author Tal Dayan
  */
 public class OrmResourceEntity extends OrmEntity {
@@ -41,7 +41,7 @@ public class OrmResourceEntity extends OrmEntity {
 
     /**
      * Each resource must be in one of these states.
-     *
+     * 
      * NOTE(tal): the enum value names are used to persist the state.
      */
     public static enum State {
@@ -69,7 +69,7 @@ public class OrmResourceEntity extends OrmEntity {
 
     /**
      * Construct a resource entity in the {@link State#UPLOAD_PENDING} state with null key.
-     *
+     * 
      * Useful when creating new resources.
      */
     public OrmResourceEntity() {
@@ -80,7 +80,7 @@ public class OrmResourceEntity extends OrmEntity {
 
     /**
      * Construct a resource entity from a data store entity.
-     *
+     * 
      * Useful when retrieving a resource from the datastore.
      */
     public OrmResourceEntity(Entity entity) {
@@ -89,7 +89,6 @@ public class OrmResourceEntity extends OrmEntity {
         this.blobKey = (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY);
         checkArgument(state.hasBlobKey() == (blobKey != null), "Inconsistent state: %s", state);
     }
-
 
     public State getState() {
         return state;
@@ -103,9 +102,9 @@ public class OrmResourceEntity extends OrmEntity {
     /**
      * Transition the entity from {@link State#UPLOAD_PENDING} state to {@link State#UPLOADED}
      * state.
-     *
+     * 
      * Asserts that the entity has key and is in {@link State#UPLOAD_PENDING} state.
-     *
+     * 
      * @param newBlobKey key of the resource blob.
      */
     public void pendingToUploadedTransition(BlobKey newBlobKey) {
@@ -116,13 +115,14 @@ public class OrmResourceEntity extends OrmEntity {
     }
 
     /**
-     * Convert a resource id returned by {@link #getId()} back to the resource key. Returns
-     * null if resource id has invalid format.
+     * Convert a resource id returned by {@link #getId()} back to the resource key. Returns null if
+     * resource id has invalid format.
      */
     @Nullable
     public static Key resourceIdToKey(String resourceId) {
         final Long resourceIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), resourceId);
-        return (resourceIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(), resourceIdLong);
+        return (resourceIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
+                resourceIdLong);
     }
 
     @Override

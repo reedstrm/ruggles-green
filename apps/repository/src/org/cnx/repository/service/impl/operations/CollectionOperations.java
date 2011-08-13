@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the collection related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class CollectionOperations {
@@ -142,18 +142,18 @@ public class CollectionOperations {
                         log, e);
             }
 
-            // Update number of versions in the collection entity
+            // Increment the collection version count
             newVersionNumber = collectionEntity.incrementVersionCount();
-            Services.persistence.write(collectionEntity);
 
             // Create new version entity
             final OrmCollectionVersionEntity versionEntity =
                 new OrmCollectionVersionEntity(collectionKey, newVersionNumber, colxmlDoc);
-            Services.persistence.write(versionEntity);
 
             // TODO(tal): If a collection version with this key already exists (due to data
             // inconsistency), return an error rather than overwriting it.
 
+            // Update persistence
+            Services.persistence.write(collectionEntity, versionEntity);
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();

@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the collection related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class CollectionOperations {
@@ -324,6 +324,8 @@ public class CollectionOperations {
             return ResponseUtil
                 .loggedError(RepositoryStatus.SERVER_ERRROR, "Collection version not found"
                     + collectionId + "/" + collectionVersion, log, e);
+        } finally {
+            checkArgument(!tx.isActive(), "Transaction left active: %s", collectionId);
         }
 
         final GetCollectionVersionInfoResult result =

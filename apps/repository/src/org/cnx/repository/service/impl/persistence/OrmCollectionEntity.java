@@ -37,7 +37,7 @@ public class OrmCollectionEntity extends OrmEntity {
 
     /**
      * Number of versions of this collection. Value >= 0. If > 0, this is also the version of the
-     * last version of this collection (version numbering is 1, 2, ...). Zero when the collection
+     * latest version of this collection (version numbering is 1, 2, ...). Zero when the collection
      * was created but no version has been added.
      */
     private int versionCount = 0;

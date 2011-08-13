@@ -102,20 +102,41 @@ public interface CnxRepositoryService {
      * If the returned response has an OK status than a new version has been added to the module.
      * Otherwise, no change is done in the repository.
      * 
-     * TODO(tal): define the XML format for the reosurce map.
-     * 
-     * TODO(tal): define extra requriements from the cnxmlDoc.
-     * 
-     * TODO(tal): break the XML arg into more java manageable parameters (e.g. Map for resource
-     * mapping).
+     * The parameter expectedVersionNumber allows to detect and reject submissions that will result
+     * in version conflict. Here is a scenario that demostrates it:
+     * <ol>
+     * <li>A module has 3 versions.</li>
+     * <li>User A fetches the latest version of the module (3) for editing.</li>
+     * <li>User B fetches the latest version of the module (3) for editing.</li>
+     * <li>User B changes module version 3 and submits with expected version 4 (3+1). The submission
+     * goes through. The module has now 4 versions.</li>
+     * <li>User A changes module version 3 and try to submit it with expected version 4 (3+1). The
+     * submission fail due to version conflict because the module already has version 4.</li>
+     * <li>User A query the module and finds that it has 4 version. That is, one additional version
+     * beyond his base version 3.</li>
+     * <li>User A fetches version 4 and merges its modified version 3 with version 4. His base
+     * version is now 4.</li>
+     * <li>User A submits his changed version with expected version 5. The submission goes through
+     * Successfully.</li>
+     * </ol>
+     *
+     * TODO(tal): define the XML format for the reosurce map.<br>
+     * TODO(tal): define extra validation constrainst from the cnxmlDoc.<br>   
      * 
      * @param context the query context
+     * @param moduleId the module id
+     * @param expectedVersionNumber if not null, the operation is rejected if this value does not
+     *            equals the the number of previous versions of this module plus one. If null, the
+     *            version is added after the existing latest version with no version conflict
+     *            verification. If not null, this value should be >= 1.
      * @param cnxmlDoc an XML doc in CNXML format.
      * @param resourceMapDoc an XML doc with resource map for this module version.
      * @return operation response.
+     * 
      */
     RepositoryResponse<AddModuleVersionResult> addModuleVersion(RepositoryRequestContext context,
-            String moduleId, String cnxmlDoc, String resourceMapDoc);
+            String moduleId, @Nullable Integer expectedVersionNumber, String cnxmlDoc,
+            String resourceMapDoc);
 
     /**
      * Get the content of a module version.

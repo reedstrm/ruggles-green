@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -35,9 +35,9 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to add a version for an existing module.
- * 
+ *
  * TODO(tal): delete this servlet after implementing the real API.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -52,13 +52,19 @@ public class AddModuleVersionServlet extends HttpServlet {
             checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
         final String moduleId =
             checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
+        final String expectedVersionParam =
+            checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+        final Integer expectedVersionNumber =
+            expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
 
-        checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
+        checkArgument(req.getParameterMap().size() == 4, "Expected 4 post parameters, found %s",
                 req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        // TODO(tal): pass in actual expected version number to detect version conflict.
         final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
-            repository.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
+            repository.addModuleVersion(context, moduleId, expectedVersionNumber, cnxmlDoc,
+                    resourceMapDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

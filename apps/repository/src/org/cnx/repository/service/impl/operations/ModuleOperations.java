@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the module related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ModuleOperations {
@@ -117,8 +117,14 @@ public class ModuleOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<AddModuleVersionResult> addModuleVersion(
-            RepositoryRequestContext context, String moduleId, String cnxmlDoc,
-            String resourceMapDoc) {
+            RepositoryRequestContext context, String moduleId,
+            @Nullable Integer expectedVersionNumber, String cnxmlDoc, String resourceMapDoc) {
+
+        if (expectedVersionNumber != null && expectedVersionNumber < 1) {
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Invalid expected version number: " + expectedVersionNumber
+                        + ", should be >= 1", log);
+        }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
@@ -143,18 +149,28 @@ public class ModuleOperations {
                         "Cannot add module version, module not found: " + moduleId, log, e);
             }
 
-            // Updated number of versions in the module entity
+            // Increment module version count
             newVersionNumber = moduleEntity.incrementVersionCount();
-            Services.persistence.write(moduleEntity);
+
+            // If version conflict reject operation
+            if (expectedVersionNumber != null && !expectedVersionNumber.equals(newVersionNumber)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
+                        "Version conflict in module " + moduleId + ", expected: "
+                            + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+            }
 
             // Create new version entity
             final OrmModuleVersionEntity versionEntity =
                 new OrmModuleVersionEntity(moduleKey, newVersionNumber, cnxmlDoc, resourceMapDoc);
 
-            // TODO(tal): If a module version with this key already exists (due to data
+            // TODO(tal): If a module version with this key already exists (due to server data
             // inconsistency), return an error rather than overwriting it.
 
+            // TODO(tal): extend write() to write multiple entities.
+            Services.persistence.write(moduleEntity);
             Services.persistence.write(versionEntity);
+
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();

@@ -2,6 +2,8 @@ Repository global todo items
 
 * Add module/collection method version param for version conflict detection
 
+* Add to repository service ability to write multiple entities at once and use where applicable.
+
 * Clean up all compilations and startup warnings
 * (ETA Aug 15 2011) Remove repository service relative blobstore URL prefixing when app engine 1.3.5 will be available.
 * Delete the temp servlets as soon as the actual API will be ready.

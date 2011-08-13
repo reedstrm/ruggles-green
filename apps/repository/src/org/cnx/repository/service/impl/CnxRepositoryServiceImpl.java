@@ -94,9 +94,10 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<AddModuleVersionResult> addModuleVersion(
-            RepositoryRequestContext context, String moduleId, String cnxmlDoc,
-            String resourceMapDoc) {
-        return ModuleOperations.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
+            RepositoryRequestContext context, String moduleId,
+            @Nullable Integer expectedVersionNumber, String cnxmlDoc, String resourceMapDoc) {
+        return ModuleOperations.addModuleVersion(context, moduleId, expectedVersionNumber,
+                cnxmlDoc, resourceMapDoc);
     }
 
     @Override

@@ -170,7 +170,7 @@ public class ModuleHTMLGeneratorTests {
                 .text("World!")
                 .build();
         assertEquals("<section id=\"xyzzy\"><h1>My Magic Section</h1>Hello, World!</section>",
-                     generate(node));
+                generate(node));
     }
 
     @Test public void sectionTitleShouldBeOptional() throws Exception {
@@ -326,8 +326,8 @@ public class ModuleHTMLGeneratorTests {
                 .attr("id", "cake")
                 .text("Huge success")
                 .build();
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Huge success</div>",
-                     generate(node));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Note:</div>"
+                + "Huge success</div>", generate(node));
     }
 
     @Test public void blockNoteShouldRenderAsDiv() throws Exception {
@@ -336,8 +336,8 @@ public class ModuleHTMLGeneratorTests {
                 .attr("display", "block")
                 .text("Huge success")
                 .build();
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Huge success</div>",
-                     generate(node));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Note:</div>"
+                + "Huge success</div>", generate(node));
     }
 
     @Test public void inlineNoteShouldRenderAsSpan() throws Exception {
@@ -356,20 +356,20 @@ public class ModuleHTMLGeneratorTests {
                 .text("Neurotoxin");
 
         b.attr("type", "note");
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Note:</h2>Neurotoxin</div>",
-                     generate(b));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Note:</div>"
+                + "Neurotoxin</div>", generate(b));
         b.attr("type", "aside");
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Aside:</h2>Neurotoxin</div>",
-                     generate(b));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Aside:</div>"
+                + "Neurotoxin</div>", generate(b));
         b.attr("type", "warning");
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Warning:</h2>Neurotoxin</div>",
-                     generate(b));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Warning:</div>"
+                + "Neurotoxin</div>", generate(b));
         b.attr("type", "tip");
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Tip:</h2>Neurotoxin</div>",
-                     generate(b));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Tip:</div>"
+                + "Neurotoxin</div>", generate(b));
         b.attr("type", "important");
-        assertEquals("<div class=\"note\" id=\"cake\"><h2>Important:</h2>Neurotoxin</div>",
-                     generate(b));
+        assertEquals("<div class=\"note\" id=\"cake\"><div class=\"title\">Important:</div>"
+                + "Neurotoxin</div>", generate(b));
     }
 
     @Test public void noteLabelShouldChangeHeading() throws Exception {
@@ -378,8 +378,8 @@ public class ModuleHTMLGeneratorTests {
                 .child(builder.element("label").text("Pro tip"))
                 .text("Write tests")
                 .build();
-        assertEquals("<div class=\"note\" id=\"sageadvice\"><h2>Pro tip:</h2>Write tests</div>",
-                     generate(node));
+        assertEquals("<div class=\"note\" id=\"sageadvice\"><div class=\"title\">Pro tip:</div>"
+                + "Write tests</div>", generate(node));
     }
 
     @Test public void noteTitleShouldChangeHeading() throws Exception {
@@ -389,8 +389,8 @@ public class ModuleHTMLGeneratorTests {
                 .text("Write tests")
                 .build();
         assertEquals("<div class=\"note\" id=\"sageadvice\">"
-                     + "<h2>Note: Beginner Mistake</h2>Write tests</div>",
-                     generate(node));
+                + "<div class=\"title\">Note: Beginner Mistake</div>Write tests</div>",
+                generate(node));
     }
 
     @Test public void defaultNewlineShouldRenderBr() throws Exception {
@@ -422,8 +422,9 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "my-rule-statement")
                         .text("QED")
         ).build();
-        assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Rule 1</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"rule\" id=\"my-rule\"><div class=\"title\">Rule 1</div>"
+                + "<div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
+                generate(node));
     }
 
     @Test public void ruleShouldUseTitles() throws Exception {
@@ -433,8 +434,10 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "my-rule-statement")
                         .text("QED")
         ).build();
-        assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Rule 1: The Best Rule</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"rule\" id=\"my-rule\">"
+                + "<div class=\"title\">Rule 1: The Best Rule</div>"
+                + "<div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
+                generate(node));
     }
 
     @Test public void ruleShouldUseLabels() throws Exception {
@@ -444,8 +447,10 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "my-rule-statement")
                         .text("QED")
         ).build();
-        assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Ultimate Rule 1</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"rule\" id=\"my-rule\">"
+                + "<div class=\"title\">Ultimate Rule 1</div>"
+                + "<div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
+                generate(node));
     }
 
     @Test public void ruleHeadingShouldChangeForType() throws Exception {
@@ -454,8 +459,9 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "my-rule-statement")
                         .text("QED")
         ).build();
-        assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Law 1</h2><div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"rule\" id=\"my-rule\"><div class=\"title\">Law 1</div>"
+                + "<div class=\"statement\" id=\"my-rule-statement\">QED</div></div>",
+                generate(node));
     }
 
     @Test public void ruleHeadingShouldIncrementCounter() throws Exception {
@@ -478,11 +484,11 @@ public class ModuleHTMLGeneratorTests {
                 )
         ).build();
 
-        assertEquals("<div class=\"rule\" id=\"rule1\"><h2>Rule 1</h2>"
-                     + "<div class=\"statement\" id=\"stmt1\">QED</div></div>"
-                     + "<div class=\"rule\" id=\"rule2\"><h2>Rule 2</h2>"
-                     + "<div class=\"statement\" id=\"stmt2\">QED</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"rule\" id=\"rule1\"><div class=\"title\">Rule 1</div>"
+                + "<div class=\"statement\" id=\"stmt1\">QED</div></div>"
+                + "<div class=\"rule\" id=\"rule2\"><div class=\"title\">Rule 2</div>"
+                + "<div class=\"statement\" id=\"stmt2\">QED</div></div>",
+                generate(node));
     }
 
     @Test public void ruleTypesShouldCountSeparately() throws Exception {
@@ -507,11 +513,10 @@ public class ModuleHTMLGeneratorTests {
                 )
         ).build();
 
-        assertEquals("<div class=\"rule\" id=\"rule1\"><h2>Rule 1</h2>"
-                     + "<div class=\"statement\" id=\"stmt1\">QED</div></div>"
-                     + "<div class=\"rule\" id=\"rule2\"><h2>Law 1</h2>"
-                     + "<div class=\"statement\" id=\"stmt2\">QED</div></div>",
-                     generate(doc));
+        assertEquals("<div class=\"rule\" id=\"rule1\"><div class=\"title\">Rule 1</div>"
+                + "<div class=\"statement\" id=\"stmt1\">QED</div></div>"
+                + "<div class=\"rule\" id=\"rule2\"><div class=\"title\">Law 1</div>"
+                + "<div class=\"statement\" id=\"stmt2\">QED</div></div>", generate(doc));
     }
 
     @Test public void ruleShouldAllowProofs() throws Exception {
@@ -523,11 +528,12 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "my-rule-proof")
                         .text("QED")
         ).build();
-        assertEquals("<div class=\"rule\" id=\"my-rule\"><h2>Rule 1</h2>"
-                     + "<div class=\"statement\" id=\"my-rule-statement\">I exist.</div>"
-                     + "<div class=\"proof\" id=\"my-rule-proof\"><h2>Proof</h2>QED</div>"
-                     + "</div>",
-                     generate(node));
+        assertEquals("<div class=\"rule\" id=\"my-rule\"><div class=\"title\">Rule 1</div>"
+                + "<div class=\"statement\" id=\"my-rule-statement\">I exist.</div>"
+                + "<div class=\"proof\" id=\"my-rule-proof\">"
+                + "<div class=\"title\">Proof</div>QED</div>"
+                + "</div>",
+                generate(node));
     }
 
     @Test public void exampleShouldRenderAsDiv() throws Exception {
@@ -535,7 +541,7 @@ public class ModuleHTMLGeneratorTests {
                 .attr("id", "my-example")
                 .text("For example, ...")
                 .build();
-        assertEquals("<div class=\"example\" id=\"my-example\"><h2>Example 1</h2>"
+        assertEquals("<div class=\"example\" id=\"my-example\"><div class=\"title\">Example 1</div>"
                      + "For example, ...</div>",
                      generate(node));
     }
@@ -546,9 +552,9 @@ public class ModuleHTMLGeneratorTests {
                 .child(builder.element("title").text("The Best One"))
                 .text("For example, ...")
                 .build();
-        assertEquals("<div class=\"example\" id=\"my-example\"><h2>Example 1: The Best One</h2>"
-                     + "For example, ...</div>",
-                     generate(node));
+        assertEquals("<div class=\"example\" id=\"my-example\">"
+                + "<div class=\"title\">Example 1: The Best One</div>"
+                + "For example, ...</div>", generate(node));
     }
 
     @Test public void exampleShouldAcceptLabel() throws Exception {
@@ -557,9 +563,9 @@ public class ModuleHTMLGeneratorTests {
                 .child(builder.element("label").text("Prime Example"))
                 .text("For example, ...")
                 .build();
-        assertEquals("<div class=\"example\" id=\"my-example\"><h2>Prime Example 1</h2>"
-                     + "For example, ...</div>",
-                     generate(node));
+        assertEquals("<div class=\"example\" id=\"my-example\">"
+                + "<div class=\"title\">Prime Example 1</div>For example, ...</div>",
+                generate(node));
     }
 
     @Test public void exerciseShouldUseProblem() throws Exception {
@@ -568,10 +574,11 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "texas-problem")
                         .text("What is the capital of Texas?")
         ).build();
-        assertEquals("<div class=\"exercise\" id=\"texas-exercise\"><h2>Exercise 1</h2>"
-                     + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
-                     + "</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"exercise\" id=\"texas-exercise\">"
+                + "<div class=\"title\">Exercise 1</div>"
+                + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
+                + "</div></div>",
+                generate(node));
     }
 
     @Test public void exerciseShouldUseSolution() throws Exception {
@@ -583,10 +590,11 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "texas-solution")
                         .text("Austin")
         ).build();
-        assertEquals("<div class=\"exercise\" id=\"texas-exercise\"><h2>Exercise 1</h2>"
-                     + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
-                     + "</div><div class=\"solution\" id=\"texas-solution\">Austin</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"exercise\" id=\"texas-exercise\">"
+                + "<div class=\"title\">Exercise 1</div>"
+                + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
+                + "</div><div class=\"solution\" id=\"texas-solution\">Austin</div></div>",
+                generate(node));
     }
 
     @Test public void exerciseShouldUseCommentary() throws Exception {
@@ -598,19 +606,19 @@ public class ModuleHTMLGeneratorTests {
                         .attr("id", "texas-commentary")
                         .text("This will be on the final exam.")
         ).build();
-        assertEquals("<div class=\"exercise\" id=\"texas-exercise\"><h2>Exercise 1</h2>"
-                     + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
-                     + "</div><div class=\"commentary\" id=\"texas-commentary\">"
-                     + "This will be on the final exam.</div></div>",
-                     generate(node));
+        assertEquals("<div class=\"exercise\" id=\"texas-exercise\">"
+                + "<div class=\"title\">Exercise 1</div>"
+                + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
+                + "</div><div class=\"commentary\" id=\"texas-commentary\">"
+                + "This will be on the final exam.</div></div>",
+                generate(node));
     }
 
     @Test public void equationShouldWrapContent() throws Exception {
         final Node node =
                 builder.element("equation").attr("id", "my-equation").text("2 + 2 = 4").build();
         assertEquals("<div class=\"equation\" id=\"my-equation\">"
-                     + "<h2>Equation 1</h2>2 + 2 = 4</div>",
-                     generate(node));
+                + "<div class=\"title\">Equation 1</div>2 + 2 = 4</div>", generate(node));
     }
 
     @Test public void defaultListShouldRenderAsUl() throws Exception {
@@ -775,7 +783,6 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<object id=\"mycdf\" "
                 + "data=\"MYFILENAME.cdf\" "
                 + "type=\"application/vnd.wolfram.cdf.text\" "
-                + "classid=\"clsid:612AB921-E294-41AA-8E98-87E7E057EF33\" "
                 + "width=\"128\" height=\"42\">"
                 + "<param name=\"src\" value=\"MYFILENAME.cdf\">"
                 + "<embed src=\"MYFILENAME.cdf\" "

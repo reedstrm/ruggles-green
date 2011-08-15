@@ -127,7 +127,7 @@ public class OrmResourceEntity extends OrmEntity {
 
     @Override
     protected void serializeToEntity(Entity entity) {
-        // TODO(tal): can we persist the enum directly, not as a string?
+        // TODO(tal): *** can we persist the enum directly, not as a string?
         entity.setProperty(STATE_PROPERTY, state.toString());
         entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
     }

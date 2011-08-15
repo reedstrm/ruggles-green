@@ -22,8 +22,6 @@ import java.util.regex.Pattern;
 /**
  * Entity id utils.
  * 
- * TODO(tal): consider to append to the id checksum bits.
- * 
  * @author Tal Dayan
  */
 public class IdUtil {

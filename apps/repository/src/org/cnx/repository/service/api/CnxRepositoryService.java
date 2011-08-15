@@ -22,11 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
  * 
- * TODO(tal): add support for lenses
- * 
  * TODO(tal): add support for search
  * 
- * TODO(tal): add methods to enumerate resources, modules and lenses.
+ * TODO(tal): add methods to enumerate resources and modules.
  * 
  */
 public interface CnxRepositoryService {
@@ -63,9 +61,6 @@ public interface CnxRepositoryService {
      * Send the resource content with its mime type to the given servlet response. This is typically
      * called from a doGet() of a servlet. Service will reutrn a list of Http-headers that user of
      * this service is expected to set before response is returned to clients.
-     * 
-     * TODO(tal): comment about the state of httpServlet when returning with an error (is the
-     * response changed? Does caller need to reset it?)>
      * 
      * @param context the query context
      * @param resourceId a valid id of the resource to serve.
@@ -120,8 +115,7 @@ public interface CnxRepositoryService {
      * Successfully.</li>
      * </ol>
      * 
-     * TODO(tal): define the XML format for the reosurce map.<br>
-     * TODO(tal): define extra validation constrainst from the cnxmlDoc.<br>
+     * TODO(tal): add XML docs validation.
      * 
      * @param context the query context
      * @param moduleId the module id
@@ -190,9 +184,7 @@ public interface CnxRepositoryService {
      * See {@link #addModuleVersion(RepositoryRequestContext, String, Integer, String, String)} for
      * a discussion of the versioning mechanism and conflict detection.
      * 
-     * TODO(tal): define extra requirements from the colxmlDoc.
-     * 
-     * TODO(tal): break the XML arg into more java manageable parameters (e.g. ACL).
+     * TODO(tal): add COLXML validation.
      * 
      * @param context the query context
      * @param collectionId the collection id.
@@ -253,9 +245,6 @@ public interface CnxRepositoryService {
      * Send the export content with its content type to the given servlet response. This is
      * typically called from a doGet() of a servlet. If the returned status is OK, no further action
      * is required from the servlet.
-     * 
-     * TODO(tal): comment about the state of httpServlet when returning with an error (is the
-     * response changed? Does caller need to reset it?)>
      * 
      * @param context the query context
      * @param exportRererence reference to the export to be served

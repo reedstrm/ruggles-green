@@ -37,8 +37,6 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 /**
  * A temp API servlet to add a version for an existing module.
  * 
- * TODO(tal): delete this servlet after implementing the real API.
- * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

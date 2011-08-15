@@ -49,8 +49,6 @@ import org.cnx.repository.service.impl.operations.Services;
 /**
  * Implementation of the repository service for Google App Engine.
  * 
- * TODO(tal): (many places in many files) make sure we log all the interesting events.
- * 
  * @author Tal Dayan
  * 
  */

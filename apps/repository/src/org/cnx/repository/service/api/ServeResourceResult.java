@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -28,9 +28,9 @@ import com.google.common.base.Preconditions;
  * @author Tal Dayan
  */
 public class ServeResourceResult {
-    // TODO(tal): any attribute to return (size, type, etc)?
-
     // List of headers to be set by Repository Service client.
+    //
+    // TODO(tal): replace this with a Map<String, String>.
     private final List<KeyValue> listOfHeaders;
 
     public List<KeyValue> getListOfHeaders() {
@@ -39,8 +39,6 @@ public class ServeResourceResult {
 
     public ServeResourceResult(List<KeyValue> listOfHeaders) {
         Preconditions.checkNotNull(listOfHeaders);
-        // At present, CNXService implementation is expected to reutrn one Httpheader for BlobKey.
-        Preconditions.checkArgument(listOfHeaders.size() == 1);
         this.listOfHeaders = listOfHeaders;
     }
 }

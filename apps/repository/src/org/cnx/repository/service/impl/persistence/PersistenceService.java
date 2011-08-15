@@ -1,5 +1,6 @@
 package org.cnx.repository.service.impl.persistence;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -113,5 +114,20 @@ public class PersistenceService {
      */
     public void delete(Key... keys) {
         datastore.delete(keys);
+    }
+
+    /**
+     * Test if an object of this key already exists. This operation has the cost of persistence
+     * lookup.
+     */
+    public boolean hasObjectWithKey(Key key) {
+        checkArgument(key != null);
+        try {
+            @SuppressWarnings("unused")
+            final Entity entity = datastore.get(key);
+        } catch (EntityNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 }

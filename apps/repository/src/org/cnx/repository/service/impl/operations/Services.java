@@ -39,7 +39,7 @@ public class Services {
     public static final PersistenceService persistence = new PersistenceService(
         DatastoreServiceFactory.getDatastoreService());
 
-    // TODO(tal): should we create an instance on the fly for each use?
+    // TODO(tal): *** should we create an instance on the fly for each use?
     public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
 
     public static final CnxRepositoryConfiguration config = CnxRepositoryConfigurationImpl

@@ -42,8 +42,6 @@ import com.google.appengine.api.datastore.Transaction;
 /**
  * Implementation of the export related operations of the repository service.
  * 
- * TODO(tal): support the semantic of 'latest' in collection and module export operations.
- * 
  * @author Tal Dayan
  */
 public class ExportOperations {
@@ -140,7 +138,7 @@ public class ExportOperations {
                     "Error serving the resource content: " + exportReference, log, e);
         }
 
-        // TODO(tal): should do here the same header trick as in serving a resource?
+        // TODO(tal): *** should do here the same header trick as in serving a resource?
         return ResponseUtil.loggedOk("Resource served: " + exportReference.toString(),
                 new ServeExportResult(), log);
     }
@@ -187,7 +185,7 @@ public class ExportOperations {
             checkArgument(!tx.isActive(), "Transaction left active: %s", exportReference);
         }
 
-        // TODO(tal): what should be the best sequence to delete the entity and its blob?
+        // TODO(tal): *** what should be the best sequence to delete the entity and its blob?
         // Ideally they should be done in one transaction but app engine does not support it.
         Services.blobstore.delete(blobKey);
 

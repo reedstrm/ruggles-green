@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -39,9 +39,6 @@ public class ExportReference {
     private final String exportTypeId;
 
     /**
-     * TODO(tal): make the notion of 'latest version' more explicit? Currently we overload the null
-     * value.
-     * 
      * @param scopeType The type of the object to which the export can be attached.
      * @param objectId The id of the object to which this object is attached. The interpretation of
      *            this id depends on scopeType. For example, if scope type is MODULE or

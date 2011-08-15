@@ -36,9 +36,7 @@ import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to delete an export.
- *
- * TODO(tal): delete this servlet after implementing the real API.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

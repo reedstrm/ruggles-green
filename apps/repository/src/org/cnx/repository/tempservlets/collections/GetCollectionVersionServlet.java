@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -38,8 +38,6 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 /**
  * A temp API servlet to get the xml and manifest of a collection version.
  * 
- * TODO(tal): delete this servlet after implementing the real API.
- * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -68,7 +66,6 @@ public class GetCollectionVersionServlet extends HttpServlet {
 
         // Determine version to serve. If latest, leave as null and we will set
         // it up later.
-        // TODO(tal): catch integer conversion overflow exception and return error.
         Integer collectionVersion =
             collectionVersionString.equals("latest") ? null : Integer
                 .valueOf(collectionVersionString);

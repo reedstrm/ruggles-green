@@ -36,9 +36,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to add a version for an existing module.
- *
- * TODO(tal): delete this servlet after implementing the real API.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -63,7 +61,6 @@ public class AddModuleVersionServlet extends HttpServlet {
                 req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
-        // TODO(tal): pass in actual expected version number to detect version conflict.
         final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
             repository.addModuleVersion(context, moduleId, expectedVersionNumber, cnxmlDoc,
                     resourceMapDoc);

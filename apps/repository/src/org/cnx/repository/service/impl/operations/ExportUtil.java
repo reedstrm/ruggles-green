@@ -97,8 +97,8 @@ public class ExportUtil {
             final String exportTypeId = exportEntity.getExportTypeId();
             final ExportType exportType = Services.config.getExportTypes().get(exportTypeId);
             checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
-            // TODO(tal): assert that export type is alloweable for this scope
-            // TODO(tal): assert no duplicate export type ids.
+            // TODO(tal): what should we do if an export type is not allowable in this scope? This
+            // can happen for example if we change the export config to be more restrictive.
             exportInfos.add(new ExportInfo(exportType));
         }
         return exportInfos;
@@ -113,7 +113,8 @@ public class ExportUtil {
     public static String exportReferenceToRequestParameters(ExportReference exportReference) {
         final StringBuilder builder = new StringBuilder();
 
-        // TODO(tal): currently we use ExportType enum name from the API as URL param values.
+        // TODO(tal): *** We are using ExportType enum name from the abstract API as URL param
+        // values.
         // Changing these name will break pending export uploads. Consider to add here a mapping
         // to stable names.
         builder.append(ExportParams.SCOPE.name);

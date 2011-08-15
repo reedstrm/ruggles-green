@@ -46,7 +46,8 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
  * 
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
  * 
- * TODO(tal): verify the uploading user against the URL creating user and reject if failed.
+ * TODO(tal): verify the uploading user against the identity of the user that created the upload URL
+ * and reject if does not match.
  * 
  * @author Tal Dayan
  */
@@ -66,7 +67,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         // or return, it is set to contains exactly the (possibly empty) list of blobs that
         // should be deleted.
         //
-        // TODO(tal): since blob deletion and data store entity update cannot be done in
+        // TODO(tal): *** since blob deletion and data store entity update cannot be done in
         // one atomic transaction, we err on the safe side and prefer to leave garbage blobs
         // rahter than breaking blob references in active exports. If we will have a significant
         // number of garbage blobs, consider to implement a garbage collection or another safe

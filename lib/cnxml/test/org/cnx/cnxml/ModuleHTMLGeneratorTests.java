@@ -150,6 +150,16 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<p id=\"mypara\">Hello, World!</p>", generate(node));
     }
 
+    @Test public void paragraphShouldShowTitle() throws Exception {
+        final Node node = builder.element("para")
+                .attr("id", "mypara")
+                .child(builder.element("title").text("My Paragraph"))
+                .text("Hello, World!")
+                .build();
+        assertEquals("<div class=\"title\">My Paragraph</div><p id=\"mypara\">Hello, World!</p>",
+                generate(node));
+    }
+
     @Test public void emptySectionTags() throws Exception {
         final Node node = builder.element("section")
                 .attr("id", "mysect")

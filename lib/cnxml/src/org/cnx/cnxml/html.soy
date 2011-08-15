@@ -106,6 +106,9 @@
  *  @param node DOM element node
  */
 {template .para}
+    {if findElem($node, 'title')}
+        <div class="title">{innerText(findElem($node, 'title'))}</div>
+    {/if}
     <p id="{$node.attributes.id}">{call .children data="all"/}</p>
 {/template}
 

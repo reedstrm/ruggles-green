@@ -150,6 +150,16 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<p id=\"mypara\">Hello, World!</p>", generate(node));
     }
 
+    @Test public void paragraphShouldShowTitle() throws Exception {
+        final Node node = builder.element("para")
+                .attr("id", "mypara")
+                .child(builder.element("title").text("My Paragraph"))
+                .text("Hello, World!")
+                .build();
+        assertEquals("<div class=\"title\">My Paragraph</div><p id=\"mypara\">Hello, World!</p>",
+                generate(node));
+    }
+
     @Test public void emptySectionTags() throws Exception {
         final Node node = builder.element("section")
                 .attr("id", "mysect")
@@ -788,7 +798,8 @@ public class ModuleHTMLGeneratorTests {
                 + "<embed src=\"MYFILENAME.cdf\" "
                 + "type=\"application/vnd.wolfram.cdf.text\" "
                 + "width=\"128\" height=\"42\">"
-                + "</object>",
+                + "</object>"
+                + "<div class=\"downloadLink\"><a href=\"MYFILENAME.cdf\">Download CDF</a></div>",
                 generate(node));
     }
 
@@ -821,13 +832,16 @@ public class ModuleHTMLGeneratorTests {
                         )
                 )
         .build();
-        assertEquals("<table id=\"1000\">"
-                + "<caption>Table 1: Information\n<details>A data table</details></caption>"
-                + "<thead><tr><th>Name</th><th>Type</th><th>Value</th></tr></thead>"
-                + "<tbody>"
-                + "<tr><td>answer</td><td>int</td><td>42</td></tr>"
-                + "<tr><td>pi</td><td>float</td><td>3.14</td></tr>"
-                + "</tbody>"
+        assertEquals("<table id=\"1000\" class=\"cals calsFrameAll \">"
+                + "<thead class=\"\"><tr class=\"\">"
+                + "<th class=\"\">Name</th><th class=\"\">Type</th><th class=\"\">Value</th>"
+                + "</tr></thead>"
+                + "<tbody class=\"\"><tr class=\"\">"
+                + "<td class=\"\">answer</td><td class=\"\">int</td><td class=\"\">42</td>"
+                + "</tr><tr class=\"\">"
+                + "<td class=\"\">pi</td><td class=\"\">float</td><td class=\"\">3.14</td>"
+                + "</tr></tbody>"
+                + "<caption><div class=\"title\">Table 1: Information</div>A data table</caption>"
                 + "</table>",
                 generate(node));
     }

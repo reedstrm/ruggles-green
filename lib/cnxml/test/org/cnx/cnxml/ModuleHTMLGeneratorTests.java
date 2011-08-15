@@ -798,7 +798,8 @@ public class ModuleHTMLGeneratorTests {
                 + "<embed src=\"MYFILENAME.cdf\" "
                 + "type=\"application/vnd.wolfram.cdf.text\" "
                 + "width=\"128\" height=\"42\">"
-                + "</object>",
+                + "</object>"
+                + "<div class=\"downloadLink\"><a href=\"MYFILENAME.cdf\">Download CDF</a></div>",
                 generate(node));
     }
 

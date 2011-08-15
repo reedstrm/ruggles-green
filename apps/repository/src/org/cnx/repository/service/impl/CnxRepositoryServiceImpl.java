@@ -126,8 +126,10 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-            RepositoryRequestContext context, String collectionId, String colxmlDoc) {
-        return CollectionOperations.addCollectionVersion(context, collectionId, colxmlDoc);
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer expectedVersionNumber, String colxmlDoc) {
+        return CollectionOperations.addCollectionVersion(context, collectionId,
+                expectedVersionNumber, colxmlDoc);
     }
 
     @Override

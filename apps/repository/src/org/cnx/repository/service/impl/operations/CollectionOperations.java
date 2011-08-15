@@ -118,7 +118,14 @@ public class CollectionOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-            RepositoryRequestContext context, String collectionId, String colxmlDoc) {
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer expectedVersionNumber, String colxmlDoc) {
+
+        if (expectedVersionNumber != null && expectedVersionNumber < 1) {
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Invalid expected version number: " + expectedVersionNumber
+                        + ", should be >= 1", log);
+        }
 
         final Key collectionKey = OrmCollectionEntity.collectionIdToKey(collectionId);
         if (collectionKey == null) {
@@ -144,6 +151,14 @@ public class CollectionOperations {
 
             // Increment the collection version count
             newVersionNumber = collectionEntity.incrementVersionCount();
+
+            // If version conflict reject operation
+            if (expectedVersionNumber != null && !expectedVersionNumber.equals(newVersionNumber)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
+                        "Version conflict in collection " + collectionId + ", expected: "
+                            + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+            }
 
             // Create new version entity
             final OrmCollectionVersionEntity versionEntity =

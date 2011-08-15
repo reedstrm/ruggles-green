@@ -119,9 +119,9 @@ public interface CnxRepositoryService {
      * <li>User A submits his changed version with expected version 5. The submission goes through
      * Successfully.</li>
      * </ol>
-     *
+     * 
      * TODO(tal): define the XML format for the reosurce map.<br>
-     * TODO(tal): define extra validation constrainst from the cnxmlDoc.<br>   
+     * TODO(tal): define extra validation constrainst from the cnxmlDoc.<br>
      * 
      * @param context the query context
      * @param moduleId the module id
@@ -187,23 +187,34 @@ public interface CnxRepositoryService {
      * If the returned response has an OK status than a new version has been added to the
      * collection. Otherwise, no change is done in the repository.
      * 
+     * See {@link #addModuleVersion(RepositoryRequestContext, String, Integer, String, String)} for
+     * a discussion of the versioning mechanism and conflict detection.
+     * 
      * TODO(tal): define extra requirements from the colxmlDoc.
      * 
      * TODO(tal): break the XML arg into more java manageable parameters (e.g. ACL).
      * 
      * @param context the query context
+     * @param collectionId the collection id.
+     * @param expectedVersionNumber if not null, the operation is rejected if this value does not
+     *            equals the the number of previous versions of this collection plus one. If null,
+     *            the version is added after the existing latest version with no version conflict
+     *            verification. If not null, this value should be >= 1.
      * @param colxmlDoc an XML doc in COLXML format.
      * @return operation response.
      */
     RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-            RepositoryRequestContext context, String collectionId, String colxmlDoc);
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer expectedVersionNumber, String colxmlDoc);
 
     /**
      * Get the content of a collection version.
      * 
+     * 
      * @param context the request context.
      * @param collectionId the target collection id
      * @param collectionVersion the target collection version or null for latest version.
+     * 
      * @return operation response.
      */
     RepositoryResponse<GetCollectionVersionResult> getCollectionVersion(

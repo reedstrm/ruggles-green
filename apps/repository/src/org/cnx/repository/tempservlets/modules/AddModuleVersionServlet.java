@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,7 @@ public class AddModuleVersionServlet extends HttpServlet {
             checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
         final String expectedVersionParam =
             checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+        @Nullable
         final Integer expectedVersionNumber =
             expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
 

@@ -30,18 +30,17 @@ import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.api.UploadedResourceContentInfo;
-import org.cnx.repository.service.impl.schema.OrmResourceEntity;
+import org.cnx.repository.service.impl.persistence.OrmResourceEntity;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.common.collect.Lists;
 
 /**
  * Implementation of the resource related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ResourceOperations {
@@ -62,11 +61,11 @@ public class ResourceOperations {
 
         final String resourceId;
         try {
-            final Entity entity = new OrmResourceEntity().toEntity();
-            Services.ormDatastore.put(entity);
-            // NOTE(tal): resource id is available here after the entity has been persisted
-            // for the first time.
-            resourceId = new OrmResourceEntity(entity).getResourceId();
+            final OrmResourceEntity entity = new OrmResourceEntity();
+            Services.persistence.write(entity);
+            // NOTE(tal): resource id is available here after the entity has been persisted and
+            // it was assigned a key.
+            resourceId = entity.getId();
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Failed to create a new resource", log, e);
@@ -99,10 +98,9 @@ public class ResourceOperations {
                     "Resource id has bad format: [" + resourceId + "]", log);
         }
 
-        final OrmResourceEntity ormEntity;
+        final OrmResourceEntity entity;
         try {
-            final Entity entity = Services.ormDatastore.get(resourceKey);
-            ormEntity = new OrmResourceEntity(entity);
+            entity = Services.persistence.read(OrmResourceEntity.class, resourceKey);
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
                 + resourceId + "]", log, e);
@@ -113,7 +111,7 @@ public class ResourceOperations {
 
         // Construct result.
         final GetResourceInfoResult result;
-        switch (ormEntity.getState()) {
+        switch (entity.getState()) {
             case UPLOAD_PENDING:
                 result = GetResourceInfoResult.newPendingUploac();
                 break;
@@ -121,10 +119,10 @@ public class ResourceOperations {
                 // NOTE(tal): blob info could be cased in the resource entity when completing
                 // the content upload.
                 final BlobInfo blobInfo =
-                    Services.blobInfoFactory.loadBlobInfo(ormEntity.getBlobKey());
+                    Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
                 if (blobInfo == null) {
                     return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                            "Could not locate blob at key: " + ormEntity.getBlobKey(), log);
+                            "Could not locate blob at key: " + entity.getBlobKey(), log);
                 }
                 final UploadedResourceContentInfo contentInfo =
                     new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
@@ -133,7 +131,7 @@ public class ResourceOperations {
                 break;
             default:
                 return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                        "Unknown resource entity state:" + ormEntity.getState(), log);
+                        "Unknown resource entity state:" + entity.getState(), log);
         }
 
         return ResponseUtil.loggedOk("Retrieved info of resource " + resourceId, result, log);
@@ -153,9 +151,8 @@ public class ResourceOperations {
 
         final BlobKey blobKey;
         try {
-            final Entity entity = Services.ormDatastore.get(resourceKey);
-            final OrmResourceEntity ormEntity = new OrmResourceEntity(entity);
-
+            final OrmResourceEntity ormEntity =
+                Services.persistence.read(OrmResourceEntity.class, resourceKey);
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_COMPLETE) {
                 return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                         "Resource content has not been uploaded yet: " + resourceId, log);

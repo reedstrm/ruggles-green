@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,20 +16,18 @@
 
 package org.cnx.repository.service.impl;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.CnxRepositoryConfiguration;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateCollectionResult;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
-import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
@@ -42,11 +40,11 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
 import org.cnx.repository.service.impl.operations.CollectionOperations;
 import org.cnx.repository.service.impl.operations.ExportOperations;
 import org.cnx.repository.service.impl.operations.ModuleOperations;
 import org.cnx.repository.service.impl.operations.ResourceOperations;
+import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * Implementation of the repository service for Google App Engine.
@@ -59,6 +57,11 @@ import org.cnx.repository.service.impl.operations.ResourceOperations;
 public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     private final static CnxRepositoryServiceImpl instance = new CnxRepositoryServiceImpl();
+
+    @Override
+    public CnxRepositoryConfiguration getConfiguration() {
+        return Services.config;
+    }
 
     @Override
     public RepositoryResponse<CreateResourceResult>
@@ -138,11 +141,6 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
             RepositoryRequestContext context, String collectionId, Integer collectionVersion) {
         return CollectionOperations.getCollectionVersionInfo(context, collectionId,
                 collectionVersion);
-    }
-
-    @Override
-    public Map<String, ExportType> getExportTypes() {
-        return ExportTypesConfiguration.getExportTypes();
     }
 
     @Override

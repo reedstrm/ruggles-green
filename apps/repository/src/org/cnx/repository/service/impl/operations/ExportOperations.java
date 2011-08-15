@@ -22,9 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.jdo.JDOObjectNotFoundException;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
@@ -35,10 +32,12 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.api.ServeExportResult;
-import org.cnx.repository.service.impl.schema.CnxJdoEntity;
-import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
+import org.cnx.repository.service.impl.persistence.OrmEntity;
+import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the export related operations of the repository service.
@@ -71,20 +70,17 @@ public class ExportOperations {
         }
 
         // Verify that the parent entity exist.
-        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         try {
             @SuppressWarnings({ "unused", "unchecked" })
-            final CnxJdoEntity parentEntity =
-                (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
+            final OrmEntity parentEntity =
+                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
                         validationResult.getParentKey());
-        } catch (JDOObjectNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                     "Export parent object not found: " + exportReference, log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error when looking up parent entity of export: " + exportReference, log, e);
-        } finally {
-            pm.close();
         }
 
         final String completionUrl =
@@ -122,20 +118,18 @@ public class ExportOperations {
         }
 
         // Lookup the export entity and fetch the blob key.
-        PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
         final BlobKey blobKey;
         try {
-            final JdoExportItemEntity entity =
-                pm.getObjectById(JdoExportItemEntity.class, validationResult.getExportKey());
+            final OrmExportItemEntity entity =
+                Services.persistence.read(OrmExportItemEntity.class,
+                        validationResult.getExportKey());
             blobKey = checkNotNull(entity.getBlobKey(), "null blobkey");
-        } catch (JDOObjectNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
                 + exportReference, log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error when looking up export: " + exportReference, log, e);
-        } finally {
-            pm.close();
         }
 
         // Serve the export from Blobstore.
@@ -165,25 +159,24 @@ public class ExportOperations {
                     validationResult.getStatusDescription(), log);
         }
 
-        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
-        final Transaction tx = pm.currentTransaction();
         final BlobKey blobKey;
-        tx.begin();
+        final Transaction tx = Services.persistence.beginTransaction();
         try {
             // Lookup export, return NOT FOUND it not found.
-            final JdoExportItemEntity entity;
+            final OrmExportItemEntity entity;
             try {
                 entity =
-                    pm.getObjectById(JdoExportItemEntity.class, validationResult.getExportKey());
-            } catch (JDOObjectNotFoundException e) {
+                    Services.persistence.read(OrmExportItemEntity.class,
+                            validationResult.getExportKey());
+            } catch (EntityNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Export not found: "
                     + exportReference, log, e);
             }
 
-            // Export entity found.
-            blobKey = checkNotNull(entity.getBlobKey());
-            pm.deletePersistent(entity);
+            // Export entity found. Delete it.
+            blobKey = entity.getBlobKey();
+            Services.persistence.delete(checkNotNull(entity.getKey()));
 
             tx.commit();
         } catch (Throwable e) {
@@ -192,7 +185,6 @@ public class ExportOperations {
                     "Error when deleting export" + exportReference, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", exportReference);
-            pm.close();
         }
 
         // TODO(tal): what should be the best sequence to delete the entity and its blob?

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -16,8 +16,6 @@
 
 package org.cnx.repository.service.api;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +30,12 @@ import javax.servlet.http.HttpServletResponse;
  * 
  */
 public interface CnxRepositoryService {
+
+    /**
+     * Return the externally visible configuration of the repository instance.
+     */
+    CnxRepositoryConfiguration getConfiguration();
+
     /**
      * Create an empty resource and return information on how to upload its content.
      * 
@@ -196,14 +200,6 @@ public interface CnxRepositoryService {
     RepositoryResponse<GetCollectionVersionInfoResult> getCollectionVersionInfo(
             RepositoryRequestContext context, String collectionId,
             @Nullable Integer collectionVersion);
-
-    /**
-     * Returns a map of export type ids to export type specification. The result of this method is
-     * guaranteed to be stable throughout the life of this repository service instance and to be
-     * consistent across repository process runs (that is, types can be added, removed or modifies
-     * though ids and types are always stable).
-     */
-    Map<String, ExportType> getExportTypes();
 
     /**
      * Get an upload URL to attach an export to an entity.

@@ -16,13 +16,13 @@
 
 package org.cnx.repository.service.impl.operations;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManagerFactory;
+import org.cnx.repository.service.api.CnxRepositoryConfiguration;
+import org.cnx.repository.service.impl.configuration.CnxRepositoryConfigurationImpl;
+import org.cnx.repository.service.impl.persistence.PersistenceService;
 
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
 /**
@@ -36,18 +36,12 @@ public class Services {
     public static final BlobstoreService blobstore = BlobstoreServiceFactory.getBlobstoreService();
 
     // A single instance used by all queries of all threads.
-    // Persistence policy string should match the specification in
-    // jdoconfig.xml.
-    // TODO(tal): delete this and jdoconfig.xml after migrating from JDO
-    public static final PersistenceManagerFactory jdoDatastore = JDOHelper
-        .getPersistenceManagerFactory("default");
-
-    // TODO(tal): rename to datastore after migrating from JDO.
-    public static final DatastoreService ormDatastore = DatastoreServiceFactory
-        .getDatastoreService();
+    public static final PersistenceService persistence = new PersistenceService(
+        DatastoreServiceFactory.getDatastoreService());
 
     // TODO(tal): should we create an instance on the fly for each use?
     public static final BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
 
-    // public static final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+    public static final CnxRepositoryConfiguration config = CnxRepositoryConfigurationImpl
+        .getInstance();
 }

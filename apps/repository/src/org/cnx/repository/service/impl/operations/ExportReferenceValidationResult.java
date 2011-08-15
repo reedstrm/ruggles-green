@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -24,12 +24,11 @@ import javax.annotation.Nullable;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportType;
 import org.cnx.repository.service.api.RepositoryStatus;
-import org.cnx.repository.service.impl.configuration.ExportTypesConfiguration;
-import org.cnx.repository.service.impl.schema.JdoCollectionEntity;
-import org.cnx.repository.service.impl.schema.JdoCollectionVersionEntity;
-import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
-import org.cnx.repository.service.impl.schema.JdoModuleEntity;
-import org.cnx.repository.service.impl.schema.JdoModuleVersionEntity;
+import org.cnx.repository.service.impl.persistence.OrmCollectionEntity;
+import org.cnx.repository.service.impl.persistence.OrmCollectionVersionEntity;
+import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
+import org.cnx.repository.service.impl.persistence.OrmModuleEntity;
+import org.cnx.repository.service.impl.persistence.OrmModuleVersionEntity;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -134,7 +133,7 @@ public class ExportReferenceValidationResult {
             validateReference(ExportReference exportReference) {
         // Lookup export type by id.
         final ExportType exportType =
-            ExportTypesConfiguration.getExportTypes().get(exportReference.getExportTypeId());
+            Services.config.getExportTypes().get(exportReference.getExportTypeId());
         if (exportType == null) {
             return new ExportReferenceValidationResult(RepositoryStatus.BAD_REQUEST,
                 "Unknown exporty type id: " + exportReference.getExportTypeId());
@@ -168,36 +167,36 @@ public class ExportReferenceValidationResult {
         switch (exportReference.getScopeType()) {
             case MODULE_VERSION:
             case MODULE:
-                final Key moduleKey = JdoModuleEntity.moduleIdToKey(exportReference.getObjectId());
+                final Key moduleKey = OrmModuleEntity.moduleIdToKey(exportReference.getObjectId());
                 if (moduleKey == null) {
                     return new ExportReferenceValidationResult(RepositoryStatus.BAD_REQUEST,
                         "Module id has bad format: " + exportReference.getObjectId());
                 }
                 if (exportReference.getScopeType().isVersion()) {
-                    parentEntityClass = JdoModuleVersionEntity.class;
+                    parentEntityClass = OrmModuleVersionEntity.class;
                     parentKey =
-                        JdoModuleVersionEntity.moduleVersionKey(moduleKey,
+                        OrmModuleVersionEntity.moduleVersionKey(moduleKey,
                                 exportReference.getVersionNumber());
                 } else {
-                    parentEntityClass = JdoModuleEntity.class;
+                    parentEntityClass = OrmModuleEntity.class;
                     parentKey = moduleKey;
                 }
                 break;
             case COLLECTION_VERSION:
             case COLLECTION:
                 final Key collectionKey =
-                    JdoCollectionEntity.collectionIdToKey(exportReference.getObjectId());
+                    OrmCollectionEntity.collectionIdToKey(exportReference.getObjectId());
                 if (collectionKey == null) {
                     return new ExportReferenceValidationResult(RepositoryStatus.BAD_REQUEST,
                         "Collection id has bad format: " + exportReference.getObjectId());
                 }
                 if (exportReference.getScopeType().isVersion()) {
-                    parentEntityClass = JdoCollectionVersionEntity.class;
+                    parentEntityClass = OrmCollectionVersionEntity.class;
                     parentKey =
-                        JdoCollectionVersionEntity.collectionVersionKey(collectionKey,
+                        OrmCollectionVersionEntity.collectionVersionKey(collectionKey,
                                 exportReference.getVersionNumber());
                 } else {
-                    parentEntityClass = JdoCollectionEntity.class;
+                    parentEntityClass = OrmCollectionEntity.class;
                     parentKey = collectionKey;
                 }
                 break;
@@ -206,7 +205,7 @@ public class ExportReferenceValidationResult {
                     "Unknown export reference scope type: " + exportReference.getScopeType());
         }
 
-        final Key exportKey = JdoExportItemEntity.exportEntityKey(parentKey, exportType);
+        final Key exportKey = OrmExportItemEntity.exportEntityKey(parentKey, exportType);
 
         // All is OK.
         return new ExportReferenceValidationResult(RepositoryStatus.OK, "ok", exportType,

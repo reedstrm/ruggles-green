@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.service.impl.schema;
+package org.cnx.repository.service.impl.persistence;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,20 +28,16 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 /**
- * A Java class representing a datastore resource entity.
- *
- * This class does not perform any persistence operations, just data
- * mapping to/from datastore Entity.
+ * A POJO representing a datastore resource entity.
  *
  * @author Tal Dayan
  */
-public class OrmResourceEntity extends CnxJdoEntity {
+public class OrmResourceEntity extends OrmEntity {
 
-    /** Resource keys always have this kind */
-    public static final String KEY_KIND = "Resource";
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "r");
 
-    /** Resources ids are prefixed with this string */
-    public static final String ID_PREFIX = "R";
+    private static final String STATE_PROPERTY = "state";
+    private static final String BLOB_KEY_PROPERTY = "blob_key";
 
     /**
      * Each resource must be in one of these states.
@@ -61,15 +57,6 @@ public class OrmResourceEntity extends CnxJdoEntity {
         }
     }
 
-    private static final String STATE_PROPERTY = "state";
-    private static final String BLOB_KEY_PROPERTY = "blob_key";
-
-    /**
-     * Entity key. Null until entity is persisted for the first time
-     */
-    @Nullable
-    private Key key;
-
     /**
      * The state of this resource. This is a required attribute.
      */
@@ -81,49 +68,28 @@ public class OrmResourceEntity extends CnxJdoEntity {
     private BlobKey blobKey;
 
     /**
-     * Construct an entity in the {@link State#UPLOAD_PENDING} state with null key.
+     * Construct a resource entity in the {@link State#UPLOAD_PENDING} state with null key.
+     *
+     * Useful when creating new resources.
      */
     public OrmResourceEntity() {
-        this.key = null;
+        super(ENTITY_SPEC, null);
         this.state = State.UPLOAD_PENDING;
         this.blobKey = null;
     }
 
     /**
-     * Construct an entity from a data store entity.
+     * Construct a resource entity from a data store entity.
+     *
+     * Useful when retrieving a resource from the datastore.
      */
     public OrmResourceEntity(Entity entity) {
-        checkNotNull(entity.getKey());
-        checkArgument(entity.getKey().getKind() == KEY_KIND, "Unexpected resource key kind: %s",
-                entity.getKey().getKind());
-        this.key = checkNotNull(entity.getKey(), "No entity key");
+        super(ENTITY_SPEC, checkNotNull(entity.getKey(), "No entity key"));
         this.state = State.valueOf((String) entity.getProperty(STATE_PROPERTY));
         this.blobKey = (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY);
         checkArgument(state.hasBlobKey() == (blobKey != null), "Inconsistent state: %s", state);
     }
 
-    /**
-     * Constructs a datastore entity for persistence.
-     */
-    public Entity toEntity() {
-        final Entity result = (key == null) ? new Entity(KEY_KIND) : new Entity(key);
-        result.setProperty(STATE_PROPERTY, state.toString());
-        result.setProperty(BLOB_KEY_PROPERTY, blobKey);
-        return result;
-    }
-
-    @Nullable
-    public Key getKey() {
-        return key;
-    }
-
-    /**
-     * Get the id of this resource. Asserts that this entity has key.
-     */
-    public String getResourceId() {
-        checkState(key != null);
-        return KeyUtil.idToString(ID_PREFIX, key.getId());
-    }
 
     public State getState() {
         return state;
@@ -144,18 +110,30 @@ public class OrmResourceEntity extends CnxJdoEntity {
      */
     public void pendingToUploadedTransition(BlobKey newBlobKey) {
         checkState(state == State.UPLOAD_PENDING, "Encountered %s", state);
-        checkState(key != null, "Resource entity has no key");
+        checkState(getKey() != null, "Resource entity has no key");
         blobKey = checkNotNull(newBlobKey, "Null blob key");
         state = State.UPLOAD_COMPLETE;
     }
 
     /**
-     * Convert a resource id returned by {@link #getResouceId()} back to the resource key. Returns
+     * Convert a resource id returned by {@link #getId()} back to the resource key. Returns
      * null if resource id has invalid format.
      */
     @Nullable
     public static Key resourceIdToKey(String resourceId) {
-        final Long resourceIdLong = KeyUtil.stringToId(ID_PREFIX, resourceId);
-        return (resourceIdLong == null) ? null : KeyFactory.createKey(KEY_KIND, resourceIdLong);
+        final Long resourceIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), resourceId);
+        return (resourceIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(), resourceIdLong);
     }
+
+    @Override
+    protected void serializeToEntity(Entity entity) {
+        // TODO(tal): can we persist the enum directly, not as a string?
+        entity.setProperty(STATE_PROPERTY, state.toString());
+        entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
+    }
+
+    public static OrmEntitySpec getSpec() {
+        return ENTITY_SPEC;
+    }
+
 }

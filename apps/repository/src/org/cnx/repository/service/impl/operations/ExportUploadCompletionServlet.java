@@ -26,37 +26,32 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
-import javax.jdo.JDOObjectNotFoundException;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.ExportReference;
-import org.cnx.repository.service.impl.schema.CnxJdoEntity;
-import org.cnx.repository.service.impl.schema.JdoExportItemEntity;
+import org.cnx.repository.service.impl.persistence.OrmEntity;
+import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of a resource upload to the blobstore.
- * 
+ *
  * TODO(tal): add code to verify that the request is indeed from the blobstore service.
- * 
+ *
  * TODO(tal): verify the uploading user against the URL creating user and reject if failed.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
 public class ExportUploadCompletionServlet extends HttpServlet {
-    /**
-     * Max allowed export size in bytes. This is an arbitrary limit.
-     */
-    private static final long MAX_EXPORT_SIZE = 100 * 1024 * 1024;
 
     private static final Logger log = Logger.getLogger(ExportUploadCompletionServlet.class
         .getName());
@@ -65,9 +60,6 @@ public class ExportUploadCompletionServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         final Map<String, BlobKey> incomingBlobs = Services.blobstore.getUploadedBlobs(req);
-
-        final PersistenceManager pm = Services.jdoDatastore.getPersistenceManager();
-        final Transaction tx = pm.currentTransaction();
 
         // List of blobs to delete upon return, each associated with a reason describing
         // why it is deleted. We update it as we go. At any point that can cause an exception
@@ -89,6 +81,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
         // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
         // to delete unused blobs when leaving the method.
+        Transaction tx = null;
         try {
             exportReference = ExportUtil.exportReferenceFromRequestParameters(req);
 
@@ -124,10 +117,11 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                         "Could not find info of new blob: " + newBlobKey, null, log, Level.SEVERE);
                 return;
             }
-            if (blobInfo.getSize() > MAX_EXPORT_SIZE) {
+            if (blobInfo.getSize() > validationResult.getExportType().getMaxSizeInBytes()) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
-                        "Export too large: " + blobInfo + " vs. " + MAX_EXPORT_SIZE, null, log,
-                        Level.WARNING);
+                        "Export too large: " + blobInfo + " vs. "
+                            + validationResult.getExportType().getMaxSizeInBytes() + ", export: "
+                            + exportReference, null, log, Level.WARNING);
                 return;
             }
             if (!validationResult.getExportType().getContentType()
@@ -143,29 +137,33 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             // This throws an exception of it does not. We don't consider this
             // to be a user error but a server error since we already verified when providing
             // the upload URL so it is treated as a server error.
-            tx.begin();
+            tx = Services.persistence.beginTransaction();
+
             @SuppressWarnings({ "unused", "unchecked" })
-            final CnxJdoEntity parentEntity =
-                (CnxJdoEntity) pm.getObjectById(validationResult.getParentEntityClass(),
+            final OrmEntity parentEntity =
+                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
                         validationResult.getParentKey());
 
             // Lookup for existing export entity, if found then overwrite, otherwise create a
             // new one.
             @Nullable
             BlobKey oldBlobKey = null;
-            JdoExportItemEntity exportItemEntity;
+            OrmExportItemEntity exportItemEntity;
             try {
                 exportItemEntity =
-                    pm.getObjectById(JdoExportItemEntity.class, validationResult.getExportKey());
-                // Save the old blob key and overwrite with the new one.
+                    Services.persistence.read(OrmExportItemEntity.class,
+                            validationResult.getExportKey());
+
+                // Keep around the old blob key and overwrite with the new one.
                 oldBlobKey = checkNotNull(exportItemEntity.getBlobKey());
                 exportItemEntity.setBlobKey(newBlobKey);
 
-            } catch (JDOObjectNotFoundException e) {
+            } catch (EntityNotFoundException e) {
+                // New export, not overwriting an existing one.
                 exportItemEntity =
-                    new JdoExportItemEntity(validationResult.getExportKey(), newBlobKey);
-                pm.makePersistent(exportItemEntity);
+                    new OrmExportItemEntity(validationResult.getExportKey(), newBlobKey);
             }
+            Services.persistence.write(exportItemEntity);
 
             tx.commit();
 
@@ -176,14 +174,16 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                 blobsToDeleteOnExit.add(Pair.of(oldBlobKey, "Overwritten old export blob"));
             }
         } catch (Throwable e) {
-            tx.rollback();
+            if (tx != null) {
+                tx.rollback();
+            }
             final String message = "Error when writing export item: " + e.getMessage();
             log.log(Level.SEVERE, message, e);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
             return;
         } finally {
-            checkArgument(!tx.isActive(), "Transaction left active: %s", req.getQueryString());
-            pm.close();
+            checkArgument((tx == null) || !tx.isActive(), "Transaction left active: %s",
+                    req.getQueryString());
 
             // Delete on exit blobs
             for (Pair<BlobKey, String> item : blobsToDeleteOnExit) {

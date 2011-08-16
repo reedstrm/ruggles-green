@@ -20,6 +20,12 @@ html, body {
     font-family: "Open Sans", sans-serif;
 }
 
+body > header > h1 {
+    background: url(../img/logo.png) no-repeat left center;
+    overflow: hidden;
+    text-indent: -999em;
+}
+
 h1 {
     margin-bottom: 0;
 }

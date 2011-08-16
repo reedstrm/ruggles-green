@@ -16,11 +16,10 @@
 
 package org.cnx.repository.service.api;
 
-import java.util.List;
-
-import org.cnx.repository.common.KeyValue;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Result of a successful serveResource() operation.
@@ -28,17 +27,26 @@ import com.google.common.base.Preconditions;
  * @author Tal Dayan
  */
 public class ServeResourceResult {
-    // List of headers to be set by Repository Service client.
-    //
-    // TODO(tal): replace this with a Map<String, String>.
-    private final List<KeyValue> listOfHeaders;
 
-    public List<KeyValue> getListOfHeaders() {
-        return listOfHeaders;
+    private ImmutableMap<String, String> additionalHeaders;
+
+    public ServeResourceResult(ImmutableMap<String, String> additionalHeaders) {
+        Preconditions.checkNotNull(additionalHeaders);
+        this.additionalHeaders = checkNotNull(additionalHeaders);
     }
 
-    public ServeResourceResult(List<KeyValue> listOfHeaders) {
-        Preconditions.checkNotNull(listOfHeaders);
-        this.listOfHeaders = listOfHeaders;
+    /**
+     * Name value map of additional HTTP headers.
+     *
+     * Zero or more HTTP header name/value pairs that must be applied to the HTTP response by the
+     * caller. These headers are in additional to other headers that the repository service may
+     * already applied to the HTTP response.
+     *
+     * NOTE(tal): in some implementations of the CNX repository service, the service may not be able
+     * to set some response headers due internal technical limitations (e.g. serving from blobstore
+     * in Google App Engine).
+     */
+    public ImmutableMap<String, String> getAdditionalHeaders() {
+        return additionalHeaders;
     }
 }

@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -140,8 +141,8 @@ public class CnxAtomResourceServlet {
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();
             ResponseBuilder responseBuilder = Response.ok();
-            for (KeyValue currHeader : result.getListOfHeaders()) {
-                responseBuilder.header(currHeader.getKey(), currHeader.getValue());
+            for (Map.Entry<String, String> header : result.getAdditionalHeaders().entrySet()) {
+                responseBuilder.header(header.getKey(), header.getValue());
             }
 
             return responseBuilder.build();

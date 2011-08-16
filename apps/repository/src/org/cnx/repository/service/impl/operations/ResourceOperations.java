@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -36,7 +35,7 @@ import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Implementation of the resource related operations of the repository service.
@@ -180,8 +179,8 @@ public class ResourceOperations {
          * a header with "BlobKey = <value>" and then App Engine replaces the body of the response
          * with the content of the blob.
          */
-        final KeyValue blobkeyHeader = new KeyValue("BlobKey", blobKey.toString());
-        ServeResourceResult result = new ServeResourceResult(Lists.newArrayList(blobkeyHeader));
+        final ImmutableMap<String, String> additionalHeaders = ImmutableMap.of(BlobstoreUtil.BLOB_KEY_HEADER_NAME, blobKey.toString());
+        ServeResourceResult result = new ServeResourceResult(additionalHeaders);
         return ResponseUtil.loggedOk("Resource served: " + resourceId, result, log);
     }
 }

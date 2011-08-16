@@ -38,6 +38,7 @@ import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Implementation of the export related operations of the repository service.
@@ -138,9 +139,10 @@ public class ExportOperations {
                     "Error serving the resource content: " + exportReference, log, e);
         }
 
-        // TODO(tal): *** should do here the same header trick as in serving a resource?
-        return ResponseUtil.loggedOk("Resource served: " + exportReference.toString(),
-                new ServeExportResult(), log);
+        final ImmutableMap<String, String> additionalHeaders =
+            ImmutableMap.of(BlobstoreUtil.BLOB_KEY_HEADER_NAME, blobKey.toString());
+        return ResponseUtil.loggedOk("Export served: " + exportReference.toString(),
+                new ServeExportResult(additionalHeaders), log);
     }
 
     /**

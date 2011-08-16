@@ -19,6 +19,7 @@ package org.cnx.repository.tempservlets.exports;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ import org.cnx.repository.service.impl.operations.Services;
 
 /**
  * A temp API servlet to serve a resource using a GET request.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -80,8 +81,11 @@ public class GetExportServlet extends HttpServlet {
             }
         }
 
-        // When ok, resource has been served so there is nothing to do here.
         checkState(repositoryResponse.isOk());
+        for (Map.Entry<String, String> header : repositoryResponse.getResult()
+            .getAdditionalHeaders().entrySet()) {
+            resp.addHeader(header.getKey(), header.getValue());
+        }
         return;
     }
 }

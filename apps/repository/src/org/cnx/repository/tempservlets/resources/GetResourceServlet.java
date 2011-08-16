@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -19,6 +19,7 @@ package org.cnx.repository.tempservlets.resources;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,8 +80,11 @@ public class GetResourceServlet extends HttpServlet {
             }
         }
 
-        // When ok, resource has been served so there is nothing to do here.
         checkState(repositoryResponse.isOk());
+        for (Map.Entry<String, String> header : repositoryResponse.getResult()
+            .getAdditionalHeaders().entrySet()) {
+            resp.addHeader(header.getKey(), header.getValue());
+        }
         return;
     }
 }

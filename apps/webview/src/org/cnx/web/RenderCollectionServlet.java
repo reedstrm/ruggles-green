@@ -80,12 +80,13 @@ import org.w3c.dom.Element;
         }
 
         // Get metadata
-        String title = "";
+        String title = "", abstractText = null;
         List<Actor> authors = null;
         final Metadata metadata = coll.getMetadata();
         if (metadata != null) {
             try {
                 title = metadata.getTitle();
+                abstractText = metadata.getAbstract();
                 authors = metadata.getAuthors();
             } catch (Exception e) {
                 log.log(Level.WARNING, "Error while getting metadata", e);
@@ -110,6 +111,7 @@ import org.w3c.dom.Element;
                         "id", collectionId,
                         "version", version,
                         "title", title,
+                        "abstract", abstractText,
                         "authors", Utils.convertActorListToSoyData(authors),
                         "contentHtml", contentHtml
                 )

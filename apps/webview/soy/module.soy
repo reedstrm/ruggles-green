@@ -29,7 +29,7 @@
         {/param}
         {param content}
             <h1 class="moduleTitle">{$module.title}</h1>
-            <p class="authors">{call .actorList}{param actors: $module.authors/}{/call}</p>
+            <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
         {/param}
     {/call}
@@ -55,7 +55,7 @@
                 <h1 class="collectionTitle"><a href="/light/collection/{$collection.id}/{$collection.version}/">{$collection.title}</a></h1>
                 <h1 class="moduleTitle">{$module.title}</h1>
             </hgroup>
-            <p class="authors">{call .actorList}{param actors: $module.authors/}{/call}</p>
+            <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .collectionNavBar data="all"/}
             {call .moduleContent data="all"/}
             {call .collectionNavBar data="all"/}

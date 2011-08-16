@@ -91,21 +91,29 @@
  */
 {template .collectionNavBar}
     <nav class="collectionNavBar">
-        <div class="previous">
-            {call .collectionNavLink}
-                {param text}Previous{/param}
-                {param module: $previousModule/}
-            {/call}
-        </div>
+        {if $previousModule}
+            <div class="previous">
+                {call .collectionNavLink}
+                    {param text}Previous{/param}
+                    {param module: $previousModule/}
+                {/call}
+            </div>
+        {else}
+            <div class="previous empty"></div>
+        {/if}
         <div class="current moduleTitle">
             {$module.title}
         </div>
-        <div class="next">
-            {call .collectionNavLink}
-                {param text}Next{/param}
-                {param module: $nextModule/}
-            {/call}
-        </div>
+        {if $nextModule}
+            <div class="next">
+                {call .collectionNavLink}
+                    {param text}Next{/param}
+                    {param module: $nextModule/}
+                {/call}
+            </div>
+        {else}
+            <div class="next empty"></div>
+        {/if}
     </nav>
 {/template}
 

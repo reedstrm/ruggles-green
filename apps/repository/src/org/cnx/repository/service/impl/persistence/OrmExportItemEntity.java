@@ -29,7 +29,7 @@ import com.google.appengine.repackaged.com.google.common.base.StringUtil;
 
 /**
  * A POJO representing an export item attached to a repository object.
- *
+ * 
  * @author Tal Dayan
  */
 public class OrmExportItemEntity extends OrmEntity {
@@ -74,7 +74,7 @@ public class OrmExportItemEntity extends OrmEntity {
 
     /**
      * Construct an export item key.
-     *
+     * 
      * @param parentKey the key of the object to which this export is attached.
      * @param exportType the type of this export.
      * @return the export item key.

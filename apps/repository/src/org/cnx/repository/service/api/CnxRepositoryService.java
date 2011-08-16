@@ -22,11 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
  * 
- * TODO(tal): add support for lenses
- * 
  * TODO(tal): add support for search
  * 
- * TODO(tal): add methods to enumerate resources, modules and lenses.
+ * TODO(tal): add methods to enumerate resources and modules.
  * 
  */
 public interface CnxRepositoryService {
@@ -64,9 +62,6 @@ public interface CnxRepositoryService {
      * called from a doGet() of a servlet. Service will reutrn a list of Http-headers that user of
      * this service is expected to set before response is returned to clients.
      * 
-     * TODO(tal): comment about the state of httpServlet when returning with an error (is the
-     * response changed? Does caller need to reset it?)>
-     * 
      * @param context the query context
      * @param resourceId a valid id of the resource to serve.
      * @param resp a HTTP servlet response in which the resource is served.
@@ -102,20 +97,40 @@ public interface CnxRepositoryService {
      * If the returned response has an OK status than a new version has been added to the module.
      * Otherwise, no change is done in the repository.
      * 
-     * TODO(tal): define the XML format for the reosurce map.
+     * The parameter expectedVersionNumber allows to detect and reject submissions that will result
+     * in version conflict. Here is a scenario that demostrates it:
+     * <ol>
+     * <li>A module has 3 versions.</li>
+     * <li>User A fetches the latest version of the module (3) for editing.</li>
+     * <li>User B fetches the latest version of the module (3) for editing.</li>
+     * <li>User B changes module version 3 and submits with expected version 4 (3+1). The submission
+     * goes through. The module has now 4 versions.</li>
+     * <li>User A changes module version 3 and try to submit it with expected version 4 (3+1). The
+     * submission fail due to version conflict because the module already has version 4.</li>
+     * <li>User A query the module and finds that it has 4 version. That is, one additional version
+     * beyond his base version 3.</li>
+     * <li>User A fetches version 4 and merges its modified version 3 with version 4. His base
+     * version is now 4.</li>
+     * <li>User A submits his changed version with expected version 5. The submission goes through
+     * Successfully.</li>
+     * </ol>
      * 
-     * TODO(tal): define extra requriements from the cnxmlDoc.
-     * 
-     * TODO(tal): break the XML arg into more java manageable parameters (e.g. Map for resource
-     * mapping).
+     * TODO(tal): add XML docs validation.
      * 
      * @param context the query context
+     * @param moduleId the module id
+     * @param expectedVersionNumber if not null, the operation is rejected if this value does not
+     *            equals the the number of previous versions of this module plus one. If null, the
+     *            version is added after the existing latest version with no version conflict
+     *            verification. If not null, this value should be >= 1.
      * @param cnxmlDoc an XML doc in CNXML format.
      * @param resourceMapDoc an XML doc with resource map for this module version.
      * @return operation response.
+     * 
      */
     RepositoryResponse<AddModuleVersionResult> addModuleVersion(RepositoryRequestContext context,
-            String moduleId, String cnxmlDoc, String resourceMapDoc);
+            String moduleId, @Nullable Integer expectedVersionNumber, String cnxmlDoc,
+            String resourceMapDoc);
 
     /**
      * Get the content of a module version.
@@ -166,23 +181,32 @@ public interface CnxRepositoryService {
      * If the returned response has an OK status than a new version has been added to the
      * collection. Otherwise, no change is done in the repository.
      * 
-     * TODO(tal): define extra requirements from the colxmlDoc.
+     * See {@link #addModuleVersion(RepositoryRequestContext, String, Integer, String, String)} for
+     * a discussion of the versioning mechanism and conflict detection.
      * 
-     * TODO(tal): break the XML arg into more java manageable parameters (e.g. ACL).
+     * TODO(tal): add COLXML validation.
      * 
      * @param context the query context
+     * @param collectionId the collection id.
+     * @param expectedVersionNumber if not null, the operation is rejected if this value does not
+     *            equals the the number of previous versions of this collection plus one. If null,
+     *            the version is added after the existing latest version with no version conflict
+     *            verification. If not null, this value should be >= 1.
      * @param colxmlDoc an XML doc in COLXML format.
      * @return operation response.
      */
     RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-            RepositoryRequestContext context, String collectionId, String colxmlDoc);
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer expectedVersionNumber, String colxmlDoc);
 
     /**
      * Get the content of a collection version.
      * 
+     * 
      * @param context the request context.
      * @param collectionId the target collection id
      * @param collectionVersion the target collection version or null for latest version.
+     * 
      * @return operation response.
      */
     RepositoryResponse<GetCollectionVersionResult> getCollectionVersion(
@@ -221,9 +245,6 @@ public interface CnxRepositoryService {
      * Send the export content with its content type to the given servlet response. This is
      * typically called from a doGet() of a servlet. If the returned status is OK, no further action
      * is required from the servlet.
-     * 
-     * TODO(tal): comment about the state of httpServlet when returning with an error (is the
-     * response changed? Does caller need to reset it?)>
      * 
      * @param context the query context
      * @param exportRererence reference to the export to be served

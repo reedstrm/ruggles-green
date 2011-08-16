@@ -49,8 +49,6 @@ import org.cnx.repository.service.impl.operations.Services;
 /**
  * Implementation of the repository service for Google App Engine.
  * 
- * TODO(tal): (many places in many files) make sure we log all the interesting events.
- * 
  * @author Tal Dayan
  * 
  */
@@ -94,9 +92,10 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<AddModuleVersionResult> addModuleVersion(
-            RepositoryRequestContext context, String moduleId, String cnxmlDoc,
-            String resourceMapDoc) {
-        return ModuleOperations.addModuleVersion(context, moduleId, cnxmlDoc, resourceMapDoc);
+            RepositoryRequestContext context, String moduleId,
+            @Nullable Integer expectedVersionNumber, String cnxmlDoc, String resourceMapDoc) {
+        return ModuleOperations.addModuleVersion(context, moduleId, expectedVersionNumber,
+                cnxmlDoc, resourceMapDoc);
     }
 
     @Override
@@ -125,8 +124,10 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-            RepositoryRequestContext context, String collectionId, String colxmlDoc) {
-        return CollectionOperations.addCollectionVersion(context, collectionId, colxmlDoc);
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer expectedVersionNumber, String colxmlDoc) {
+        return CollectionOperations.addCollectionVersion(context, collectionId,
+                expectedVersionNumber, colxmlDoc);
     }
 
     @Override

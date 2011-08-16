@@ -203,9 +203,10 @@ public class CnxAtomModuleServlet {
             CnxAtomPubConstants.getResourceMappingDocFromContent((Content) postedEntry
                 .getContents().get(0));
 
+        // TODO(tal): pass in actual expected version number to detect version conflict.
         RepositoryResponse<AddModuleVersionResult> createdModule =
             repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,
-                    cnxmlDoc, resourceMappingDoc);
+                    null, cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*

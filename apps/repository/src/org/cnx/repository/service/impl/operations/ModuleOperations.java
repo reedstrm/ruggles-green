@@ -117,8 +117,14 @@ public class ModuleOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<AddModuleVersionResult> addModuleVersion(
-            RepositoryRequestContext context, String moduleId, String cnxmlDoc,
-            String resourceMapDoc) {
+            RepositoryRequestContext context, String moduleId,
+            @Nullable Integer expectedVersionNumber, String cnxmlDoc, String resourceMapDoc) {
+
+        if (expectedVersionNumber != null && expectedVersionNumber < 1) {
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Invalid expected version number: " + expectedVersionNumber
+                        + ", should be >= 1", log);
+        }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
@@ -143,18 +149,30 @@ public class ModuleOperations {
                         "Cannot add module version, module not found: " + moduleId, log, e);
             }
 
-            // Updated number of versions in the module entity
+            // Increment module version count
             newVersionNumber = moduleEntity.incrementVersionCount();
-            Services.persistence.write(moduleEntity);
+
+            // If version conflict reject operation
+            if (expectedVersionNumber != null && !expectedVersionNumber.equals(newVersionNumber)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
+                        "Version conflict in module " + moduleId + ", expected: "
+                            + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+            }
 
             // Create new version entity
             final OrmModuleVersionEntity versionEntity =
                 new OrmModuleVersionEntity(moduleKey, newVersionNumber, cnxmlDoc, resourceMapDoc);
 
-            // TODO(tal): If a module version with this key already exists (due to data
-            // inconsistency), return an error rather than overwriting it.
-
-            Services.persistence.write(versionEntity);
+            // Sanity check that we don't overwrite an existing version. Should never be
+            // triggered if the persisted data is consistent.
+            if (Services.persistence.hasObjectWithKey(versionEntity.getKey())) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                        "Server module data inconsistency. Key: " + versionEntity.getKey(), log);
+            }
+            // Update the persistence
+            Services.persistence.write(moduleEntity, versionEntity);
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
@@ -176,14 +194,14 @@ public class ModuleOperations {
             RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
 
         if (moduleVersion != null && moduleVersion < 1) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Illegal module version number "
-                + moduleVersion, log);
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Illegal module version number " + moduleVersion, log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Module id has bad format: ["
-                + moduleId + "]", log);
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Module id has bad format: [" + moduleId + "]", log);
         }
 
         // final DatastoreService datastore = Services.ormDatastore;
@@ -243,25 +261,22 @@ public class ModuleOperations {
             RepositoryRequestContext context, String moduleId, @Nullable Integer moduleVersion) {
 
         if (moduleVersion != null && moduleVersion < 1) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Illegal module version number "
-                + moduleVersion, log);
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Illegal module version number " + moduleVersion, log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
         if (moduleKey == null) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST, "Module id has bad format: ["
-                + moduleId + "]", log);
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Module id has bad format: [" + moduleId + "]", log);
         }
 
-        // final DatastoreService datastore = Services.ormDatastore;
         final int versionToServe;
         final List<ExportInfo> exports;
         final OrmModuleVersionEntity versionEntity;
         final Transaction tx = Services.persistence.beginTransaction();
 
         try {
-            // TODO(tal): refactor this and share with other operations in this file.
-            //
             // Determine module version to serve. If 'latest' than read module entity and
             // determine latest version.
             //
@@ -278,7 +293,7 @@ public class ModuleOperations {
                 }
                 // If module has no versions than there is not latest version.
                 if (moduleEntity.getVersionCount() < 1) {
-                    ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                    return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                             "Module has no versions: " + moduleId, log);
                 }
                 versionToServe = moduleEntity.getVersionCount();

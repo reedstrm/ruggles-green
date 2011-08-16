@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableMap;
  * This class is part of the abstracted CNX repository service API and thus should not include
  * implementation specific configuration attributes.
  * 
- * @author tal
+ * @author Tal Dayan
  * 
  */
 public interface CnxRepositoryConfiguration {

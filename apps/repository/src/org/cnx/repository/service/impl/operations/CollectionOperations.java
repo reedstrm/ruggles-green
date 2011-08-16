@@ -44,7 +44,7 @@ import com.google.appengine.api.datastore.Transaction;
 
 /**
  * Implementation of the collection related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class CollectionOperations {
@@ -118,7 +118,14 @@ public class CollectionOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<AddCollectionVersionResult> addCollectionVersion(
-            RepositoryRequestContext context, String collectionId, String colxmlDoc) {
+            RepositoryRequestContext context, String collectionId,
+            @Nullable Integer expectedVersionNumber, String colxmlDoc) {
+
+        if (expectedVersionNumber != null && expectedVersionNumber < 1) {
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                    "Invalid expected version number: " + expectedVersionNumber
+                        + ", should be >= 1", log);
+        }
 
         final Key collectionKey = OrmCollectionEntity.collectionIdToKey(collectionId);
         if (collectionKey == null) {
@@ -142,18 +149,33 @@ public class CollectionOperations {
                         log, e);
             }
 
-            // Update number of versions in the collection entity
+            // Increment the collection version count
             newVersionNumber = collectionEntity.incrementVersionCount();
-            Services.persistence.write(collectionEntity);
+
+            // If version conflict reject operation
+            if (expectedVersionNumber != null && !expectedVersionNumber.equals(newVersionNumber)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
+                        "Version conflict in collection " + collectionId + ", expected: "
+                            + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+            }
 
             // Create new version entity
             final OrmCollectionVersionEntity versionEntity =
                 new OrmCollectionVersionEntity(collectionKey, newVersionNumber, colxmlDoc);
-            Services.persistence.write(versionEntity);
 
-            // TODO(tal): If a collection version with this key already exists (due to data
-            // inconsistency), return an error rather than overwriting it.
+            // Sanity check that we don't overwrite an existing version. Should never be
+            // triggered if the persisted data is consistent.
+            if (Services.persistence.hasObjectWithKey(versionEntity.getKey())) {
+                tx.rollback();
+                return ResponseUtil
+                    .loggedError(RepositoryStatus.SERVER_ERRROR,
+                            "Server collection data inconsistency. Key: " + versionEntity.getKey(),
+                            log);
+            }
 
+            // Update persistence
+            Services.persistence.write(collectionEntity, versionEntity);
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
@@ -177,13 +199,13 @@ public class CollectionOperations {
             @Nullable Integer collectionVersion) {
 
         if (collectionVersion != null && collectionVersion < 1) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Illegal collection version number " + collectionVersion, log);
         }
 
         final Key collectionKey = OrmCollectionEntity.collectionIdToKey(collectionId);
         if (collectionKey == null) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Collection id has bad format: [" + collectionId + "]", log);
         }
 
@@ -255,13 +277,13 @@ public class CollectionOperations {
             @Nullable Integer collectionVersion) {
 
         if (collectionVersion != null && collectionVersion < 1) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Illegal collection version number " + collectionVersion, log);
         }
 
         final Key collectionKey = OrmCollectionEntity.collectionIdToKey(collectionId);
         if (collectionKey == null) {
-            ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+            return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Collection id has bad format: [" + collectionId + "]", log);
         }
 

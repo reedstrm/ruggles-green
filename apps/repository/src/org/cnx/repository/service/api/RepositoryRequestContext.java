@@ -36,8 +36,6 @@ public class RepositoryRequestContext {
     @Nullable
     public final String authenticatedUserId;
 
-    // TODO(tal): add here more attributes (e.g. debug level, debug logger, etc)
-
     /**
      * @param hostUrl the prefix of the server URL up to the path (not including). Examples:
      *            "http://localhost:8888", "http://my_app-appstope.com". Used to construct URLs

@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableSet;
 
@@ -29,6 +30,8 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableSet;
  * @author Tal Dayan
  */
 public class ExportType {
+
+    private static final Pattern EXPORT_TYPE_ID_PATTERN = Pattern.compile("[a-zA-Z0-9._]+");
 
     private final String id;
     private final String contentType;
@@ -50,8 +53,9 @@ public class ExportType {
      */
     public ExportType(String id, String contentType, long maxSizeInBytes,
         Set<ExportScopeType> allowedScopeTypes) {
+        checkArgument(EXPORT_TYPE_ID_PATTERN.matcher(id).matches(), "Invalid export type id: [%s]",
+                id);
         checkArgument(maxSizeInBytes > 0, "Invalid max size in bytes: %s", maxSizeInBytes);
-        // TODO(tal): assert that id is a web safe string (a-zA-Z._-0-9).
         this.id = checkNotNull(id);
         this.contentType = checkNotNull(contentType);
         this.maxSizeInBytes = maxSizeInBytes;

@@ -26,7 +26,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a module entity.
- *
+ * 
  * @author Tal Dayan
  */
 public class OrmModuleEntity extends OrmEntity {
@@ -44,7 +44,7 @@ public class OrmModuleEntity extends OrmEntity {
 
     /**
      * Construct an entity with zero versions.
-     *
+     * 
      * Useful when creating new modules.
      */
     public OrmModuleEntity() {
@@ -82,7 +82,7 @@ public class OrmModuleEntity extends OrmEntity {
 
     @Override
     protected void serializeToEntity(Entity entity) {
-        entity.setProperty(VERSION_COUNT_PROPERTY, versionCount);  // serialized as Long
+        entity.setProperty(VERSION_COUNT_PROPERTY, versionCount); // serialized as Long
     }
 
     public static OrmEntitySpec getSpec() {

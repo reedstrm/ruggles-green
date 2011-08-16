@@ -1,10 +1,10 @@
 package org.cnx.repository.service.impl.persistence;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -25,23 +25,31 @@ public class PersistenceService {
     }
 
     /**
-     * Write given entity to the persistence layer.
-     *
-     * If ormEntity has a key than it is stored under this key. If an entity of that key already
-     * exists, it is overwritten. If ormEntity does not have a key, a unique key is assign to it by
-     * this method.
+     * Write entities to the persistence layer.
+     * 
+     * If an orm entity has a key than it is stored under this key. If an entity of that key already
+     * exists, it is overwritten. If an orm entity does not have a key, a unique key is assign to it
+     * by this method.
      */
-    public void write(OrmEntity ormEntity) {
-        final Entity entity = ormEntity.toEntity();
-        datastore.put(entity);
+    public void write(OrmEntity... ormEntities) {
+        final int n = ormEntities.length;
 
-        // If orm entity has no key, get the key assigned by the datastore.
-        if (ormEntity.getKey() == null) {
-            ormEntity.setKey(entity.getKey());
+        final List<Entity> entities = Lists.newArrayList();
+        for (int i = 0; i < n; i++) {
+            entities.add(ormEntities[i].toEntity());
         }
 
-        // Santiy check.
-        checkState(ormEntity.getKey().equals(entity.getKey()));
+        final List<Key> keys = datastore.put(entities);
+
+        // If an orm entity has no key, get the key assigned by the datastore.
+        for (int i = 0; i < n; i++) {
+            if (ormEntities[i].getKey() == null) {
+                ormEntities[i].setKey(keys.get(i));
+            } else {
+                // Santiy check.
+                checkState(ormEntities[i].getKey().equals(keys.get(i)));
+            }
+        }
     }
 
     public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
@@ -65,10 +73,10 @@ public class PersistenceService {
 
     /**
      * Read the list of direct children entities of a given parent.
-     *
+     * 
      * @param entityClass the children entity class. Only children of this class are read.
      * @param parentKey the parent object key.
-     *
+     * 
      * @return a list of the child entities.
      */
     public <T extends OrmEntity> List<T> readChildren(Class<T> entityClass, Key parentKey) {
@@ -106,5 +114,20 @@ public class PersistenceService {
      */
     public void delete(Key... keys) {
         datastore.delete(keys);
+    }
+
+    /**
+     * Test if an object of this key already exists. This operation has the cost of persistence
+     * lookup.
+     */
+    public boolean hasObjectWithKey(Key key) {
+        checkArgument(key != null);
+        try {
+            @SuppressWarnings("unused")
+            final Entity entity = datastore.get(key);
+        } catch (EntityNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 }

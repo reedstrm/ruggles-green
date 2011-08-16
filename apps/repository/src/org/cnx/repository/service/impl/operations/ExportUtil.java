@@ -34,7 +34,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * Exports related utils.
- *
+ * 
  * @author Tal Dayan
  */
 public class ExportUtil {
@@ -61,7 +61,7 @@ public class ExportUtil {
 
     /**
      * Construct export reference from the parameters of an request.
-     *
+     * 
      * @param an incoming request that contains parameters encoded by
      *            {@link #exportReferenceToRequestParameters}
      */
@@ -97,8 +97,8 @@ public class ExportUtil {
             final String exportTypeId = exportEntity.getExportTypeId();
             final ExportType exportType = Services.config.getExportTypes().get(exportTypeId);
             checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
-            // TODO(tal): assert that export type is alloweable for this scope
-            // TODO(tal): assert no duplicate export type ids.
+            // TODO(tal): what should we do if an export type is not allowable in this scope? This
+            // can happen for example if we change the export config to be more restrictive.
             exportInfos.add(new ExportInfo(exportType));
         }
         return exportInfos;
@@ -106,14 +106,15 @@ public class ExportUtil {
 
     /**
      * Construct request parameters representing a given export reference.
-     *
+     * 
      * @return a string with the encoded parameters in the form name=value&name=value&... This
      *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
      */
     public static String exportReferenceToRequestParameters(ExportReference exportReference) {
         final StringBuilder builder = new StringBuilder();
 
-        // TODO(tal): currently we use ExportType enum name from the API as URL param values.
+        // TODO(tal): *** We are using ExportType enum name from the abstract API as URL param
+        // values.
         // Changing these name will break pending export uploads. Consider to add here a mapping
         // to stable names.
         builder.append(ExportParams.SCOPE.name);

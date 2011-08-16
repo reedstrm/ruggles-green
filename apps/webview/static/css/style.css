@@ -16,6 +16,10 @@
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
 
+article, aside, command, details, summary, figure, figcaption, footer, header, hgroup, nav, section {
+    display: block;
+}
+
 html, body {
     font-family: "Open Sans", sans-serif;
 }

@@ -37,9 +37,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to get the xml and manifest of a module version.
- * 
- * TODO(tal): delete this servlet after implementing the real API.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

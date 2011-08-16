@@ -54,6 +54,7 @@ public class WebViewModule extends AbstractModule {
             SoyTofu provideTofu(SoyFileSet.Builder builder) {
         builder.add(new File("base.soy"));
         builder.add(new File("collection.soy"));
+        builder.add(new File("index.soy"));
         builder.add(new File("module.soy"));
         return builder.build().compileToJavaObj();
     }

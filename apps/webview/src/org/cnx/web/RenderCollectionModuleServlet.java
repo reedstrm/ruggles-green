@@ -54,6 +54,7 @@ import org.w3c.dom.Element;
     private static final String TEMPLATE_NAME = "org.cnx.web.collectionModule";
     private static final String PREFIX = "/light/collection/";
     private static final String MIME_TYPE = "text/html; charset=utf-8";
+    private static final String COLLECTION_URI_PREFIX = "/light/collection/";
 
     private static final Logger log =
             Logger.getLogger(RenderCollectionModuleServlet.class.getName());
@@ -169,6 +170,7 @@ import org.w3c.dom.Element;
                 "collection", new SoyMapData(
                         "id", collectionId,
                         "version", collectionVersion,
+                        "uri", COLLECTION_URI_PREFIX + collectionId + "/" + collectionVersion + "/",
                         "title", collectionTitle
                 ),
                 "module", new SoyMapData(

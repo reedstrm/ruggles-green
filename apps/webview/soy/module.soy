@@ -29,7 +29,7 @@
         {/param}
         {param content}
             <h1 class="moduleTitle">{$module.title}</h1>
-            <p class="authors">{call .actorList}{param actors: $module.authors/}{/call}</p>
+            <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
         {/param}
     {/call}
@@ -52,10 +52,10 @@
         {/param}
         {param content}
             <hgroup>
-                <h1 class="collectionTitle"><a href="/light/collection/{$collection.id}/{$collection.version}/">{$collection.title}</a></h1>
+                <h1 class="collectionTitle"><a href="{$collection.uri}">{$collection.title}</a></h1>
                 <h1 class="moduleTitle">{$module.title}</h1>
             </hgroup>
-            <p class="authors">{call .actorList}{param actors: $module.authors/}{/call}</p>
+            <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .collectionNavBar data="all"/}
             {call .moduleContent data="all"/}
             {call .collectionNavBar data="all"/}
@@ -89,23 +89,21 @@
  *                         one.
  *  @param? nextModule A partial Module object for the previous module, or null if there isn't one.
  */
-{template .collectionNavBar}
+{template .collectionNavBar private="true"}
     <nav class="collectionNavBar">
-        <div class="previous">
-            {call .collectionNavLink}
-                {param text}Previous{/param}
-                {param module: $previousModule/}
-            {/call}
-        </div>
+        {call .collectionNavLink}
+            {param text}Previous{/param}
+            {param class}previous{/param}
+            {param module: $previousModule/}
+        {/call}
         <div class="current moduleTitle">
             {$module.title}
         </div>
-        <div class="next">
-            {call .collectionNavLink}
-                {param text}Next{/param}
-                {param module: $nextModule/}
-            {/call}
-        </div>
+        {call .collectionNavLink}
+            {param text}Next{/param}
+            {param class}next{/param}
+            {param module: $nextModule/}
+        {/call}
     </nav>
 {/template}
 
@@ -114,12 +112,15 @@
  *
  *  @param text The link label
  *  @param module A partial Module object
+ *  @param class Container class
  */
-{template .collectionNavLink}
+{template .collectionNavLink private="true"}
     {if $module}
-        <a href="{$module.uri}">{$text}</a>
-        {if $module.title}{sp}<span class="moduleTitle">{$module.title}</span>{/if}
+        <a href="{$module.uri}" class="{$class}">
+            {$text}
+            {if $module.title}<div class="moduleTitle" title="{$module.title}">{$module.title}</div>{/if}
+        </a>
     {else}
-        <span class="collectionNavNoModule">{$text}</span>
+        <div class="{$class} collectionNavNoModule"></div>
     {/if}
 {/template}

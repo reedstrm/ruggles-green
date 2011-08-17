@@ -23,5 +23,6 @@ import java.util.List;
  */
 public interface Metadata {
     public String getTitle() throws Exception;
+    public String getAbstract() throws Exception;
     public List<Actor> getAuthors() throws Exception;
 }

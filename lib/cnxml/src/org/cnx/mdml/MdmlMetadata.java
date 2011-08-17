@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
  */
 public class MdmlMetadata implements Metadata {
     private static final String TITLE_TAG = "title";
+    private static final String ABSTRACT_TAG = "abstract";
     private static final String ACTORS_TAG = "actors";
     private static final String ROLES_TAG = "roles";
 
@@ -68,11 +69,11 @@ public class MdmlMetadata implements Metadata {
     }
 
     public String getTitle() throws Exception {
-        final Element titleElement = DOMUtils.findFirstChild(parent, mdmlNamespace, TITLE_TAG);
-        if (titleElement == null) {
-            return null;
-        }
-        return titleElement.getTextContent();
+        return DOMUtils.getElementText(parent, mdmlNamespace, TITLE_TAG);
+    }
+
+    public String getAbstract() throws Exception {
+        return DOMUtils.getElementText(parent, mdmlNamespace, ABSTRACT_TAG);
     }
 
     public List<Actor> getAuthors() throws Exception {

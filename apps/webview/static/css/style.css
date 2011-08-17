@@ -16,8 +16,18 @@
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
 
+article, aside, command, details, summary, figure, figcaption, footer, header, hgroup, nav, section {
+    display: block;
+}
+
 html, body {
     font-family: "Open Sans", sans-serif;
+}
+
+body > header > h1 {
+    background: url(../img/logo.png) no-repeat left center;
+    overflow: hidden;
+    text-indent: -999em;
 }
 
 h1 {
@@ -43,9 +53,12 @@ hgroup > h1.moduleTitle {
 
 .collectionNavBar {
     display: table;
+    table-layout: fixed;
     width: 100%;
-    border: thin solid black;
     padding: 0.5ex 1ex;
+
+    background: #cedff0;
+    border: thin solid gray;
 }
 
 .collectionNavBar a {
@@ -63,6 +76,7 @@ hgroup > h1.moduleTitle {
 .collectionNavBar > .previous, .collectionNavBar > .next {
     display: table-cell;
     width: 25%;
+    vertical-align: top;
 }
 
 .collectionNavBar > .previous {
@@ -77,13 +91,18 @@ hgroup > h1.moduleTitle {
     background: url(../img/arrow-right.png) no-repeat right center;
 }
 
-.collectionNavBar > .previous .moduleTitle, .collectionNavBar > .next .moduleTitle {
-    display: block;
-    font-size: 80%;
+.collectionNavBar > .collectionNavNoModule {
+    background: none;
 }
 
-.collectionNavNoModule {
-    color: #555;
+.collectionNavBar > .previous .moduleTitle, .collectionNavBar > .next .moduleTitle {
+    width: 100%;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: 80%;
 }
 
 .subcollection > .title {
@@ -92,6 +111,15 @@ hgroup > h1.moduleTitle {
 
 .moduleContent p {
     text-align: justify;
+}
+
+.moduleContent h1 {
+    margin-top: 2em;
+}
+
+.moduleContent > section > h1 {
+    margin-top: 1.5em;
+    border-bottom: thin solid gray;
 }
 
 .moduleContent .title, .moduleContent figcaption {
@@ -106,6 +134,16 @@ hgroup > h1.moduleTitle {
 
 table.cals {
     border-collapse: collapse;
+}
+
+table.cals tr {
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+}
+
+table.cals th, table.cals td {
+    border-left: thin solid black;
+    border-right: thin solid black;
 }
 
 .calsFrameSides {
@@ -164,4 +202,19 @@ table.cals {
 .calsNoRowsep th, .calsNoRowsep td, th.calsNoRowsep, td.calsNoRowsep {
     border-top: none;
     border-bottom: none;
+}
+
+.collectionAbstract {
+    text-align: justify;
+}
+
+.collectionToc {
+    margin-top: 1.5em;
+
+    -moz-column-count: 2;
+    -moz-column-gap: 2em;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 2em;
+    column-count: 2;
+    column-gap: 2em;
 }

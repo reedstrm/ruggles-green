@@ -26,7 +26,10 @@
         {param title}{$collection.title}{/param}
         {param content}
             <h1 class="collectionTitle">{$collection.title}</h1>
-            <p class="authors">{call .actorList}{param actors: $collection.authors/}{/call}</p>
+            <p class="authors">By {call .actorList}{param actors: $collection.authors/}{/call}</p>
+            {if $collection.abstract}
+                <p class="collectionAbstract">{$collection.abstract}</p>
+            {/if}
             <div class="collectionToc">
                 {$collection.contentHtml|noAutoescape}
             </div>

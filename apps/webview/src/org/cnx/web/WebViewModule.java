@@ -25,6 +25,7 @@ import org.cnx.cnxml.LinkResolver;
 import org.cnx.common.collxml.Collection;
 import org.cnx.util.RenderTime;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -52,11 +53,15 @@ public class WebViewModule extends AbstractModule {
 
     @Provides @Singleton @WebViewTemplate
             SoyTofu provideTofu(SoyFileSet.Builder builder) {
-        builder.add(new File("base.soy"));
-        builder.add(new File("collection.soy"));
-        builder.add(new File("index.soy"));
-        builder.add(new File("module.soy"));
-        return builder.build().compileToJavaObj();
+        return builder
+                .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
+                        .put("analyticsKey", "")
+                        .build())
+                .add(new File("base.soy"))
+                .add(new File("collection.soy"))
+                .add(new File("index.soy"))
+                .add(new File("module.soy"))
+                .build().compileToJavaObj();
     }
 
     @Provides @RenderTime Module provideModule() {

@@ -32,7 +32,7 @@ import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
  * Cnx AtomPub Service.
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxAtomService extends AtomService {
@@ -43,6 +43,7 @@ public class CnxAtomService extends AtomService {
         return constants;
     }
 
+    @SuppressWarnings("unchecked")
     public CnxAtomService(String hostUrl) {
         // TODO(arjuns) : Fix this.
 

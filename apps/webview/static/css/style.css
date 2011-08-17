@@ -53,6 +53,7 @@ hgroup > h1.moduleTitle {
 
 .collectionNavBar {
     display: table;
+    table-layout: fixed;
     width: 100%;
     padding: 0.5ex 1ex;
 
@@ -75,6 +76,7 @@ hgroup > h1.moduleTitle {
 .collectionNavBar > .previous, .collectionNavBar > .next {
     display: table-cell;
     width: 25%;
+    vertical-align: top;
 }
 
 .collectionNavBar > .previous {
@@ -89,17 +91,18 @@ hgroup > h1.moduleTitle {
     background: url(../img/arrow-right.png) no-repeat right center;
 }
 
-.collectionNavBar > .empty {
+.collectionNavBar > .collectionNavNoModule {
     background: none;
 }
 
 .collectionNavBar > .previous .moduleTitle, .collectionNavBar > .next .moduleTitle {
-    display: block;
-    font-size: 80%;
-}
+    width: 100%;
 
-.collectionNavNoModule {
-    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: 80%;
 }
 
 .subcollection > .title {

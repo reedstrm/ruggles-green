@@ -136,6 +136,16 @@ table.cals {
     border-collapse: collapse;
 }
 
+table.cals tr {
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+}
+
+table.cals th, table.cals td {
+    border-left: thin solid black;
+    border-right: thin solid black;
+}
+
 .calsFrameSides {
     border-left: thin solid black;
     border-right: thin solid black;

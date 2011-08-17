@@ -30,7 +30,7 @@
     </resources>
 
     <target name="default">
-        <fail message="Target path for jars is not set.">
+        <fail message="Path for target_dir is not set.">
             <condition>
                 <not>
                     <and>
@@ -46,7 +46,7 @@
     </target>
 
     <target name="testing">
-        <fail message="Target path for jars is not set.">
+        <fail message="Target path for test_lib_dir is not set.">
             <condition>
                 <not>
                     <and>

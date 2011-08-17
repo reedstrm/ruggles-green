@@ -14,8 +14,6 @@
     limitations under the License.
 -->
 
-<!-- Ant build file for the CNX application commons. -->
-
 <project name="common" default="jar">
     <description>Code that is shared across multiple CNX Apps.</description>
 
@@ -23,7 +21,7 @@
     <property file="local.properties" />
 
     <property name="target_dir" value="${basedir}/${output.jars}" />
-    <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+
 
     <resources id="resources">
         <fileset dir="src" includes="**/*.soy" />
@@ -35,17 +33,7 @@
         <mkdir dir="${output.jars}" />
 
         <!-- Add dependent jars to be copied. before classes are compiled. -->
-        <ant antfile="asm/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-
-        <ant antfile="jdom/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-
-        <ant antfile="appengine/build.xml"
+        <ant antfile="commons-codec/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -55,7 +43,12 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="guice/build.xml"
+        <ant antfile="jersey/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jdom/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -66,16 +59,6 @@
              dir="${third_party}" />
 
         <ant antfile="soy/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-
-        <ant antfile="jersey/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-
-        <ant antfile="xerces/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -91,6 +74,12 @@
              target="copyjar"
              dir="${basedir}/${libcnxmldir}" />
 
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="${basedir}/${xmls.dir}" />
+
+        <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
 
         <javac srcdir="src"
                destdir="${classdir}"

@@ -1,0 +1,7 @@
+Rome Propono was downloaded from : http://java.net/projects/rome/sources/svn/show/trunk/subprojects/propono?rev=840
+
+Rome Propono is an AtomPub Library which allows easy implementation for AtomPub Server and Clients.
+
+This jar was modified because for AtomPub Clients, romo-propono uses legacy HTTP Client, and in order to run it on AppEngine which does not work.
+So in order to make rome-propono jar work on AppEngine, original source was modified and HttpClient was replaced with CustomHttpClient.
+

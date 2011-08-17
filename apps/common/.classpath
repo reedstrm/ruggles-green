@@ -2,13 +2,17 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
+	<classpathentry kind="lib" path="build/jars/guava-r09.jar" sourcepath="/usr/local/google/cnxclients/ruggles-green/third_party/guava/guava-r09/guava-src-r09.zip"/>
 	<classpathentry kind="lib" path="build/jars/guice-3.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
-	<classpathentry kind="lib" path="build/jars/org.cnx.html.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/soy-excluding-deps-20100708.jar"/>
+	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.xmlschema.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.cnxml.latest.jar"/>
+	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
+	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -15,14 +15,33 @@
  */
 package org.cnx.repository.atompub;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import org.apache.commons.codec.binary.Base64;
+import org.cnx.resourceentry.ObjectFactory;
+import org.cnx.resourceentry.ResourceEntryValue;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
 
 /**
  *
@@ -30,7 +49,8 @@ import com.sun.syndication.feed.atom.Content;
  */
 public class CnxAtomPubConstants {
     Logger logger = Logger.getLogger(CnxAtomPubConstants.class.getName());
-    /** Subdomain for AtomPub relative to {@link #applicationUrl} */
+
+    /** Sub-domain for AtomPub relative to host. */
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
     /** Path for REST URL for ATOMPUB API */
@@ -40,8 +60,12 @@ public class CnxAtomPubConstants {
     public final static int LOCAL_SERVER_PORT = 8888;
 
     public CnxAtomPubConstants(URL atomPubRestUrl) {
-        // TODO(arjuns) : Find a better way to handle this as for unittests this returns null.
         this.atomPubRestUrl = atomPubRestUrl;
+    }
+
+    // TODO(arjuns) : Convert URL to URI.
+    public URL getAtomPubRestUrl() {
+        return atomPubRestUrl;
     }
 
     /**
@@ -87,6 +111,19 @@ public class CnxAtomPubConstants {
         }
     }
 
+    /** Get URL for ModuleVersion to fetch via AtomPub. */
+    public URL getCollectionVersionAbsPath(String collectionId, String version) {
+        try {
+            return new URL(getCollectionCnxCollectionsAbsPath() + "/" + collectionId + "/"
+                + version);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
+    }
+
     /** Get URL for Resource to fetch via AtomPub. */
     public URL getResourceAbsPath(String resourceId) {
         try {
@@ -100,7 +137,10 @@ public class CnxAtomPubConstants {
     }
 
     /** Relation tag for BlobstoreUrl under Other Link. */
-    public static final String REL_TAG_FOR_BLOBSTORE_URL = "related";
+    public static final String REL_TAG_FOR_BLOBSTORE_URL = "blobstore";
+
+    /** Relation tag for Resource under Other Link. */
+    public static final String REL_TAG_FOR_SELF_URL = "self";
 
     /** Scheme for AtomPub collection for CnxResources. */
     public final URL getCollectionResourceScheme() {
@@ -119,8 +159,8 @@ public class CnxAtomPubConstants {
     public static final String COLLECTION_MODULE_GET_PATH = "/";
     public static final String COLLECTION_MODULE_POST_PATH = "/";
 
-    /** Version String for all versioned items. */
-    public static final String VERSION_STRING = "version";
+    /** Default new Version for any module. */
+    public static final int NEW_CNX_COLLECTION_DEFAULT_VERSION = 1;
 
     /** Get URI for AtomPub collection for CNX Modules. */
     public URL getCollectionModulesAbsPath() {
@@ -149,8 +189,7 @@ public class CnxAtomPubConstants {
     /** Get URL for ModuleVersion to fetch via AtomPub. */
     public URL getModuleVersionAbsPath(String moduleId, String version) {
         try {
-            return new URL(getCollectionModulesAbsPath() + "/" + moduleId + "/" + VERSION_STRING
-                + "/" + version);
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId + "/" + version);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -177,6 +216,8 @@ public class CnxAtomPubConstants {
     /** Path for GET operation relative to {@link #COLLECTION_CNX_COLLECTION_REL_PATH}. */
     public static final String COLLECTION_CNX_COLLECTION_GET_PATH = "/";
 
+    // TODO(arjuns) : Rename CnxCollection -> Collection and Collection-> AtomPubCollection
+    // so that it is consistent with repository.
     /** Get URI for AtomPub collection for CNX Collections. */
     public URL getCollectionCnxCollectionsAbsPath() {
         try {
@@ -189,6 +230,15 @@ public class CnxAtomPubConstants {
         }
     }
 
+    /**
+     * Get Collection XML from AtomPub Entry.
+     */
+    public String getCollXmlDocFromAtomPubCollectionEntry(Entry apCollectionEntry)
+            throws UnsupportedEncodingException {
+        Content content = (Content) apCollectionEntry.getContents().get(0);
+        return decodeFrom64BitEncodedString(content.getValue());
+    }
+
     /** Scheme for AtomPub collection for CnxModules. */
     public final URL getCollectionCnxCollectionScheme() {
         return getCollectionCnxCollectionsAbsPath();
@@ -197,89 +247,192 @@ public class CnxAtomPubConstants {
     /** Name for CNX Workspace. */
     public static final String CNX_WORKSPACE_TITLE = "Connexions Workspace";
 
+    /** Relation tag for Self links for CNX Resources/Modules/Collections. */
+    public static final String LINK_RELATION_SELF_TAG = "self";
+
     /** Relation tag for Edit links for CNX Resources/Modules/Collections. */
     public static final String LINK_RELATION_EDIT_TAG = "edit";
 
     /** Delimiter to connect Ids and Versions. */
     public static final String DELIMITER_ID_VERSION = ":";
 
-    /** Delimiter for combining CNXML and Resource */
-    public static final String DELIMITER_CONTENT = "!!!!----!!!!";
-
     /** Default new Version for any module. */
-    public static final int NEW_MODULE_DEFAULT_VERSION = 0;
+    public static final int NEW_MODULE_DEFAULT_VERSION = 1;
 
-    /** Get AtomPub Content for CNXML Doc. */
-    private Content getCnxmlContent(String cnxmlDoc) {
-        Content cnxmlContent = new Content();
-        // TODO(arjuns) : Move this to proper media type.
-        cnxmlContent.setType("text");
-        cnxmlContent.setValue(cnxmlDoc);
-        cnxmlContent.setSrc("CNXML");
-
-        return cnxmlContent;
-    }
-
-    /** Get AtomPub Content for ResourceMapping Doc. */
-    private Content getResourceMappingContent(String resourceMappingDoc) {
-        Content resourceMappingContent = new Content();
-        // TODO(arjuns) : Move this to proper media type.
-        resourceMappingContent.setType("text");
-        resourceMappingContent.setValue(resourceMappingDoc);
-        resourceMappingContent.setSrc("RESOURCE_MAPPING");
-
-        return resourceMappingContent;
-    }
-
-    /** Get AtomPub List of Contents from CNXMl and ResourceMappingDoc. */
-    public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc) {
-
-        StringBuilder contentValueBuilder =
-            new StringBuilder().append(cnxmlDoc).append(DELIMITER_CONTENT).append(
-                resourceMappingDoc);
+    /**
+     * Get AtomPub List of Contents from CNXMl and ResourceMappingDoc.
+     *
+     * @throws JAXBException
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc)
+            throws JAXBException, JDOMException, IOException {
+        String encodedCnxml = get64bitEncodedString(cnxmlDoc);
+        String encodedResourceMappingDoc = get64bitEncodedString(resourceMappingDoc);
+        String moduleEntryXml = getModuleEntryValue(encodedCnxml, encodedResourceMappingDoc);
+        String encodedModuleEntryXml = get64bitEncodedString(moduleEntryXml);
 
         Content content = new Content();
         // TODO(arjuns) : Fix this to common media type.
-        content.setType("application/xml");
-        content.setValue(contentValueBuilder.toString());
+        content.setType("text");
+        content.setValue(encodedModuleEntryXml);
 
         return Lists.newArrayList(content);
-
-        // TODO(arjuns) : Fix this.
-        // return Lists.newArrayList(getCnxmlContent(cnxmlDoc),
-        // getResourceMappingContent(resourceMappingDoc));
     }
 
-    /** Get CNXML Doc from Content */
-    public static String getCnxmlDocFromContent(Content content) {
-        String contentValue = content.getValue();
+    /**
+     * Get AtomPub List of Contents from CollXml.
+     *
+     * @throws JAXBException
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public List<Content> getAtomPubListOfContentForCollectionEntry(String collXmlDoc)
+            throws JAXBException, JDOMException, IOException {
+        String encodedCollXml = get64bitEncodedString(collXmlDoc);
 
-        String args[] = contentValue.split(DELIMITER_CONTENT);
-        return args[0];
+        Content content = new Content();
+        // TODO(arjuns) : Fix this to common media type.
+        content.setType("text");
+        content.setValue(encodedCollXml);
+
+        return Lists.newArrayList(content);
     }
 
-    /** Get ResourceMapping Doc from Content */
-    public static String getResourceMappingDocFromContent(Content content) {
-        String contentValue = content.getValue();
-
-        String args[] = contentValue.split(DELIMITER_CONTENT);
-        return args[1];
+    /**
+     * Get CNXML-doc from ModuleEntry XML.
+     *
+     * @return 64 bit encoded CNXML.
+     */
+    public String getCnxmlFromModuleEntryXml(String moduleEntryXml) throws JDOMException,
+            IOException {
+        return getDecodedChild("cnxml-doc", moduleEntryXml);
     }
 
-    /** Get moduleId/collectionId from AtomId. */
+    /**
+     * Get ResourceMapping doc from ModuleEntry XML.
+     *
+     * @return 64 bit encoded ResourceMapping Doc.
+     */
+    public String getResourceMappingDocFromModuleEntryXml(String moduleEntryXml)
+            throws JDOMException, IOException {
+        return getDecodedChild("resource-mapping-doc", moduleEntryXml);
+    }
+
+    private String getDecodedChild(String childElement, String moduleEntryXml)
+            throws JDOMException, IOException {
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(new StringReader(moduleEntryXml));
+
+        Element root = document.getRootElement();
+        String encodedXml = root.getChild(childElement).getText();
+        String originalXml = decodeFrom64BitEncodedString(encodedXml);
+
+        return originalXml;
+    }
+
+    /**
+     * Get moduleId/collectionId from AtomId.
+     */
     public static String getIdFromAtomPubId(String atomPubId) {
         String[] args = atomPubId.split(":");
         return args[0];
     }
 
-    /** Get version from AtomId. */
+    /**
+     * Get version from AtomId.
+     */
     public static String getVersionFromAtomPubId(String atomPubId) {
         String[] args = atomPubId.split(":");
         return args[1];
     }
 
-    /** Get AtomPubId from moduleId/collectionId and version. */
+    /**
+     * Get AtomPubId from moduleId/collectionId and version.
+     */
     public static String getAtomPubIdFromCnxIdAndVersion(String cnxId, String version) {
         return cnxId + DELIMITER_ID_VERSION + version;
+    }
+
+    static String getClassPath() {
+        return System.getProperties().getProperty("java.class.path", null);
+    }
+
+    /**
+     * Decode a 64 Bit encoded String.
+     *
+     * @param encodedString 64bit encoded string.
+     * @return Decoded string.
+     * @throws UnsupportedEncodingException
+     */
+    public String decodeFrom64BitEncodedString(String encodedString)
+            throws UnsupportedEncodingException {
+        byte[] encodedBytes = Base64.decodeBase64(encodedString);
+        byte[] decodedBytes = Base64.decodeBase64(encodedBytes);
+        return new String(decodedBytes, Charsets.UTF_8.displayName());
+    }
+
+    /**
+     * Encode a String to 64 bit string.
+     *
+     * @param originalString : String to be encoded.
+     * @return 64 bit encoded String.
+     * @throws UnsupportedEncodingException
+     */
+    public String get64bitEncodedString(String originalString) throws UnsupportedEncodingException {
+        byte[] encodedStringBytes =
+            Base64.encodeBase64URLSafe(originalString.getBytes(Charsets.UTF_8.displayName()));
+        String encoded64BitString = Base64.encodeBase64URLSafeString(encodedStringBytes);
+        return encoded64BitString;
+    }
+
+    /**
+     * Get XML for Module Entry. This consists of 64 bit encoded CNXML and 64 bit encoded
+     * ResourceMapping Doc. This is used to create {@link ResourceEntryValue}
+     *
+     * @param encodedCnxml 64 bit encoded cnxmlDoc.
+     * @param encodedResourceMappingXml 64 bit encoded cnxmlDoc.
+     *
+     * @return XML representation for {@link ResourceEntryValue}
+     * @throws JAXBException
+     */
+    public String getModuleEntryValue(String encodedCnxml, String encodedResourceMappingXml)
+            throws JAXBException {
+        ObjectFactory objectFactory = new ObjectFactory();
+        JAXBElement<byte[]> encodedCnxmlDoc = objectFactory.createCnxmlDoc(
+            Base64.decodeBase64(encodedCnxml));
+        JAXBElement<byte[]> encodedResourceMappingDoc = objectFactory.createResourceMappingDoc(
+            Base64.decodeBase64(encodedResourceMappingXml));
+
+        ResourceEntryValue resourceEntryValue = objectFactory.createResourceEntryValue();
+        resourceEntryValue.setCnxmlDoc(encodedCnxmlDoc.getValue());
+        resourceEntryValue.setResourceMappingDoc(encodedResourceMappingDoc.getValue());
+
+        // TODO(arjuns) : Move this inside xmls folder.
+
+        String moduleEntryValueXml =
+            jaxbObjectToString(ResourceEntryValue.class, resourceEntryValue);
+        return moduleEntryValueXml;
+    }
+
+    /**
+     * Convert a JAXB object to its XML Representation.
+     *
+     * @param jaxbObject JAXB object whose XML representation is required.
+     * @param rootClass Class annotated with RootElement for JAXB objects.
+     *
+     * @return XML representation for JAXB Object.
+     */
+    @SuppressWarnings("rawtypes")
+    public String jaxbObjectToString(Class rootClass, Object jaxbObject) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(rootClass);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+
+        StringWriter stringWriter = new StringWriter();
+        marshaller.marshal(jaxbObject, stringWriter);
+
+        return stringWriter.toString();
     }
 }

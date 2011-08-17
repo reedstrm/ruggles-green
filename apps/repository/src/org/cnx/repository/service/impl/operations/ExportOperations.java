@@ -62,7 +62,7 @@ public class ExportOperations {
 
         // Validate the export reference
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.validateReference(exportReference);
+                ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
                     validationResult.getStatusDescription(), log);
@@ -72,8 +72,8 @@ public class ExportOperations {
         try {
             @SuppressWarnings({ "unused", "unchecked" })
             final OrmEntity parentEntity =
-                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
-                        validationResult.getParentKey());
+            (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
+                    validationResult.getParentKey());
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                     "Export parent object not found: " + exportReference, log, e);
@@ -83,22 +83,15 @@ public class ExportOperations {
         }
 
         final String completionUrl =
-            ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?"
-                + ExportUtil.exportReferenceToRequestParameters(exportReference);
+                ExportOperations.UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                        + ExportUtil.exportReferenceToRequestParameters(exportReference);
 
-        // Workaround for runs locally in eclipse.
-        //
-        // TODO(tal): remove after blobstore get fixed (ETA Aug 15 2011)
-        String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
-        if (uploadUrl.startsWith("/")) {
-            log.warning("Prefexing resource upload url with '" + context.hostUrl + "'");
-            uploadUrl = context.hostUrl + uploadUrl;
-        }
+        final String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
 
         // All done OK.
         return ResponseUtil.loggedOk("Created upload URL for export: " + exportReference,
                 new GetExportUploadUrlResult(uploadUrl, validationResult.getExportType()
-                    .getContentType()), log);
+                        .getContentType()), log);
     }
 
     /**
@@ -110,7 +103,7 @@ public class ExportOperations {
 
         // Validate the export reference.
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.validateReference(exportReference);
+                ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
                     validationResult.getStatusDescription(), log);
@@ -120,12 +113,12 @@ public class ExportOperations {
         final BlobKey blobKey;
         try {
             final OrmExportItemEntity entity =
-                Services.persistence.read(OrmExportItemEntity.class,
-                        validationResult.getExportKey());
+                    Services.persistence.read(OrmExportItemEntity.class,
+                            validationResult.getExportKey());
             blobKey = checkNotNull(entity.getBlobKey(), "null blobkey");
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
-                + exportReference, log, e);
+                    + exportReference, log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error when looking up export: " + exportReference, log, e);
@@ -140,7 +133,7 @@ public class ExportOperations {
         }
 
         final ImmutableMap<String, String> additionalHeaders =
-            ImmutableMap.of(BlobstoreUtil.BLOB_KEY_HEADER_NAME, blobKey.toString());
+                ImmutableMap.of(BlobstoreUtil.BLOB_KEY_HEADER_NAME, blobKey.toString());
         return ResponseUtil.loggedOk("Export served: " + exportReference.toString(),
                 new ServeExportResult(additionalHeaders), log);
     }
@@ -153,7 +146,7 @@ public class ExportOperations {
 
         // Validate the export reference.
         final ExportReferenceValidationResult validationResult =
-            ExportReferenceValidationResult.validateReference(exportReference);
+                ExportReferenceValidationResult.validateReference(exportReference);
         if (validationResult.getRepositoryStatus().isError()) {
             return ResponseUtil.loggedError(validationResult.getRepositoryStatus(),
                     validationResult.getStatusDescription(), log);
@@ -166,12 +159,12 @@ public class ExportOperations {
             final OrmExportItemEntity entity;
             try {
                 entity =
-                    Services.persistence.read(OrmExportItemEntity.class,
-                            validationResult.getExportKey());
+                        Services.persistence.read(OrmExportItemEntity.class,
+                                validationResult.getExportKey());
             } catch (EntityNotFoundException e) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Export not found: "
-                    + exportReference, log, e);
+                        + exportReference, log, e);
             }
 
             // Export entity found. Delete it.
@@ -192,6 +185,6 @@ public class ExportOperations {
         Services.blobstore.delete(blobKey);
 
         return ResponseUtil.loggedOk("Export found and deleted: " + exportReference + ", blobKey: "
-            + blobKey.getKeyString(), new DeleteExportResult(), log);
+                + blobKey.getKeyString(), new DeleteExportResult(), log);
     }
 }

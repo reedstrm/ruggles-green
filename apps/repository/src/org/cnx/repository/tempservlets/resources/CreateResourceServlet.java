@@ -42,7 +42,7 @@ public class CreateResourceServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         RepositoryResponse<CreateResourceResult> repositoryResponse =
-            repository.createResource(new RepositoryRequestContext(req, null));
+                repository.createResource(new RepositoryRequestContext(null));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

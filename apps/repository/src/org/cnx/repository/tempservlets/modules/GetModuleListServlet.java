@@ -61,7 +61,7 @@ public class GetModuleListServlet extends HttpServlet {
         final String maxResultsParam = checkNotNull(req.getParameter("max"), "Missing max param");
         final int maxResults = Integer.parseInt(maxResultsParam);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetModuleListResult> repositoryResponse =
                 repository.getModuleList(context, curosr, maxResults);
 

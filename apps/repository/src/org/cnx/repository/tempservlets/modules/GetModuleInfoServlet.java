@@ -63,7 +63,7 @@ public class GetModuleInfoServlet extends HttpServlet {
         }
         final String moduleId = matcher.group(1);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetModuleInfoResult> repositoryResponse =
                 repository.getModuleInfo(context, moduleId);
 

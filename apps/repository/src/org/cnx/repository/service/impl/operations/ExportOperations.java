@@ -52,7 +52,7 @@ public class ExportOperations {
     /**
      * URI of export upload completion servlet. Should match the servlet mapping in web.xml.
      */
-    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/exports/uploaded";
+    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/_repo/export_uploaded";
 
     /**
      * See description in {@link CnxRepositoryService#getExportUploadUrl}

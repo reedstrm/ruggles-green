@@ -46,7 +46,7 @@
     </security-constraint>
     -->
   
-  <!-- CNX RESOURCE API -->
+  <!-- CNX RESOURCE API (TEMP) -->
 
   <servlet>
     <servlet-name>CreateResourceServlet</servlet-name>
@@ -78,7 +78,7 @@
     <url-pattern>/resource_info/*</url-pattern>
   </servlet-mapping>
 
-  <!-- CNX MODULES API -->
+  <!-- CNX MODULES API (TEMP) -->
 
   <servlet>
     <servlet-name>CreateModuleServlet</servlet-name>
@@ -140,7 +140,7 @@
     <url-pattern>/module_list/*</url-pattern>
   </servlet-mapping>
 
-  <!--  CNX COLLECTIONS API -->
+  <!--  CNX COLLECTIONS API (TEMP) -->
 
   <servlet>
     <servlet-name>CreateCollectionServlet</servlet-name>
@@ -192,19 +192,7 @@
     <url-pattern>/collection_version_info/*</url-pattern>
   </servlet-mapping>
 
-  <!-- Repository service -->
-
-  <servlet>
-    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <url-pattern>/resource_factory/uploaded</url-pattern>
-  </servlet-mapping> 
-  
-   <!--  CNX EXPORTS API -->
+   <!--  CNX EXPORTS API (TEMP) -->
   
   <servlet>
     <servlet-name>GetExportUploadUrlServlet</servlet-name>
@@ -215,17 +203,7 @@
     <servlet-name>GetExportUploadUrlServlet</servlet-name>
     <url-pattern>/exports/getuploadurl</url-pattern>
   </servlet-mapping>  
-  
-   <servlet>
-    <servlet-name>ExportUploadCompletionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.operations.ExportUploadCompletionServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>ExportUploadCompletionServlet</servlet-name>
-    <url-pattern>/exports/uploaded</url-pattern>
-  </servlet-mapping>  
-  
+    
    <servlet>
     <servlet-name>GetExportServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.exports.GetExportServlet</servlet-class>
@@ -246,8 +224,40 @@
     <url-pattern>/exports/delete</url-pattern>
   </servlet-mapping> 
    
-  <!--  TEST -->
+  <!-- Repository service -->
+
+  <servlet>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <url-pattern>/_repo/resource_uploaded</url-pattern>
+  </servlet-mapping> 
   
+  <servlet>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ExportUploadCompletionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <url-pattern>/_repo/export_uploaded</url-pattern>
+  </servlet-mapping>   
+  
+  <servlet>
+    <servlet-name>BlobServingDoneServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.BlobServingDoneServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>BlobServingDoneServlet</servlet-name>
+    <url-pattern>/_repo/done</url-pattern>
+  </servlet-mapping> 
+
+  <!--  TEST -->
+ 
    <servlet>
     <servlet-name>TestServlet</servlet-name>
     <servlet-class>org.cnx.repository.test.TestServlet</servlet-class>

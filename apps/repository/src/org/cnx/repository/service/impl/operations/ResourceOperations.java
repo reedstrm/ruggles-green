@@ -50,7 +50,7 @@ public class ResourceOperations {
      * Base path of the resource upload completion servlet. Should match servlet mapping in web.xml.
      * Servlet mapping should be this value with the suffix "/*".
      */
-    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/resource_factory/uploaded";
+    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/_repo/resource_uploaded";
 
     /**
      * See description in {@link CnxRepositoryService}

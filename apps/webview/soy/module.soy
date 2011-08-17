@@ -24,10 +24,10 @@
 {template .module}
     {call .page}
         {param title}{$module.title}{/param}
-        {param javascript}
+        {param javascriptHtml}
             {call .mathjax/}
         {/param}
-        {param content}
+        {param contentHtml}
             <h1 class="moduleTitle">{$module.title}</h1>
             <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
@@ -47,10 +47,10 @@
 {template .collectionModule}
     {call .page}
         {param title}{$module.title}{/param}
-        {param javascript}
+        {param javascriptHtml}
             {call .mathjax/}
         {/param}
-        {param content}
+        {param contentHtml}
             <hgroup>
                 <h1 class="collectionTitle"><a href="{$collection.uri}">{$collection.title}</a></h1>
                 <h1 class="moduleTitle">{$module.title}</h1>

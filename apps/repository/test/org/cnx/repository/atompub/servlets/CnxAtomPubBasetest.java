@@ -27,7 +27,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 /**
  * BaseTest for all tests for CNX AtomPub API.
- * 
+ *
  * @author Arjun Satyapal
  */
 public abstract class CnxAtomPubBasetest extends JerseyTest {
@@ -57,9 +57,14 @@ public abstract class CnxAtomPubBasetest extends JerseyTest {
      */
     public CnxAtomPubBasetest() throws MalformedURLException {
         super(new WebAppDescriptor.Builder(PACKAGE).contextPath(
-                CnxAtomPubConstants.ATOMPUB_URL_PREFIX).build());
+            CnxAtomPubConstants.ATOMPUB_URL_PREFIX).build());
 
         // TODO(arjuns) : Temp override as junit is not working with datastore.
+
+        // TODO(arjuns) : Fix warning : Aug 14, 2011 6:55:43 AM
+        // com.sun.syndication.propono.atom.client.ClientEntry addToCollection
+        // WARNING: WARNING added entry, but no location header returned
+        // cnxServerAtomPubUrl = new URL("http://100.cnx-repo.appspot.com/atompub");
         cnxServerAtomPubUrl =
             new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
 

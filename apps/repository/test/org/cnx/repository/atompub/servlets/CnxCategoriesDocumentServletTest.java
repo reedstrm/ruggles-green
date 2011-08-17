@@ -25,7 +25,7 @@ import org.junit.Test;
 
 /**
  * Test for {@link CnxCategoriesDocumentServlet}
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxCategoriesDocumentServletTest extends CnxAtomPubBasetest {

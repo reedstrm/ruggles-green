@@ -40,15 +40,13 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 /**
  * An internal API servlet to handle the completion call back of resource upload to the blobstore.
- * 
- * TODO(tal): add code to verify that the request is indeed from the blobstore service and not from
- * external user's script.
- * 
- * TODO(tal): verify the uploading user against the identity of the user that created the resource
- * creating resource and reject if does not match.
- * 
+ *
+ * TODO(tal): add code to verify that the request is indeed from the blobstore service.
+ *
+ * TODO(tal): verify the uploading user against the resource creating user and reject if failed.
+ *
  * @author Tal Dayan
- * 
+ *
  */
 
 @SuppressWarnings("serial")
@@ -165,6 +163,6 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         }
 
         log.info("Uploaded content of resource " + resourceId);
-        resp.sendRedirect("/");
+        resp.sendRedirect("/resource_factory/SuccessServlet");
     }
 }

@@ -185,6 +185,16 @@
   <!-- Repository service -->
 
   <servlet>
+    <servlet-name>SuccessServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.SuccessServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SuccessServlet</servlet-name>
+    <url-pattern>/resource_factory/SuccessServlet</url-pattern>
+  </servlet-mapping> 
+  
+  <servlet>
     <servlet-name>ResourceUploadCompletionServlet</servlet-name>
     <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
   </servlet>

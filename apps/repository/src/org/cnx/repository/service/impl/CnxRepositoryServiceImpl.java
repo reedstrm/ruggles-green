@@ -33,6 +33,7 @@ import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.GetModuleListResult;
 import org.cnx.repository.service.api.GetModuleVersionInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -88,6 +89,12 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
             String moduleId) {
         return ModuleOperations.getModuleInfo(context, moduleId);
+    }
+
+    @Override
+    public RepositoryResponse<GetModuleListResult> getModuleList(RepositoryRequestContext context,
+            @Nullable String moduleListCursor, int maxResults) {
+        return ModuleOperations.getModuleList(context, moduleListCursor, maxResults);
     }
 
     @Override

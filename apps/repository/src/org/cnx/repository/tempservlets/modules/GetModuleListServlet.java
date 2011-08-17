@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -14,12 +14,15 @@
  * the License.
  */
 
-package org.cnx.repository.tempservlets.resources;
+package org.cnx.repository.tempservlets.modules;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,38 +31,39 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.GetResourceInfoResult;
+import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.GetModuleListResult;
+import org.cnx.repository.service.api.ModuleInfo;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.UploadedResourceContentInfo;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
+import com.google.appengine.repackaged.com.google.common.base.Join;
+
 /**
- * A temp API servlet to serve metadata of a resource.
+ * A temp API servlet to get module list.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetResourceInfoServlet extends HttpServlet {
-
-    private static final Pattern uriPattern = Pattern.compile("/resource_info/([a-zA-Z0-9_-]+)");
-
+public class GetModuleListServlet extends HttpServlet {
     private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
+
+    private static final Logger log = Logger.getLogger(GetModuleListServlet.class.getName());
+
+    //private static final Pattern uriPattern = Pattern.compile("/module_info/([a-zA-Z0-9_-]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Parse request resource id from the query.
-        final String requestURI = req.getRequestURI();
-        final Matcher matcher = uriPattern.matcher(requestURI);
-        if (!matcher.matches()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could parse resource id in request URI [" + requestURI + "]");
-            return;
-        }
-        final String resourceId = matcher.group(1);
+        final String cursorParam = checkNotNull(req.getParameter("cursor"), "Missing cursor param");
+        final String curosr = cursorParam.equals("null") ? null : cursorParam;
 
-        final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-            repository.getResourceInfo(new RepositoryRequestContext(req, null), resourceId);
+        final String maxResultsParam = checkNotNull(req.getParameter("max"), "Missing max param");
+        final int maxResults = Integer.parseInt(maxResultsParam);
+
+        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryResponse<GetModuleListResult> repositoryResponse =
+                repository.getModuleList(context, curosr, maxResults);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -81,23 +85,18 @@ public class GetResourceInfoServlet extends HttpServlet {
 
         // Map repository OK to API OK
         checkState(repositoryResponse.isOk());
-        final GetResourceInfoResult result = repositoryResponse.getResult();
+        final GetModuleListResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("Resource info:");
-
-        out.println("* resource state: " + result.getResourceState());
-        out.println("* resource id: " + resourceId);
-
-        if (result.hasContent()) {
-            out.println("* uploaded content info:");
-            final UploadedResourceContentInfo contentInfo = result.getContentInfo();
-            out.println("  - content type: " + contentInfo.getContentType());
-            out.println("  - file name: " + contentInfo.getContentOriginalFileName());
-            out.println("  - size: " + contentInfo.getContentSize());
-            out.println("  - upload time: " + contentInfo.getContentUploadTime());
+        out.println("Modules");
+        for (String moduleId : result.getModuleIds()) {
+            out.printf("Module [%s]\n", moduleId);
         }
+
+        final String endCursor = result.isLast() ? null : result.getEndCursor();
+
+        out.printf("\nEnd cursor: %s\n", endCursor);
     }
 }

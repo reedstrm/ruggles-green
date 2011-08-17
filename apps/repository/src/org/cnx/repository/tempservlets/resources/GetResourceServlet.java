@@ -35,7 +35,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to serve a resource using a GET request.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")

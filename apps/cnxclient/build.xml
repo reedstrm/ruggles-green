@@ -6,13 +6,13 @@
   KIND, either express or implied. See the License for the specific language governing 
   permissions and limitations under the License. -->
 
-<project name="cnxclient" default="compile" basedir=".">
+<project name="cnxclient" default="compile">
     <description>
     A Java client for CNX-V2 which is based on rome-1.0 and rome-propono-1.0.0.
   </description>
-
-    <property file="build.properties" />
     <property file="local.properties" />
+    <property file="build.properties" />
+
     <property name="target_dir" value="${basedir}/${output.jars}" />
 
     <target name="compile" description="Compile the classes">
@@ -20,37 +20,54 @@
         <mkdir dir="${libdir}" />
         <mkdir dir="${output.jars}" />
 
+        <!-- Third party dependencies. -->
         <ant antfile="commons-beanutils/build.xml"
-                     inheritAll="true"
-                     target="default"
-                     dir="${third.party.jars}" />
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
         <ant antfile="commons-codec/build.xml"
-                     inheritAll="true"
-                     target="default"
-                     dir="${third.party.jars}" />
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
+        
+        <ant antfile="commons-logging/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
         <ant antfile="commons-httpclient/build.xml"
-                     inheritAll="true"
-                     target="default"
-                     dir="${third.party.jars}" />
-
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
         <ant antfile="rome-propono/build.xml"
              inheritAll="true"
              target="default"
              dir="${third.party.jars}" />
 
+        <!-- Non-third-party dependencies. -->
         <ant antfile="build.xml"
-            inheritall="false"
-            target="copyjar"
-            dir="${basedir}/${commondir}" >
+             inheritall="false"
+             target="copyjar"
+             dir="${basedir}/${commondir}">
+            <property name="target_dir" value="${target_dir}" />
+        </ant>
+
+        <ant antfile="build.xml"
+             inheritall="false"
+             target="copyjar"
+             dir="${basedir}/${xmls.dir}">
             <property name="target_dir" value="${target_dir}" />
         </ant>
 
         <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
 
-        <javac srcdir="${srcdir}" destdir="${classdir}" includeantruntime="false" debug="true">
+        <javac srcdir="${srcdir}"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true"
+               failonerror="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
@@ -60,6 +77,8 @@
 
     <target name="clean" description="Remove built files">
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${xmls.dir}" />
+
         <delete dir="${builddir}" />
     </target>
 
@@ -68,7 +87,8 @@
     </tstamp>
 
     <property name="client-jar-name" value="org.cnx.cnxclient" />
-    <property name="dest-client-jar" value="${libdir}/${client-jar-name}.${timenow}.jar" />
+    <property name="dest-client-jar"
+              value="${libdir}/${client-jar-name}.${timenow}.jar" />
 
     <target name="jar"
             description="Build a JAR of the classes"
@@ -80,9 +100,10 @@
     </target>
 
     <target name="copyjar"
-        description="Copy jar to calling Build file."
-        depends="jar">
-        <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar"/>
+            description="Copy jar to calling Build file."
+            depends="jar">
+        <copy file="${dest-client-jar}"
+              tofile="${target_dir}/${client-jar-name}.latest.jar" />
     </target>
 
     <target name="all"

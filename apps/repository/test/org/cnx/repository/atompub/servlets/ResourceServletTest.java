@@ -19,11 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.servlets.migrators.ResourceMigrator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +36,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomResourceServlet}
- * 
+ *
  * @author Arjun Satyapal
  */
 public class ResourceServletTest extends CnxAtomPubBasetest {
@@ -53,12 +56,13 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
 
     @Test
     public void testResource() throws Exception {
-        ClientEntry createResourceEntry = cnxClient.createUploadUrl();
+        ClientEntry createResourceEntry = cnxClient.createUploadUrl("test-resource");
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
         String expectedResourceUrl = getConstants().getResourceAbsPath(resourceId).toString();
-        assertEquals(expectedResourceUrl, createResourceEntry.getEditURI());
+        assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
+            .getHrefResolved());
 
         /*
          * There should be two links in following order :<br> 1. Link for Blobstore.<br> 2. Link for
@@ -68,18 +72,33 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         List<Link> listOfLinks = createResourceEntry.getOtherLinks();
         assertEquals(2, listOfLinks.size());
 
-        Link blobStoreLink = listOfLinks.get(0);
+        Link selfLink = listOfLinks.get(0);
+        assertEquals(CnxAtomPubConstants.REL_TAG_FOR_SELF_URL, selfLink.getRel());
+        assertEquals(expectedResourceUrl, selfLink.getHref());
+
+        Link blobStoreLink = listOfLinks.get(1);
         assertEquals(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL, blobStoreLink.getRel());
         assertNotNull(blobStoreLink.getHref());
-
-        Link resourceLink = listOfLinks.get(1);
-        assertEquals(CnxAtomPubConstants.LINK_RELATION_EDIT_TAG, resourceLink.getRel());
-        assertEquals(expectedResourceUrl, resourceLink.getHref());
 
         // Now upload blob to AppEngine.
         cnxClient.uploadFileToBlobStore(blobStoreLink.getHrefResolved(), file);
 
         // TODO(arjuns) : Add test for get once it works.
-        System.out.println(createResourceEntry);
+        // TODO(arjuns) : Add link in entry for get.
+    }
+
+    // TODO(arjuns) : Move this to separate test.
+    @Test
+    public void testResourceMigrator() throws HttpException, ProponoException, IOException {
+        ResourceMigrator resourceMigrator = new ResourceMigrator(cnxClient);
+
+        ClientEntry createResourceEntry = resourceMigrator.migrateResource(file.getAbsolutePath());
+        createResourceEntry.getEditURI();
+        assertNotNull(createResourceEntry);
+        assertNotNull(createResourceEntry.getId());
+        String resourceId = createResourceEntry.getId();
+        String expectedResourceUrl = getConstants().getResourceAbsPath(resourceId).toString();
+        assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
+            .getHrefResolved());
     }
 }

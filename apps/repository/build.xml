@@ -15,6 +15,7 @@
 -->
 
 <project name="repository" default="war">
+    <!-- TODO(arjuns) : Move generation of classes from build/classes to war/WEB-INF/classes. -->
     <description>
         Build file for CNX Repository.
     </description>
@@ -30,17 +31,24 @@
         <mkdir dir="${war.dir}/WEB-INF" />
         <mkdir dir="${war.dir}/WEB-INF/classes" />
         <mkdir dir="${war.dir}/WEB-INF/lib" />
+
         <copy todir="${war.dir}/WEB-INF">
-            <fileset dir="src/WEB-INF">
+            <fileset dir="config/WEB-INF">
                 <include name="*.*" />
             </fileset>
         </copy>
         <copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="${output.jars}" includes="*.jar" />
         </copy>
+
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
+
+        <copy todir="${war.dir}/WEB-INF/classes/META-INF">
+            <fileset dir="src/META-INF" includes="**/*.*" />
+        </copy>
+
         <enhance_war war="${war.dir}" />
     </target>
 
@@ -48,20 +56,19 @@
     <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
     <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
 
-    <target name="compile" description="Compile the application servlet code">
+    <target name="compile" description="Compile the application servlet code" depends="prepare-for-test-compile">
         <mkdir dir="${classdir}" />
         <mkdir dir="${output.jars}" />
 
         <ant antfile="appengine/build.xml"
-             inheritAll="true"
+             inheritall="true"
              target="default"
              dir="${third_party}" />
 
-        <!-- TODO(arjuns) : Remove asm from third_party. -->
         <ant antfile="asm/build.xml"
-        inheritall="true"
-                target="default"
-                dir="${third_party}" />
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
 
         <ant antfile="commons-logging/build.xml"
              inheritall="true"
@@ -111,10 +118,16 @@
              target="copyjar"
              dir="${basedir}/${cnxclientdir}" />
 
+        <ant antfile="build.xml"
+             inheritall="true"
+             target="copyjar"
+             dir="${basedir}/${xmls.dir}" />
+
         <javac srcdir="src"
                destdir="${classdir}"
                includeantruntime="false"
-               debug="on">
+               debug="on"
+               failonerror="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
@@ -122,8 +135,10 @@
         </javac>
     </target>
 
-    <target name="test-compile" description="Compile Unit Tests." depends="compile">
+    <target name="prepare-for-test-compile">
         <mkdir dir="${test.outdir}" />
+        <mkdir dir="${test.classes}" />
+
 
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
 
@@ -136,11 +151,16 @@
              inheritAll="true"
              target="test"
              dir="${third_party}" />
+    </target>
+    
+    <target name="test-compile"
+            description="Compile Unit Tests."
+            depends="compile">
 
         <!-- TODO(arjuns) : Optimize classpaths. -->
         <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
         <javac srcdir="${test.src}"
-               destdir="${classdir}"
+               destdir="${test.classes}"
                includeantruntime="false"
                debug="true">
             <compilerarg line="${javac.flags}" />
@@ -151,7 +171,7 @@
             </classpath>
         </javac>
     </target>
-    
+
     <target name="test" description="Run unit tests" depends="test-compile">
         <junit fork="yes" printsummary="yes" failureproperty="test.failed">
             <jvmarg value="-enableassertions" />
@@ -159,6 +179,7 @@
                 <resources refid="depend_lib" />
                 <resources refid="depend_test_lib" />
                 <pathelement location="${classdir}" />
+                <pathelement location="${test.classes}" />
             </classpath>
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
@@ -179,10 +200,10 @@
         <delete dir="${buildir}" />
         <delete dir="${war.dir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${xmls.dir}" />
         <ant antfile="build.xml"
              target="clean"
              dir="${basedir}/${cnxclientdir}" />
-
     </target>
 
     <target name="runserver" depends="war" description="Run the dev_appserver">
@@ -224,15 +245,15 @@
     <target name="request_logs" description="Downloads the application's logs">
         <appcfg action="request_logs" war="${war.dir}">
             <options>
-                <arg value="--num_days=${log.days}"/>
+                <arg value="--num_days=${log.days}" />
             </options>
             <args>
-                <arg value="${log.file}"/>
+                <arg value="${log.file}" />
             </args>
         </appcfg>
     </target>
 
     <target name="all"
             description="Refers to all the targets in this file other then test."
-            depends="compile, war, test-compile" />
+            depends="compile, test-compile, war" />
 </project>

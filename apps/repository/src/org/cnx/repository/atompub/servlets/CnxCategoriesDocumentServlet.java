@@ -28,14 +28,19 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
+import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 
 import com.sun.syndication.propono.atom.common.Categories;
+import com.sun.syndication.propono.atom.server.AtomRequest;
+import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
- * 
+ *
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
@@ -49,8 +54,14 @@ public class CnxCategoriesDocumentServlet {
             @Context HttpServletResponse response) {
         // TODO(arjuns) : Add caching and exception handling.
 
+        AtomRequest areq = new AtomRequestImpl(req);
+        // TODO(arjuns) : get a better way to get the context.
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomService =
+            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
+
         // TODO(arjuns) : Fix this.
-        CnxAtomPubConstants constants = new CnxAtomPubConstants(null);
+        CnxAtomPubConstants constants = atomService.getConstants();
         // new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
         Categories categories = new Categories();
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
@@ -58,8 +69,7 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxCollectionCategoryEle(constants
             .getCollectionCnxCollectionScheme()));
 
-        return Response.ok()
-            .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
-            .build();
+        return Response.ok().entity(
+            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
     }
 }

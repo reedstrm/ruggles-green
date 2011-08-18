@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="element-atompub-resource-entry-value">
+    <element name="resource-entry-value">
+      <group>
+        <element name="cnxml-doc">
+          <data type="base64Binary" />
+        </element>
+        <element name="resource-mapping-doc">
+          <data type="base64Binary" />
+        </element>
+      </group>
+    </element>
+  </define>
+  <start>
+    <ref name="element-atompub-resource-entry-value" />
+  </start>
+</grammar>

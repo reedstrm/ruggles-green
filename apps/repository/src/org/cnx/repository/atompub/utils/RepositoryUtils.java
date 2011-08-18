@@ -15,12 +15,17 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import javax.servlet.http.HttpServletRequest;
+import java.net.URL;
+import java.util.List;
 
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 
+import com.google.common.collect.Lists;
+import com.sun.syndication.feed.atom.Link;
+
 /**
- * 
+ *
  * @author Arjun Satyapal
  */
 public class RepositoryUtils {
@@ -30,5 +35,25 @@ public class RepositoryUtils {
 
     public static RepositoryRequestContext getRepositoryContext() {
         return new RepositoryRequestContext(GLOBAL_USER_ID);
+    }
+
+    public static List<Link> getListOfLinks(URL selfUrl, URL editUrl) {
+        List<Link> listOfLinks = Lists.newArrayList();
+
+        if (selfUrl != null) {
+            Link selfLink = new Link();
+            selfLink.setRel(CnxAtomPubConstants.LINK_RELATION_SELF_TAG);
+            selfLink.setHref(selfUrl.toString());
+            listOfLinks.add(selfLink);
+        }
+
+        if (editUrl != null) {
+            Link editLink = new Link();
+            editLink.setRel(CnxAtomPubConstants.LINK_RELATION_EDIT_TAG);
+            editLink.setHref(editUrl.toString());
+            listOfLinks.add(editLink);
+        }
+
+        return listOfLinks;
     }
 }

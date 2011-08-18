@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="element-location-repository">
+    <element name="repository">
+      <group>
+        <element name="repository-id">
+          <data type="token">
+            <param name="minLength">5</param>
+          </data>
+        </element>
+        <element name="resource-id">
+          <text />
+        </element>
+      </group>
+    </element>
+  </define>
+
+  <!--  This is not going to be used but required for proper Java Classes to be constructed. -->
+  <define name="element-location-internet">
+    <element name="internet">
+      <group>
+        <element name="url"><text/></element>
+      </group>
+    </element>
+  </define>
+
+  <define name="element-location-information">
+    <element name="location-information">
+      <choice>
+        <ref name="element-location-repository" />
+        <ref name="element-location-internet" />
+      </choice>
+    </element>
+  </define>
+
+
+  <define name="element-resource">
+    <element name="resource">
+      <attribute name="name">
+        <text />
+      </attribute>
+      <ref name="element-location-information" />
+    </element>
+  </define>
+
+  <define name="element-resources">
+    <element name="resources">
+      <attribute name="version">
+        <data datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+          type="decimal" />
+      </attribute>
+
+      <oneOrMore>
+        <ref name="element-resource" />
+      </oneOrMore>
+    </element>
+  </define>
+
+  <start>
+    <ref name="element-resources" />
+  </start>
+</grammar>

@@ -53,7 +53,7 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
 
     @Test
     public void testCnxServiceDocument() {
-        ClientWorkspace workspace = cnxClient.getWorkSpace();
+        ClientWorkspace workspace = cnxClient.getWorkspace();
         assertEquals(3, workspace.getCollections().size());
         assertEquals(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, workspace.getTitle());
         assertEquals(CustomMediaTypes.TEXT, workspace.getTitleType());
@@ -90,6 +90,6 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
         assertEquals(collectionTermAndLabel, category.getLabel());
 
         // TODO(arjuns) : Change scheme to use rel.
-        assertEquals(scheme.toString(), category.getScheme());
+        assertEquals(scheme.toString(), category.getScheme().toString());
     }
 }

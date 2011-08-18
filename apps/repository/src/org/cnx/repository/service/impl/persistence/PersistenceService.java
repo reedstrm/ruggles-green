@@ -59,7 +59,7 @@ public class PersistenceService {
     }
 
     public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
-            throws EntityNotFoundException {
+        throws EntityNotFoundException {
         final Entity entity = datastore.get(key);
         return deserialize(entityClass, entity);
     }
@@ -92,7 +92,7 @@ public class PersistenceService {
         query.setAncestor(parentKey);
 
         final List<Entity> entities =
-                datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+            datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         final List<T> ormEntities = Lists.newArrayList();
 
@@ -111,7 +111,7 @@ public class PersistenceService {
             return (OrmEntitySpec) entityClass.getDeclaredMethod("getSpec").invoke(null);
         } catch (Throwable e) {
             throw new RuntimeException("Error involing static method getSpec() of class "
-                    + entityClass, e);
+                + entityClass, e);
         }
     }
 
@@ -197,8 +197,8 @@ public class PersistenceService {
         // of data, tested on dev environment, Aug 2011).
         @Nullable
         final String endCursor =
-        endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
-            .toWebSafeString();
+            endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
+                .toWebSafeString();
 
         return Pair.of(keys, endCursor);
     }

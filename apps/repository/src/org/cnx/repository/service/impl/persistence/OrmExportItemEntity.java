@@ -19,6 +19,8 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Date;
+
 import org.cnx.repository.service.api.ExportType;
 
 import com.google.appengine.api.blobstore.BlobKey;
@@ -45,8 +47,8 @@ public class OrmExportItemEntity extends OrmEntity {
     // @Persistent
     private BlobKey blobKey;
 
-    public OrmExportItemEntity(Key key, BlobKey blobKey) {
-        super(ENTITY_SPEC, checkNotNull(key));
+    public OrmExportItemEntity(Key key, Date creationTime, BlobKey blobKey) {
+        super(ENTITY_SPEC, checkNotNull(key), creationTime);
         this.blobKey = checkNotNull(blobKey);
     }
 
@@ -54,7 +56,8 @@ public class OrmExportItemEntity extends OrmEntity {
      * Deserialize an export entity from a datastore entity.
      */
     public OrmExportItemEntity(Entity entity) {
-        this(entity.getKey(), (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY));
+        super(ENTITY_SPEC, entity);
+        this.blobKey = (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY);
     }
 
     public String getExportTypeId() {

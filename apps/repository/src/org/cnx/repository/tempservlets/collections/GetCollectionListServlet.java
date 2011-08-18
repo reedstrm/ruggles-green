@@ -21,7 +21,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetCollectionListResult;
-import org.cnx.repository.service.api.GetModuleListResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
@@ -43,8 +41,6 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 public class GetCollectionListServlet extends HttpServlet {
     private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
-    private static final Logger log = Logger.getLogger(GetCollectionListServlet.class.getName());
-
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String cursorParam = checkNotNull(req.getParameter("cursor"), "Missing cursor param");
@@ -55,7 +51,7 @@ public class GetCollectionListServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionListResult> repositoryResponse =
-                repository.getCollectionList(context, curosr, maxResults);
+            repository.getCollectionList(context, curosr, maxResults);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

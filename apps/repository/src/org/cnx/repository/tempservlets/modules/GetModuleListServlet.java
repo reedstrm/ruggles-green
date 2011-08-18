@@ -21,7 +21,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +40,6 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 @SuppressWarnings("serial")
 public class GetModuleListServlet extends HttpServlet {
     private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
-
-    private static final Logger log = Logger.getLogger(GetModuleListServlet.class.getName());
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

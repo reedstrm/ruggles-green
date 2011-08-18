@@ -16,23 +16,18 @@
 
 package org.cnx.repository.service.api;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
 /**
- * Common context that is passed to each repository operation.
+ * Common context that is passed to each repository operation. Caller should create a fresh context
+ * object for each request they issue.
  * 
  * @author Tal Dayan
  */
 public class RepositoryRequestContext {
 
     @Nullable
-    public final String authenticatedUserId;
+    private final String authenticatedUserId;
 
     /**
      * @param authenticatedUserId an optional string with the user id. Null if no user id is

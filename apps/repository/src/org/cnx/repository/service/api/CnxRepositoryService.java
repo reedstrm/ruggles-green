@@ -105,9 +105,9 @@ public interface CnxRepositoryService {
      *            Implementations are even allowed to return zero modules (e.g. to avoid timeouts)
      *            as long as each invocation of this method has some internal progress.
      * 
-     * @return a response object. If OK, the result contains the module list, a flag indicating
-     *            if more modules are available and a cursor to use in the next query. See
-     *            {@link GetModuleListResult} for details.
+     * @return a response object. If OK, the result contains the module list, a flag indicating if
+     *         more modules are available and a cursor to use in the next query. See
+     *         {@link GetModuleListResult} for details.
      */
     RepositoryResponse<GetModuleListResult> getModuleList(RepositoryRequestContext context,
             @Nullable String startCursor, int maxResults);

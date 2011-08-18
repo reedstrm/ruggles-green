@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.datastore.Entity;
@@ -34,6 +36,7 @@ import com.google.appengine.api.datastore.Key;
  * @author Tal Dayan
  */
 public abstract class OrmEntity {
+    private static final String CREATION_TIME_PROPERTY = "created";
 
     private final OrmEntitySpec entitySpec;
 
@@ -44,14 +47,32 @@ public abstract class OrmEntity {
     @Nullable
     private Key key;
 
-    protected OrmEntity(OrmEntitySpec entitySpec, @Nullable Key key) {
-        this.entitySpec = entitySpec;
+    /**
+     * Entity creation time.
+     */
+    private Date creationTime;
+
+    protected OrmEntity(OrmEntitySpec entitySpec, @Nullable Key key, Date creationTime) {
+        this.entitySpec = checkNotNull(entitySpec);
         this.key = key;
+        this.creationTime = checkNotNull(creationTime);
+    }
+
+    protected OrmEntity(OrmEntitySpec entitySpec, Entity entity) {
+        this.entitySpec = checkNotNull(entitySpec);
+        this.key = checkNotNull(entity.getKey());
+        this.creationTime =
+            checkNotNull((Date) entity.getProperty(CREATION_TIME_PROPERTY),
+                    "Creation time property not found");
     }
 
     @Nullable
     public Key getKey() {
         return key;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
     }
 
     /**
@@ -81,10 +102,12 @@ public abstract class OrmEntity {
     }
 
     public Entity toEntity() {
-        final Entity result =
+        final Entity entity =
             (getKey() == null) ? new Entity(entitySpec.getKeyKind()) : new Entity(key);
-        serializeToEntity(result);
-        return result;
+
+        entity.setProperty(CREATION_TIME_PROPERTY, creationTime);
+        serializeToEntity(entity);
+        return entity;
     }
 
     /**

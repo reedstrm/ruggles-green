@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.blobstore.BlobKey;
@@ -72,8 +74,8 @@ public class OrmResourceEntity extends OrmEntity {
      * 
      * Useful when creating new resources.
      */
-    public OrmResourceEntity() {
-        super(ENTITY_SPEC, null);
+    public OrmResourceEntity(Date creationTime) {
+        super(ENTITY_SPEC, null, creationTime);
         this.state = State.UPLOAD_PENDING;
         this.blobKey = null;
     }
@@ -84,7 +86,7 @@ public class OrmResourceEntity extends OrmEntity {
      * Useful when retrieving a resource from the datastore.
      */
     public OrmResourceEntity(Entity entity) {
-        super(ENTITY_SPEC, checkNotNull(entity.getKey(), "No entity key"));
+        super(ENTITY_SPEC, entity);
         this.state = State.valueOf((String) entity.getProperty(STATE_PROPERTY));
         this.blobKey = (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY);
         checkArgument(state.hasBlobKey() == (blobKey != null), "Inconsistent state: %s", state);

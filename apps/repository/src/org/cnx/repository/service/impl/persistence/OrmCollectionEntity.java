@@ -19,6 +19,8 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.datastore.Entity;
@@ -48,15 +50,15 @@ public class OrmCollectionEntity extends OrmEntity {
      * 
      * Useful when creating new collections.
      */
-    public OrmCollectionEntity() {
-        super(ENTITY_SPEC, null);
+    public OrmCollectionEntity(Date creationTime) {
+        super(ENTITY_SPEC, null, creationTime);
     }
 
     /**
      * Deserialize a collection version entity from a datastore entity.
      */
     public OrmCollectionEntity(Entity entity) {
-        super(ENTITY_SPEC, checkNotNull(entity.getKey(), "No entity key"));
+        super(ENTITY_SPEC, entity);
         // NOTE(tal): numeric values are stored as Longs.
         this.versionCount = ((Long) entity.getProperty(VERSION_COUNT_PROPERTY)).intValue();
     }

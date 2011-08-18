@@ -18,7 +18,8 @@ package org.cnx.repository.service.impl.persistence;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+
+import java.util.Date;
 
 import javax.annotation.Nullable;
 
@@ -49,15 +50,15 @@ public class OrmModuleEntity extends OrmEntity {
      * 
      * Useful when creating new modules.
      */
-    public OrmModuleEntity() {
-        super(ENTITY_SPEC, null);
+    public OrmModuleEntity(Date creationTime) {
+        super(ENTITY_SPEC, null, creationTime);
     }
 
     /**
      * Deserialize a module entity from a datastore entity.
      */
     public OrmModuleEntity(Entity entity) {
-        super(ENTITY_SPEC, checkNotNull(entity.getKey(), "No entity key"));
+        super(ENTITY_SPEC, entity);
         // NOTE(tal): numeric values are stored by datastore as Longs.
         this.versionCount = ((Long) entity.getProperty(VERSION_COUNT_PROPERTY)).intValue();
     }

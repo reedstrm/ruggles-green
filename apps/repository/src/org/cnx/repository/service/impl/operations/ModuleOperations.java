@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -65,9 +66,9 @@ public class ModuleOperations {
     public static RepositoryResponse<CreateModuleResult> createModule(
             RepositoryRequestContext context) {
         final String moduleId;
-
+        final Date transactionTime = new Date();
         try {
-            final OrmModuleEntity moduleEntity = new OrmModuleEntity();
+            final OrmModuleEntity moduleEntity = new OrmModuleEntity(transactionTime);
             // The unique module id is created the first time the entity is persisted.
             Services.persistence.write(moduleEntity);
             moduleId = checkNotNull(moduleEntity.getId(), "Null module id");
@@ -77,7 +78,7 @@ public class ModuleOperations {
         }
 
         return ResponseUtil.loggedOk("New module created: " + moduleId, new CreateModuleResult(
-                moduleId), log);
+            moduleId), log);
     }
 
     /**
@@ -134,12 +135,12 @@ public class ModuleOperations {
 
         if (maxResults > MAX_MODULES_PER_LIST_QUERY) {
             log.info("Reducing caller module maxResults from " + maxResults + " to "
-                    + MAX_MODULES_PER_LIST_QUERY);
+                + MAX_MODULES_PER_LIST_QUERY);
             maxResults = MAX_MODULES_PER_LIST_QUERY;
         }
 
         Pair<List<Key>, String> results =
-                Services.persistence.entityKeyList(OrmModuleEntity.class, maxResults, startCursor);
+            Services.persistence.entityKeyList(OrmModuleEntity.class, maxResults, startCursor);
 
         ImmutableList.Builder<String> builder = ImmutableList.builder();
         for (Key moduleKey : results.first) {
@@ -149,7 +150,7 @@ public class ModuleOperations {
         final ImmutableList<String> moduleIds = builder.build();
 
         return ResponseUtil.loggedOk("Retrieve module list page with " + moduleIds.size()
-                + " module ids", new GetModuleListResult(moduleIds, results.second), log);
+            + " module ids", new GetModuleListResult(moduleIds, results.second), log);
     }
 
     /**
@@ -162,7 +163,7 @@ public class ModuleOperations {
         if (expectedVersionNumber != null && expectedVersionNumber < 1) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Invalid expected version number: " + expectedVersionNumber
-                    + ", should be >= 1", log);
+                        + ", should be >= 1", log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
@@ -174,6 +175,7 @@ public class ModuleOperations {
         // We read the module entity and its child export entities in one transation. This is
         // OK since they are in the same entity group.
 
+        final Date transactionTime = new Date();
         final int newVersionNumber;
         final Transaction tx = checkNotNull(Services.persistence.beginTransaction());
 
@@ -196,12 +198,13 @@ public class ModuleOperations {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
                         "Version conflict in module " + moduleId + ", expected: "
-                                + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+                            + expectedVersionNumber + ", actual: " + newVersionNumber, log);
             }
 
             // Create new version entity
             final OrmModuleVersionEntity versionEntity =
-                    new OrmModuleVersionEntity(moduleKey, newVersionNumber, cnxmlDoc, resourceMapDoc);
+                new OrmModuleVersionEntity(moduleKey, transactionTime, newVersionNumber, cnxmlDoc,
+                    resourceMapDoc);
 
             // Sanity check that we don't overwrite an existing version. Should never be
             // triggered if the persisted data is consistent.
@@ -275,10 +278,10 @@ public class ModuleOperations {
 
             // Fetch module version entity
             final Key moduleVersionKey =
-                    OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
+                OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
 
             versionEntity =
-                    Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
+                Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
@@ -288,8 +291,8 @@ public class ModuleOperations {
         }
 
         final GetModuleVersionResult result =
-                new GetModuleVersionResult(moduleId, versionEntity.getVersionNumber(),
-                        versionEntity.getCNXMLDoc(), versionEntity.getResourceMapDoc());
+            new GetModuleVersionResult(moduleId, versionEntity.getVersionNumber(),
+                versionEntity.getCNXMLDoc(), versionEntity.getResourceMapDoc());
         return ResponseUtil.loggedOk("Fetched module version", result, log);
     }
 
@@ -342,10 +345,10 @@ public class ModuleOperations {
 
             // Fetch the module version entity
             final Key moduleVersionKey =
-                    OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
+                OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
 
             versionEntity =
-                    Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
+                Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
@@ -364,7 +367,7 @@ public class ModuleOperations {
         }
 
         final GetModuleVersionInfoResult result =
-                new GetModuleVersionInfoResult(moduleId, versionEntity.getVersionNumber(), exports);
+            new GetModuleVersionInfoResult(moduleId, versionEntity.getVersionNumber(), exports);
         return ResponseUtil.loggedOk("Fetched module version info", result, log);
     }
 }

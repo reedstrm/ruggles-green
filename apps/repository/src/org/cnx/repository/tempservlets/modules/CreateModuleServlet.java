@@ -41,9 +41,9 @@ public class CreateModuleServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateModuleResult> repositoryResponse =
-            repository.createModule(context);
+                repository.createModule(context);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

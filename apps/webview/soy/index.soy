@@ -22,13 +22,18 @@
 {template .index}
     {call .page}
         {param title}Connexions 2.0{/param}
-        {param content}
+        {param headerHtml}
+            <img src="/static/img/logo-large.png" width="550" height="150" alt="Connexions">
+        {/param}
+        {param contentHtml}
+            <div id="contentArea">
             <h1>Welcome to Connexions 2.0</h1>
             <p>View the <a href="/light/collection/col10064/latest/">Signals and Systems</a> collection.</p>
             <p style="font-size: 80%">
                 Confused? You may be looking for the <a href="http://cnx.org/">original Connexions
                 website.</a>
             </p>
+            </div>
         {/param}
     {/call}
 {/template}

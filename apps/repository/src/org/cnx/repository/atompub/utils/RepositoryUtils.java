@@ -28,7 +28,7 @@ public class RepositoryUtils {
     /** Temporary global userId. */
     public static final String GLOBAL_USER_ID = "temp_user";
 
-    public static RepositoryRequestContext getRepositoryContext(HttpServletRequest httpRequest) {
-        return new RepositoryRequestContext(httpRequest, GLOBAL_USER_ID);
+    public static RepositoryRequestContext getRepositoryContext() {
+        return new RepositoryRequestContext(GLOBAL_USER_ID);
     }
 }

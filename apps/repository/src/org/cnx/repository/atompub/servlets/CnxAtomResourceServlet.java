@@ -39,6 +39,7 @@ import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
@@ -77,11 +78,11 @@ public class CnxAtomResourceServlet {
             @Context HttpServletResponse res) {
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateResourceResult> createdResource =
-            repositoryService.createResource(RepositoryUtils.getRepositoryContext(req));
+                repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
         if (createdResource.isOk()) {
             /*
@@ -101,7 +102,7 @@ public class CnxAtomResourceServlet {
             URI createdLocation;
             try {
                 URL resourcePath =
-                    atomPubService.getConstants().getResourceAbsPath(result.getResourceId());
+                        atomPubService.getConstants().getResourceAbsPath(result.getResourceId());
                 createdLocation = new URI(resourcePath.toString());
 
                 String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
@@ -109,7 +110,7 @@ public class CnxAtomResourceServlet {
                 return Response.created(createdLocation).entity(stringEntry).build();
             } catch (URISyntaxException e) {
                 logger.severe("Failed to create Resource because : "
-                    + Throwables.getStackTraceAsString(e));
+                        + Throwables.getStackTraceAsString(e));
             } catch (IllegalArgumentException e) {
                 // TODO(arjuns): Auto-generated catch block
                 e.printStackTrace();
@@ -127,16 +128,16 @@ public class CnxAtomResourceServlet {
     @GET
     @Path(RESOURCE_GET_URL_PATTERN)
     public Response
-            postNewResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
-                    @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
+    postNewResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
+            @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(req), resourceId,
-                    res);
+                repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(), resourceId,
+                        res);
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();

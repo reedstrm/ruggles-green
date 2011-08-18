@@ -35,7 +35,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to serve a resource using a GET request.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -58,7 +58,7 @@ public class GetResourceServlet extends HttpServlet {
 
         // TODO(arjuns) : This doesnt work.
         final RepositoryResponse<ServeResourceResult> repositoryResponse =
-            repository.serveResouce(new RepositoryRequestContext(req, null), resourceId, resp);
+                repository.serveResouce(new RepositoryRequestContext(null), resourceId, resp);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -80,7 +80,7 @@ public class GetResourceServlet extends HttpServlet {
 
         checkState(repositoryResponse.isOk());
         for (Map.Entry<String, String> header : repositoryResponse.getResult()
-            .getAdditionalHeaders().entrySet()) {
+                .getAdditionalHeaders().entrySet()) {
             resp.addHeader(header.getKey(), header.getValue());
         }
         return;

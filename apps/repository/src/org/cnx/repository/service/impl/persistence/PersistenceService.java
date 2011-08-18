@@ -7,13 +7,19 @@ import static com.google.common.base.Preconditions.checkState;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 public class PersistenceService {
@@ -53,7 +59,7 @@ public class PersistenceService {
     }
 
     public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
-        throws EntityNotFoundException {
+            throws EntityNotFoundException {
         final Entity entity = datastore.get(key);
         return deserialize(entityClass, entity);
     }
@@ -86,7 +92,7 @@ public class PersistenceService {
         query.setAncestor(parentKey);
 
         final List<Entity> entities =
-            datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+                datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         final List<T> ormEntities = Lists.newArrayList();
 
@@ -105,7 +111,7 @@ public class PersistenceService {
             return (OrmEntitySpec) entityClass.getDeclaredMethod("getSpec").invoke(null);
         } catch (Throwable e) {
             throw new RuntimeException("Error involing static method getSpec() of class "
-                + entityClass, e);
+                    + entityClass, e);
         }
     }
 
@@ -129,5 +135,71 @@ public class PersistenceService {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Query entity key list with support for paging.
+     * 
+     * Result order is undefined. Retrieving the entire list (possibly using multiple calls)
+     * guarantees returning all the matching entities that existed before from before the first call
+     * until the end of the last call.
+     * 
+     * IMPORTANT, callers should impose a reasonable max on {@link maxResults} to avoid memory
+     * explosion.
+     * 
+     * TODO(tal): consider to use QueryResultIterator instead of QueryResultList for reduced memory
+     * footprint.
+     * 
+     * @param c the result ORM entity class.
+     * @param maxResults max results to return to the user. May return less than that, even zero.
+     * @param startCursor null if to iterate the list from start. Returned end cursor from previous
+     *            query to continue. Asserted to be >= 1.
+     * 
+     * @return a pair of result list and end cursor. If end cursor is null then end of data has been
+     *         reached. Otherwise, caller can issue another call using the end cursor as start
+     *         cursor to fetch the next page.
+     */
+    public <T extends OrmEntity> Pair<List<Key>, String> entityKeyList(Class<T> c, int maxResults,
+            @Nullable String startCursor) {
+        checkArgument(maxResults >= 1);
+
+        final OrmEntitySpec entitySpec = entityClassSpec(c);
+
+        // Querying for keys only.
+        final Query q = new Query(entitySpec.getKeyKind()).setKeysOnly();
+
+        final PreparedQuery pq = datastore.prepare(q);
+
+        final FetchOptions fetchOptions = FetchOptions.Builder.withLimit(maxResults);
+
+        if (startCursor != null) {
+            fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
+        }
+
+        // TODO(tal): should we use a query result iterator instead of a list?
+        //
+        // These entities have keys only since we queried above for keys only. They cannot
+        // be deserialized into ORM entities.
+        final QueryResultList<Entity> results = pq.asQueryResultList(fetchOptions);
+
+        final List<Key> keys = Lists.newArrayList();
+
+        for (Entity entity : results) {
+            keys.add(entity.getKey());
+        }
+
+        // TODO(tal): we base this termination condition on reverse engineering the app engine
+        // code. Need to confirm with an authorative source.
+        final boolean endOfData = (results.size() < maxResults);
+
+        // TODO(tal): what is the semantic of having a null cursor? It is an error? (it does not
+        // seem to be though the signal for end of data since it is non null even at the end
+        // of data, tested on dev environment, Aug 2011).
+        @Nullable
+        final String endCursor =
+        endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
+            .toWebSafeString();
+
+        return Pair.of(keys, endCursor);
     }
 }

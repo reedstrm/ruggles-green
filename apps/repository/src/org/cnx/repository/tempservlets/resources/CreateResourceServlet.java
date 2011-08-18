@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -31,7 +31,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to create a new resource.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -42,7 +42,7 @@ public class CreateResourceServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         RepositoryResponse<CreateResourceResult> repositoryResponse =
-            repository.createResource(new RepositoryRequestContext(req, null));
+                repository.createResource(new RepositoryRequestContext(null));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

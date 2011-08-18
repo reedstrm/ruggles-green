@@ -227,11 +227,4 @@ table.cals th, table.cals td {
 
 .collectionToc {
     margin-top: 1.5em;
-
-    -moz-column-count: 2;
-    -moz-column-gap: 2em;
-    -webkit-column-count: 2;
-    -webkit-column-gap: 2em;
-    column-count: 2;
-    column-gap: 2em;
 }

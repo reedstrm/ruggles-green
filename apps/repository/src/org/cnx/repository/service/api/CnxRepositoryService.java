@@ -71,6 +71,17 @@ public interface CnxRepositoryService {
             String resourceId, HttpServletResponse httpResponse);
 
     /**
+     * Query resource id list with optional paging.
+     * 
+     * Note that the method return resources ids regardless of their state. Some resources
+     * may not have uploaded content yte.
+     * 
+     * Similar to {@link #getModuleList}. See there for details.
+     */
+    RepositoryResponse<GetResourceListResult> getResourceList(RepositoryRequestContext context,
+            @Nullable String startCursor, int maxResults);
+
+    /**
      * Create a new module.
      * 
      * If the returned response has an OK status than a new module, with no version, has been

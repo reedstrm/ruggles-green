@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet to which client will be redirected on successful upload of resource.
- * This is mandated by AppEngine.
- *
+ * Servlet to which client will be redirected on successful upload of resource. This is mandated by
+ * AppEngine.
+ * 
  * @author Arjun Satyapal
  */
 public class SuccessServlet extends HttpServlet {

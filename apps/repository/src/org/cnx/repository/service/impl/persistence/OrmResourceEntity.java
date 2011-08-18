@@ -116,6 +116,12 @@ public class OrmResourceEntity extends OrmEntity {
         state = State.UPLOAD_COMPLETE;
     }
 
+    public static String resourceKeyToId(Key resourceId) {
+        checkNotNull(resourceId);
+        checkArgument(ENTITY_SPEC.getKeyKind().equals(resourceId.getKind()), "Not a resource key");
+        return IdUtil.idToString(ENTITY_SPEC.getIdPrefix(), resourceId.getId());
+    }
+
     /**
      * Convert a resource id returned by {@link #getId()} back to the resource key. Returns null if
      * resource id has invalid format.

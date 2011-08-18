@@ -43,6 +43,7 @@ import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
@@ -92,11 +93,11 @@ public class CnxAtomModuleServlet {
         AtomRequest areq = new AtomRequestImpl(req);
 
         // TODO(arjuns) : See better way of getting URL.
-        RepositoryRequestContext context = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(context.getHostUrl());
+        RepositoryRequestContext context = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
-            repositoryService.createModule(RepositoryUtils.getRepositoryContext(req));
+                repositoryService.createModule(RepositoryUtils.getRepositoryContext());
 
         if (createdModule.isOk()) {
             /*
@@ -239,8 +240,8 @@ public class CnxAtomModuleServlet {
 
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
             repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,

@@ -24,88 +24,28 @@ import java.net.URL;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.appengine.api.utils.SystemProperty;
-
 /**
  * Common context that is passed to each repository operation.
- *
+ * 
  * @author Tal Dayan
  */
 public class RepositoryRequestContext {
-    public final String hostUrl;
 
     @Nullable
     public final String authenticatedUserId;
 
     /**
-     * @param hostUrl the prefix of the server URL up to the path (not including). Examples:
-     *            "http://localhost:8888", "http://my_app-appstope.com". Used to construct URLs
-     *            returned in repository responses.
-     *
      * @param authenticatedUserId an optional string with the user id. Null if no user id is
      *            associated with this request. It is the responsibility of the caller to
      *            authenticate the user. The repository service uses this value to authorize the
      *            operation.
      */
-    public RepositoryRequestContext(String hostUrl, @Nullable String authenticatedUserId) {
-        this.hostUrl = checkNotNull(hostUrl);
+    public RepositoryRequestContext(@Nullable String authenticatedUserId) {
         this.authenticatedUserId = authenticatedUserId;
-    }
-
-    /**
-     * Convenience constructor to construct form httpRequest.
-     */
-    public RepositoryRequestContext(HttpServletRequest httpRequest,
-        @Nullable String authenticatedUserId) {
-        this(computeHostUrl(httpRequest), authenticatedUserId);
-    }
-
-    public String getHostUrl() {
-        return hostUrl;
     }
 
     @Nullable
     public String getAuthenticatedUserId() {
         return authenticatedUserId;
-    }
-
-    /**
-     * Compute local host base url from an incoming httpRequest.
-     *
-     * @param httpRequest an incoming HTTP request.
-     * @return host URL (e.g. "http://myserver.com" or "http://localhost:8888"
-     */
-    private static String computeHostUrl(HttpServletRequest httpRequest) {
-        final String scheme = httpRequest.getScheme();
-        final int port = httpRequest.getLocalPort();
-
-        // Is the default port for this scheme?
-        final boolean isDefaultPort =
-            ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
-
-        final URL serverUrl;
-        try {
-
-            if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-                serverUrl = new URL(scheme, httpRequest.getLocalName(), port, "");
-            } else {
-                String requestUrl = httpRequest.getRequestURL().toString();
-                String urlOfInterest = requestUrl.substring(0, requestUrl.indexOf(".appspot.com"));
-
-                serverUrl = new URL(urlOfInterest + ".appspot.com");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Could not construct host url", e);
-        }
-
-        // ApiProxy.Environment env = ApiProxy.getCurrentEnvironment();
-        // Object value =
-        // env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
-        // System.out.println("**** value: " + value);
-        // for (Object key: env.getAttributes().keySet()) {
-        // System.out.println("  [" + key + "]");
-        // }
-
-        return serverUrl.toString();
     }
 }

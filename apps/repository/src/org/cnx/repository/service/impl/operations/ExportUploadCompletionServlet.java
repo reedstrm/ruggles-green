@@ -55,7 +55,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 public class ExportUploadCompletionServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(ExportUploadCompletionServlet.class
-        .getName());
+            .getName());
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -88,7 +88,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
             // Validate incoming export reference
             final ExportReferenceValidationResult validationResult =
-                ExportReferenceValidationResult.validateReference(exportReference);
+                    ExportReferenceValidationResult.validateReference(exportReference);
             checkArgument(validationResult.getRepositoryStatus().isOk(),
                     "Invalid export reference: %s, error: %s", exportReference,
                     validationResult.getStatusDescription());
@@ -99,8 +99,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                         resp,
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Resource upload completion handler "
-                            + "expected to find exactly one blob but found ["
-                            + incomingBlobs.size() + "]", null, log, Level.WARNING);
+                                + "expected to find exactly one blob but found ["
+                                + incomingBlobs.size() + "]", null, log, Level.WARNING);
                 return;
             }
 
@@ -121,16 +121,16 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             if (blobInfo.getSize() > validationResult.getExportType().getMaxSizeInBytes()) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                         "Export too large: " + blobInfo + " vs. "
-                            + validationResult.getExportType().getMaxSizeInBytes() + ", export: "
-                            + exportReference, null, log, Level.WARNING);
+                                + validationResult.getExportType().getMaxSizeInBytes() + ", export: "
+                                + exportReference, null, log, Level.WARNING);
                 return;
             }
             if (!validationResult.getExportType().getContentType()
-                .equals(blobInfo.getContentType())) {
+                    .equals(blobInfo.getContentType())) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                         "Expected content type "
-                            + validationResult.getExportType().getContentType() + ", found "
-                            + blobInfo.getContentType(), null, log, Level.WARNING);
+                                + validationResult.getExportType().getContentType() + ", found "
+                                + blobInfo.getContentType(), null, log, Level.WARNING);
                 return;
             }
 
@@ -142,8 +142,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
             @SuppressWarnings({ "unused", "unchecked" })
             final OrmEntity parentEntity =
-                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
-                        validationResult.getParentKey());
+            (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
+                    validationResult.getParentKey());
 
             // Lookup for existing export entity, if found then overwrite, otherwise create a
             // new one.
@@ -152,8 +152,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             OrmExportItemEntity exportItemEntity;
             try {
                 exportItemEntity =
-                    Services.persistence.read(OrmExportItemEntity.class,
-                            validationResult.getExportKey());
+                        Services.persistence.read(OrmExportItemEntity.class,
+                                validationResult.getExportKey());
 
                 // Keep around the old blob key and overwrite with the new one.
                 oldBlobKey = checkNotNull(exportItemEntity.getBlobKey());
@@ -162,7 +162,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             } catch (EntityNotFoundException e) {
                 // New export, not overwriting an existing one.
                 exportItemEntity =
-                    new OrmExportItemEntity(validationResult.getExportKey(), newBlobKey);
+                        new OrmExportItemEntity(validationResult.getExportKey(), newBlobKey);
             }
             Services.persistence.write(exportItemEntity);
 
@@ -194,6 +194,6 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         }
 
         log.info("Written export " + exportReference);
-        resp.sendRedirect("/");
+        resp.sendRedirect(BlobUploadDoneServlet.REDIRECTION_URL);
     }
 }

@@ -43,6 +43,8 @@ import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
+import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
@@ -99,7 +101,7 @@ public class CnxAtomResourceServlet {
         }
 
         RepositoryResponse<CreateResourceResult> createdResource =
-            repositoryService.createResource(RepositoryUtils.getRepositoryContext(req));
+                repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
         if (createdResource.isOk()) {
             /*
@@ -152,8 +154,8 @@ public class CnxAtomResourceServlet {
                     @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
             repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(req), resourceId,

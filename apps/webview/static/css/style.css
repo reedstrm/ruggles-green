@@ -24,10 +24,15 @@ html, body {
     font-family: "Open Sans", sans-serif;
 }
 
+body > header {
+    text-align: center;
+}
+
 body > header > h1 {
     background: url(../img/logo.png) no-repeat left center;
     overflow: hidden;
     text-indent: -999em;
+    text-align: left;
 }
 
 h1 {
@@ -53,6 +58,7 @@ hgroup > h1.moduleTitle {
 
 .collectionNavBar {
     display: table;
+    table-layout: fixed;
     width: 100%;
     padding: 0.5ex 1ex;
 
@@ -75,6 +81,7 @@ hgroup > h1.moduleTitle {
 .collectionNavBar > .previous, .collectionNavBar > .next {
     display: table-cell;
     width: 25%;
+    vertical-align: top;
 }
 
 .collectionNavBar > .previous {
@@ -89,17 +96,30 @@ hgroup > h1.moduleTitle {
     background: url(../img/arrow-right.png) no-repeat right center;
 }
 
-.collectionNavBar > .empty {
+.collectionNavBar > .collectionNavNoModule {
     background: none;
 }
 
 .collectionNavBar > .previous .moduleTitle, .collectionNavBar > .next .moduleTitle {
-    display: block;
+    width: 100%;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
     font-size: 80%;
 }
 
-.collectionNavNoModule {
-    color: #555;
+.collection {
+    -webkit-margin-before: 0;
+}
+
+.subcollection {
+    margin-top: 1em;
+}
+
+.subcollection:first-child {
+    margin-top: 0;
 }
 
 .subcollection > .title {
@@ -131,6 +151,16 @@ hgroup > h1.moduleTitle {
 
 table.cals {
     border-collapse: collapse;
+}
+
+table.cals tr {
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+}
+
+table.cals th, table.cals td {
+    border-left: thin solid black;
+    border-right: thin solid black;
 }
 
 .calsFrameSides {

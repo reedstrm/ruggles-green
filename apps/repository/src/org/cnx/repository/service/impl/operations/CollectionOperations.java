@@ -33,14 +33,11 @@ import org.cnx.repository.service.api.GetCollectionInfoResult;
 import org.cnx.repository.service.api.GetCollectionListResult;
 import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
-import org.cnx.repository.service.api.GetModuleListResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.impl.persistence.OrmCollectionEntity;
 import org.cnx.repository.service.impl.persistence.OrmCollectionVersionEntity;
-import org.cnx.repository.service.impl.persistence.OrmModuleEntity;
-
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Transaction;

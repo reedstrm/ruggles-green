@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.GetCollectionListResult;
-import org.cnx.repository.service.api.GetModuleListResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;

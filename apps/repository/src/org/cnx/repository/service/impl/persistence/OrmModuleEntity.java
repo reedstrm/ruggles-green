@@ -18,8 +18,6 @@ package org.cnx.repository.service.impl.persistence;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.datastore.Entity;

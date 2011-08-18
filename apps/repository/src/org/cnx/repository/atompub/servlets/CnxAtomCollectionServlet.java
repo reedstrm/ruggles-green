@@ -85,11 +85,12 @@ public class CnxAtomCollectionServlet {
         AtomRequest areq = new AtomRequestImpl(req);
 
         // TODO(arjuns) : See better way of getting URL.
-        RepositoryRequestContext context = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(context.getHostUrl());
+        RepositoryRequestContext context = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService =
+            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
 
         RepositoryResponse<CreateCollectionResult> createdCollection =
-            repositoryService.createCollection(RepositoryUtils.getRepositoryContext(req));
+            repositoryService.createCollection(RepositoryUtils.getRepositoryContext());
 
         if (createdCollection.isOk()) {
             /*
@@ -136,8 +137,8 @@ public class CnxAtomCollectionServlet {
         logger.info(areq.getContentType());
 
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        atomPubService = new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
 
         Entry postedEntry = null;
         try {
@@ -161,7 +162,7 @@ public class CnxAtomCollectionServlet {
 
         int newVersion = Integer.parseInt(version);
         RepositoryResponse<AddCollectionVersionResult> createdCollection =
-            repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(req),
+            repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
                 collectionId, newVersion, decodedCollXml);
 
         if (createdCollection.isOk()) {
@@ -230,11 +231,12 @@ public class CnxAtomCollectionServlet {
 
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService =
+            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
 
         RepositoryResponse<GetCollectionVersionResult> collectionVersionResult =
-            repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(req),
+            repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
                 collectionId, Integer.parseInt(version));
 
         if (collectionVersionResult.isOk()) {

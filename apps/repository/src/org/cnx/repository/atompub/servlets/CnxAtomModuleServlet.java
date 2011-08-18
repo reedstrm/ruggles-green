@@ -149,8 +149,8 @@ public class CnxAtomModuleServlet {
         AtomRequest areq = new AtomRequestImpl(req);
 
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        atomPubService = new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
 
         Entry postedEntry = null;
         try {
@@ -177,7 +177,7 @@ public class CnxAtomModuleServlet {
 
         int newVersion = Integer.parseInt(version);
         RepositoryResponse<AddModuleVersionResult> createdModule =
-            repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,
+            repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
                 newVersion, cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
@@ -244,7 +244,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(req), moduleId,
+            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
                 Integer.parseInt(version));
 
         if (moduleVersionResult.isOk()) {

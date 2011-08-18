@@ -16,17 +16,14 @@
 package org.cnx.repository.atompub.servlets;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -44,7 +41,6 @@ import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
-import org.cnx.repository.common.KeyValue;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
@@ -54,10 +50,8 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.impl.Atom10Parser;
 import com.sun.syndication.propono.atom.server.AtomRequest;
 import com.sun.syndication.propono.atom.server.AtomRequestImpl;
@@ -85,8 +79,9 @@ public class CnxAtomResourceServlet {
         // TODO(arjuns): Handle exceptions.
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomPubService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomPubService =
+            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
 
         Entry postedEntry = null;
         try {
@@ -96,12 +91,11 @@ public class CnxAtomResourceServlet {
             logger.info(PrettyXmlOutputter.prettyXmlOutputEntry(postedEntry));
         } catch (Exception e1) {
             // TODO(arjuns): Auto-generated catch block
-            e1.printStackTrace();
             throw new RuntimeException(e1);
         }
 
         RepositoryResponse<CreateResourceResult> createdResource =
-                repositoryService.createResource(RepositoryUtils.getRepositoryContext());
+            repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
         if (createdResource.isOk()) {
             /*
@@ -115,13 +109,20 @@ public class CnxAtomResourceServlet {
             entry.setPublished(new Date());
 
             try {
-                //     TODO(arjuns) : Create a function for this.
+                // TODO(arjuns) : Create a function for this.
                 // URL to fetch the Module published now.
-                URL selfUrl = atomPubService.getConstants().getResourceAbsPath(result.getResourceId());
-                List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/*editUrl*/);
+                URL selfUrl =
+                    atomPubService.getConstants().getResourceAbsPath(result.getResourceId());
+                List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
 
+                // TODO(arjuns) : Temporary hack.
                 // URL client is expected to post the blob.
-                URL editUrl = new URL(result.getResourceUploadUrl());
+                String uploadUrl = result.getResourceUploadUrl();
+                if (!uploadUrl.startsWith("http")) {
+                    uploadUrl = RepositoryRequestContext.computeHostUrl(req) + uploadUrl;
+                }
+
+                URL editUrl = new URL(uploadUrl);
                 Link blobstoreLink = new Link();
                 blobstoreLink.setRel(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL);
                 blobstoreLink.setHref(editUrl.toString());
@@ -149,17 +150,15 @@ public class CnxAtomResourceServlet {
 
     @GET
     @Path(RESOURCE_GET_URL_PATTERN)
-    public Response
-            getResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
-                    @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
+    public Response getResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
+            @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(req), resourceId,
-                res);
+            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(), resourceId, res);
 
         if (serveResourceResult.isOk()) {
             ServeResourceResult result = serveResourceResult.getResult();

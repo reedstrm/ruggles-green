@@ -56,7 +56,7 @@
     <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
     <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
 
-    <target name="compile" description="Compile the application servlet code">
+    <target name="compile" description="Compile the application servlet code" depends="prepare-for-test-compile">
         <mkdir dir="${classdir}" />
         <mkdir dir="${output.jars}" />
 
@@ -155,7 +155,7 @@
     
     <target name="test-compile"
             description="Compile Unit Tests."
-            depends="prepare-for-test-compile,compile">
+            depends="compile">
 
         <!-- TODO(arjuns) : Optimize classpaths. -->
         <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
@@ -204,10 +204,6 @@
         <ant antfile="build.xml"
              target="clean"
              dir="${basedir}/${cnxclientdir}" />
-        <ant antfile="build.xml"
-             target="clean"
-             dir="${basedir}/${resource.mapping.dir}" />
-
     </target>
 
     <target name="runserver" depends="war" description="Run the dev_appserver">

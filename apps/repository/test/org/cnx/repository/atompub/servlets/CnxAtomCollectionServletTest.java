@@ -41,7 +41,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     Logger logger = Logger.getLogger(CnxAtomCollectionServletTest.class.getName());
     private CnxAtomPubClient cnxClient;
-    private final String ORIGINAL_COLLECTION_ID = "col10064";
+
     private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.12_complete/";
     private final String ORIGINAL_COLLECTION_XML_LOCATION = COLLECTION_LOCATION + "collection.xml";
 
@@ -91,6 +91,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         CollectionMigrator migrator = new CollectionMigrator(cnxClient);
         // NOTE(arjuns): This is deliberately commented. Need to create a small collection for
         // testing.
+//        String ORIGINAL_COLLECTION_ID = "col10064";
         // migrator.migrateCollection(ORIGINAL_COLLECTION_ID, COLLECTION_LOCATION);
     }
 }

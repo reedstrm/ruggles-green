@@ -56,8 +56,9 @@ public class CnxCategoriesDocumentServlet {
 
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext(req);
-        CnxAtomService atomService = new CnxAtomService(repositoryContext.getHostUrl());
+        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
+        CnxAtomService atomService =
+            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
 
         // TODO(arjuns) : Fix this.
         CnxAtomPubConstants constants = atomService.getConstants();
@@ -68,8 +69,7 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxCollectionCategoryEle(constants
             .getCollectionCnxCollectionScheme()));
 
-        return Response.ok()
-            .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
-            .build();
+        return Response.ok().entity(
+            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
     }
 }

@@ -36,7 +36,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  */
 public class OrmResourceEntity extends OrmEntity {
 
-    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "r");
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "R");
 
     private static final String STATE_PROPERTY = "state";
     private static final String BLOB_KEY_PROPERTY = "blob_key";

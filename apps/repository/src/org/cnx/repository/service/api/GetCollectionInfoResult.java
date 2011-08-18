@@ -47,7 +47,6 @@ public class GetCollectionInfoResult {
         return collectionId;
     }
 
-
     public Date getCreationTime() {
         return creationTime;
     }

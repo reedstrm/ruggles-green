@@ -25,10 +25,15 @@ html, body {
 }
 
 body > header {
+    background: #ddd;
+    padding: 1ex 0;
     text-align: center;
 }
 
 body > header > h1 {
+    margin: 0;
+    padding: 0;
+
     background: url(../img/logo.png) no-repeat left center;
     overflow: hidden;
     text-indent: -999em;

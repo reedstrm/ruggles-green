@@ -779,6 +779,25 @@ public class ModuleHTMLGeneratorTests {
                 generate(node));
     }
 
+    @Test public void mediaShouldAlwaysUseOverride() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(
+                        builder.element("image")
+                                .attr("src", "http://www.example.com/foo.png")
+                                .attr("mime-type", "image/png"),
+                        builder.element("object")
+                                .attr("src", "http://www.example.com/my-widget")
+                                .attr("mime-type", "application/x-widget")
+                                .attr("for", "webview2.0")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\">Epic widget</object>",
+                generate(node));
+    }
+
     @Test public void mathematicaTest() throws Exception {
         final Node node = builder.element("media")
                 .attr("id", "mycdf")

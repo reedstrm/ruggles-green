@@ -57,7 +57,7 @@ public class GetCollectionInfoServlet extends HttpServlet {
         final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
             final String message =
-                "Could not parse collection id in request URI [" + collectionUri + "]";
+                    "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
@@ -66,7 +66,7 @@ public class GetCollectionInfoServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionInfoResult> repositoryResponse =
-            repository.getCollectionInfo(context, collectionId);
+                repository.getCollectionInfo(context, collectionId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -93,10 +93,9 @@ public class GetCollectionInfoServlet extends HttpServlet {
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        // out.println();
         out.println("Collection Info");
-
         out.println("* ID = " + result.getCollectionId());
+        out.println("* Created = " + result.getCreationTime());
         out.println("* Versions = " + result.getVersionCount());
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }

@@ -36,6 +36,7 @@ Done
 + Add module/collection method version param for version conflict detection
 + Add service methods to enumerate all collections
 + Add service methods to enumerate all modules
-+* (ETA Aug 15 2011) Remove repository service relative blobstore URL prefixing when app engine 1.3.5 will be available.
++ (ETA Aug 15 2011) Remove repository service relative blobstore URL prefixing when app engine 1.3.5 will be available.
++ Return creationTime from all entities (in getInfo).
 
 

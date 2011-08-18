@@ -21,6 +21,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 /**
@@ -39,21 +41,27 @@ public class GetResourceInfoResult {
         }
     }
 
-    final ResourceState resourceState;
+    private final String resourceId;
+    private final Date creationTime;
+    private final ResourceState resourceState;
 
     /**
      * Content info. Available only when {@link #hasContent()} is true;
      */
     @Nullable
-    final UploadedResourceContentInfo contentInfo;
+    private final UploadedResourceContentInfo contentInfo;
 
     /**
+     * @param resourceId the id of this resource.
+     * @param creationTime time this resource was created (not to be confused with upload time).
      * @param resourceState the state of this resource.
      * @param contentInfo if resource state hasContent() is true then this is the content info.
      *            Otherwise it should be null.
      */
-    private GetResourceInfoResult(ResourceState resourceState,
-        @Nullable UploadedResourceContentInfo contentInfo) {
+    private GetResourceInfoResult(String resourceId, Date creationTime,
+            ResourceState resourceState, @Nullable UploadedResourceContentInfo contentInfo) {
+        this.resourceId = checkNotNull(resourceId);
+        this.creationTime = checkNotNull(creationTime);
         this.resourceState = checkNotNull(resourceState);
         this.contentInfo = contentInfo;
 
@@ -62,12 +70,20 @@ public class GetResourceInfoResult {
                 resourceState);
     }
 
-    public boolean hasContent() {
-        return resourceState.hasContent();
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
     }
 
     public ResourceState getResourceState() {
         return resourceState;
+    }
+
+    public boolean hasContent() {
+        return resourceState.hasContent();
     }
 
     /**
@@ -78,11 +94,14 @@ public class GetResourceInfoResult {
         return contentInfo;
     }
 
-    public static GetResourceInfoResult newPendingUploac() {
-        return new GetResourceInfoResult(ResourceState.PENDING_UPLOAD, null);
+    public static GetResourceInfoResult newPendingUploac(String resourceId, Date creationTime) {
+        return new GetResourceInfoResult(resourceId, creationTime, ResourceState.PENDING_UPLOAD,
+                null);
     }
 
-    public static GetResourceInfoResult newUploaded(UploadedResourceContentInfo contentInfo) {
-        return new GetResourceInfoResult(ResourceState.UPLOADED, checkNotNull(contentInfo));
+    public static GetResourceInfoResult newUploaded(String resourceId, Date creationTime,
+            UploadedResourceContentInfo contentInfo) {
+        return new GetResourceInfoResult(resourceId, creationTime, ResourceState.UPLOADED,
+                checkNotNull(contentInfo));
     }
 }

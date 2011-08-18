@@ -19,6 +19,7 @@ package org.cnx.repository.service.api;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -30,18 +31,24 @@ import com.google.common.collect.ImmutableList;
  */
 public class GetModuleInfoResult {
     private final String moduleId;
+    private final Date creationTime;
     private final int versionCount;
     private final ImmutableList<ExportInfo> exports;
 
-    public GetModuleInfoResult(String moduleId, int versionCount, List<ExportInfo> exports) {
+    public GetModuleInfoResult(String moduleId, Date creationTime, int versionCount, List<ExportInfo> exports) {
         checkArgument(versionCount >= 0, "Negative version count: %s", versionCount);
         this.moduleId = checkNotNull(moduleId);
+        this.creationTime = checkNotNull(creationTime);
         this.versionCount = versionCount;
         this.exports = ImmutableList.copyOf(checkNotNull(exports));
     }
 
     public String getModuleId() {
         return moduleId;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
     }
 
     public int getVersionCount() {

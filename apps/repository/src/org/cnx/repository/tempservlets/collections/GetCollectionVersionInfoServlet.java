@@ -47,10 +47,10 @@ public class GetCollectionVersionInfoServlet extends HttpServlet {
     private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     private static final Logger log = Logger.getLogger(GetCollectionVersionInfoServlet.class
-        .getName());
+            .getName());
 
     private static final Pattern uriPattern = Pattern
-        .compile("/collection_version_info/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
+            .compile("/collection_version_info/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -59,7 +59,7 @@ public class GetCollectionVersionInfoServlet extends HttpServlet {
         final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
             final String message =
-                "Could not parse collection id in request URI [" + collectionUri + "]";
+                    "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
@@ -70,12 +70,12 @@ public class GetCollectionVersionInfoServlet extends HttpServlet {
         // Determine version to serve. If latest, leave as null and we will set
         // it up later.
         final Integer collectionVersion =
-            collectionVersionString.equals("latest") ? null : Integer
-                .valueOf(collectionVersionString);
+                collectionVersionString.equals("latest") ? null : Integer
+                    .valueOf(collectionVersionString);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionVersionInfoResult> repositoryResponse =
-            repository.getCollectionVersionInfo(context, collectionId, collectionVersion);
+                repository.getCollectionVersionInfo(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -109,8 +109,9 @@ public class GetCollectionVersionInfoServlet extends HttpServlet {
         out.println();
         out.println("Collection Version:");
 
-        out.println("* Collection:\n" + result.getCollectionId() + "\n");
-        out.println("* Version:\n" + result.getVersionNumber() + "\n");
+        out.println("* Collection =" + result.getCollectionId());
+        out.println("* Version = " + result.getVersionNumber());
+        out.println("* Created = " + result.getCreationTime());
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }
 }

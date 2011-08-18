@@ -19,6 +19,7 @@ package org.cnx.repository.service.api;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -31,13 +32,15 @@ import com.google.common.collect.ImmutableList;
 public class GetCollectionVersionInfoResult {
     private final String collectionId;
     private final int versionNumber;
+    private final Date creationTime;
     private final ImmutableList<ExportInfo> exports;
 
     public GetCollectionVersionInfoResult(String collectionId, int versionNumber,
-        List<ExportInfo> exports) {
+            Date creationTime, List<ExportInfo> exports) {
         checkArgument(versionNumber >= 1, "Invalid version number: %s", versionNumber);
         this.collectionId = checkNotNull(collectionId);
         this.versionNumber = versionNumber;
+        this.creationTime = checkNotNull(creationTime);
         this.exports = ImmutableList.copyOf(checkNotNull(exports));
     }
 
@@ -47,6 +50,10 @@ public class GetCollectionVersionInfoResult {
 
     public int getVersionNumber() {
         return versionNumber;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
     }
 
     public ImmutableList<ExportInfo> getExports() {

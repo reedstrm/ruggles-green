@@ -92,6 +92,27 @@ public interface CnxRepositoryService {
             String moduleId);
 
     /**
+     * Query module id list with optional paging.
+     * 
+     * Query the list of all modules and return up to maxResults results. The method supports paging
+     * to limit the result size of each call.
+     * 
+     * @param startCursor pass in null to query modules from the beginning of the internal list.
+     *            Pass in the end cursor from previous call to fetch the next chunk of modules.
+     * @param maxResults an int >= 1. The method is guaranteed not to return more modules than this
+     *            count. Note though that an implementation of this method is permitted return less
+     *            than this count even before the end of the module has been reached.
+     *            Implementations are even allowed to return zero modules (e.g. to avoid timeouts)
+     *            as long as each invocation of this method has some internal progress.
+     * 
+     * @return a response object. If OK, the result contains the module list, a flag indicating
+     *            if more modules are available and a cursor to use in the next query. See
+     *            {@link GetModuleListResult} for details.
+     */
+    RepositoryResponse<GetModuleListResult> getModuleList(RepositoryRequestContext context,
+            @Nullable String startCursor, int maxResults);
+
+    /**
      * Add module version
      * 
      * If the returned response has an OK status than a new version has been added to the module.
@@ -174,6 +195,14 @@ public interface CnxRepositoryService {
      */
     RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
             String collectionId);
+
+    /**
+     * Query collection id list with optional paging.
+     * 
+     * Similar to {@link #getModuleList}. See there for details.
+     */
+    RepositoryResponse<GetCollectionListResult> getCollectionList(RepositoryRequestContext context,
+            @Nullable String startCursor, int maxResults);
 
     /**
      * Add collection version

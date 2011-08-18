@@ -24,7 +24,7 @@
 {template .collection}
     {call .page}
         {param title}{$collection.title}{/param}
-        {param content}
+        {param contentHtml}
             <h1 class="collectionTitle">{$collection.title}</h1>
             <p class="authors">By {call .actorList}{param actors: $collection.authors/}{/call}</p>
             {if $collection.abstract}

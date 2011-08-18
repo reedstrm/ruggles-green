@@ -47,7 +47,7 @@ public class GetCollectionVersionServlet extends HttpServlet {
     private static final Logger log = Logger.getLogger(GetCollectionVersionServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern
-        .compile("/collection/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
+            .compile("/collection/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -56,7 +56,7 @@ public class GetCollectionVersionServlet extends HttpServlet {
         final Matcher matcher = uriPattern.matcher(collectionUri);
         if (!matcher.matches()) {
             final String message =
-                "Could not parse collection id in request URI [" + collectionUri + "]";
+                    "Could not parse collection id in request URI [" + collectionUri + "]";
             log.log(Level.SEVERE, message);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
@@ -67,12 +67,12 @@ public class GetCollectionVersionServlet extends HttpServlet {
         // Determine version to serve. If latest, leave as null and we will set
         // it up later.
         Integer collectionVersion =
-            collectionVersionString.equals("latest") ? null : Integer
-                .valueOf(collectionVersionString);
+                collectionVersionString.equals("latest") ? null : Integer
+                    .valueOf(collectionVersionString);
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetCollectionVersionResult> repositoryResponse =
-            repository.getCollectionVersion(context, collectionId, collectionVersion);
+                repository.getCollectionVersion(context, collectionId, collectionVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author Tal Dayan
  */
 public class ServletUtil {
-
     /**
      * Setup to return a servlet error status.
      * 

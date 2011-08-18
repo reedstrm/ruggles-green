@@ -50,7 +50,7 @@ public class ResourceOperations {
      * Base path of the resource upload completion servlet. Should match servlet mapping in web.xml.
      * Servlet mapping should be this value with the suffix "/*".
      */
-    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/resource_factory/uploaded";
+    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/_repo/resource_uploaded";
 
     /**
      * See description in {@link CnxRepositoryService}
@@ -71,17 +71,13 @@ public class ResourceOperations {
         }
 
         final String completionUrl =
-            UPLOAD_COMPLETION_SERVLET_PATH + "?"
-                + ResourceUtil.encodeUploadCompletionParameters(resourceId);
+                UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                        + ResourceUtil.encodeUploadCompletionParameters(resourceId);
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
-        if (uploadUrl.startsWith("/")) {
-            log.warning("Prefexing resource upload url with '" + context.hostUrl + "'");
-            uploadUrl = context.hostUrl + uploadUrl;
-        }
 
         return ResponseUtil.loggedOk("Resource created: " + resourceId, new CreateResourceResult(
-            resourceId, uploadUrl), log);
+                resourceId, uploadUrl), log);
     }
 
     /**
@@ -102,7 +98,7 @@ public class ResourceOperations {
             entity = Services.persistence.read(OrmResourceEntity.class, resourceKey);
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
-                + resourceId + "]", log, e);
+                    + resourceId + "]", log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error when trying to retrieve resource: [" + resourceId + "]", log, e);
@@ -118,14 +114,14 @@ public class ResourceOperations {
                 // NOTE(tal): blob info could be cased in the resource entity when completing
                 // the content upload.
                 final BlobInfo blobInfo =
-                    Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
+                Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
                 if (blobInfo == null) {
                     return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                             "Could not locate blob at key: " + entity.getBlobKey(), log);
                 }
                 final UploadedResourceContentInfo contentInfo =
-                    new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
-                        blobInfo.getCreation(), blobInfo.getFilename());
+                        new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
+                                blobInfo.getCreation(), blobInfo.getFilename());
                 result = GetResourceInfoResult.newUploaded(contentInfo);
                 break;
             default:
@@ -151,7 +147,7 @@ public class ResourceOperations {
         final BlobKey blobKey;
         try {
             final OrmResourceEntity ormEntity =
-                Services.persistence.read(OrmResourceEntity.class, resourceKey);
+                    Services.persistence.read(OrmResourceEntity.class, resourceKey);
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_COMPLETE) {
                 return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                         "Resource content has not been uploaded yet: " + resourceId, log);
@@ -159,7 +155,7 @@ public class ResourceOperations {
             blobKey = ormEntity.getBlobKey();
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
-                + resourceId + "]", log, e);
+                    + resourceId + "]", log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
                     "Error when trying to retrieve resource: " + resourceId, log, e);

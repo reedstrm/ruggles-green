@@ -46,21 +46,21 @@ public class AddCollectionVersionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String colxmlDoc =
-            checkNotNull(req.getParameter("colxml"), "Missing post param \"colxml\"");
+                checkNotNull(req.getParameter("colxml"), "Missing post param \"colxml\"");
         final String moduleId =
-            checkNotNull(req.getParameter("collection_id"), "Missing post param \"collection_id\"");
+                checkNotNull(req.getParameter("collection_id"), "Missing post param \"collection_id\"");
         final String expectedVersionParam =
-            checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+                checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
         @Nullable
         final Integer expectedVersionNumber =
-            expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
+        expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
 
         checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
                 req.getParameterMap().size());
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<AddCollectionVersionResult> repositoryResponse =
-            repository.addCollectionVersion(context, moduleId, expectedVersionNumber, colxmlDoc);
+                repository.addCollectionVersion(context, moduleId, expectedVersionNumber, colxmlDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

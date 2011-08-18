@@ -29,10 +29,12 @@ import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
+import org.cnx.repository.service.api.GetCollectionListResult;
 import org.cnx.repository.service.api.GetCollectionVersionInfoResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.GetExportUploadUrlResult;
 import org.cnx.repository.service.api.GetModuleInfoResult;
+import org.cnx.repository.service.api.GetModuleListResult;
 import org.cnx.repository.service.api.GetModuleVersionInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
@@ -63,7 +65,7 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateResourceResult>
-            createResource(RepositoryRequestContext context) {
+    createResource(RepositoryRequestContext context) {
         return ResourceOperations.createResource(context);
     }
 
@@ -88,6 +90,12 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<GetModuleInfoResult> getModuleInfo(RepositoryRequestContext context,
             String moduleId) {
         return ModuleOperations.getModuleInfo(context, moduleId);
+    }
+
+    @Override
+    public RepositoryResponse<GetModuleListResult> getModuleList(RepositoryRequestContext context,
+            @Nullable String moduleListCursor, int maxResults) {
+        return ModuleOperations.getModuleList(context, moduleListCursor, maxResults);
     }
 
     @Override
@@ -120,6 +128,12 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(
             RepositoryRequestContext context, String collectionId) {
         return CollectionOperations.getCollectionInfo(context, collectionId);
+    }
+
+    @Override
+    public RepositoryResponse<GetCollectionListResult> getCollectionList(RepositoryRequestContext context,
+            @Nullable String collectionListCursor, int maxResults) {
+        return CollectionOperations.getCollectionList(context, collectionListCursor, maxResults);
     }
 
     @Override

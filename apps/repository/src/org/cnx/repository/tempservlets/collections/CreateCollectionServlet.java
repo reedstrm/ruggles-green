@@ -41,9 +41,9 @@ public class CreateCollectionServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final RepositoryRequestContext context = new RepositoryRequestContext(req, null);
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateCollectionResult> repositoryResponse =
-            repository.createCollection(context);
+                repository.createCollection(context);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

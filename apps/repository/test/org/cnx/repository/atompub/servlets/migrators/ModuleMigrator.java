@@ -38,6 +38,7 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 
 /**
+ * Migrator for a module.
  *
  * @author Arjun Satyapal
  */

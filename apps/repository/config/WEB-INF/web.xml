@@ -46,7 +46,7 @@
     </security-constraint>
     -->
   
-  <!-- CNX RESOURCE API -->
+  <!-- CNX RESOURCE API (TEMP) -->
 
   <servlet>
     <servlet-name>CreateResourceServlet</servlet-name>
@@ -78,7 +78,7 @@
     <url-pattern>/resource_info/*</url-pattern>
   </servlet-mapping>
 
-  <!-- CNX MODULES API -->
+  <!-- CNX MODULES API (TEMP) -->
 
   <servlet>
     <servlet-name>CreateModuleServlet</servlet-name>
@@ -129,8 +129,18 @@
     <servlet-name>GetModuleInfoServlet</servlet-name>
     <url-pattern>/module_info/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetModuleListServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleListServlet</servlet-class>
+  </servlet>
 
-  <!--  CNX COLLECTIONS API -->
+  <servlet-mapping>
+    <servlet-name>GetModuleListServlet</servlet-name>
+    <url-pattern>/module_list</url-pattern>
+  </servlet-mapping>
+
+  <!--  CNX COLLECTIONS API (TEMP) -->
 
   <servlet>
     <servlet-name>CreateCollectionServlet</servlet-name>
@@ -181,30 +191,18 @@
     <servlet-name>GetCollectionVersionInfoServlet</servlet-name>
     <url-pattern>/collection_version_info/*</url-pattern>
   </servlet-mapping>
-
-  <!-- Repository service -->
-
-  <servlet>
-    <servlet-name>SuccessServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.operations.SuccessServlet</servlet-class>
+  
+   <servlet>
+    <servlet-name>GetCollectionListServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionListServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>SuccessServlet</servlet-name>
-    <url-pattern>/resource_factory/SuccessServlet</url-pattern>
-  </servlet-mapping> 
-  
-  <servlet>
-    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
-  </servlet>
+    <servlet-name>GetCollectionListServlet</servlet-name>
+    <url-pattern>/collection_list</url-pattern>
+  </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
-    <url-pattern>/resource_factory/uploaded</url-pattern>
-  </servlet-mapping> 
-  
-   <!--  CNX EXPORTS API -->
+   <!--  CNX EXPORTS API (TEMP) -->
   
   <servlet>
     <servlet-name>GetExportUploadUrlServlet</servlet-name>
@@ -215,17 +213,7 @@
     <servlet-name>GetExportUploadUrlServlet</servlet-name>
     <url-pattern>/exports/getuploadurl</url-pattern>
   </servlet-mapping>  
-  
-   <servlet>
-    <servlet-name>ExportUploadCompletionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.operations.ExportUploadCompletionServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>ExportUploadCompletionServlet</servlet-name>
-    <url-pattern>/exports/uploaded</url-pattern>
-  </servlet-mapping>  
-  
+    
    <servlet>
     <servlet-name>GetExportServlet</servlet-name>
     <servlet-class>org.cnx.repository.tempservlets.exports.GetExportServlet</servlet-class>
@@ -246,17 +234,37 @@
     <url-pattern>/exports/delete</url-pattern>
   </servlet-mapping> 
    
-  <!--  TEST -->
-  
-   <servlet>
-    <servlet-name>TestServlet</servlet-name>
-    <servlet-class>org.cnx.repository.test.TestServlet</servlet-class>
+  <!-- Repository service -->
+
+  <servlet>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>TestServlet</servlet-name>
-    <url-pattern>/test</url-pattern>
-  </servlet-mapping>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <url-pattern>/_repo/resource_uploaded</url-pattern>
+  </servlet-mapping> 
+  
+  <servlet>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ExportUploadCompletionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <url-pattern>/_repo/export_uploaded</url-pattern>
+  </servlet-mapping>   
+  
+  <servlet>
+    <servlet-name>BlobUploadDoneServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.BlobUploadDoneServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>BlobUploadDoneServlet</servlet-name>
+    <url-pattern>/_repo/done</url-pattern>
+  </servlet-mapping> 
 
   <!-- Mapping for AtomPub API -->
   <servlet>

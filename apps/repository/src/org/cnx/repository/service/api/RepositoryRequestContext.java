@@ -28,7 +28,7 @@ import com.google.appengine.api.utils.SystemProperty;
 
 /**
  * Common context that is passed to each repository operation.
- *
+ * 
  * @author Tal Dayan
  */
 public class RepositoryRequestContext {
@@ -47,21 +47,8 @@ public class RepositoryRequestContext {
      *            authenticate the user. The repository service uses this value to authorize the
      *            operation.
      */
-    public RepositoryRequestContext(String hostUrl, @Nullable String authenticatedUserId) {
-        this.hostUrl = checkNotNull(hostUrl);
+    public RepositoryRequestContext(@Nullable String authenticatedUserId) {
         this.authenticatedUserId = authenticatedUserId;
-    }
-
-    /**
-     * Convenience constructor to construct form httpRequest.
-     */
-    public RepositoryRequestContext(HttpServletRequest httpRequest,
-        @Nullable String authenticatedUserId) {
-        this(computeHostUrl(httpRequest), authenticatedUserId);
-    }
-
-    public String getHostUrl() {
-        return hostUrl;
     }
 
     @Nullable

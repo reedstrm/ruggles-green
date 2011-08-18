@@ -47,6 +47,6 @@ public class ExportInfo {
 
     @Override
     public String toString() {
-        return exportType.getId() + "/" + creationTime;
+        return "id: " + exportType.getId() + ", time: " + creationTime;
     }
 }

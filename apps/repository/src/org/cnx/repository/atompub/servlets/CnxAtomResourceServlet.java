@@ -58,7 +58,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Jersey Servlets for Cnx Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH)
@@ -79,15 +79,15 @@ public class CnxAtomResourceServlet {
         // TODO(arjuns): Handle exceptions.
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
-        CnxAtomService atomPubService =
-            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
+
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         Entry postedEntry = null;
         try {
             postedEntry =
-                Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
-                    .getInputStream(), Charsets.UTF_8.displayName())), null);
+                Atom10Parser.parseEntry(
+                        new BufferedReader(new InputStreamReader(req.getInputStream(),
+                            Charsets.UTF_8.displayName())), null);
             logger.info(PrettyXmlOutputter.prettyXmlOutputEntry(postedEntry));
         } catch (Exception e1) {
             // TODO(arjuns): Auto-generated catch block
@@ -119,7 +119,7 @@ public class CnxAtomResourceServlet {
                 // URL client is expected to post the blob.
                 String uploadUrl = result.getResourceUploadUrl();
                 if (!uploadUrl.startsWith("http")) {
-                    uploadUrl = RepositoryRequestContext.computeHostUrl(req) + uploadUrl;
+                    uploadUrl = ServerUtil.computeHostUrl(req) + uploadUrl;
                 }
 
                 URL editUrl = new URL(uploadUrl);

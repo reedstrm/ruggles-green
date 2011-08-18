@@ -67,7 +67,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Servlet to Handle CNX Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH)
@@ -97,7 +97,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
-                repositoryService.createModule(RepositoryUtils.getRepositoryContext());
+            repositoryService.createModule(RepositoryUtils.getRepositoryContext());
 
         if (createdModule.isOk()) {
             /*
@@ -115,7 +115,7 @@ public class CnxAtomModuleServlet {
             // TODO(arjuns) : Change URL to URI.
             URL editUrl =
                 atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    Integer.toString(firstVersion));
+                        Integer.toString(firstVersion));
             entry.setOtherLinks(RepositoryUtils.getListOfLinks(null /* selfUrl */, editUrl));
 
             try {
@@ -143,20 +143,19 @@ public class CnxAtomModuleServlet {
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response createNewModuleVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-            @PathParam(MODULE_VERSION_PATH_PARAM) String version)
-                    throws JDOMException, IOException {
+            @PathParam(MODULE_VERSION_PATH_PARAM) String version) throws JDOMException, IOException {
         // TODO(arjuns) : Handle exceptions.
         AtomRequest areq = new AtomRequestImpl(req);
 
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
-        atomPubService = new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
+        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         Entry postedEntry = null;
         try {
             postedEntry =
-                Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
-                    .getInputStream(), Charsets.UTF_8.displayName())), null);
+                Atom10Parser.parseEntry(
+                        new BufferedReader(new InputStreamReader(req.getInputStream(),
+                            Charsets.UTF_8.displayName())), null);
         } catch (Exception e) {
             // TODO(arjuns): Handle exception.
             throw new RuntimeException(e);
@@ -170,7 +169,7 @@ public class CnxAtomModuleServlet {
         Content encodedModuleEntryContent = (Content) postedEntry.getContents().get(0);
         String decodedModuleEntryValue =
             atomPubService.getConstants().decodeFrom64BitEncodedString(
-                encodedModuleEntryContent.getValue());
+                    encodedModuleEntryContent.getValue());
 
         String cnxmlDoc = getCnxml(decodedModuleEntryValue);
         String resourceMappingDoc = getResourceMappingDoc(decodedModuleEntryValue);
@@ -178,7 +177,7 @@ public class CnxAtomModuleServlet {
         int newVersion = Integer.parseInt(version);
         RepositoryResponse<AddModuleVersionResult> createdModule =
             repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
-                newVersion, cnxmlDoc, resourceMappingDoc);
+                    newVersion, cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -197,12 +196,12 @@ public class CnxAtomModuleServlet {
             // URL to fetch the Module published now.
             URL selfUrl =
                 atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    Integer.toString(result.getNewVersionNumber()));
+                        Integer.toString(result.getNewVersionNumber()));
 
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
                 atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    Integer.toString(nextVersion));
+                        Integer.toString(nextVersion));
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -210,7 +209,7 @@ public class CnxAtomModuleServlet {
             try {
                 URL moduleVersionPath =
                     atomPubService.getConstants().getModuleVersionAbsPath(moduleId,
-                        Integer.toString(result.getNewVersionNumber()));
+                            Integer.toString(result.getNewVersionNumber()));
                 URI createdLocation = new URI(moduleVersionPath.toString());
 
                 String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
@@ -235,17 +234,16 @@ public class CnxAtomModuleServlet {
     public Response getModuleVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String version) throws JAXBException,
-            JDOMException, IOException {
+        JDOMException, IOException {
         // TODO(arjuns) : Handle exceptions.
 
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
             repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
-                Integer.parseInt(version));
+                    Integer.parseInt(version));
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult result = moduleVersionResult.getResult();
@@ -255,7 +253,7 @@ public class CnxAtomModuleServlet {
             Entry entry = new Entry();
             entry.setId(moduleId + ":" + version);
             entry.setContents(atomPubService.getConstants().getAtomPubListOfContent(cnxmlDoc,
-                resourceMappingDoc));
+                    resourceMappingDoc));
 
             int nextVersion = Integer.parseInt(version) + 1;
             // URL to fetch the Module published now.
@@ -267,7 +265,7 @@ public class CnxAtomModuleServlet {
 
             URL editUrl =
                 atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    Integer.toString(nextVersion));
+                        Integer.toString(nextVersion));
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -291,22 +289,20 @@ public class CnxAtomModuleServlet {
     }
 
     // TODO(arjuns) : move this to common.
-    private String getResourceMappingDoc(String moduleEntryValue) throws JDOMException,
-            IOException {
+    private String getResourceMappingDoc(String moduleEntryValue) throws JDOMException, IOException {
         return getDecodedChild("resource-mapping-doc", moduleEntryValue);
     }
 
     // TODO(arjuns) : move this to common.
     private String getDecodedChild(String childElement, String moduleEntryValue)
-            throws JDOMException, IOException {
+        throws JDOMException, IOException {
         // TODO(arjuns): Handle exceptions.
         SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(new StringReader(moduleEntryValue));
 
         Element root = document.getRootElement();
         String encodedXml = root.getChild(childElement).getText();
-        String originalXml = atomPubService.getConstants().decodeFrom64BitEncodedString(
-            encodedXml);
+        String originalXml = atomPubService.getConstants().decodeFrom64BitEncodedString(encodedXml);
 
         return originalXml;
     }

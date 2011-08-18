@@ -31,8 +31,7 @@ import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-import org.cnx.repository.atompub.utils.RepositoryUtils;
-import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.atompub.utils.ServerUtil;
 
 import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.server.AtomRequest;
@@ -40,7 +39,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
@@ -55,10 +54,7 @@ public class CnxCategoriesDocumentServlet {
         // TODO(arjuns) : Add caching and exception handling.
 
         AtomRequest areq = new AtomRequestImpl(req);
-        // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
-        CnxAtomService atomService =
-            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
+        CnxAtomService atomService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         // TODO(arjuns) : Fix this.
         CnxAtomPubConstants constants = atomService.getConstants();
@@ -67,9 +63,10 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));
         categories.addCategory(getCnxCollectionCategoryEle(constants
-            .getCollectionCnxCollectionScheme()));
+                .getCollectionCnxCollectionScheme()));
 
-        return Response.ok().entity(
-            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
+        return Response.ok()
+                .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
+                .build();
     }
 }

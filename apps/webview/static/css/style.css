@@ -110,6 +110,18 @@ hgroup > h1.moduleTitle {
     font-size: 80%;
 }
 
+.collection {
+    -webkit-margin-before: 0;
+}
+
+.subcollection {
+    margin-top: 1em;
+}
+
+.subcollection:first-child {
+    margin-top: 0;
+}
+
 .subcollection > .title {
     font-weight: bold;
 }

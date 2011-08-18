@@ -106,7 +106,7 @@ public interface CnxRepositoryService {
      *            as long as each invocation of this method has some internal progress.
      * 
      * @return a response object. If OK, the result contains the module list, a flag indicating
-     *            if more modules are available and a cursor to use in the next query. See 
+     *            if more modules are available and a cursor to use in the next query. See
      *            {@link GetModuleListResult} for details.
      */
     RepositoryResponse<GetModuleListResult> getModuleList(RepositoryRequestContext context,
@@ -195,6 +195,14 @@ public interface CnxRepositoryService {
      */
     RepositoryResponse<GetCollectionInfoResult> getCollectionInfo(RepositoryRequestContext context,
             String collectionId);
+
+    /**
+     * Query collection id list with optional paging.
+     * 
+     * Similar to {@link #getModuleList}. See there for details.
+     */
+    RepositoryResponse<GetCollectionListResult> getCollectionList(RepositoryRequestContext context,
+            @Nullable String startCursor, int maxResults);
 
     /**
      * Add collection version

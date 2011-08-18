@@ -16,6 +16,7 @@
 
 package org.cnx.repository.service.impl.persistence;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.annotation.Nullable;
@@ -67,6 +68,13 @@ public class OrmCollectionEntity extends OrmEntity {
     public int incrementVersionCount() {
         versionCount++;
         return versionCount;
+    }
+
+    public static String collectionKeyToId(Key collectionKey) {
+        checkNotNull(collectionKey);
+        checkArgument(ENTITY_SPEC.getKeyKind().equals(collectionKey.getKind()),
+                "Not a collection key");
+        return IdUtil.idToString(ENTITY_SPEC.getIdPrefix(), collectionKey.getId());
     }
 
     /**

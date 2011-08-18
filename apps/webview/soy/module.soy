@@ -56,7 +56,6 @@
                 <h1 class="moduleTitle">{$module.title}</h1>
             </hgroup>
             <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
-            {call .collectionNavBar data="all"/}
             {call .moduleContent data="all"/}
             {call .collectionNavBar data="all"/}
         {/param}

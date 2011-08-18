@@ -247,26 +247,14 @@
   </servlet-mapping>   
   
   <servlet>
-    <servlet-name>BlobServingDoneServlet</servlet-name>
-    <servlet-class>org.cnx.repository.service.impl.operations.BlobServingDoneServlet</servlet-class>
+    <servlet-name>BlobUploadDoneServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.BlobUploadDoneServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>BlobServingDoneServlet</servlet-name>
+    <servlet-name>BlobUploadDoneServlet</servlet-name>
     <url-pattern>/_repo/done</url-pattern>
   </servlet-mapping> 
-
-  <!--  TEST -->
- 
-   <servlet>
-    <servlet-name>TestServlet</servlet-name>
-    <servlet-class>org.cnx.repository.test.TestServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>TestServlet</servlet-name>
-    <url-pattern>/test</url-pattern>
-  </servlet-mapping>
 
   <!-- Mapping for AtomPub API -->
   <servlet>

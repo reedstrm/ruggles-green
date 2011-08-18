@@ -194,6 +194,6 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         }
 
         log.info("Written export " + exportReference);
-        resp.sendRedirect(BlobServingDoneServlet.REDIRECTION_URL);
+        resp.sendRedirect(BlobUploadDoneServlet.REDIRECTION_URL);
     }
 }

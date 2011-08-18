@@ -165,6 +165,6 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         }
 
         log.info("Uploaded content of resource " + resourceId);
-        resp.sendRedirect(BlobServingDoneServlet.REDIRECTION_URL);
+        resp.sendRedirect(BlobUploadDoneServlet.REDIRECTION_URL);
     }
 }

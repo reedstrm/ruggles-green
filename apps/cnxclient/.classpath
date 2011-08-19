@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="build/jars/rome-1.0.jar" sourcepath="/usr/local/google/cnxclients/ruggles-green/third_party/rome/rome-1.0/rome-src.jar.zip"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
 	<classpathentry kind="lib" path="build/jars/xercesImpl.jar"/>
@@ -13,5 +12,6 @@
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar" sourcepath="/home/arjuns/Downloads/openlogic-commons-httpclient-3.1-all-src-1.zip"/>
 	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

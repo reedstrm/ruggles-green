@@ -28,6 +28,12 @@ public class CnxMediaTypes extends MediaType {
     public final static MediaType APPLICATION_ATOMSVC_XML_TYPE = new MediaType("application",
         "atomsvc+xml");
 
+    /** Text/html with charset = UTF-8 */
+    public final static String TEXT_HTML_UTF8 = "text/html; charset=utf-8";
+    public final static MediaType TEXT_HTML_UTF8_TYPE = new MediaType("text",
+            "html");
+
+
     /** MediaType : "text" */
     public final static String TEXT = "text";
 }

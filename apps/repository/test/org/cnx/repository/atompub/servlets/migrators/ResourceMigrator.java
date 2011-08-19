@@ -40,6 +40,12 @@ public class ResourceMigrator {
     public ClientEntry migrateResource(String resourceLocation) throws HttpException,
             ProponoException, IOException {
         File file = new File(resourceLocation);
-        return cnxClient.uploadFileToBlobStore(file.getName(), file);
+        // This is done to remove all the whitespaces from resourceName.
+        return cnxClient.uploadFileToBlobStore(getResourceNameForResourceMappingDoc(file.getName()),
+            file);
+    }
+
+    public static String getResourceNameForResourceMappingDoc(String name) {
+        return name.replace(" ", "");
     }
 }

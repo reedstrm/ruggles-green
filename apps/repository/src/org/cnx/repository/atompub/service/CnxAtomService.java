@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.cnx.repository.atompub.CnxMediaTypes;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -61,7 +61,7 @@ public class CnxAtomService extends AtomService {
          * For Connexions repository, there is only one workspace. Each workspace will have three
          * AtomPubcollections : 1. Resources 2. Modules 3. Collections.
          */
-        workspace = new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, CustomMediaTypes.TEXT);
+        workspace = new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, CnxMediaTypes.TEXT);
         getWorkspaces().add(workspace);
 
         workspace

@@ -21,15 +21,17 @@ import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.appengine.api.utils.SystemProperty;
+
 /**
  * Server related utils.
- * 
+ *
  * @author Tal Dayan
  */
 public class ServerUtil {
     /**
      * Compute local host base url from an incoming httpRequest.
-     * 
+     *
      * @param httpRequest an incoming HTTP request.
      * @return host URL (e.g. "http://myserver.com" or "http://localhost:8888"
      */
@@ -39,16 +41,24 @@ public class ServerUtil {
 
         // Is the default port for this scheme?
         final boolean isDefaultPort =
-                ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
+            ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
 
-        final URL url;
+        final URL serverUrl;
         try {
-            url = new URL(scheme, httpRequest.getLocalName(), isDefaultPort ? -1 : port, "");
+
+            if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
+                serverUrl = new URL(scheme, httpRequest.getLocalName(), port, "");
+            } else {
+                String requestUrl = httpRequest.getRequestURL().toString();
+                String urlOfInterest = requestUrl.substring(0, requestUrl.indexOf(".appspot.com"));
+
+                serverUrl = new URL(urlOfInterest + ".appspot.com");
+            }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Could not construct host url", e);
         }
 
-        return url.toString();
+        return serverUrl.toString();
     }
 
 }

@@ -16,13 +16,7 @@
 
 package org.cnx.repository.service.api;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-
-import com.google.appengine.api.utils.SystemProperty;
 
 /**
  * Common context that is passed to each repository operation.
@@ -46,45 +40,5 @@ public class RepositoryRequestContext {
     @Nullable
     public String getAuthenticatedUserId() {
         return authenticatedUserId;
-    }
-
-    /**
-     * Compute local host base url from an incoming httpRequest.
-     *
-     * @param httpRequest an incoming HTTP request.
-     * @return host URL (e.g. "http://myserver.com" or "http://localhost:8888"
-     */
-    public static String computeHostUrl(HttpServletRequest httpRequest) {
-        final String scheme = httpRequest.getScheme();
-        final int port = httpRequest.getLocalPort();
-
-        // Is the default port for this scheme?
-        final boolean isDefaultPort =
-            ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
-
-        final URL serverUrl;
-        try {
-
-            if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-                serverUrl = new URL(scheme, httpRequest.getLocalName(), port, "");
-            } else {
-                String requestUrl = httpRequest.getRequestURL().toString();
-                String urlOfInterest = requestUrl.substring(0, requestUrl.indexOf(".appspot.com"));
-
-                serverUrl = new URL(urlOfInterest + ".appspot.com");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Could not construct host url", e);
-        }
-
-        // ApiProxy.Environment env = ApiProxy.getCurrentEnvironment();
-        // Object value =
-        // env.getAttributes().get("com.google.appengine.runtime.default_version_hostname");
-        // System.out.println("**** value: " + value);
-        // for (Object key: env.getAttributes().keySet()) {
-        // System.out.println("  [" + key + "]");
-        // }
-
-        return serverUrl.toString();
     }
 }

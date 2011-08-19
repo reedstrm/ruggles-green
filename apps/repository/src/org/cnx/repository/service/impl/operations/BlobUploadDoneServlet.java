@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * A do nothing servlet to handle the blobstore upload completion redirection.
- * 
+ *
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -32,6 +32,7 @@ public class BlobUploadDoneServlet extends HttpServlet {
     // Should match web.xml.
     public static final String REDIRECTION_URL = "/_repo/done";
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/plain");
         resp.getWriter().print("Done.");

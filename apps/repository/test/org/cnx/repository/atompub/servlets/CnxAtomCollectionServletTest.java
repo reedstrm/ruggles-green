@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.atompub.servlets.migrators.CollectionMigrator;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,7 +79,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         logger.info("New location for collection = \n" + expectedCollectionUrl);
 
         // TODO(arjuns) : refactor this.
-        String version =
+        VersionWrapper version =
             CnxAtomPubConstants.getVersionFromAtomPubId(cnxCollectionNewVersionEntry.getId());
         Entry getEntry = cnxClient.getCollectionVersionEntry(collectionId, version);
 
@@ -91,7 +92,9 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         CollectionMigrator migrator = new CollectionMigrator(cnxClient);
         // NOTE(arjuns): This is deliberately commented. Need to create a small collection for
         // testing.
-//        String ORIGINAL_COLLECTION_ID = "col10064";
-        // migrator.migrateCollection(ORIGINAL_COLLECTION_ID, COLLECTION_LOCATION);
+        String ORIGINAL_COLLECTION_ID = "col10064";
+        ClientEntry collectionEntry =
+            migrator.migrateCollection(ORIGINAL_COLLECTION_ID, COLLECTION_LOCATION);
+        logger.info("Collection created at : " + collectionEntry.getEditURI());
     }
 }

@@ -44,11 +44,6 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
-
-        <copy todir="${war.dir}/WEB-INF/classes/META-INF">
-            <fileset dir="src/META-INF" includes="**/*.*" />
-        </copy>
-
         <enhance_war war="${war.dir}" />
     </target>
 
@@ -162,6 +157,7 @@
         <javac srcdir="${test.src}"
                destdir="${test.classes}"
                includeantruntime="false"
+               failonerror="true"
                debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>

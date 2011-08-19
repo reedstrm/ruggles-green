@@ -81,10 +81,12 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(blobStoreLink.getHref());
 
         // Now upload blob to AppEngine.
-        cnxClient.uploadFileToBlobStore(blobStoreLink.getHrefResolved(), file);
+        cnxClient.uploadFileToBlobStore(ResourceMigrator.getResourceNameForResourceMappingDoc(file
+            .getName()), file);
 
         // TODO(arjuns) : Add test for get once it works.
         // TODO(arjuns) : Add link in entry for get.
+        // TODO(arjuns) : Add test for resourceName with white spaces.
     }
 
     // TODO(arjuns) : Move this to separate test.

@@ -27,6 +27,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.VersionWrapper;
 import org.jdom.JDOMException;
 
 import com.google.common.base.Charsets;
@@ -67,7 +68,7 @@ public class CollectionMigrator {
         return null;
     }
 
-    public Entry migrateCollection(String origCollectionId, String collectionLocation)
+    public ClientEntry migrateCollection(String origCollectionId, String collectionLocation)
             throws HttpException, ProponoException, IOException, JAXBException, JDOMException {
         List<File> listOfModulesToUpload = getListOfModulesToBeUploaded(collectionLocation);
 
@@ -75,7 +76,8 @@ public class CollectionMigrator {
 
         List<File> listOfFailedModules = Lists.newArrayList();
 
-        while(listOfModulesToUpload.size() != 0) {
+        int failureCount = 0;
+        while (listOfModulesToUpload.size() != 0) {
             // TODO(arjuns) : Need to handle only specific exception. Else test will never die.
             logger.info("**** Remaining size = " + listOfModulesToUpload.size());
             File currModule = listOfModulesToUpload.get(0);
@@ -93,7 +95,11 @@ public class CollectionMigrator {
                 logger.info("Finished migrating : " + existingModuleId);
                 logger.info("**** Remaining size = " + listOfModulesToUpload.size());
             } catch (Exception e) {
-                logger.info("Failed to upload module : " + currModule.getName());
+                logger.severe("Failed to upload module : " + currModule.getName());
+                failureCount++;
+                if(failureCount > 10) {
+                    throw new RuntimeException("Too many failures. Try again.");
+                }
                 continue;
             }
         }
@@ -116,10 +122,11 @@ public class CollectionMigrator {
 
         String newCollectionId =
             CnxAtomPubConstants.getIdFromAtomPubId(createCollectionVersionEntry.getId());
-        String newVersion =
+        VersionWrapper newVersion =
             CnxAtomPubConstants.getVersionFromAtomPubId(createCollectionVersionEntry.getId());
 
-        Entry getCollectionVersionEntry = cnxClient.getCollectionVersionEntry(newCollectionId, newVersion);
+        ClientEntry getCollectionVersionEntry =
+            cnxClient.getCollectionVersionEntry(newCollectionId, newVersion);
 
         Link newLink = getSelfLinkFromEntry(getCollectionVersionEntry);
         logger.info("New location for collection = \n" + newLink.getHrefResolved());

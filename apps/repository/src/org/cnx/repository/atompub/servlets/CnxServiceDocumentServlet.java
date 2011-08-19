@@ -24,8 +24,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
@@ -36,7 +36,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
- * 
+ *
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)
@@ -45,7 +45,7 @@ public class CnxServiceDocumentServlet {
 
     // @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
     @GET
-    @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
+    @Produces(CnxMediaTypes.APPLICATION_ATOMSVC_XML)
     @Path(SERVICE_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
             @Context HttpServletResponse res) {

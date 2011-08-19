@@ -28,10 +28,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 
 import com.sun.syndication.propono.atom.common.Categories;
@@ -48,7 +49,7 @@ public class CnxCategoriesDocumentServlet {
     private final String CATEGORY_DOCUMENT_GET = "/";
 
     @GET
-    @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(CATEGORY_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
             @Context HttpServletResponse response) {
@@ -58,7 +59,7 @@ public class CnxCategoriesDocumentServlet {
         // TODO(arjuns) : get a better way to get the context.
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomService =
-            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
+            new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         // TODO(arjuns) : Fix this.
         CnxAtomPubConstants constants = atomService.getConstants();

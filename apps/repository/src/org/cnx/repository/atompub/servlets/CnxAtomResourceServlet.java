@@ -36,13 +36,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
@@ -72,7 +73,7 @@ public class CnxAtomResourceServlet {
     private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
     @POST
-    @Produces(CustomMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_RESOURCE_POST)
     public Response postNewResource(@Context HttpServletRequest req,
             @Context HttpServletResponse res) {
@@ -80,8 +81,7 @@ public class CnxAtomResourceServlet {
         AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
-        CnxAtomService atomPubService =
-            new CnxAtomService(RepositoryRequestContext.computeHostUrl(req));
+        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         Entry postedEntry = null;
         try {
@@ -119,7 +119,7 @@ public class CnxAtomResourceServlet {
                 // URL client is expected to post the blob.
                 String uploadUrl = result.getResourceUploadUrl();
                 if (!uploadUrl.startsWith("http")) {
-                    uploadUrl = RepositoryRequestContext.computeHostUrl(req) + uploadUrl;
+                    uploadUrl = ServerUtil.computeHostUrl(req) + uploadUrl;
                 }
 
                 URL editUrl = new URL(uploadUrl);
@@ -148,6 +148,7 @@ public class CnxAtomResourceServlet {
 
     // TODO(arjuns) : Do we need URL to return AtomEntry for Resources?
 
+    // TODO(arjuns) : Repository should start sending the content-type.
     @GET
     @Path(RESOURCE_GET_URL_PATTERN)
     public Response getResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
@@ -161,10 +162,23 @@ public class CnxAtomResourceServlet {
             repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(), resourceId, res);
 
         if (serveResourceResult.isOk()) {
-            ServeResourceResult result = serveResourceResult.getResult();
+
             ResponseBuilder responseBuilder = Response.ok();
+            ServeResourceResult result = serveResourceResult.getResult();
+
             for (Map.Entry<String, String> header : result.getAdditionalHeaders().entrySet()) {
                 responseBuilder.header(header.getKey(), header.getValue());
+            }
+
+            RepositoryResponse<GetResourceInfoResult> repositoryInfo =
+                    repositoryService.getResourceInfo(repositoryContext, resourceId);
+
+            if (repositoryInfo.isOk()) {
+                String fileName =
+                    repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
+                if (fileName.endsWith(".cdf")) {
+                    responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf, application/vnd.wolfram.cdf.text");
+                }
             }
 
             return responseBuilder.build();

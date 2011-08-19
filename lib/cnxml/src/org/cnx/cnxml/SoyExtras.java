@@ -192,6 +192,7 @@ class SoyExtras extends AbstractModule {
                 "flash",
                 "image",
                 "java-applet",
+                "labview",
                 "object",
                 "video"
         );

@@ -16,6 +16,7 @@
 
 package org.cnx.cnxml;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -53,9 +54,13 @@ public class CnxmlModule extends AbstractModule {
     }
 
     @Provides @Singleton @SoyHTMLGenerator.Template
-            SoyTofu provideTofu(SoyFileSet.Builder builder) {
-        builder.add(SoyHTMLGenerator.class.getResource("html.soy"));
-        return builder.build().compileToJavaObj();
+            SoyTofu provideTofu(SoyFileSet.Builder builder, @CnxmlNamespace String cnxmlNamespace) {
+        return builder
+                .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
+                        .put("cnxmlNamespace", cnxmlNamespace)
+                        .build())
+                .add(SoyHTMLGenerator.class.getResource("html.soy"))
+                .build().compileToJavaObj();
     }
 
     @Provides @Singleton @Named("ContentMathMLProcessor.transformer")

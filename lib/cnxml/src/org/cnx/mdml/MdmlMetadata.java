@@ -16,18 +16,15 @@
 
 package org.cnx.mdml;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.cnx.util.DOMUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  *  MdmlMetadata provides accessors for common MDML fields.

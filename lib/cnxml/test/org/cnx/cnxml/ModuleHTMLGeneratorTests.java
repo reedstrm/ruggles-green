@@ -16,24 +16,16 @@
 
 package org.cnx.cnxml;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyModule;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.mdml.MdmlModule;
+import org.cnx.resourcemapping.ObjectFactory;
 import org.cnx.util.RenderScope;
 import org.cnx.util.UtilModule;
 import org.cnx.util.testing.DOMBuilder;
@@ -42,7 +34,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
@@ -86,8 +77,9 @@ public class ModuleHTMLGeneratorTests {
         try {
             final String cnxmlNamespace = injector.getInstance(
                     Key.get(String.class, CnxmlNamespace.class));
+            ObjectFactory dummyFactory = new ObjectFactory();
             return injector.getInstance(ModuleHTMLGenerator.class).generate(
-                    new Module(moduleId, d, d, null, cnxmlNamespace));
+                    new Module(moduleId, d, dummyFactory.createResources(), null, cnxmlNamespace));
         } finally {
             scope.exit();
         }

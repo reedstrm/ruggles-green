@@ -23,10 +23,8 @@ import org.cnx.cnxml.LinkResolver;
 import org.cnx.util.DocumentBuilderProvider;
 import org.cnx.util.testing.DOMBuilder;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
 public class LinkProcessorTests {

@@ -16,13 +16,17 @@
 
 package org.cnx.cnxml;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.logging.Logger;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 
 /**
  *  LinkProcessor traverses the DOM tree given to it and bakes the final URI into the
@@ -33,6 +37,8 @@ import org.w3c.dom.NodeList;
  *  @see LinkResolver
  */
 public class LinkProcessor implements Processor {
+    Logger logger = Logger.getLogger(LinkProcessor.class.getName());
+
     private static final ImmutableSet<String> LINK_ELEMENT_NAMES = ImmutableSet.<String>of(
             "foreign",
             "link",
@@ -62,6 +68,7 @@ public class LinkProcessor implements Processor {
         this.cnxmlNamespace = cnxmlNamespace;
     }
 
+    @Override
     public Module process(final Module module) throws Exception {
         processElement(module.getCnxml().getDocumentElement());
         return module;
@@ -129,7 +136,14 @@ public class LinkProcessor implements Processor {
     private void resolveMedia(final Element elem) throws Exception {
         URI src, target;
 
-        src = new URI(elem.getAttribute("src"));
+        String attr = elem.getAttribute("src");
+        try {
+            src = new URI(attr);
+        } catch (URISyntaxException e) {
+            logger.severe("Forcing string escape for : " + attr);
+            String escapedString = URLEncoder.encode(attr, "UTF-8");
+            src = new URI(escapedString);
+        }
         target = resolver.resolveURI(src);
         if (target != null) {
             elem.setAttribute("src", target.toString());

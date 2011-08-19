@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
@@ -140,8 +141,9 @@ public class LinkProcessor implements Processor {
         try {
             src = new URI(attr);
         } catch (URISyntaxException e) {
+            // TODO(arjuns), TODO(light) : do same approach for other Attributes.
             logger.severe("Forcing string escape for : " + attr);
-            String escapedString = URLEncoder.encode(attr, "UTF-8");
+            String escapedString = URLEncoder.encode(attr, Charsets.UTF_8.displayName());
             src = new URI(escapedString);
         }
         target = resolver.resolveURI(src);

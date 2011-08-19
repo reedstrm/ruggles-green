@@ -19,6 +19,7 @@ package org.cnx.cnxml;
 import com.google.inject.Inject;
 import org.cnx.mdml.Metadata;
 import org.cnx.mdml.MdmlMetadata;
+import org.cnx.resourcemapping.Resources;
 import org.cnx.util.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,13 +35,13 @@ public class ModuleFactoryImpl implements ModuleFactory {
         this.cnxmlNamespace = cnxmlNamespace;
     }
 
-    @Override public Module create(String id, Document cnxml, Document resourceMapping) {
+    @Override public Module create(String id, Document cnxml, Resources resources) {
         Metadata metadata = null;
         Element elem = DOMUtils.findFirstChild(cnxml.getDocumentElement(),
                 cnxmlNamespace, METADATA_TAG_NAME);
         if (elem != null) {
             metadata = metadataFactory.create(elem);
         }
-        return new Module(id, cnxml, resourceMapping, metadata, cnxmlNamespace);
+        return new Module(id, cnxml, resources, metadata, cnxmlNamespace);
     }
 }

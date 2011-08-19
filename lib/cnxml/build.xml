@@ -79,8 +79,13 @@
              inheritAll="true"
              target="copyjar"
              dir="../util" />
+        
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="../../apps/xmls" />
 
-        <javac srcdir="src"
+        <javac srcdir="${java.src.dir}"
                destdir="${classdir}"
                includeantruntime="false"
                debug="true">
@@ -98,16 +103,16 @@
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
 
         <ant antfile="junit/build.xml"
-                 inheritAll="true"
-                 target="default"
-                 dir="${third_party}" />
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
 
         <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
 
         <javac srcdir="${test.src}"
-                   destdir="${test.dir}"
-                   includeantruntime="false"
-                   debug="true">
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>
                 <resources refid="depend_lib" />
@@ -151,6 +156,7 @@
         <mkdir dir="build/lib" />
         <jar destfile="build/lib/org.cnx.cnxml.jar">
             <fileset dir="${classdir}" />
+            <fileset dir="${java.src.dir}" />
             <resources refid="resources" />
         </jar>
     </target>
@@ -162,6 +168,7 @@
               tofile="${target_dir}/org.cnx.cnxml.latest.jar" />
     </target>
 
-    <target name="all" description="all targets in this build file for repository build."
-        depends="compile, test-compile, jar" />
+    <target name="all"
+            description="all targets in this build file for repository build."
+            depends="compile, test-compile, jar" />
 </project>

@@ -17,11 +17,7 @@
 package org.cnx.cnxml;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
-import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.tofu.SoyTofu;
 
 /**
  *  DefaultProcessorModule is the default set of DOM processors.

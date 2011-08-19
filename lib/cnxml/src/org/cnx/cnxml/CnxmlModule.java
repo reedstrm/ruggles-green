@@ -16,22 +16,21 @@
 
 package org.cnx.cnxml;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
+
+import org.cnx.util.RenderTime;
+
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
-import javax.xml.transform.stream.StreamSource;
-import org.cnx.util.RenderTime;
 
 /**
  *  CnxmlModule is the default configuration for the HTML generator.
@@ -66,8 +65,7 @@ public class CnxmlModule extends AbstractModule {
 
             // TODO(light): This is not thread-safe.
             factory.setURIResolver(new URIResolver() {
-                @Override public Source resolve(String href, String base)
-                        throws TransformerException {
+                @Override public Source resolve(String href, String base) {
                     if (cnxSource.getSystemId().equals(href)) {
                         return cnxSource;
                     } else if (w3cSource.getSystemId().equals(href)) {

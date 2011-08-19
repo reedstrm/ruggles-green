@@ -66,6 +66,7 @@
             depends="compile">
         <jar destfile="build/lib/org.cnx.util.jar">
             <fileset dir="${classdir}" />
+            <fileset dir="src" />
         </jar>
     </target>
 

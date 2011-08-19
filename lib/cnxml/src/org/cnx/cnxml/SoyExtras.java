@@ -190,9 +190,12 @@ class SoyExtras extends AbstractModule {
                 "flash",
                 "image",
                 "java-applet",
+                "labview",
                 "object",
                 "video"
         );
+        private static final String PDF_MEDIA_VALUE = "pdf";
+        private static final String OVERRIDE_MEDIA_VALUE = "webview2.0";
 
         private final String cnxmlNamespace;
 
@@ -221,6 +224,7 @@ class SoyExtras extends AbstractModule {
 
             // Find first appropriate child node
             final SoyListData childNodes = elem.getListData("childNodes");
+            SoyData firstNode = null;
             for (SoyData childData : childNodes) {
                 if (!(childData instanceof SoyMapData)) {
                     continue;
@@ -237,10 +241,20 @@ class SoyExtras extends AbstractModule {
                 }
                 if ("element".equals(child.getString("nodeType"))
                         && cnxmlNamespace.equals(child.getString("namespaceURI"))
-                        && MEDIA_ELEMENTS.contains(child.getString("localName"))
-                        && !"pdf".equals(mediaFor)) {
-                    return child;
+                        && MEDIA_ELEMENTS.contains(child.getString("localName"))) {
+                    if (OVERRIDE_MEDIA_VALUE.equals(mediaFor)) {
+                        // A special for="webview2.0" attribute is used to force the media element
+                        // to be used.  This is necessary to provide backward compatibility with
+                        // cnx.org and still allow Mathematica to be embedded.
+                        return child;
+                    } else if (!PDF_MEDIA_VALUE.equals(mediaFor) && firstNode == null) {
+                        firstNode = child;
+                    }
                 }
+            }
+
+            if (firstNode != null) {
+                return firstNode;
             }
             return NullData.INSTANCE;
         }

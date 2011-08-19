@@ -154,6 +154,13 @@ hgroup > h1.moduleTitle {
     margin-top: 1em;
 }
 
+.moduleContent .unhandled {
+    width: 20em;
+    padding: 0 1ex;
+    border: thin solid #bfbaa1;
+    background: #deca73;
+}
+
 table.cals {
     border-collapse: collapse;
 }

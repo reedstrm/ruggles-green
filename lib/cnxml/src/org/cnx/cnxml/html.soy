@@ -27,8 +27,10 @@
 {template .main}
     {if $node.nodeType == 'text'}
         {$node.nodeValue}
-    {elseif $node.nodeType == 'element'}
+    {elseif $node.nodeType == 'element' and $node.namespaceURI == cnxmlNamespace}
         {switch $node.localName}
+            {case 'title', 'label', 'caption'}
+                // Don't render, handled by other tags.
             {case 'para'}
                 {call .para data="all"/}
             {case 'section'}
@@ -57,10 +59,6 @@
                 {call .note data="all"/}
             {case 'media'}
                 {call .media data="all"/}
-            {case 'math'}
-                {if $node.namespaceURI == 'http://www.w3.org/1998/Math/MathML'}
-                    {call .math data="all"/}
-                {/if}
             {case 'rule'}
                 {call .rule data="all"/}
             {case 'statement'}
@@ -85,10 +83,23 @@
                 {call .figure data="all"/}
             {case 'table'}
                 {call .table data="all"/}
+            {default}
+                {call .unhandled data="all"/}
         {/switch}
+    {elseif $node.nodeType == 'element' and $node.localName == 'math' and $node.namespaceURI == 'http://www.w3.org/1998/Math/MathML'}
+        {call .math data="all"/}
     {elseif $node.nodeType == 'document'}
         {call .document}{param node: findElem($node, 'document')/}{/call}
     {/if}
+{/template}
+
+/**
+ *  Render a placeholder for an unhandled element.
+ *
+ *  @param node DOM element node
+ */
+{template .unhandled}
+    <div class="unhandled">Unrecognized Content: {$node.localName}</div>
 {/template}
 
 /**
@@ -473,19 +484,23 @@
  *  @param alt Media alternate text
  */
 {template .media_dispatch private="true"}
-    {switch $node.localName}
-        {case 'image'}
-            {call .image data="all"/}
-        {case 'object'}
-            {switch $node.attributes.mime_type}
-                {case 'application/vnd.wolfram.cdf.text'}
-                    {call .mathematica data="all"/}
-                {default}
-                    {call .object data="all"/}
-            {/switch}
-        {case 'flash'}
-            {call .object data="all"/}
-    {/switch}
+    {if $node != null}
+        {switch $node.localName}
+            {case 'image'}
+                {call .image data="all"/}
+            {case 'object'}
+                {switch $node.attributes.mime_type}
+                    {case 'application/vnd.wolfram.cdf.text'}
+                        {call .mathematica data="all"/}
+                    {default}
+                        {call .object data="all"/}
+                {/switch}
+            {case 'flash'}
+                {call .object data="all"/}
+            {default}
+                {call .unhandled}{param node: $node/}{/call}
+        {/switch}
+    {/if}
 {/template}
 
 /**
@@ -858,11 +873,11 @@
     {call .tableInternal data="all"}
         {param frame}
             {switch $node.attributes.frame}
-            {case 'sides'}calsFrameSides
-            {case 'top'}calsFrameTop
-            {case 'bottom'}calsFrameBottom
-            {case 'topbot'}calsFrameTopBottom
-            {default}calsFrameAll
+                {case 'sides'}calsFrameSides
+                {case 'top'}calsFrameTop
+                {case 'bottom'}calsFrameBottom
+                {case 'topbot'}calsFrameTopBottom
+                {default}calsFrameAll
             {/switch}
         {/param}
     {/call}

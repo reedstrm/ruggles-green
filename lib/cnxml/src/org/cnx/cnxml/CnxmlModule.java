@@ -24,6 +24,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.cnx.util.RenderTime;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -52,9 +53,13 @@ public class CnxmlModule extends AbstractModule {
     }
 
     @Provides @Singleton @SoyHTMLGenerator.Template
-            SoyTofu provideTofu(SoyFileSet.Builder builder) {
-        builder.add(SoyHTMLGenerator.class.getResource("html.soy"));
-        return builder.build().compileToJavaObj();
+            SoyTofu provideTofu(SoyFileSet.Builder builder, @CnxmlNamespace String cnxmlNamespace) {
+        return builder
+                .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
+                        .put("cnxmlNamespace", cnxmlNamespace)
+                        .build())
+                .add(SoyHTMLGenerator.class.getResource("html.soy"))
+                .build().compileToJavaObj();
     }
 
     @Provides @Singleton @Named("ContentMathMLProcessor.transformer")

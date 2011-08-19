@@ -39,6 +39,7 @@ import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.CollectionHTMLGenerator;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
@@ -221,7 +222,7 @@ public class ArjunRenderCollectionServlet {
         Collection collection = fetcher.getCollection(collectionId, collXml);
 
         // Ensure module is part of the collection
-        final Collection.ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
+        final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
         if (currentModuleLink == null) {
             logger.log(Level.INFO, "Collection " + collectionId + " does not contain module "
                 + moduleId);
@@ -235,7 +236,7 @@ public class ArjunRenderCollectionServlet {
         String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
         Module module = fetcher.getModule(moduleId, cnxml, resourceMappingXml);
 
-        final Collection.ModuleLink[] links = collection.getPreviousNext(moduleId);
+        final ModuleLink[] links = collection.getPreviousNext(moduleId);
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml = null;
@@ -311,7 +312,7 @@ public class ArjunRenderCollectionServlet {
         return myresponse.build();
     }
 
-    private static final SoyData convertModuleLinkToSoyData(@Nullable Collection.ModuleLink link,
+    private static final SoyData convertModuleLinkToSoyData(@Nullable ModuleLink link,
             @Nullable URI uri) {
         if (link == null) {
             return SoyData.createFromExistingData(null);
@@ -327,7 +328,7 @@ public class ArjunRenderCollectionServlet {
     }
 
     private static final URI
-            getModuleLinkUri(LinkResolver linkResolver, Collection.ModuleLink link)
+            getModuleLinkUri(LinkResolver linkResolver, ModuleLink link)
                     throws Exception {
         return linkResolver.resolveDocument(link.getModuleId(), link.getModuleVersion());
     }

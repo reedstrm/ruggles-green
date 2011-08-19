@@ -32,6 +32,7 @@ import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.ModuleLink;
 import org.cnx.mdml.Actor;
 import org.cnx.util.RenderScope;
 
@@ -87,7 +88,7 @@ import com.google.template.soy.tofu.SoyTofu;
         }
 
         // Ensure module is part of the collection
-        final Collection.ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
+        final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
         if (currentModuleLink == null) {
             log.log(Level.INFO, "Collection " + collectionId +
                     " does not contain module " + moduleId);
@@ -105,7 +106,7 @@ import com.google.template.soy.tofu.SoyTofu;
             return;
         }
 
-        final Collection.ModuleLink[] links = collection.getPreviousNext(moduleId);
+        final ModuleLink[] links = collection.getPreviousNext(moduleId);
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml;
@@ -183,12 +184,12 @@ import com.google.template.soy.tofu.SoyTofu;
         resp.getWriter().print(tofu.render(TEMPLATE_NAME, params, null));
     }
 
-    private static final URI getModuleLinkUri(LinkResolver linkResolver,
-            Collection.ModuleLink link) throws Exception {
+    private static final URI getModuleLinkUri(LinkResolver linkResolver, ModuleLink link)
+            throws Exception {
         return linkResolver.resolveDocument(link.getModuleId(), link.getModuleVersion());
     }
 
-    private static final SoyData convertModuleLinkToSoyData(@Nullable Collection.ModuleLink link,
+    private static final SoyData convertModuleLinkToSoyData(@Nullable ModuleLink link,
             @Nullable URI uri) {
         if (link == null) {
             return SoyData.createFromExistingData(null);

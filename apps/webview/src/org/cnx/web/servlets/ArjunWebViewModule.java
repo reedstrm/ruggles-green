@@ -14,16 +14,19 @@
  *  limitations under the License.
  */
 
-package org.cnx.web;
+package org.cnx.web.servlets;
 
 import java.io.File;
 
 import org.cnx.cnxml.LinkProcessor;
+import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.Processor;
-import org.cnx.cnxml.LinkResolver;
 import org.cnx.common.collxml.Collection;
 import org.cnx.util.RenderTime;
+import org.cnx.web.StaticXmlFetcher;
+import org.cnx.web.WebViewTemplate;
+import org.cnx.web.XmlFetcher;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -37,13 +40,14 @@ import com.google.template.soy.tofu.SoyTofu;
 /**
  *  WebViewModule is the Guice configuration for the web view application.
  */
-public class WebViewModule extends AbstractModule {
+public class ArjunWebViewModule extends AbstractModule {
     @Override protected void configure() {
         bind(String.class)
                 .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
                 .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
         bind(XmlFetcher.class).to(StaticXmlFetcher.class);
-        bind(LinkResolver.class).to(StaticLinkResolver.class);
+//        bind(LinkResolver.class).to(ArjunLinkResolver.class);
+        bind(LinkResolver.class).to(ArjunLinkResolver.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);

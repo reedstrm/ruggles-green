@@ -16,29 +16,27 @@
 
 package org.cnx.web;
 
-import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
-import com.google.template.soy.data.SoyMapData;
-import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.cnx.common.collxml.Collection;
 import org.cnx.common.collxml.CollectionHTMLGenerator;
 import org.cnx.common.collxml.CollxmlNamespace;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
-import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.tofu.SoyTofu;
 
 @Singleton public class RenderCollectionServlet extends HttpServlet {
     private static final String TEMPLATE_NAME = "org.cnx.web.collection";

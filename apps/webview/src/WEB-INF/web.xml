@@ -19,7 +19,8 @@
     </filter>
     <filter-mapping>
         <filter-name>guiceFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/light/*</url-pattern>
+        <url-pattern>/home/*</url-pattern>
     </filter-mapping>
     <listener>
         <listener-class>org.cnx.web.GuiceConfig</listener-class>
@@ -34,13 +35,24 @@
         </auth-constraint>
     </security-constraint>
 
+  <servlet-mapping>
+    <servlet-name>home</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>home</servlet-name>
+    <servlet-class>org.cnx.web.FrontPageServlet</servlet-class>
+  </servlet>
+
+
     <!-- Mapping for REST Servlets for serving content. -->
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.cnx.web;</param-value>
+            <param-value>org.cnx.web.servlets;</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

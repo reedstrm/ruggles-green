@@ -21,30 +21,31 @@
     <property file="build.properties" />
 
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
-    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml"/>
+    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml" />
 
-    <target name="war" depends="compile" 
-                    description="Assemble the application directory">
-        <mkdir dir="${war.dir}/WEB-INF"/>
-        <mkdir dir="${war.dir}/WEB-INF/classes"/>
-        <mkdir dir="${war.dir}/WEB-INF/lib"/>
+    <target name="war"
+            depends="compile"
+            description="Assemble the application directory">
+        <mkdir dir="${war.dir}/WEB-INF" />
+        <mkdir dir="${war.dir}/WEB-INF/classes" />
+        <mkdir dir="${war.dir}/WEB-INF/lib" />
         <copy todir="${war.dir}">
             <fileset dir="soy">
-                <exclude name="**/.hg/**"/>
-                <exclude name="**/*~"/>
+                <exclude name="**/.hg/**" />
+                <exclude name="**/*~" />
             </fileset>
             <fileset dir="html">
-                <exclude name="**/.hg/**"/>
-                <exclude name="**/*~"/>
+                <exclude name="**/.hg/**" />
+                <exclude name="**/*~" />
             </fileset>
             <fileset file="col10064_1.12_complete.zip" />
         </copy>
         <copy todir="${war.dir}/static">
-            <fileset dir="static"/>
+            <fileset dir="static" />
         </copy>
         <copy todir="${war.dir}/WEB-INF">
             <fileset dir="src/WEB-INF">
-                <include name="*.xml"/>
+                <include name="*.xml" />
             </fileset>
         </copy>
         <copy todir="${war.dir}/WEB-INF/lib">
@@ -53,7 +54,7 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
-        <enhance_war war="${war.dir}"/>
+        <enhance_war war="${war.dir}" />
     </target>
 
     <property name="target_dir" value="${basedir}/${output.jars}" />
@@ -61,10 +62,25 @@
     <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
 
     <target name="compile" description="Compile the application servlet code">
-        <mkdir dir="${classdir}"/>
-        <mkdir dir="${output.jars}"/>
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${output.jars}" />
 
         <ant antfile="appengine/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="asm/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="commons-httpclient/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jsr/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -75,6 +91,16 @@
              dir="${third_party}" />
 
         <ant antfile="guice/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jersey/build.xml"
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="soy/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -99,17 +125,17 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="jersey/build.xml"
-            inheritall="true"
-            target="default"
-            dir="${third_party}" />
-
-        <ant antfile="soy/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
-
         <!-- Non third-party dependencies. -->
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="${basedir}/${commondir}" />
+
+        <ant antfile="build.xml"
+             inheritall="true"
+             target="copyjar"
+             dir="${basedir}/${cnxclientdir}" />
+
         <ant antfile="build.xml"
              inheritAll="true"
              target="copyjar"
@@ -120,81 +146,77 @@
              target="copyjar"
              dir="${basedir}/${libcnxmldir}" />
 
-        <ant antfile="build.xml"
-             inheritAll="true"
-             target="copyjar"
-             dir="${basedir}/${commondir}" />
-
-        <ant antfile="build.xml"
-            inheritall="true"
-            target="copyjar"
-            dir="${basedir}/${cnxclientdir}" />
-
-
-        <javac srcdir="src" destdir="${classdir}" includeantruntime="false" debug="on">
-            <compilerarg line="${javac.flags}"/>
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               failonerror="true"
+               debug="on">
+            <compilerarg line="${javac.flags}" />
             <classpath>
-                <resources refid="depend_lib"/>
+                <resources refid="depend_lib" />
             </classpath>
         </javac>
     </target>
 
     <target name="clean" description="Force a clean slate to rebuild">
-        <delete dir="${buildir}"/>
-        <delete dir="${war.dir}"/>
+        <delete dir="${buildir}" />
+        <delete dir="${war.dir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${libutildir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${libcnxmldir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${cnxclientdir}" />
-
     </target>
 
     <target name="runserver" depends="war" description="Run the dev_appserver">
-        <dev_appserver war="${war.dir}" port="${http.port}"/>
+        <dev_appserver war="${war.dir}" port="${http.port}" />
     </target>
 
-    <target name="dev_appserver" depends="runserver"/>
+    <target name="dev_appserver" depends="runserver" />
 
-    <target name="debug" depends="war" 
-                    description="Launches dev_appserver with remote debugging enabled">
-        <echo message="Launching dev_appserver on Web port ${http.port}, Java remote debug port ${debug.port}"/>
+    <target name="debug"
+            depends="war"
+            description="Launches dev_appserver with remote debugging enabled">
+        <echo message="Launching dev_appserver on Web port ${http.port}, Java remote debug port ${debug.port}" />
         <dev_appserver war="${war.dir}" port="${http.port}">
             <options>
-                <arg value="--jvm_flag=-Xdebug"/>
-                <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${debug.port}"/>
+                <arg value="--jvm_flag=-Xdebug" />
+                <arg value="--jvm_flag=-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${debug.port}" />
             </options>
         </dev_appserver>
     </target>
 
 
 
-    <target name="update" depends="war" 
-                    description="Uploads the application, including indexes">
-        <appcfg action="update" war="${war.dir}"/>
+    <target name="update"
+            depends="war"
+            description="Uploads the application, including indexes">
+        <appcfg action="update" war="${war.dir}" />
     </target>
 
-    <target name="update_indexes" depends="war" 
-                    description="Uploads only the application's indexes">
-        <appcfg action="update_indexes" war="${war.dir}"/>
+    <target name="update_indexes"
+            depends="war"
+            description="Uploads only the application's indexes">
+        <appcfg action="update_indexes" war="${war.dir}" />
     </target>
 
-    <target name="rollback" depends="war" 
-                    description="Rolls back any in-progress application update">
-        <appcfg action="rollback" war="${war.dir}"/>
+    <target name="rollback"
+            depends="war"
+            description="Rolls back any in-progress application update">
+        <appcfg action="rollback" war="${war.dir}" />
     </target>
 
-    <target name="request_logs" 
-                    description="Downloads the application's logs">
+    <target name="request_logs" description="Downloads the application's logs">
         <appcfg action="request_logs" war="${war.dir}">
             <options>
-                <arg value="--num_days=${log.days}"/>
+                <arg value="--num_days=${log.days}" />
             </options>
             <args>
-                <arg value="${log.file}"/>
+                <arg value="${log.file}" />
             </args>
         </appcfg>
     </target>
 
-    <target name="all" description="Refers to all the targets in this file other then test."
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
             depends="compile, war" />
 </project>

@@ -17,10 +17,8 @@
 package org.cnx.web;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
@@ -34,12 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
-import org.cnx.common.collxml.Collection;
 import org.cnx.mdml.Actor;
-import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 @Singleton public class RenderModuleServlet extends HttpServlet {
     private static final String TEMPLATE_NAME = "org.cnx.web.module";

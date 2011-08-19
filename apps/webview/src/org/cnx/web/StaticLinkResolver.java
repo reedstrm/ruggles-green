@@ -23,7 +23,6 @@ import java.net.URI;
 import javax.annotation.Nullable;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.common.collxml.Collection;
-import org.cnx.util.RenderTime;
 
 @Singleton public class StaticLinkResolver implements LinkResolver {
     private static final String BASE = "/staticxml/";

@@ -16,8 +16,10 @@
 
 package org.cnx.common.collxml;
 
+import static com.google.common.base.Preconditions.*;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import javax.annotation.Nullable;
@@ -31,61 +33,33 @@ public class Collection {
     private final String id;
     private final Document collxml;
     private final Metadata metadata;
-    private final List<ModuleLink> moduleLinks;
-
-    /**
-     *  A module link is a POJO that stores a link from a collection to a module it contains, along
-     *  with associated metadata.
-     */
-    public static class ModuleLink {
-        private final String moduleId;
-        private final String moduleVersion;
-        private final Metadata metadata;
-
-        public ModuleLink(String moduleId, String moduleVersion, @Nullable Metadata metadata) {
-            this.moduleId = moduleId;
-            this.moduleVersion = moduleVersion;
-            this.metadata = metadata;
-        }
-
-        public String getModuleId() {
-            return moduleId;
-        }
-
-        public String getModuleVersion() {
-            return moduleVersion;
-        }
-
-        public Metadata getMetadata() {
-            return metadata;
-        }
-
-        @Override public int hashCode() {
-            return Objects.hashCode(moduleId, moduleVersion, metadata);
-        }
-
-        @Override public boolean equals(Object o) {
-            if (o instanceof ModuleLink) {
-                final ModuleLink other = (ModuleLink)o;
-                return Objects.equal(moduleId, other.moduleId) &&
-                        Objects.equal(moduleVersion, other.moduleVersion) &&
-                        Objects.equal(metadata, other.metadata);
-            }
-            return false;
-        }
-    }
+    private final ImmutableList<CollectionItem> topItems;
+    private final ImmutableList<ModuleLink> moduleLinks;
 
     /** Create a collection. This is package-private; others should use CollectionFactory. */
     Collection(String id, Document collxml, @Nullable Metadata metadata,
-            List<ModuleLink> moduleLinks) {
-        Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(collxml);
-        Preconditions.checkNotNull(moduleLinks);
-
-        this.id = id;
-        this.collxml = collxml;
+            List<CollectionItem> topItems) {
+        this.id = checkNotNull(id);
+        this.collxml = checkNotNull(collxml);
         this.metadata = metadata;
-        this.moduleLinks = moduleLinks;
+        this.topItems = ImmutableList.copyOf(checkNotNull(topItems));
+        this.moduleLinks = findModuleLinks();
+    }
+
+    private ImmutableList<ModuleLink> findModuleLinks() {
+        final ArrayList<ModuleLink> links = new ArrayList<ModuleLink>();
+        findModuleLinks(links, topItems);
+        return ImmutableList.copyOf(links);
+    }
+
+    private void findModuleLinks(ArrayList<ModuleLink> links, ImmutableList<CollectionItem> list) {
+        for (CollectionItem item : list) {
+            if (item instanceof ModuleLink) {
+                links.add((ModuleLink)item);
+            } else if (!item.getChildren().isEmpty()) {
+                findModuleLinks(links, item.getChildren());
+            }
+        }
     }
 
     public String getId() {
@@ -100,7 +74,11 @@ public class Collection {
         return metadata;
     }
 
-    public List<ModuleLink> getModuleLinks() {
+    public ImmutableList<CollectionItem> getTopItems() {
+        return topItems;
+    }
+
+    public ImmutableList<ModuleLink> getModuleLinks() {
         return moduleLinks;
     }
 
@@ -108,7 +86,7 @@ public class Collection {
      *  This method checks whether the collection has a module.
      */
     public boolean hasModule(String moduleId) {
-        Preconditions.checkNotNull(moduleId);
+        checkNotNull(moduleId);
         for (ModuleLink link : moduleLinks) {
             if (moduleId.equals(link.getModuleId())) {
                 return true;
@@ -123,7 +101,7 @@ public class Collection {
      *  @return The module link associated with the ID, or null if not found.
      */
     public ModuleLink getModuleLink(String moduleId) {
-        Preconditions.checkNotNull(moduleId);
+        checkNotNull(moduleId);
         for (ModuleLink link : moduleLinks) {
             if (moduleId.equals(link.getModuleId())) {
                 return link;
@@ -140,7 +118,7 @@ public class Collection {
      *  @return An array containing [previous, next].  One or both may be null.
      */
     public ModuleLink[] getPreviousNext(String moduleId) {
-        Preconditions.checkNotNull(moduleId);
+        checkNotNull(moduleId);
         final ModuleLink[] result = new ModuleLink[2];
         ListIterator<ModuleLink> linkIter = moduleLinks.listIterator();
         boolean found = false;

@@ -38,8 +38,7 @@ public class CommonHack {
 
     public static final String REPO_ATOM_PUB_URL = REPO_SERVER_URL + "/atompub";
 
-     public static final String WEBVIEW_SERVER_URL = "http://100.arjuns-test.appspot.com/content";
-//    public static final String WEBVIEW_SERVER_URL = "http://localhost:8080/content";
+    public static final String COLLECTION_URI_PREFIX = "/content/collection/";
 
     public static Resources getResourcesFromResourceMappingDoc(String resourceMappingXml) {
         JAXBContext jaxbContext;

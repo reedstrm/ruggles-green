@@ -126,6 +126,12 @@ public class ModuleHTMLGeneratorTests {
                      generate(doc.createTextNode(s)));
     }
 
+    @Test public void unhandledContentShouldBeReported() throws Exception {
+        final DOMBuilder b = builder.element("greeting").text("Hello, World");
+        assertEquals("<div class=\"unhandled\">Unrecognized Content: greeting</div>",
+                generate(b));
+    }
+
     @Test public void emptyParagraphTags() throws Exception {
         final Node node = builder.element("para")
                 .attr("id", "mypara")
@@ -769,6 +775,36 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">Epic widget</object>",
                 generate(node));
+    }
+
+    @Test public void mediaShouldAlwaysUseOverride() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(
+                        builder.element("image")
+                                .attr("src", "http://www.example.com/foo.png")
+                                .attr("mime-type", "image/png"),
+                        builder.element("object")
+                                .attr("src", "http://www.example.com/my-widget")
+                                .attr("mime-type", "application/x-widget")
+                                .attr("for", "webview2.0")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\">Epic widget</object>",
+                generate(node));
+    }
+
+    @Test public void mathShouldPassThrough() throws Exception {
+        final String mathmlNamespace = "http://www.w3.org/1998/Math/MathML";
+        final Node node = builder.element(mathmlNamespace, "math").child(
+                builder.element(mathmlNamespace, "mrow").child(
+                        builder.element(mathmlNamespace, "mi").text("a"),
+                        builder.element(mathmlNamespace, "mo").text("+"),
+                        builder.element(mathmlNamespace, "mi").text("b")
+                )).build();
+        assertEquals("<math><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>", generate(node));
     }
 
     @Test public void mathematicaTest() throws Exception {

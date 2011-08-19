@@ -16,16 +16,12 @@
 
 package org.cnx.repository.service.impl.persistence;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Date;
 
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a module entity.
@@ -73,9 +69,7 @@ public class OrmModuleEntity extends OrmEntity {
     }
 
     public static String moduleKeyToId(Key moduleKey) {
-        checkNotNull(moduleKey);
-        checkArgument(ENTITY_SPEC.getKeyKind().equals(moduleKey.getKind()), "Not a module key");
-        return IdUtil.idToString(ENTITY_SPEC.getIdPrefix(), moduleKey.getId());
+        return IdUtil.keyToId(ENTITY_SPEC, moduleKey);
     }
 
     /**
@@ -84,9 +78,7 @@ public class OrmModuleEntity extends OrmEntity {
      */
     @Nullable
     public static Key moduleIdToKey(String moduleId) {
-        final Long moduleIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), moduleId);
-        return (moduleIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
-                moduleIdLong);
+        return IdUtil.idToKey(ENTITY_SPEC, moduleId);
     }
 
     @Override

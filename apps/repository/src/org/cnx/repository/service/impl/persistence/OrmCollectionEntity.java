@@ -16,16 +16,12 @@
 
 package org.cnx.repository.service.impl.persistence;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Date;
 
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a collection entity.
@@ -73,10 +69,7 @@ public class OrmCollectionEntity extends OrmEntity {
     }
 
     public static String collectionKeyToId(Key collectionKey) {
-        checkNotNull(collectionKey);
-        checkArgument(ENTITY_SPEC.getKeyKind().equals(collectionKey.getKind()),
-                "Not a collection key");
-        return IdUtil.idToString(ENTITY_SPEC.getIdPrefix(), collectionKey.getId());
+        return IdUtil.keyToId(ENTITY_SPEC, collectionKey);
     }
 
     /**
@@ -85,9 +78,7 @@ public class OrmCollectionEntity extends OrmEntity {
      */
     @Nullable
     public static Key collectionIdToKey(String collectionId) {
-        final Long collectionIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), collectionId);
-        return (collectionIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
-                collectionIdLong);
+        return IdUtil.idToKey(ENTITY_SPEC, collectionId);
     }
 
     @Override

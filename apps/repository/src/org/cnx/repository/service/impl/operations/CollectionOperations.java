@@ -37,6 +37,7 @@ import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
+import org.cnx.repository.service.impl.persistence.IdUtil;
 import org.cnx.repository.service.impl.persistence.OrmCollectionEntity;
 import org.cnx.repository.service.impl.persistence.OrmCollectionVersionEntity;
 
@@ -145,12 +146,8 @@ public class CollectionOperations {
         Pair<List<Key>, String> results =
             Services.persistence.entityKeyList(OrmCollectionEntity.class, maxResults, startCursor);
 
-        ImmutableList.Builder<String> builder = ImmutableList.builder();
-        for (Key moduleKey : results.first) {
-            builder.add(OrmCollectionEntity.collectionKeyToId(moduleKey));
-        }
-
-        final ImmutableList<String> collectionIds = builder.build();
+        final ImmutableList<String> collectionIds =
+            IdUtil.keysToIds(OrmCollectionEntity.class, results.first);
 
         return ResponseUtil.loggedOk("Retrieve collection list page with " + collectionIds.size()
             + " module ids", new GetCollectionListResult(collectionIds, results.second), log);

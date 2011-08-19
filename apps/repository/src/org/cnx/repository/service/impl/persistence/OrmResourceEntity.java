@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a datastore resource entity.
@@ -116,10 +115,8 @@ public class OrmResourceEntity extends OrmEntity {
         state = State.UPLOAD_COMPLETE;
     }
 
-    public static String resourceKeyToId(Key resourceId) {
-        checkNotNull(resourceId);
-        checkArgument(ENTITY_SPEC.getKeyKind().equals(resourceId.getKind()), "Not a resource key");
-        return IdUtil.idToString(ENTITY_SPEC.getIdPrefix(), resourceId.getId());
+    public static String resourceKeyToId(Key resourceKey) {
+        return IdUtil.keyToId(ENTITY_SPEC, resourceKey);
     }
 
     /**
@@ -128,9 +125,7 @@ public class OrmResourceEntity extends OrmEntity {
      */
     @Nullable
     public static Key resourceIdToKey(String resourceId) {
-        final Long resourceIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), resourceId);
-        return (resourceIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
-                resourceIdLong);
+        return IdUtil.idToKey(ENTITY_SPEC, resourceId);
     }
 
     @Override

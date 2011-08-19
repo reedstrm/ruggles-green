@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class SuccessServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {

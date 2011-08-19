@@ -1,5 +1,6 @@
 Repository global todo items
 
+* Make the IdUtil test to work (requires GAE test jars)
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
 
 * Clean up all compilations and startup warnings

@@ -64,8 +64,8 @@ public abstract class OrmEntity {
         this.entitySpec = checkNotNull(entitySpec);
         this.key = checkNotNull(entity.getKey());
         this.creationTime =
-                checkNotNull((Date) entity.getProperty(CREATION_TIME_PROPERTY),
-                        "Creation time property not found");
+            checkNotNull((Date) entity.getProperty(CREATION_TIME_PROPERTY),
+                    "Creation time property not found");
     }
 
     @Nullable
@@ -98,18 +98,35 @@ public abstract class OrmEntity {
     public String getId() {
         checkState(entitySpec.supportsIds(), "Entities of kind %s have no ids, just keys",
                 entitySpec.getKeyKind());
-        checkState(getKey() != null, "Entity has no key (kind = %s)", entitySpec.getKeyKind());
-        // TODO(tal): assert here that the key has an id and has no name.
-        return IdUtil.idToString(entitySpec.getIdPrefix(), key.getId());
+        return IdUtil.keyToId(entitySpec, getKey());
     }
+
+    // TODO(tal): consider to move this functionality to IdUtil.
+    // public static String keyToId(OrmEntitySpec entitySpec, Key key) {
+    // checkNotNull(key, "Null key");
+    // checkArgument(entitySpec.getKeyKind().equals(key.getKind()), "Key kind mismatch:  %s", key);
+    // return IdUtil.idToString(entitySpec.getIdPrefix(), key.getId());
+    // }
 
     public Entity toEntity() {
         final Entity entity =
-                (getKey() == null) ? new Entity(entitySpec.getKeyKind()) : new Entity(key);
+            (getKey() == null) ? new Entity(entitySpec.getKeyKind()) : new Entity(key);
 
-                entity.setProperty(CREATION_TIME_PROPERTY, creationTime);
-                serializeToEntity(entity);
-                return entity;
+        entity.setProperty(CREATION_TIME_PROPERTY, creationTime);
+        serializeToEntity(entity);
+        return entity;
+    }
+
+    /**
+     * Invoke the getSpec() method of an entity class to get its spec.
+     */
+    public static <T extends OrmEntity> OrmEntitySpec entityClassSpec(Class<T> entityClass) {
+        try {
+            return (OrmEntitySpec) entityClass.getDeclaredMethod("getSpec").invoke(null);
+        } catch (Throwable e) {
+            throw new RuntimeException("Error involing static method getSpec() of class "
+                + entityClass, e);
+        }
     }
 
     /**

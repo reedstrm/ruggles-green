@@ -86,15 +86,4 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         String downloadedCollXml =
             cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(getEntry);
     }
-
-    @Test
-    public void testMigrationOfCompleteCollection() throws Exception {
-        CollectionMigrator migrator = new CollectionMigrator(cnxClient);
-        // NOTE(arjuns): This is deliberately commented. Need to create a small collection for
-        // testing.
-        String ORIGINAL_COLLECTION_ID = "col10064";
-        ClientEntry collectionEntry =
-            migrator.migrateCollection(ORIGINAL_COLLECTION_ID, COLLECTION_LOCATION);
-        logger.info("Collection created at : " + collectionEntry.getEditURI());
-    }
 }

@@ -17,14 +17,18 @@ package org.cnx.repository.atompub.servlets.migrators;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBException;
+
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.VersionWrapper;
+import org.jdom.JDOMException;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -32,6 +36,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.sun.syndication.propono.atom.client.ClientEntry;
+import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Migrator for a module.
@@ -47,7 +52,7 @@ public class ModuleMigrator {
         this.cnxClient = cnxClient;
     }
 
-    public ClientEntry migrateModule(String origModuleId, String moduleLocation) throws Exception {
+    public ClientEntry createNewModule(String moduleLocation) throws Exception {
         return migrateVersion(null, CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION, moduleLocation);
     }
 
@@ -120,7 +125,7 @@ public class ModuleMigrator {
             }
         }
 
-        String resourceMappingDocXml =
+        String resourceMappingXml =
             cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
 
         /*
@@ -143,9 +148,16 @@ public class ModuleMigrator {
         } else {
             entryToUpdate = cnxClient.getService().getEntry(currentModuleUrl.toString());
         }
-        ClientEntry createModuleVersionEntry =
-            cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingDocXml);
 
-        return cnxClient.getModuleVersionEntry(moduleId, currentVersion);
+
+        return publishNewVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
+    }
+
+    public ClientEntry publishNewVersion(ClientEntry entryToUpdate, String cnxmlAsString,
+            String resourceMappingXml) throws ProponoException, JAXBException, JDOMException, IOException {
+        ClientEntry createModuleVersionEntry =
+                cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
+
+        return createModuleVersionEntry;
     }
 }

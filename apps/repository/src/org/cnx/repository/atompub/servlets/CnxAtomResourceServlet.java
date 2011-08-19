@@ -101,7 +101,6 @@ public class CnxAtomResourceServlet {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */
-
             CreateResourceResult result = createdResource.getResult();
             Entry entry = new Entry();
             entry.setId(result.getResourceId());
@@ -177,7 +176,7 @@ public class CnxAtomResourceServlet {
                 String fileName =
                     repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
                 if (fileName.endsWith(".cdf")) {
-                    responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf, application/vnd.wolfram.cdf.text");
+                    responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf.text");
                 }
             }
 

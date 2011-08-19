@@ -237,7 +237,7 @@ public class CnxAtomModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response getModuleVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
@@ -308,7 +308,7 @@ public class CnxAtomModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(MODULE_VERSION_CNXML_URL)
     public Response getModuleVersionXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
@@ -339,7 +339,7 @@ public class CnxAtomModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(MODULE_VERSION_RESOURCE_MAPPING_URL)
     public Response getModuleVersionResourceMapping(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,

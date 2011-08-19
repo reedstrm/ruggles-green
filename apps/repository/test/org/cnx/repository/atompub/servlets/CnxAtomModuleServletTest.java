@@ -15,8 +15,9 @@
  */
 package org.cnx.repository.atompub.servlets;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -126,7 +127,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
         ModuleMigrator migrator = new ModuleMigrator(cnxClient);
-        Entry moduleEntry = migrator.migrateModule(ORIGINAL_MODULE_ID, COLLECTION_LOCATION + ORIGINAL_MODULE_ID);
+        Entry moduleEntry = migrator.createNewModule(COLLECTION_LOCATION + ORIGINAL_MODULE_ID);
         assertNotNull(moduleEntry);
 
         VersionWrapper expectedVersion = new VersionWrapper(1);
@@ -141,7 +142,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
         ModuleMigrator migrator = new ModuleMigrator(cnxClient);
-        Entry moduleEntry = migrator.migrateModule(ORIGINAL_MODULE_ID, moduleLocation);
+        Entry moduleEntry = migrator.createNewModule(moduleLocation);
 
         String newModuleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
         VersionWrapper version = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
@@ -159,22 +160,5 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         logger.info("New location : " + moduleLatestUrl);
         assertEquals(expectedVersion, actualVersion);
-    }
-
-    // TODO(arjuns) : Move this to some other place.
-    @Test
-    public void testUpdateRichsModules() throws Exception {
-        String localFileSystemModuleId = "m2102/";
-        String moduleLocalLocation = COLLECTION_LOCATION + localFileSystemModuleId;
-
-        String cnxRepoModuleId = "m34287";
-        URL moduleLatestUrl =
-                cnxClient.getConstants().getModuleVersionAbsPath(cnxRepoModuleId,
-                    new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING));
-        ClientEntry clientEntry = cnxClient.getService().getEntry(moduleLatestUrl.toString());
-        VersionWrapper currentVersion = CnxAtomPubConstants.getVersionFromAtomPubId(clientEntry.getId());
-        System.out.println("Current Version = " + currentVersion);
-        ModuleMigrator migrator = new ModuleMigrator(cnxClient);
-        migrator.migrateVersion(cnxRepoModuleId, currentVersion, moduleLocalLocation);
     }
 }

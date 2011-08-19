@@ -86,7 +86,7 @@ public class CollectionMigrator {
                 logger.info("Starting to migrate : " + existingModuleId);
                 ModuleMigrator moduleMigrator = new ModuleMigrator(cnxClient);
                 Entry migratedModuleEntry =
-                    moduleMigrator.migrateModule(existingModuleId, currModule.getAbsolutePath());
+                    moduleMigrator.createNewModule(currModule.getAbsolutePath());
                 mapOfModuleIdToNewModuleEntry.put(existingModuleId, migratedModuleEntry);
                 Link newLink = getSelfLinkFromEntry(migratedModuleEntry);
                 logger.info("Module[" + existingModuleId + "] migrated to : "

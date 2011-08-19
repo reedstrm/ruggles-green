@@ -49,8 +49,6 @@ import org.cnx.web.Utils;
 import org.cnx.web.WebViewTemplate;
 import org.cnx.web.XmlFetcher;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -69,7 +67,7 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
  * @author Arjun Satyapal
  */
 // TODO(arjuns) : Fix this hardcoding.
-@Path("/arjuns/collection")
+@Path("/collection")
 public class ArjunRenderCollectionServlet {
     static Logger logger = Logger.getLogger(ArjunRenderCollectionServlet.class.getName());
 
@@ -220,7 +218,6 @@ public class ArjunRenderCollectionServlet {
 
         Injector injector = Guice.createInjector(new ArjunGuiceConfig());
         XmlFetcher fetcher = injector.getInstance(XmlFetcher.class);
-         final MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
         Collection collection = fetcher.getCollection(collectionId, collXml);
 
         // Ensure module is part of the collection
@@ -241,7 +238,7 @@ public class ArjunRenderCollectionServlet {
         final Collection.ModuleLink[] links = collection.getPreviousNext(moduleId);
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
-        String moduleContentHtml;
+        String moduleContentHtml = null;
         List<Actor> moduleAuthors;
         final String moduleContentHtmlCacheKey =
             "moduleContentHtml " + collectionId + " " + moduleId;
@@ -253,14 +250,10 @@ public class ArjunRenderCollectionServlet {
             renderScope.seed(Collection.class, collection);
             renderScope.seed(Module.class, module);
 
-            moduleContentHtml = (String) cache.get(moduleContentHtmlCacheKey);
             if (moduleContentHtml == null) {
                 logger.info("moduleContentHtml missed cache");
                 ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
                 moduleContentHtml = generator.generate(module);
-                 cache.put(moduleContentHtmlCacheKey, moduleContentHtml);
-            } else {
-                logger.info("moduleContentHtml hit cache");
             }
 
             // Get collection title

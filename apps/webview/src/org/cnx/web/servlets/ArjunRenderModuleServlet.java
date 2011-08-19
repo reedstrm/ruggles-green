@@ -43,8 +43,6 @@ import org.cnx.web.Utils;
 import org.cnx.web.WebViewTemplate;
 import org.cnx.web.XmlFetcher;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -58,7 +56,7 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
  * @author Arjun Satyapal
  */
 // TODO(arjuns) : Fix this hardcoding.
-@Path("/arjuns/module")
+@Path("/module")
 public class ArjunRenderModuleServlet {
     Logger logger = Logger.getLogger(ArjunRenderModuleServlet.class.getName());
 
@@ -106,11 +104,9 @@ public class ArjunRenderModuleServlet {
 
         final VersionWrapper moduleVersionInt = new VersionWrapper(moduleVersionString);
 
-        final MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
-
         final String moduleContentHtmlCacheKey = "moduleContentHtml " + " " + moduleId;
 
-        String finalHtml = (String) cache.get(moduleContentHtmlCacheKey);
+        String finalHtml = null;
 
         if (finalHtml == null) {
             // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
@@ -154,13 +150,11 @@ public class ArjunRenderModuleServlet {
             SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
 
             finalHtml = tofu.render(CommonHack.MODULE_TEMPLATE_NAME, params, null);
-            cache.put(moduleContentHtmlCacheKey, finalHtml);
         }
 
         builder.append(finalHtml);
 
         ResponseBuilder myresponse = Response.ok();
-        // myresponse.type(CnxMediaTypes.TEXT_HTML_UTF8);
         myresponse.entity(builder.toString());
         return myresponse.build();
     }

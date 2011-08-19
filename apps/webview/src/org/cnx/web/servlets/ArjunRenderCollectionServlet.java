@@ -296,13 +296,24 @@ public class ArjunRenderCollectionServlet {
         }
 
         SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
-        final SoyMapData params =
-            new SoyMapData("collection", new SoyMapData("id", collectionId, "version",
-                collectionVersion.toString(), "title", collectionTitle), "module", new SoyMapData("id",
-                moduleId, "version", moduleVersion.toString(), "title", moduleTitle, "authors", Utils
-                    .convertActorListToSoyData(moduleAuthors), "contentHtml", moduleContentHtml),
+        final SoyMapData params = new SoyMapData(
+                "collection", new SoyMapData(
+                        "id", collectionId,
+                        "version", collectionVersion.toString(),
+                        "uri", CommonHack.COLLECTION_URI_PREFIX
+                                + collectionId + "/" + collectionVersion + "/",
+                        "title", collectionTitle
+                ),
+                "module", new SoyMapData(
+                        "id", moduleId,
+                        "version", moduleVersion.toString(),
+                        "title", moduleTitle,
+                        "authors", Utils.convertActorListToSoyData(moduleAuthors),
+                        "contentHtml", moduleContentHtml
+                ),
                 "previousModule", convertModuleLinkToSoyData(links[0], previousModuleUri),
-                "nextModule", convertModuleLinkToSoyData(links[1], nextModuleUri));
+                "nextModule", convertModuleLinkToSoyData(links[1], nextModuleUri)
+        );
 
         String renderedModuleHtml = tofu.render(CommonHack.COLLECTION_MODULE_TEMPLATE_NAME, params, null);
         builder.append(renderedModuleHtml);

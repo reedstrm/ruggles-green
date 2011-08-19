@@ -82,7 +82,7 @@ public class ArjunLinkResolver implements LinkResolver {
             final String collectionVersion = "1";
 
             String test =
-                CommonHack.WEBVIEW_SERVER_URL + "/collection/" + collection.getId() + "/"
+                "/content/collection/" + collection.getId() + "/"
                     + collectionVersion + "/module/" + moduleId + "/" + moduleVersion;
 
             return new URI(test);
@@ -90,7 +90,7 @@ public class ArjunLinkResolver implements LinkResolver {
 
         // TODO(arjuns) : Move this to common place.
         String returnUri =
-            CommonHack.WEBVIEW_SERVER_URL + "/module/" + moduleId + "/" + moduleVersion;
+            "/content/module/" + moduleId + "/" + moduleVersion;
         return new URI(returnUri);
     }
 

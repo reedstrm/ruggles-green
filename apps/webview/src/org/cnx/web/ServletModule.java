@@ -21,7 +21,7 @@ package org.cnx.web;
  */
 public class ServletModule extends com.google.inject.servlet.ServletModule {
     @Override protected void configureServlets() {
-        serveRegex("^/$").with(FrontPageServlet.class);
+        serveRegex("^/home$").with(FrontPageServlet.class);
         serveRegex("^/light/clear-cache$").with(CacheClearServlet.class);
         serveRegex("^/light/module/[^/]+/[^/]+/$").with(RenderModuleServlet.class);
         serveRegex("^/light/collection/[^/]+/[^/]+/module/[^/]+/[^/]+/$")

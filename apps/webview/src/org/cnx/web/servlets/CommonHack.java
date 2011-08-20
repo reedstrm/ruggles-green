@@ -40,7 +40,6 @@ public class CommonHack {
     public static final String REPO_ATOM_PUB_URL = REPO_SERVER_URL + "/atompub";
 
     public static final String COLLECTION_URI_PREFIX = CONTENT_NAME_SPACE + "/collection/";
-    public static final String MODULE_URI_PREFIX = CONTENT_NAME_SPACE + "/module/";
 
 
     public static Resources getResourcesFromResourceMappingDoc(String resourceMappingXml) {

@@ -88,11 +88,12 @@ public class ArjunLinkResolver implements LinkResolver {
             // TODO(arjuns): TODO(light) collection version
             final String collectionVersion = "1";
 
-            uriBuilder.append(CommonHack.COLLECTION_URI_PREFIX).append(collection.getId()).append(
+            uriBuilder.append("/collection/").append(collection.getId()).append(
                 "/").append(collectionVersion);
         }
 
-        uriBuilder.append(CommonHack.MODULE_URI_PREFIX).append(moduleId).append("/").append(
+        // TODO(arjuns) : See how to get rid of this string.
+        uriBuilder.append("/module/").append(moduleId).append("/").append(
             moduleVersion);
         return new URI(uriBuilder.toString());
     }

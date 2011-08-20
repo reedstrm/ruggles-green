@@ -138,8 +138,6 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     public void testMultipleModules() throws Exception {
         // Create first version.
         String moduleLocation = COLLECTION_LOCATION + ORIGINAL_MODULE_ID;
-        File cnxml = new File(moduleLocation + "/index_auto_generated.cnxml");
-        String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
         ModuleMigrator migrator = new ModuleMigrator(cnxClient);
         Entry moduleEntry = migrator.createNewModule(moduleLocation);
@@ -148,9 +146,9 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         VersionWrapper version = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
 
         // Now publishing second version.
-
         migrator.migrateVersion(newModuleId, version, moduleLocation);
 
+        // Validating version.
         URL moduleLatestUrl =
             cnxClient.getConstants().getModuleVersionAbsPath(newModuleId,
                 new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING));

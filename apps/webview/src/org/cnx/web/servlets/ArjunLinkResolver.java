@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.common.collxml.Collection;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.resourcemapping.Resource;
 import org.cnx.resourcemapping.Resources;
 
@@ -47,7 +48,7 @@ public class ArjunLinkResolver implements LinkResolver {
 
     @Inject
     public ArjunLinkResolver(Provider<Collection> collectionProvider,
-            Provider<Module> moduleProvider) {
+        Provider<Module> moduleProvider) {
         this.collectionProvider = collectionProvider;
         this.moduleProvider = moduleProvider;
     }
@@ -77,21 +78,23 @@ public class ArjunLinkResolver implements LinkResolver {
     @Override
     public URI resolveDocument(String moduleId, @Nullable String moduleVersion) throws Exception {
         final Collection collection = collectionProvider.get();
+
+        if (moduleVersion == null) {
+            moduleVersion = CnxAtomPubConstants.LATEST_VERSION_STRING;
+        }
+
+        StringBuilder uriBuilder = new StringBuilder(CommonHack.CONTENT_NAME_SPACE);
         if (collection != null && collection.hasModule(moduleId)) {
             // TODO(arjuns): TODO(light) collection version
             final String collectionVersion = "1";
 
-            String test =
-                "/content/collection/" + collection.getId() + "/"
-                    + collectionVersion + "/module/" + moduleId + "/" + moduleVersion;
-
-            return new URI(test);
+            uriBuilder.append(CommonHack.COLLECTION_URI_PREFIX).append(collection.getId()).append(
+                "/").append(collectionVersion);
         }
 
-        // TODO(arjuns) : Move this to common place.
-        String returnUri =
-            "/content/module/" + moduleId + "/" + moduleVersion;
-        return new URI(returnUri);
+        uriBuilder.append(CommonHack.MODULE_URI_PREFIX).append(moduleId).append("/").append(
+            moduleVersion);
+        return new URI(uriBuilder.toString());
     }
 
     @Override

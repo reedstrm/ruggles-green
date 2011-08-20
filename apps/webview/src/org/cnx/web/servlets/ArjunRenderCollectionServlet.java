@@ -106,7 +106,6 @@ public class ArjunRenderCollectionServlet {
         }
     }
 
-    // http://localhost:8080/content/collection/c30039/1
     @GET
     @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
     @Path(COLLECTION_VERSION_URL_PATTERN)

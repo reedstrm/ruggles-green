@@ -22,6 +22,7 @@ article, aside, command, details, summary, figure, figcaption, footer, header, h
 
 html, body {
     font-family: "Open Sans", sans-serif;
+    font-size: 90%;
 }
 
 body > header {
@@ -65,6 +66,7 @@ hgroup > h1.moduleTitle {
     display: table;
     table-layout: fixed;
     width: 100%;
+    margin-top: 1em;
     padding: 0.5ex 1ex;
 
     background: #cedff0;
@@ -136,11 +138,10 @@ hgroup > h1.moduleTitle {
 }
 
 .moduleContent h1 {
-    margin-top: 2em;
+    margin-top: 1.5em;
 }
 
 .moduleContent > section > h1 {
-    margin-top: 1.5em;
     border-bottom: thin solid gray;
 }
 

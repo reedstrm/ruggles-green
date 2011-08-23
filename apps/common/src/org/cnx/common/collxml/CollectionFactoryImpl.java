@@ -44,7 +44,7 @@ public class CollectionFactoryImpl implements CollectionFactory {
     }
 
     @Override public Collection create(String id, Document collxml) {
-        return new Collection(id, collxml, parseMetadata(collxml), parseModuleLinks(collxml));
+        return new Collection(id, collxml, parseMetadata(collxml), parseTopNodes(collxml));
     }
 
     private Metadata parseMetadata(Document collxml) {
@@ -56,44 +56,39 @@ public class CollectionFactoryImpl implements CollectionFactory {
         return metadataFactory.create(elem);
     }
 
-    private ArrayList<Collection.ModuleLink> parseModuleLinks(Document collxml) {
-        ArrayList<Collection.ModuleLink> links = new ArrayList<Collection.ModuleLink>();
+    private ArrayList<CollectionItem> parseTopNodes(Document collxml) {
+        ArrayList<CollectionItem> nodes = new ArrayList<CollectionItem>();
         Element elem = DOMUtils.findFirstChild(collxml.getDocumentElement(),
                 collxmlNamespace, CONTENT_TAG_NAME);
         if (elem == null) {
-            return links;
+            return nodes;
         }
-        parseModuleLinks(links, elem);
-        return links;
+        return parseNodes(0, elem);
     }
 
-    private void parseModuleLinks(ArrayList<Collection.ModuleLink> links, Element parent) {
-        final NodeList childList = parent.getChildNodes();
-        final int length = childList.getLength();
-
-        for (int i = 0; i < length; i++) {
-            final Node child = childList.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE &&
-                    collxmlNamespace.equals(child.getNamespaceURI())) {
-                final Element elem = (Element)child;
-                final String localName = child.getLocalName();
-
-                if (MODULE_TAG_NAME.equals(localName)) {
-                    if (elem.hasAttribute(DOCUMENT_ATTR_NAME) &&
-                            elem.hasAttribute(VERSION_ATTR_NAME)) {
-                        links.add(new Collection.ModuleLink(
-                                    elem.getAttribute(DOCUMENT_ATTR_NAME),
-                                    elem.getAttribute(VERSION_ATTR_NAME),
-                                    metadataFactory.create(elem)));
-                    }
-                } else if (SUBCOLLECTION_TAG_NAME.equals(localName)) {
-                    final Element content = DOMUtils.findFirstChild(elem, collxmlNamespace,
-                            CONTENT_TAG_NAME);
-                    if (content != null) {
-                        parseModuleLinks(links, content);
-                    }
+    private ArrayList<CollectionItem> parseNodes(int depth, Element parent) {
+        final ArrayList<CollectionItem> nodes = new ArrayList<CollectionItem>();
+        int index = 0;
+        for (Element elem : DOMUtils.iterElements(parent)) {
+            final String localName = elem.getLocalName();
+            if (MODULE_TAG_NAME.equals(localName)) {
+                nodes.add(new ModuleLink(
+                        depth,
+                        index,
+                        elem.getAttribute(DOCUMENT_ATTR_NAME),
+                        elem.getAttribute(VERSION_ATTR_NAME),
+                        metadataFactory.create(elem)));
+                index++;
+            } else if (SUBCOLLECTION_TAG_NAME.equals(localName)) {
+                final Element content = DOMUtils.findFirstChild(elem, collxmlNamespace,
+                        CONTENT_TAG_NAME);
+                if (content != null) {
+                    final ArrayList<CollectionItem> subnodes = parseNodes(depth + 1, content);
+                    nodes.add(new Subcollection(depth, index, subnodes,
+                            metadataFactory.create(elem)));
                 }
             }
         }
+        return nodes;
     }
 }

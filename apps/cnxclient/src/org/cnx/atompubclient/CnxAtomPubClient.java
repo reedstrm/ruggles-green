@@ -18,7 +18,6 @@ package org.cnx.atompubclient;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,13 +28,13 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.resourceentry.ResourceEntryValue;
 import org.cnx.resourcemapping.LocationInformation;
 import org.cnx.resourcemapping.ObjectFactory;
@@ -46,10 +45,7 @@ import org.jdom.JDOMException;
 
 import com.google.common.base.Preconditions;
 import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.impl.Atom10Parser;
 import com.sun.syndication.propono.atom.client.AtomClientFactory;
 import com.sun.syndication.propono.atom.client.ClientAtomService;
 import com.sun.syndication.propono.atom.client.ClientCollection;
@@ -90,6 +86,13 @@ public class CnxAtomPubClient {
      */
     public CnxAtomPubConstants getConstants() {
         return constants;
+    }
+
+    /**
+     * Get ClientAtomService.
+     */
+    public ClientAtomService getService() {
+        return service;
     }
 
     /**
@@ -235,7 +238,8 @@ public class CnxAtomPubClient {
      */
     void postFileToBlobstore(URL blobstoreUrl, File file) throws IOException {
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
-        Part[] parts = { new FilePart(file.getName(), file) };
+        Part[] parts = { new FilePart(file.getName(), file),
+            };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
         int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
@@ -273,14 +277,11 @@ public class CnxAtomPubClient {
         moduleVersionEntry.update();
 
         String moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleVersionEntry.getId());
-        int currentVersion =
-            Integer.parseInt(CnxAtomPubConstants
-                .getVersionFromAtomPubId(moduleVersionEntry.getId()));
-        // TODO(arjuns) : Validate this.
-        String newVersion = Integer.toString(currentVersion);
+        VersionWrapper currentVersion =
+            CnxAtomPubConstants.getVersionFromAtomPubId(moduleVersionEntry.getId());
 
         moduleVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(moduleId,
-            newVersion));
+            currentVersion));
 
         return moduleVersionEntry;
     }
@@ -291,34 +292,23 @@ public class CnxAtomPubClient {
      *
      * @param moduleId
      * @param version
+     * @throws ProponoException
      */
-    public Entry getModuleVersionEntry(String moduleId, String version) {
+    public ClientEntry getModuleVersionEntry(String moduleId, VersionWrapper version)
+            throws ProponoException {
         URL moduleVersionUrl = constants.getModuleVersionAbsPath(moduleId, version);
 
-        ClientCollection colModule = getCollectionModule();
-        Entry getEntry = null;
-        try {
-            String encodedModuleVersionEntry =
-                httpClient.getURLContentAsString(moduleVersionUrl.toString());
-            getEntry =
-                Atom10Parser.parseEntry(new StringReader(encodedModuleVersionEntry),
-                    moduleVersionUrl.toString());
-        } catch (Exception e) {
-            // TODO(arjuns) : Handle exception.
-            throw new RuntimeException(e);
-        }
-
-        return getEntry;
+        return service.getEntry(moduleVersionUrl.toString());
     }
 
     // TODO(arjuns) : Move this to common.
-    public String getCnxml(String moduleId, String version) throws HttpException, IOException,
-            JDOMException {
+    public String getCnxml(String moduleId, VersionWrapper version) throws HttpException,
+            IOException, JDOMException, ProponoException {
         return getCnxml(getModuleVersionEntry(moduleId, version));
     }
 
     // TODO(arjuns) : Move this to common.
-    public String getCnxml(Entry moduleVersionEntry) throws JDOMException, IOException {
+    public String getCnxml(ClientEntry moduleVersionEntry) throws JDOMException, IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
             constants.decodeFrom64BitEncodedString(encodedModuleEntryValue);
@@ -326,13 +316,14 @@ public class CnxAtomPubClient {
     }
 
     // TODO(arjuns) : Move this to common.
-    public String getModuleVersionResourceMappingXml(String moduleId, String version)
-            throws HttpException, JDOMException, IOException {
+    public String getModuleVersionResourceMappingXml(String moduleId, VersionWrapper version)
+            throws HttpException, JDOMException, IOException, ProponoException {
         return getResourceMappingXml(getModuleVersionEntry(moduleId, version));
     }
 
     // TODO(arjuns) : Move this to common.
-    public String getResourceMappingXml(Entry moduleVersionEntry) throws JDOMException, IOException {
+    public String getResourceMappingXml(ClientEntry moduleVersionEntry) throws JDOMException,
+            IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
             constants.decodeFrom64BitEncodedString(encodedModuleEntryValue);
@@ -342,8 +333,8 @@ public class CnxAtomPubClient {
     /**
      * Get Content from AtomEntry.
      */
-    public Content getContentFromEntry(Entry entry) {
-        return (Content) entry.getContents().get(0);
+    public Content getContentFromEntry(ClientEntry entry) {
+        return entry.getContent();
     }
 
     /**
@@ -394,8 +385,8 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * Create New CNX Collection version on CNX Repository. Before first version can be created,
-     * a collectionId must be obtained using {@link #createNewCollection}.
+     * Create New CNX Collection version on CNX Repository. Before first version can be created, a
+     * collectionId must be obtained using {@link #createNewCollection}.
      *
      * @param collXmlVersionEntry Entry returned as response for {@link #createNewCollection}
      * @param collXmlDoc Collection XML Doc.
@@ -404,21 +395,19 @@ public class CnxAtomPubClient {
      * @throws IOException
      * @throws JDOMException
      */
-    public ClientEntry createNewCollectionVersion(ClientEntry collXmlVersionEntry,
-            String collXmlDoc) throws ProponoException, JAXBException, JDOMException, IOException {
+    public ClientEntry
+            createNewCollectionVersion(ClientEntry collXmlVersionEntry, String collXmlDoc)
+                    throws ProponoException, JAXBException, JDOMException, IOException {
         collXmlVersionEntry.setContents(constants
             .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
         collXmlVersionEntry.update();
 
         String collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collXmlVersionEntry.getId());
-        int currentVersion =
-            Integer.parseInt(CnxAtomPubConstants.getVersionFromAtomPubId(collXmlVersionEntry
-                .getId()));
-
-        String newVersion = Integer.toString(currentVersion);
+        VersionWrapper currentVersion =
+            CnxAtomPubConstants.getVersionFromAtomPubId(collXmlVersionEntry.getId());
 
         collXmlVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId,
-            newVersion));
+            currentVersion));
 
         return collXmlVersionEntry;
     }
@@ -428,23 +417,12 @@ public class CnxAtomPubClient {
      *
      * @param collectionId
      * @param version
+     * @throws ProponoException
      */
-    public Entry getCollectionVersionEntry(String collectionId, String version) {
+    public ClientEntry getCollectionVersionEntry(String collectionId, VersionWrapper version)
+            throws ProponoException {
         URL collectionVersionUrl = constants.getCollectionVersionAbsPath(collectionId, version);
 
-        Entry getEntry = null;
-        try {
-            String collectionVersionEntry =
-                httpClient.getURLContentAsString(collectionVersionUrl.toString());
-            getEntry =
-                Atom10Parser.parseEntry(new StringReader(collectionVersionEntry),
-                    collectionVersionUrl.toString());
-        } catch (Exception e) {
-            // TODO(arjuns): Auto-generated catch block
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        return getEntry;
+        return service.getEntry(collectionVersionUrl.toString());
     }
 }

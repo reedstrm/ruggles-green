@@ -23,7 +23,7 @@
     <property file="build.properties" />
 
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
-    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml" />
+    <import file="${third_party}/appengine/appengine-java-sdk-1.5.3/config/user/ant-macros.xml" />
 
     <target name="war"
             depends="compile"
@@ -44,11 +44,6 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
-
-        <copy todir="${war.dir}/WEB-INF/classes/META-INF">
-            <fileset dir="src/META-INF" includes="**/*.*" />
-        </copy>
-
         <enhance_war war="${war.dir}" />
     </target>
 
@@ -162,6 +157,7 @@
         <javac srcdir="${test.src}"
                destdir="${test.classes}"
                includeantruntime="false"
+               failonerror="true"
                debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>

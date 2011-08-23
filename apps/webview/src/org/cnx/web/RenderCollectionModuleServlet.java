@@ -16,36 +16,34 @@
 
 package org.cnx.web;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
-import com.google.template.soy.data.SoyData;
-import com.google.template.soy.data.SoyMapData;
-import com.google.template.soy.tofu.SoyTofu;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.ModuleLink;
 import org.cnx.mdml.Actor;
-import org.cnx.util.DOMUtils;
 import org.cnx.util.RenderScope;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.template.soy.data.SoyData;
+import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.tofu.SoyTofu;
 
 /**
  *  This servlet renders a module in the context of a collection.
@@ -90,7 +88,7 @@ import org.w3c.dom.Element;
         }
 
         // Ensure module is part of the collection
-        final Collection.ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
+        final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
         if (currentModuleLink == null) {
             log.log(Level.INFO, "Collection " + collectionId +
                     " does not contain module " + moduleId);
@@ -108,7 +106,7 @@ import org.w3c.dom.Element;
             return;
         }
 
-        final Collection.ModuleLink[] links = collection.getPreviousNext(moduleId);
+        final ModuleLink[] links = collection.getPreviousNext(moduleId);
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml;
@@ -186,12 +184,12 @@ import org.w3c.dom.Element;
         resp.getWriter().print(tofu.render(TEMPLATE_NAME, params, null));
     }
 
-    private static final URI getModuleLinkUri(LinkResolver linkResolver,
-            Collection.ModuleLink link) throws Exception {
+    private static final URI getModuleLinkUri(LinkResolver linkResolver, ModuleLink link)
+            throws Exception {
         return linkResolver.resolveDocument(link.getModuleId(), link.getModuleVersion());
     }
 
-    private static final SoyData convertModuleLinkToSoyData(@Nullable Collection.ModuleLink link,
+    private static final SoyData convertModuleLinkToSoyData(@Nullable ModuleLink link,
             @Nullable URI uri) {
         if (link == null) {
             return SoyData.createFromExistingData(null);

@@ -16,24 +16,16 @@
 
 package org.cnx.cnxml;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyModule;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.CnxmlNamespace;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.mdml.MdmlModule;
+import org.cnx.resourcemapping.ObjectFactory;
 import org.cnx.util.RenderScope;
 import org.cnx.util.UtilModule;
 import org.cnx.util.testing.DOMBuilder;
@@ -42,7 +34,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import static org.junit.Assert.*;
 
@@ -86,8 +77,9 @@ public class ModuleHTMLGeneratorTests {
         try {
             final String cnxmlNamespace = injector.getInstance(
                     Key.get(String.class, CnxmlNamespace.class));
+            ObjectFactory dummyFactory = new ObjectFactory();
             return injector.getInstance(ModuleHTMLGenerator.class).generate(
-                    new Module(moduleId, d, d, null, cnxmlNamespace));
+                    new Module(moduleId, d, dummyFactory.createResources(), null, cnxmlNamespace));
         } finally {
             scope.exit();
         }
@@ -132,6 +124,12 @@ public class ModuleHTMLGeneratorTests {
         final String s = "I am a \"<b>leet hacker</b>\"";
         assertEquals("I am a &quot;&lt;b&gt;leet hacker&lt;/b&gt;&quot;",
                      generate(doc.createTextNode(s)));
+    }
+
+    @Test public void unhandledContentShouldBeReported() throws Exception {
+        final DOMBuilder b = builder.element("greeting").text("Hello, World");
+        assertEquals("<div class=\"unhandled\">Unrecognized Content: greeting</div>",
+                generate(b));
     }
 
     @Test public void emptyParagraphTags() throws Exception {
@@ -777,6 +775,36 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">Epic widget</object>",
                 generate(node));
+    }
+
+    @Test public void mediaShouldAlwaysUseOverride() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "thing")
+                .attr("alt", "Epic widget")
+                .child(
+                        builder.element("image")
+                                .attr("src", "http://www.example.com/foo.png")
+                                .attr("mime-type", "image/png"),
+                        builder.element("object")
+                                .attr("src", "http://www.example.com/my-widget")
+                                .attr("mime-type", "application/x-widget")
+                                .attr("for", "webview2.0")
+                )
+                .build();
+        assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\">Epic widget</object>",
+                generate(node));
+    }
+
+    @Test public void mathShouldPassThrough() throws Exception {
+        final String mathmlNamespace = "http://www.w3.org/1998/Math/MathML";
+        final Node node = builder.element(mathmlNamespace, "math").child(
+                builder.element(mathmlNamespace, "mrow").child(
+                        builder.element(mathmlNamespace, "mi").text("a"),
+                        builder.element(mathmlNamespace, "mo").text("+"),
+                        builder.element(mathmlNamespace, "mi").text("b")
+                )).build();
+        assertEquals("<math><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>", generate(node));
     }
 
     @Test public void mathematicaTest() throws Exception {

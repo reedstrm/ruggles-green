@@ -68,6 +68,9 @@ public class CnxAtomPubConstants {
         return atomPubRestUrl;
     }
 
+    /** String representation for latest version. */
+    public static String LATEST_VERSION_STRING = "latest";
+
     /**
      * Constants related to Service Document.
      */
@@ -111,14 +114,17 @@ public class CnxAtomPubConstants {
         }
     }
 
+
+
+
+
     /** Get URL for ModuleVersion to fetch via AtomPub. */
-    public URL getCollectionVersionAbsPath(String collectionId, String version) {
+    public URL getCollectionVersionAbsPath(String collectionId, VersionWrapper version) {
         try {
             return new URL(getCollectionCnxCollectionsAbsPath() + "/" + collectionId + "/"
                 + version);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
-
             // TODO(arjuns): Create a CNXAtomPubException to handle this.
             throw new RuntimeException(e);
         }
@@ -160,7 +166,7 @@ public class CnxAtomPubConstants {
     public static final String COLLECTION_MODULE_POST_PATH = "/";
 
     /** Default new Version for any module. */
-    public static final int NEW_CNX_COLLECTION_DEFAULT_VERSION = 1;
+    public static final VersionWrapper NEW_CNX_COLLECTION_DEFAULT_VERSION = new VersionWrapper("1");
 
     /** Get URI for AtomPub collection for CNX Modules. */
     public URL getCollectionModulesAbsPath() {
@@ -186,16 +192,18 @@ public class CnxAtomPubConstants {
         }
     }
 
-    /** Get URL for ModuleVersion to fetch via AtomPub. */
-    public URL getModuleVersionAbsPath(String moduleId, String version) {
+    /** Get URL for ModuleVersion to fetch via AtomPup. */
+    public URL getModuleVersionAbsPath(String moduleId, VersionWrapper version) {
+//        validateVersion(version);
         try {
-            return new URL(getCollectionModulesAbsPath() + "/" + moduleId + "/" + version);
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId + "/" + version.toString());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
             // TODO(arjuns): Create a CNXAtomPubException to handle this.
             throw new RuntimeException(e);
         }
+
     }
 
     /** Scheme for AtomPub collection for CnxModules. */
@@ -257,7 +265,7 @@ public class CnxAtomPubConstants {
     public static final String DELIMITER_ID_VERSION = ":";
 
     /** Default new Version for any module. */
-    public static final int NEW_MODULE_DEFAULT_VERSION = 1;
+    public static final VersionWrapper NEW_MODULE_DEFAULT_VERSION = new VersionWrapper(1);
 
     /**
      * Get AtomPub List of Contents from CNXMl and ResourceMappingDoc.
@@ -344,16 +352,17 @@ public class CnxAtomPubConstants {
     /**
      * Get version from AtomId.
      */
-    public static String getVersionFromAtomPubId(String atomPubId) {
+    public static VersionWrapper getVersionFromAtomPubId(String atomPubId) {
         String[] args = atomPubId.split(":");
-        return args[1];
+        return new VersionWrapper(args[1]);
     }
 
     /**
      * Get AtomPubId from moduleId/collectionId and version.
      */
-    public static String getAtomPubIdFromCnxIdAndVersion(String cnxId, String version) {
-        return cnxId + DELIMITER_ID_VERSION + version;
+    public static String getAtomPubIdFromCnxIdAndVersion(String cnxId, VersionWrapper version) {
+        return cnxId + DELIMITER_ID_VERSION + version.toString();
+
     }
 
     static String getClassPath() {
@@ -401,10 +410,10 @@ public class CnxAtomPubConstants {
     public String getModuleEntryValue(String encodedCnxml, String encodedResourceMappingXml)
             throws JAXBException {
         ObjectFactory objectFactory = new ObjectFactory();
-        JAXBElement<byte[]> encodedCnxmlDoc = objectFactory.createCnxmlDoc(
-            Base64.decodeBase64(encodedCnxml));
-        JAXBElement<byte[]> encodedResourceMappingDoc = objectFactory.createResourceMappingDoc(
-            Base64.decodeBase64(encodedResourceMappingXml));
+        JAXBElement<byte[]> encodedCnxmlDoc =
+            objectFactory.createCnxmlDoc(Base64.decodeBase64(encodedCnxml));
+        JAXBElement<byte[]> encodedResourceMappingDoc =
+            objectFactory.createResourceMappingDoc(Base64.decodeBase64(encodedResourceMappingXml));
 
         ResourceEntryValue resourceEntryValue = objectFactory.createResourceEntryValue();
         resourceEntryValue.setCnxmlDoc(encodedCnxmlDoc.getValue());

@@ -14,12 +14,17 @@
     limitations under the License.
 */
 
-#contentArea {
-    max-width: 50em;
-    margin: 0 auto;
+html, body {
+    margin: 0;
+    padding: 0;
 }
 
 body > header {
-    max-width: 50em;
+    width: 100%;
+}
+
+#contentArea {
+    max-width: 55em;
     margin: 0 auto;
+    padding: 0 1em 1em;
 }

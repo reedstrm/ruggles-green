@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -29,8 +30,9 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.servlets.CnxAtomPubBasetest;
+import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.atompub.servlets.migrators.ModuleMigrator;
+import org.cnx.repository.atompub.servlets.migrators.ResourceMigrator;
 import org.jdom.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,9 +53,8 @@ import com.sun.syndication.propono.utils.ProponoException;
 public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     Logger logger = Logger.getLogger(CnxAtomModuleServletTest.class.getName());
     private CnxAtomPubClient cnxClient;
-    private final String ORIGINAL_MODULE_ID = "m10057";
-    private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.12_complete/"
-        + ORIGINAL_MODULE_ID;
+    private final String ORIGINAL_MODULE_ID = "m10085";
+    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.12_complete/";
 
     public CnxAtomModuleServletTest() throws Exception {
         super();
@@ -67,14 +68,16 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     @Test
     public void testMigrateCompleteModule() throws HttpException, ProponoException, IOException,
             JAXBException, JDOMException {
+        String tempLocation = "/home/arjuns/mymodule";
         List<File> listOfResourcesToUpload =
-            ModuleMigrator.getListOfResourcesToBeUploaded(MODULE_LOCATION);
+            ModuleMigrator.getListOfResourcesToBeUploaded(tempLocation);
 
         List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
         for (File currFile : listOfResourcesToUpload) {
             logger.info("Attempting to upload : " + currFile.getAbsolutePath());
             ClientEntry resourceEntry =
-                cnxClient.uploadFileToBlobStore(currFile.getName(), currFile);
+                cnxClient.uploadFileToBlobStore(ResourceMigrator
+                    .getResourceNameForResourceMappingDoc(currFile.getName()), currFile);
             listOfEntryForUploadedResources.add(resourceEntry);
             logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
                 + resourceEntry.getId() + "], and can be found here [" + resourceEntry.getEditURI()
@@ -85,7 +88,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         String resourceMappingDocXml =
             cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
 
-        File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
+        File cnxml = new File(tempLocation + "/index_auto_generated.cnxml");
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
         ClientEntry createModuleEntry = cnxClient.createNewModule();
@@ -98,10 +101,10 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         // TODO(arjuns) : refactor this.
         String moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleNewVersionEntry.getId());
-        String version = CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
-        Entry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);
+        VersionWrapper version = CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
+        ClientEntry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);
 
-        logger.info("New location for [" + ORIGINAL_MODULE_ID + "] is "
+        logger.info("New location for [" + ORIGINAL_MODULE_ID + "] is \n"
             + moduleNewVersionEntry.getEditURI());
 
         Content content = (Content) getEntry.getContents().get(0);
@@ -114,18 +117,46 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         String downloadedResourceMappingDoc = cnxClient.getResourceMappingXml(getEntry);
         assertEquals(resourceMappingDocXml, downloadedResourceMappingDoc);
+        // TODO(arjuns) : Add test for links.
     }
 
-    // TODO(arjuns) : Move this test to other file.
+//    // TODO(arjuns) : Move this test to other file.
     @Test
-    public void testModuleMigrator() throws IOException, ProponoException, JAXBException, JDOMException {
-        File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
+    public void testModuleMigrator() throws Exception {
+        File cnxml = new File(COLLECTION_LOCATION + ORIGINAL_MODULE_ID + "/index_auto_generated.cnxml");
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
         ModuleMigrator migrator = new ModuleMigrator(cnxClient);
-        Entry moduleEntry = migrator.migrateModule(ORIGINAL_MODULE_ID, MODULE_LOCATION);
+        Entry moduleEntry = migrator.createNewModule(COLLECTION_LOCATION + ORIGINAL_MODULE_ID);
         assertNotNull(moduleEntry);
-        cnxClient.getConstants();
-        assertEquals("1", CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId()));
+
+        VersionWrapper expectedVersion = new VersionWrapper(1);
+        assertEquals(expectedVersion, CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId()));
+    }
+
+    @Test
+    public void testMultipleModules() throws Exception {
+        // Create first version.
+        String moduleLocation = COLLECTION_LOCATION + ORIGINAL_MODULE_ID;
+
+        ModuleMigrator migrator = new ModuleMigrator(cnxClient);
+        Entry moduleEntry = migrator.createNewModule(moduleLocation);
+
+        String newModuleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        VersionWrapper version = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
+
+        // Now publishing second version.
+        migrator.migrateVersion(newModuleId, version, moduleLocation);
+
+        // Validating version.
+        URL moduleLatestUrl =
+            cnxClient.getConstants().getModuleVersionAbsPath(newModuleId,
+                new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING));
+        ClientEntry clientEntry = cnxClient.getService().getEntry(moduleLatestUrl.toString());
+        VersionWrapper expectedVersion = new VersionWrapper(2);
+        VersionWrapper actualVersion = CnxAtomPubConstants.getVersionFromAtomPubId(clientEntry.getId());
+
+        logger.info("New location : " + moduleLatestUrl);
+        assertEquals(expectedVersion, actualVersion);
     }
 }

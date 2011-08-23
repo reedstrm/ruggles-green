@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.utils.CustomMediaTypes;
+import org.cnx.repository.atompub.CnxMediaTypes;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxServiceDocumentServlet}
- * 
+ *
  * @author Arjun Satyapal
  */
 public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
@@ -56,7 +56,7 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
         ClientWorkspace workspace = cnxClient.getWorkspace();
         assertEquals(3, workspace.getCollections().size());
         assertEquals(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, workspace.getTitle());
-        assertEquals(CustomMediaTypes.TEXT, workspace.getTitleType());
+        assertEquals(CnxMediaTypes.TEXT, workspace.getTitleType());
 
         // Now validate each collection individually.
         validateCollection(cnxClient.getCollectionResource(),

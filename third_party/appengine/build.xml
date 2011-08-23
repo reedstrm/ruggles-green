@@ -52,7 +52,7 @@
         </fail>
 
         <copy todir="${target_dir}">
-            <resources refid="appengine-1.5.2" />
+            <resources refid="appengine-1.5.3" />
         </copy>
     </target>
 
@@ -68,7 +68,7 @@
         </fail>
 
         <copy todir="${test_lib_dir}">
-            <resources refid="appengine-1.5.2.testing" />
+            <resources refid="appengine-1.5.3.testing" />
         </copy>
     </target>
 </project>

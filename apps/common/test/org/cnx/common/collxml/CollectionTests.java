@@ -17,7 +17,6 @@
 package org.cnx.common.collxml;
 
 import com.google.common.collect.ImmutableList;
-import org.cnx.common.collxml.Collection.ModuleLink;
 import org.cnx.util.DocumentBuilderProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,29 +31,34 @@ public class CollectionTests {
     }
 
     @Test public void hasModuleShouldNotFindMissingModule() {
-        final Collection coll = new Collection("col123", collxml, null, ImmutableList.of(
-                new ModuleLink("m567", "latest", null)
-        ));
+        final Collection coll = new Collection("col123", collxml, null,
+                ImmutableList.<CollectionItem>of(
+                    new ModuleLink(0, 0, "m567", "latest", null)
+                ));
         assertFalse(coll.hasModule("m123"));
     }
 
     @Test public void hasModuleShouldFindModule() {
-        final Collection coll = new Collection("col123", collxml, null, ImmutableList.of(
-                new ModuleLink("m567", "latest", null)
-        ));
+        final Collection coll = new Collection("col123", collxml, null,
+                ImmutableList.<CollectionItem>of(
+                        new ModuleLink(0, 0, "m567", "latest", null)
+                ));
         assertTrue(coll.hasModule("m567"));
     }
 
     @Test public void hasModuleShouldFindSubmodule() {
-        final Collection coll = new Collection("col123", collxml, null, ImmutableList.of(
-                new ModuleLink("m567", "latest", null)
-        ));
+        final Collection coll = new Collection("col123", collxml, null,
+                ImmutableList.<CollectionItem>of(
+                        new Subcollection(0, 0, ImmutableList.<CollectionItem>of(
+                                new ModuleLink(1, 0, "m567", "latest", null)
+                        ), null)
+                ));
         assertTrue(coll.hasModule("m567"));
     }
 
     @Test public void getPreviousNextShouldReturnNullsWhenNotFound() {
         final Collection coll = new Collection("col123", collxml, null,
-                ImmutableList.<ModuleLink>of());
+                ImmutableList.<CollectionItem>of());
         final ModuleLink[] result = coll.getPreviousNext("m0001");
         assertEquals(2, result.length);
         assertNull(result[0]);
@@ -62,9 +66,10 @@ public class CollectionTests {
     }
 
     @Test public void getPreviousNextShouldReturnNullsForSingleItem() {
-        final Collection coll = new Collection("col123", collxml, null, ImmutableList.of(
-                new ModuleLink("m0001", "latest", null)
-        ));
+        final Collection coll = new Collection("col123", collxml, null,
+                ImmutableList.<CollectionItem>of(
+                        new ModuleLink(0, 0, "m0001", "latest", null)
+                ));
         final ModuleLink[] result = coll.getPreviousNext("m0001");
         assertEquals(2, result.length);
         assertNull(result[0]);
@@ -72,10 +77,10 @@ public class CollectionTests {
     }
 
     @Test public void getPreviousNextShouldReturnSiblings() {
-        final ImmutableList<ModuleLink> links = ImmutableList.of(
-                new ModuleLink("m01", "latest", null),
-                new ModuleLink("m02", "latest", null),
-                new ModuleLink("m03", "latest", null)
+        final ImmutableList<CollectionItem> links = ImmutableList.<CollectionItem>of(
+                new ModuleLink(0, 0, "m01", "latest", null),
+                new ModuleLink(0, 1, "m02", "latest", null),
+                new ModuleLink(0, 2, "m03", "latest", null)
         );
         final Collection coll = new Collection("col123", collxml, null, links);
         final ModuleLink[] result = coll.getPreviousNext("m02");
@@ -85,10 +90,10 @@ public class CollectionTests {
     }
 
     @Test public void getPreviousNextShouldHandleFirst() {
-        final ImmutableList<ModuleLink> links = ImmutableList.of(
-                new ModuleLink("m01", "latest", null),
-                new ModuleLink("m02", "latest", null),
-                new ModuleLink("m03", "latest", null)
+        final ImmutableList<CollectionItem> links = ImmutableList.<CollectionItem>of(
+                new ModuleLink(0, 0, "m01", "latest", null),
+                new ModuleLink(0, 1, "m02", "latest", null),
+                new ModuleLink(0, 2, "m03", "latest", null)
         );
         final Collection coll = new Collection("col123", collxml, null, links);
         final ModuleLink[] result = coll.getPreviousNext("m01");
@@ -98,10 +103,10 @@ public class CollectionTests {
     }
 
     @Test public void getPreviousNextShouldHandleLast() {
-        final ImmutableList<ModuleLink> links = ImmutableList.of(
-                new ModuleLink("m01", "latest", null),
-                new ModuleLink("m02", "latest", null),
-                new ModuleLink("m03", "latest", null)
+        final ImmutableList<CollectionItem> links = ImmutableList.<CollectionItem>of(
+                new ModuleLink(0, 0, "m01", "latest", null),
+                new ModuleLink(0, 1, "m02", "latest", null),
+                new ModuleLink(0, 2, "m03", "latest", null)
         );
         final Collection coll = new Collection("col123", collxml, null, links);
         final ModuleLink[] result = coll.getPreviousNext("m03");

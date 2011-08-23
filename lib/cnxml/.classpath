@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/xalan-2.7.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/org.cnx.xmlschema.latest.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

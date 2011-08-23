@@ -22,13 +22,19 @@ article, aside, command, details, summary, figure, figcaption, footer, header, h
 
 html, body {
     font-family: "Open Sans", sans-serif;
+    font-size: 90%;
 }
 
 body > header {
+    background: #ddd;
+    padding: 1ex 0;
     text-align: center;
 }
 
 body > header > h1 {
+    margin: 0;
+    padding: 0;
+
     background: url(../img/logo.png) no-repeat left center;
     overflow: hidden;
     text-indent: -999em;
@@ -45,7 +51,7 @@ p.authors {
 
 hgroup > h1.collectionTitle {
     margin-bottom: 0;
-    font-size: 150%;
+    font-size: 100%;
 }
 
 hgroup > h1.collectionTitle > a {
@@ -60,6 +66,7 @@ hgroup > h1.moduleTitle {
     display: table;
     table-layout: fixed;
     width: 100%;
+    margin-top: 1em;
     padding: 0.5ex 1ex;
 
     background: #cedff0;
@@ -131,11 +138,10 @@ hgroup > h1.moduleTitle {
 }
 
 .moduleContent h1 {
-    margin-top: 2em;
+    margin-top: 1.5em;
 }
 
 .moduleContent > section > h1 {
-    margin-top: 1.5em;
     border-bottom: thin solid gray;
 }
 
@@ -147,6 +153,13 @@ hgroup > h1.moduleTitle {
 .moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement {
     margin-bottom: 1em;
     margin-top: 1em;
+}
+
+.moduleContent .unhandled {
+    width: 20em;
+    padding: 0 1ex;
+    border: thin solid #bfbaa1;
+    background: #deca73;
 }
 
 table.cals {
@@ -227,11 +240,4 @@ table.cals th, table.cals td {
 
 .collectionToc {
     margin-top: 1.5em;
-
-    -moz-column-count: 2;
-    -moz-column-gap: 2em;
-    -webkit-column-count: 2;
-    -webkit-column-gap: 2em;
-    column-count: 2;
-    column-gap: 2em;
 }

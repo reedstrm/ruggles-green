@@ -19,6 +19,7 @@ package org.cnx.cnxml;
 import com.google.common.base.Preconditions;
 import javax.annotation.Nullable;
 import org.cnx.mdml.Metadata;
+import org.cnx.resourcemapping.Resources;
 import org.cnx.util.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,20 +32,21 @@ import org.w3c.dom.Element;
 public class Module {
     private final String id;
     private final Document cnxml;
-    private final Document resourceMapping;
+    private final Resources resources;
     private final Metadata metadata;
     private final String cnxmlNamespace;
 
-    public Module(String id, Document cnxml, Document resourceMapping,
+    public Module(String id, Document cnxml, Resources resources,
             @Nullable Metadata metadata, @CnxmlNamespace String cnxmlNamespace) {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(cnxml);
-        Preconditions.checkNotNull(resourceMapping);
+        // TODO(arjuns) : uncomment this later.
+//        Preconditions.checkNotNull(resources);
         Preconditions.checkNotNull(cnxmlNamespace);
 
         this.id = id;
         this.cnxml= cnxml;
-        this.resourceMapping = resourceMapping;
+        this.resources = resources;
         this.metadata = metadata;
         this.cnxmlNamespace = cnxmlNamespace;
     }
@@ -57,8 +59,8 @@ public class Module {
         return cnxml;
     }
 
-    public Document getResourceMapping() {
-        return resourceMapping;
+    public Resources getResources() {
+        return resources;
     }
 
     public Metadata getMetadata() {

@@ -16,8 +16,6 @@
 
 package org.cnx.cnxml;
 
-import org.w3c.dom.Node;
-
 /**
  *  Processor is an interface for a single pass operation on a Module before it is passed to the
  *  HTML generator.

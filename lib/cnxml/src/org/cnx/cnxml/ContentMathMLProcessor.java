@@ -24,7 +24,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  *  ContentMathMLProcessor transforms content MathML into presentation MathML.
@@ -43,7 +42,7 @@ import org.w3c.dom.Node;
     public Module process(Module module) throws Exception {
         final Document doc = documentBuilder.newDocument();
         transformer.transform(new DOMSource(module.getCnxml()), new DOMResult(doc));
-        return new Module(module.getId(), doc, module.getResourceMapping(), module.getMetadata(),
+        return new Module(module.getId(), doc, module.getResources(), module.getMetadata(),
                 module.getCnxmlNamespace());
     }
 }

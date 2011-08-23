@@ -84,6 +84,7 @@
         <javac srcdir="src"
                destdir="${classdir}"
                includeantruntime="false"
+               failonerror="true"
                debug="true">
             <compilerarg line="${javac.flags}" />
             <classpath>

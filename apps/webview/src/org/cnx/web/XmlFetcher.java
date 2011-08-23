@@ -18,7 +18,7 @@ package org.cnx.web;
 
 import org.cnx.cnxml.Module;
 import org.cnx.common.collxml.Collection;
-import org.w3c.dom.Document;
+import org.cnx.resourcemapping.Resources;
 
 /**
  *  An implementor of the XmlFetcher interface can retrieve modules and collections from a source.
@@ -26,6 +26,12 @@ import org.w3c.dom.Document;
  *  These may be locally cached, stored on another server, etc.
  */
 public interface XmlFetcher {
+    public Module getModule(String moduleId, String cnxml, String resourceMappingXml) throws Exception;
+    public Collection getCollection(String collectionId, String collXml) throws Exception;
+    public Resources getResources(String resourceMappingXml);
+
+    // TODO(arjuns): Remove following two methods.
     public Module fetchModuleVersion(String moduleId, String version) throws Exception;
     public Collection fetchCollectionVersion(String collectionId, String version) throws Exception;
+
 }

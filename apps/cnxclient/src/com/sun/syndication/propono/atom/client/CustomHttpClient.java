@@ -16,6 +16,7 @@
 package com.sun.syndication.propono.atom.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -52,31 +53,6 @@ public class CustomHttpClient extends HttpClient {
     private static final String FIELD_RESPONSE_STATUS = "statusLine";
     @SuppressWarnings("rawtypes")
     private final Class parent = HttpMethodBase.class;
-
-    private InputStreamReader getReaderForURL(String uri) {
-        try {
-            URL url = uri2url(uri);
-            return new InputStreamReader(url.openStream());
-        } catch (IOException e) {
-            // TODO(arjuns): Auto-generated catch block
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Returns webpage for a URL as String.
-     */
-    public String getURLContentAsString(String uri) throws IOException {
-        return CharStreams.toString(getReaderForURL(uri));
-    }
-
-    private URL uri2url(String uri) {
-        try {
-            return new URL(uri);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * This is the Generic executeMethod which will replace all the http-methods and in
@@ -206,9 +182,7 @@ public class CustomHttpClient extends HttpClient {
                 + "] is not yet implemented.");
 
         }
-        int responseCode = connection.getResponseCode();
-
-        updateStatusLineInResponseBody(method, responseCode);
+        updateStatusLineInResponseBody(method, connection.getResponseCode());
 
         response = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
         return response;
@@ -219,11 +193,18 @@ public class CustomHttpClient extends HttpClient {
      */
     private String handleGetMethod(HttpMethod method) throws IOException, URIException,
             NoSuchFieldException, IllegalAccessException {
-        String response;
-        response = CharStreams.toString(getReaderForURL(method.getURI().toString()));
+
+        URL url = new URL(method.getURI().toString());
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        GetMethod getMethod = (GetMethod) method;
+        InputStream inputStream = (InputStream)connection.getContent();
+        String response = CharStreams.toString(new InputStreamReader(inputStream));
+
         Field responseBodyField = parent.getDeclaredField(FIELD_RESPONSE_BODY_NAME);
         responseBodyField.setAccessible(true);
         responseBodyField.set(method, response.getBytes());
+        updateStatusLineInResponseBody(method, connection.getResponseCode());
+
         return response;
     }
 }

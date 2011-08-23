@@ -21,7 +21,7 @@
     <property file="build.properties" />
 
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
-    <import file="${third_party}/appengine/appengine-1.5.2/config/user/ant-macros.xml" />
+    <import file="${third_party}/appengine/appengine-java-sdk-1.5.3/config/user/ant-macros.xml" />
 
     <target name="war"
             depends="compile"

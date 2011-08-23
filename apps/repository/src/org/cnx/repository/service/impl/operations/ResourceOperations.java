@@ -128,14 +128,6 @@ public class ResourceOperations {
                         .newPendingUploac(entity.getId(), entity.getCreationTime());
                 break;
             case UPLOAD_COMPLETE:
-                // NOTE(tal): blob info could be cased in the resource entity when completing
-                // the content upload.
-                // final BlobInfo blobInfo =
-                // Services.blobInfoFactory.loadBlobInfo(entity.getBlobKey());
-                // if (blobInfo == null) {
-                // return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                // "Could not locate blob at key: " + entity.getBlobKey(), log);
-                // }
                 final OrmBlobInfo blobInfo = checkNotNull(entity.getBlobInfo());
                 final UploadedResourceContentInfo contentInfo =
                     new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),

@@ -130,7 +130,6 @@ public class OrmResourceEntity extends OrmEntity {
         } else {
             checkState(blobInfo == null);
         }
-        // entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
     }
 
     public static OrmEntitySpec getSpec() {

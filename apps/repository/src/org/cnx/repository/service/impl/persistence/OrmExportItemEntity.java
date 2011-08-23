@@ -41,8 +41,6 @@ public class OrmExportItemEntity extends OrmEntity {
      */
     private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Export", null);
 
-    // private static final String BLOB_KEY_PROPERTY = "blob_key";
-
     private final OrmBlobInfo blobInfo;
 
     public OrmExportItemEntity(Key key, Date creationTime, OrmBlobInfo blobInfo) {
@@ -69,10 +67,6 @@ public class OrmExportItemEntity extends OrmEntity {
         return blobInfo;
     }
 
-    // public void setBlobInfo(OrmBlobInfo blobInfo) {
-    // this.blobInfo = checkNotNull(blobInfo);
-    // }
-
     /**
      * Construct an export item key.
      * 
@@ -89,7 +83,6 @@ public class OrmExportItemEntity extends OrmEntity {
     @Override
     protected void serializeToEntity(Entity entity) {
         blobInfo.serializeToEntity(entity);
-        // entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
     }
 
     public static OrmEntitySpec getSpec() {

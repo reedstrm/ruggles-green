@@ -16,7 +16,6 @@
 
 package org.cnx.repository.service.api;
 
-//import org.cnx.util.Assertions;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -35,7 +34,7 @@ public class GetResourceInfoResult {
         PENDING_UPLOAD,
         UPLOADED;
 
-        /** Does a resource in this state has content? */
+        /** Tests if a resource in this state has content. */
         public boolean hasContent() {
             return this != PENDING_UPLOAD;
         }

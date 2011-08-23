@@ -55,7 +55,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 public class ResourceUploadCompletionServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(ResourceUploadCompletionServlet.class
-        .getName());
+            .getName());
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -67,7 +67,7 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
         // or return, it is set to contains exactly the (possibly empty) list of blobs that
         // should be deleted.
         //
-        // TODO(tal): since blob deletion and data store entity update cannot be done in
+        // NOTE(tal): since blob deletion and data store entity update cannot be done in
         // one atomic transaction, we err on the safe side and prefer to leave garbage blobs
         // rather than breaking blob references in active exports. If we will have a significant
         // number of garbage blobs, consider to implement a garbage collection or another safe
@@ -93,8 +93,8 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             // Get blob id from the request
             if (incomingBlobs.size() != 1) {
                 final String message =
-                    "Resource factory completion handler expected to find "
-                        + "exactly one blob but found [" + incomingBlobs.size() + "]";
+                        "Resource factory completion handler expected to find "
+                                + "exactly one blob but found [" + incomingBlobs.size() + "]";
                 log.severe(message);
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                 return;
@@ -117,7 +117,7 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
                         resp,
                         HttpServletResponse.SC_NOT_ACCEPTABLE,
                         "Export too large: " + blobInfo + " vs. "
-                            + Services.config.getMaxResourceSize(), null, log, Level.WARNING);
+                                + Services.config.getMaxResourceSize(), null, log, Level.WARNING);
                 return;
             }
 
@@ -129,13 +129,13 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
 
             // Read the resource entity
             final OrmResourceEntity ormEntity =
-                Services.persistence.read(OrmResourceEntity.class, resourceKey);
+                    Services.persistence.read(OrmResourceEntity.class, resourceKey);
 
             // Promote the resource entity to UPLOADED state with the incoming blob.
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_PENDING) {
                 tx.rollback();
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_BAD_REQUEST, "Resource "
-                    + resourceId + " is not in pending upload state: " + ormEntity.getState(),
+                        + resourceId + " is not in pending upload state: " + ormEntity.getState(),
                         null, log, Level.WARNING);
                 return;
             }

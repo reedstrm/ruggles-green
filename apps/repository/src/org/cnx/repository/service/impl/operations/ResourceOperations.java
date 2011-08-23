@@ -122,8 +122,8 @@ public class ResourceOperations {
         switch (entity.getState()) {
             case UPLOAD_PENDING:
                 result =
-                GetResourceInfoResult
-                .newPendingUploac(entity.getId(), entity.getCreationTime());
+                    GetResourceInfoResult
+                        .newPendingUploac(entity.getId(), entity.getCreationTime());
                 break;
             case UPLOAD_COMPLETE:
                 // NOTE(tal): blob info could be cased in the resource entity when completing

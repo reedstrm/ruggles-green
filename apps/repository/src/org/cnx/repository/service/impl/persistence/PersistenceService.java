@@ -59,7 +59,7 @@ public class PersistenceService {
     }
 
     public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
-        throws EntityNotFoundException {
+            throws EntityNotFoundException {
         final Entity entity = datastore.get(key);
         return deserialize(entityClass, entity);
     }
@@ -92,7 +92,7 @@ public class PersistenceService {
         query.setAncestor(parentKey);
 
         final List<Entity> entities =
-            datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+                datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         final List<T> ormEntities = Lists.newArrayList();
 
@@ -164,10 +164,8 @@ public class PersistenceService {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
         }
 
-        // TODO(tal): should we use a query result iterator instead of a list?
-        //
-        // These entities have keys only since we queried above for keys only. They cannot
-        // be deserialized into ORM entities.
+        // NOTE(tal): these entities have keys only since we queried above for keys only. They
+        // cannot be deserialized into ORM entities.
         final QueryResultList<Entity> results = pq.asQueryResultList(fetchOptions);
 
         final List<Key> keys = Lists.newArrayList();
@@ -176,17 +174,12 @@ public class PersistenceService {
             keys.add(entity.getKey());
         }
 
-        // TODO(tal): we base this termination condition on reverse engineering the app engine
-        // code. Need to confirm with an authorative source.
         final boolean endOfData = (results.size() < maxResults);
 
-        // TODO(tal): what is the semantic of having a null cursor? It is an error? (it does not
-        // seem to be though the signal for end of data since it is non null even at the end
-        // of data, tested on dev environment, Aug 2011).
         @Nullable
         final String endCursor =
-            endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
-                .toWebSafeString();
+        endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
+            .toWebSafeString();
 
         return Pair.of(keys, endCursor);
     }

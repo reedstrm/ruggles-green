@@ -101,13 +101,6 @@ public abstract class OrmEntity {
         return IdUtil.keyToId(entitySpec, getKey());
     }
 
-    // TODO(tal): consider to move this functionality to IdUtil.
-    // public static String keyToId(OrmEntitySpec entitySpec, Key key) {
-    // checkNotNull(key, "Null key");
-    // checkArgument(entitySpec.getKeyKind().equals(key.getKind()), "Key kind mismatch:  %s", key);
-    // return IdUtil.idToString(entitySpec.getIdPrefix(), key.getId());
-    // }
-
     public Entity toEntity() {
         final Entity entity =
             (getKey() == null) ? new Entity(entitySpec.getKeyKind()) : new Entity(key);

@@ -35,7 +35,8 @@ public class GetCollectionInfoResult {
     private final int versionCount;
     private final ImmutableList<ExportInfo> exports;
 
-    public GetCollectionInfoResult(String collectionId, Date creationTime, int versionCountr, List<ExportInfo> exports) {
+    public GetCollectionInfoResult(String collectionId, Date creationTime, int versionCountr,
+        List<ExportInfo> exports) {
         checkArgument(versionCountr >= 0, "Invalid collection version count: %s", versionCountr);
         this.collectionId = checkNotNull(collectionId);
         this.creationTime = checkNotNull(creationTime);

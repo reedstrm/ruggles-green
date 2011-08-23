@@ -35,7 +35,8 @@ public class GetModuleInfoResult {
     private final int versionCount;
     private final ImmutableList<ExportInfo> exports;
 
-    public GetModuleInfoResult(String moduleId, Date creationTime, int versionCount, List<ExportInfo> exports) {
+    public GetModuleInfoResult(String moduleId, Date creationTime, int versionCount,
+        List<ExportInfo> exports) {
         checkArgument(versionCount >= 0, "Negative version count: %s", versionCount);
         this.moduleId = checkNotNull(moduleId);
         this.creationTime = checkNotNull(creationTime);

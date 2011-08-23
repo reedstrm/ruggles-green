@@ -58,7 +58,7 @@ public class GetResourceInfoResult {
      *            Otherwise it should be null.
      */
     private GetResourceInfoResult(String resourceId, Date creationTime,
-            ResourceState resourceState, @Nullable UploadedResourceContentInfo contentInfo) {
+        ResourceState resourceState, @Nullable UploadedResourceContentInfo contentInfo) {
         this.resourceId = checkNotNull(resourceId);
         this.creationTime = checkNotNull(creationTime);
         this.resourceState = checkNotNull(resourceState);
@@ -95,12 +95,12 @@ public class GetResourceInfoResult {
 
     public static GetResourceInfoResult newPendingUploac(String resourceId, Date creationTime) {
         return new GetResourceInfoResult(resourceId, creationTime, ResourceState.PENDING_UPLOAD,
-                null);
+            null);
     }
 
     public static GetResourceInfoResult newUploaded(String resourceId, Date creationTime,
             UploadedResourceContentInfo contentInfo) {
         return new GetResourceInfoResult(resourceId, creationTime, ResourceState.UPLOADED,
-                checkNotNull(contentInfo));
+            checkNotNull(contentInfo));
     }
 }

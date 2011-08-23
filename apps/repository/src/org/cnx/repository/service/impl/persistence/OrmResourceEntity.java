@@ -16,7 +16,6 @@
 
 package org.cnx.repository.service.impl.persistence;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -24,7 +23,6 @@ import java.util.Date;
 
 import javax.annotation.Nullable;
 
-import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 
@@ -38,7 +36,6 @@ public class OrmResourceEntity extends OrmEntity {
     private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "R");
 
     private static final String STATE_PROPERTY = "state";
-    private static final String BLOB_KEY_PROPERTY = "blob_key";
 
     /**
      * Each resource must be in one of these states.
@@ -58,15 +55,12 @@ public class OrmResourceEntity extends OrmEntity {
         }
     }
 
-    /**
-     * The state of this resource. This is a required attribute.
-     */
+    /** The state of this resource. This is a required attribute. */
     private State state = State.UPLOAD_PENDING;
 
-    /**
-     * The blob key of this resource. Exists in states where hasBlobKey() is true, null otherwise.
-     */
-    private BlobKey blobKey;
+    /** The blob info. Non null IFF state.hasBlobKey() is true. */
+    @Nullable
+    private OrmBlobInfo blobInfo;
 
     /**
      * Construct a resource entity in the {@link State#UPLOAD_PENDING} state with null key.
@@ -76,7 +70,7 @@ public class OrmResourceEntity extends OrmEntity {
     public OrmResourceEntity(Date creationTime) {
         super(ENTITY_SPEC, null, creationTime);
         this.state = State.UPLOAD_PENDING;
-        this.blobKey = null;
+        this.blobInfo = null;
     }
 
     /**
@@ -87,8 +81,7 @@ public class OrmResourceEntity extends OrmEntity {
     public OrmResourceEntity(Entity entity) {
         super(ENTITY_SPEC, entity);
         this.state = State.valueOf((String) entity.getProperty(STATE_PROPERTY));
-        this.blobKey = (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY);
-        checkArgument(state.hasBlobKey() == (blobKey != null), "Inconsistent state: %s", state);
+        this.blobInfo = (state.hasBlobKey()) ? new OrmBlobInfo(entity) : null;
     }
 
     public State getState() {
@@ -96,8 +89,8 @@ public class OrmResourceEntity extends OrmEntity {
     }
 
     @Nullable
-    public BlobKey getBlobKey() {
-        return blobKey;
+    public OrmBlobInfo getBlobInfo() {
+        return blobInfo;
     }
 
     /**
@@ -106,12 +99,12 @@ public class OrmResourceEntity extends OrmEntity {
      * 
      * Asserts that the entity has key and is in {@link State#UPLOAD_PENDING} state.
      * 
-     * @param newBlobKey key of the resource blob.
+     * @param newBlobInfo info of the resource blob.
      */
-    public void pendingToUploadedTransition(BlobKey newBlobKey) {
+    public void pendingToUploadedTransition(OrmBlobInfo newBlobInfo) {
         checkState(state == State.UPLOAD_PENDING, "Encountered %s", state);
         checkState(getKey() != null, "Resource entity has no key");
-        blobKey = checkNotNull(newBlobKey, "Null blob key");
+        blobInfo = checkNotNull(newBlobInfo, "Null blob info");
         state = State.UPLOAD_COMPLETE;
     }
 
@@ -132,7 +125,12 @@ public class OrmResourceEntity extends OrmEntity {
     protected void serializeToEntity(Entity entity) {
         // TODO(tal): *** can we persist the enum directly, not as a string?
         entity.setProperty(STATE_PROPERTY, state.toString());
-        entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
+        if (state.hasBlobKey()) {
+            checkNotNull(blobInfo).serializeToEntity(entity);
+        } else {
+            checkState(blobInfo == null);
+        }
+        // entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
     }
 
     public static OrmEntitySpec getSpec() {

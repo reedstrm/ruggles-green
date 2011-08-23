@@ -36,7 +36,7 @@ public class GetCollectionVersionInfoResult {
     private final ImmutableList<ExportInfo> exports;
 
     public GetCollectionVersionInfoResult(String collectionId, int versionNumber,
-            Date creationTime, List<ExportInfo> exports) {
+        Date creationTime, List<ExportInfo> exports) {
         checkArgument(versionNumber >= 1, "Invalid version number: %s", versionNumber);
         this.collectionId = checkNotNull(collectionId);
         this.versionNumber = versionNumber;

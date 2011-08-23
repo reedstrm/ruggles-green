@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.ExportReference;
+import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
 import org.cnx.repository.service.impl.persistence.OrmEntity;
 import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 
@@ -154,7 +155,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                 final OrmExportItemEntity oldExportItemEntity =
                     Services.persistence.read(OrmExportItemEntity.class,
                             validationResult.getExportKey());
-                oldBlobKey = checkNotNull(oldExportItemEntity.getBlobKey());
+                oldBlobKey = checkNotNull(oldExportItemEntity.getBlobInfo().getBlobKey());
             } catch (EntityNotFoundException e) {
                 // Do nothing here. this is normal.
             }
@@ -162,7 +163,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             // Create a new entity
             final OrmExportItemEntity newExportItemEntity =
                 new OrmExportItemEntity(validationResult.getExportKey(), transactionTime,
-                    newBlobKey);
+                    new OrmBlobInfo(blobInfo));
             Services.persistence.write(newExportItemEntity);
             tx.commit();
 

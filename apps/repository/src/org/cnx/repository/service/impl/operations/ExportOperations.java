@@ -115,7 +115,7 @@ public class ExportOperations {
             final OrmExportItemEntity entity =
                 Services.persistence.read(OrmExportItemEntity.class,
                         validationResult.getExportKey());
-            blobKey = checkNotNull(entity.getBlobKey(), "null blobkey");
+            blobKey = entity.getBlobInfo().getBlobKey();
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
                 + exportReference, log, e);
@@ -168,7 +168,7 @@ public class ExportOperations {
             }
 
             // Export entity found. Delete it.
-            blobKey = entity.getBlobKey();
+            blobKey = entity.getBlobInfo().getBlobKey();
             Services.persistence.delete(checkNotNull(entity.getKey()));
 
             tx.commit();

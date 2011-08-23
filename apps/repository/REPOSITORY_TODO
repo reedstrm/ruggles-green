@@ -1,7 +1,10 @@
 Repository global todo items
 
-* Add API method to lookup resources by size/hash
+* Add API capability for the migrator to keep entity ids.
+
 * return size and md5 hash for resource and export info results
+* Add API method to lookup resources by size/hash
+
 * Make the IdUtil test to work (requires GAE test jars)
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
 

@@ -36,7 +36,7 @@ public class GetModuleVersionInfoResult {
     private final ImmutableList<ExportInfo> exports;
 
     public GetModuleVersionInfoResult(String moduleId, int versionNumber, Date creationTime,
-            List<ExportInfo> exports) {
+        List<ExportInfo> exports) {
         checkArgument(versionNumber >= 1, "Invalid module version number: %s", versionNumber);
         this.moduleId = checkNotNull(moduleId);
         this.versionNumber = versionNumber;

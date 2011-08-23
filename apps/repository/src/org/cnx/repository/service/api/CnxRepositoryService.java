@@ -73,8 +73,8 @@ public interface CnxRepositoryService {
     /**
      * Query resource id list with optional paging.
      * 
-     * Note that the method return resources ids regardless of their state. Some resources
-     * may not have uploaded content yte.
+     * Note that the method return resources ids regardless of their state. Some resources may not
+     * have uploaded content yte.
      * 
      * Similar to {@link #getModuleList}. See there for details.
      */

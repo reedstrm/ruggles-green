@@ -16,6 +16,30 @@
 
 package org.cnx.cnxml;
 
+import static org.cnx.cnxml.SoyStringConstants.ATTRIBUTE_NODES;
+import static org.cnx.cnxml.SoyStringConstants.AUDIO;
+import static org.cnx.cnxml.SoyStringConstants.CDATA;
+import static org.cnx.cnxml.SoyStringConstants.CHILD_NODES;
+import static org.cnx.cnxml.SoyStringConstants.DOWNLOAD;
+import static org.cnx.cnxml.SoyStringConstants.ELEMENT;
+import static org.cnx.cnxml.SoyStringConstants.FIND_ELEM;
+import static org.cnx.cnxml.SoyStringConstants.FLASH;
+import static org.cnx.cnxml.SoyStringConstants.IMAGE;
+import static org.cnx.cnxml.SoyStringConstants.INNER_TEXT;
+import static org.cnx.cnxml.SoyStringConstants.JAVA_APPLET;
+import static org.cnx.cnxml.SoyStringConstants.LABVIEW;
+import static org.cnx.cnxml.SoyStringConstants.LOCAL_NAME;
+import static org.cnx.cnxml.SoyStringConstants.MATH_CHILDREN_JAVA;
+import static org.cnx.cnxml.SoyStringConstants.MEDIA;
+import static org.cnx.cnxml.SoyStringConstants.NAMESPACE_URI;
+import static org.cnx.cnxml.SoyStringConstants.NODE_TYPE;
+import static org.cnx.cnxml.SoyStringConstants.NODE_VALUE;
+import static org.cnx.cnxml.SoyStringConstants.OBJECT;
+import static org.cnx.cnxml.SoyStringConstants.PDF;
+import static org.cnx.cnxml.SoyStringConstants.STR_TO_DECIMAL;
+import static org.cnx.cnxml.SoyStringConstants.TEXT;
+import static org.cnx.cnxml.SoyStringConstants.VIDEO;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -34,47 +58,52 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *  SoyExtras contains functions needed by the Soy templates for HTML generation.
+ * SoyExtras contains functions needed by the Soy templates for HTML generation.
  */
 class SoyExtras extends AbstractModule {
-    @Override public void configure() {
+    @Override
+    public void configure() {
         final Multibinder<SoyFunction> soyFunctionsSetBinder =
                 Multibinder.newSetBinder(binder(), SoyFunction.class);
         soyFunctionsSetBinder.addBinding().to(FindElemFunction.class);
         soyFunctionsSetBinder.addBinding().to(InnerTextFunction.class);
+        soyFunctionsSetBinder.addBinding().to(MathChildrenJavaFunction.class);
         soyFunctionsSetBinder.addBinding().to(StrtodFunction.class);
         soyFunctionsSetBinder.addBinding().to(MediaFunction.class);
     }
 
     /**
-     *  FindElemFunction provides the <code>findElem()</code> function to Soy.
-     *  The function takes two arguments: the first is a DOM node (transformed into
-     *  a Soy map), and the second is a string.  It returns the first child node of
-     *  the DOM node whose tag matches the string.
+     * FindElemFunction provides the <code>findElem()</code> function to Soy. The function takes two
+     * arguments: the first is a DOM node (transformed into a Soy map), and the second is a string.
+     * It returns the first child node of the DOM node whose tag matches the string.
      */
-    @Singleton private static class FindElemFunction implements SoyTofuFunction {
-        private static final String NAME = "findElem";
-
-        @Inject public FindElemFunction() {}
-
-        @Override public String getName() {
-            return NAME;
+    @Singleton
+    private static class FindElemFunction implements SoyTofuFunction {
+        @Inject
+        public FindElemFunction() {
         }
 
-        @Override public Set<Integer> getValidArgsSizes() {
+        @Override
+        public String getName() {
+            return FIND_ELEM.getSoyName();
+        }
+
+        @Override
+        public Set<Integer> getValidArgsSizes() {
             return ImmutableSet.of(2);
         }
 
-        @Override public SoyData computeForTofu(List<SoyData> args) {
+        @Override
+        public SoyData computeForTofu(List<SoyData> args) {
             SoyMapData elem;
             String name;
 
             // TODO(light): Better error messages
             if (args.get(0) instanceof SoyMapData) {
-                elem = (SoyMapData)args.get(0);
+                elem = (SoyMapData) args.get(0);
             } else {
                 throw new IllegalArgumentException(
-                        "Argument 1 to findElem() function is not SoyMapData");
+                        "Argument 1 to " + getName() + "() function is not SoyMapData");
             }
 
             try {
@@ -84,9 +113,9 @@ class SoyExtras extends AbstractModule {
                         "Argument 2 to findElem() function is not String");
             }
 
-            for (SoyData item : elem.getListData("childNodes")) {
+            for (SoyData item : elem.getListData(CHILD_NODES.getSoyName())) {
                 if (item instanceof SoyMapData) {
-                    if (name.equals(((SoyMapData)item).getString("localName"))) {
+                    if (name.equals(((SoyMapData) item).getString(LOCAL_NAME.getSoyName()))) {
                         return item;
                     }
                 }
@@ -96,44 +125,47 @@ class SoyExtras extends AbstractModule {
     }
 
     /**
-     *  InnerTextFunction provides the <code>innerText()</code> function to Soy.
-     *  The function takes one argument: a DOM node.    It returns the concatenation
-     *  of the text nodes inside the node.
+     * InnerTextFunction provides the <code>innerText()</code> function to Soy. The function takes
+     * one argument: a DOM node. It returns the concatenation of the text nodes inside the node.
      */
-    @Singleton private static class InnerTextFunction implements SoyTofuFunction {
-        private static final String NAME = "innerText";
-
-        @Inject public InnerTextFunction() {}
-
-        @Override public String getName() {
-            return NAME;
+    @Singleton
+    private static class InnerTextFunction implements SoyTofuFunction {
+        @Inject
+        public InnerTextFunction() {
         }
 
-        @Override public Set<Integer> getValidArgsSizes() {
+        @Override
+        public String getName() {
+            return INNER_TEXT.getSoyName();
+        }
+
+        @Override
+        public Set<Integer> getValidArgsSizes() {
             return ImmutableSet.of(1);
         }
 
-        @Override public SoyData computeForTofu(List<SoyData> args) {
+        @Override
+        public SoyData computeForTofu(List<SoyData> args) {
             SoyMapData elem;
             // TODO(light): Better error messages
             if (args.get(0) instanceof SoyMapData) {
-                elem = (SoyMapData)args.get(0);
+                elem = (SoyMapData) args.get(0);
             } else {
                 throw new IllegalArgumentException(
-                        "Argument 1 to innerText() function is not SoyMapData");
+                        "Argument 1 to " + getName() + "() function is not SoyMapData");
             }
             // Find text nodes in children
-            final SoyListData childNodes = elem.getListData("childNodes");
+            final SoyListData childNodes = elem.getListData(CHILD_NODES.getSoyName());
             final StringBuilder builder = new StringBuilder();
             for (SoyData childData : childNodes) {
                 if (!(childData instanceof SoyMapData)) {
                     continue;
                 }
 
-                final SoyMapData child = (SoyMapData)childData;
-                final String nodeType = child.getString("nodeType");
-                if ("text".equals(nodeType) || "cdata".equals(nodeType)) {
-                    builder.append(child.getString("nodeValue"));
+                final SoyMapData child = (SoyMapData) childData;
+                final String nodeType = child.getString(NODE_TYPE.getSoyName());
+                if ("text".equals(nodeType) || CDATA.getSoyName().equals(nodeType)) {
+                    builder.append(child.getString(NODE_VALUE.getSoyName()));
                 }
             }
             return new StringData(builder.toString());
@@ -141,31 +173,114 @@ class SoyExtras extends AbstractModule {
     }
 
     /**
-     *  StrtodFunction provides the <code>strtod()</code> function to Soy.
-     *  The function takes one argument: a string.  It returns the equivalent
-     *  integer, or null if the string does not represent an integer.
+     * MathChildrenJavaFunction takes a DOM node (in soy data format) and returns a string
+     * representing its rendering in HTML.
+     *
+     * TODO(tal): take care of escaping.
      */
-    @Singleton private static class StrtodFunction implements SoyTofuFunction {
-        private static final String NAME = "strtod";
-
-        @Inject public StrtodFunction() {}
-
-        @Override public String getName() {
-            return NAME;
+    @Singleton
+    private static class MathChildrenJavaFunction implements SoyTofuFunction {
+        @Inject
+        public MathChildrenJavaFunction() {
         }
 
-        @Override public Set<Integer> getValidArgsSizes() {
+        @Override
+        public String getName() {
+            return MATH_CHILDREN_JAVA.getSoyName();
+        }
+
+        @Override
+        public Set<Integer> getValidArgsSizes() {
             return ImmutableSet.of(1);
         }
 
-        @Override public SoyData computeForTofu(List<SoyData> args) {
+        @Override
+        public SoyData computeForTofu(List<SoyData> args) {
+            final SoyMapData node;
+            // TODO(light): Better error messages
+            if (args.get(0) instanceof SoyMapData) {
+                node = (SoyMapData) args.get(0);
+            } else {
+                throw new IllegalArgumentException(
+                        "Argument 1 to " + getName() + "() function is not SoyMapData");
+            }
+
+            final StringBuilder builder = new StringBuilder();
+            internalCompute(builder, node);
+
+            return new StringData(builder.toString());
+        }
+
+
+        private void internalCompute(StringBuilder builder, SoyMapData node) {
+
+            final SoyListData childList = node.getListData(CHILD_NODES.getSoyName());
+
+            for (int i = 0; i < childList.length(); i++) {
+                final SoyMapData child = childList.getMapData(i);
+
+                final String childType = child.getString(NODE_TYPE.getSoyName());
+
+                if (TEXT.getSoyName().equals(childType)) {
+                    builder.append(child.getString(NODE_VALUE.getSoyName()));
+                } else if (ELEMENT.getSoyName().equals(childType)) {
+                    builder.append("<");
+                    builder.append(child.getString(LOCAL_NAME.getSoyName()));
+
+                    final SoyListData attributeList =
+                        child.getListData(ATTRIBUTE_NODES.getSoyName());
+                    for (int j = 0; j < attributeList.length(); j++) {
+                        final SoyMapData attribute = attributeList.getMapData(j);
+                        //System.out.println("*** Attribute: " + attribute);
+                        builder.append(" ");
+                        builder.append(attribute.getString(LOCAL_NAME.getSoyName()));
+                        builder.append("=\"");
+                        builder.append(attribute.getString(NODE_VALUE.getSoyName()));
+                        builder.append("\"");
+                    }
+                    builder.append(">");
+                    internalCompute(builder, child);  // recursion
+                    builder.append("</");
+                    builder.append(child.getString(LOCAL_NAME.getSoyName()));
+                    builder.append(">");
+                }
+                // else ignore silently
+            }
+
+        }
+    }
+
+    /**
+     * StrtodFunction provides the <code>strtod()</code> function to Soy. The function takes one
+     * argument: a string. It returns the equivalent integer, or null if the string does not
+     * represent an integer.
+     */
+    @Singleton
+    private static class StrtodFunction implements SoyTofuFunction {
+        @Inject
+        public StrtodFunction() {
+        }
+
+        @Override
+        public String getName() {
+            return STR_TO_DECIMAL.getSoyName();
+        }
+
+        @Override
+        public Set<Integer> getValidArgsSizes() {
+            return ImmutableSet.of(1);
+        }
+
+        @Override
+        public SoyData computeForTofu(List<SoyData> args) {
             String str;
 
             // TODO(light): Better error messages
             if (args.get(0) instanceof StringData) {
-                str = ((StringData)args.get(0)).stringValue();
+                str = ((StringData) args.get(0)).stringValue();
             } else {
-                throw new IllegalArgumentException("Argument 1 to " + NAME + "() function is not string");
+                throw new IllegalArgumentException("Argument 1 to " + getName()
+                        + "() function is not string");
             }
 
             try {
@@ -178,76 +293,79 @@ class SoyExtras extends AbstractModule {
     }
 
     /**
-     *  MediaFunction provides the <code>media()</code> function to Soy.
-     *  The function takes one argument: a CNXML DOM node.  It returns the first valid media
-     *  DOM node.
+     * MediaFunction provides the <code>media()</code> function to Soy. The function takes one
+     * argument: a CNXML DOM node. It returns the first valid media DOM node.
      */
-    @Singleton private static class MediaFunction implements SoyTofuFunction {
-        private static final String NAME = "media";
+    @Singleton
+    private static class MediaFunction implements SoyTofuFunction {
         private static final ImmutableSet<String> MEDIA_ELEMENTS = ImmutableSet.of(
-                "audio",
-                "download",
-                "flash",
-                "image",
-                "java-applet",
-                "labview",
-                "object",
-                "video"
-        );
-        private static final String PDF_MEDIA_VALUE = "pdf";
-        private static final String OVERRIDE_MEDIA_VALUE = "webview2.0";
+            AUDIO.getSoyName(),
+            DOWNLOAD.getSoyName(),
+            FLASH.getSoyName(),
+            IMAGE.getSoyName(),
+            JAVA_APPLET.getSoyName(),
+            LABVIEW.getSoyName(),
+            OBJECT.getSoyName(),
+            VIDEO.getSoyName());
+
+        private static final String OVERRIDE_MEDIA_VALUE = SoyStringConstants.WEBVIEW_2_0
+            .getSoyName();
 
         private final String cnxmlNamespace;
 
-        @Inject public MediaFunction(@CnxmlNamespace String cnxmlNamespace) {
+        @Inject
+        public MediaFunction(@CnxmlNamespace String cnxmlNamespace) {
             this.cnxmlNamespace = cnxmlNamespace;
         }
 
-        @Override public String getName() {
-            return NAME;
+        @Override
+        public String getName() {
+            return MEDIA.getSoyName();
         }
 
-        @Override public Set<Integer> getValidArgsSizes() {
+        @Override
+        public Set<Integer> getValidArgsSizes() {
             return ImmutableSet.of(1);
         }
 
-        @Override public SoyData computeForTofu(List<SoyData> args) {
+        @Override
+        public SoyData computeForTofu(List<SoyData> args) {
             SoyMapData elem;
 
             // TODO(light): Better error messages
             if (args.get(0) instanceof SoyMapData) {
-                elem = (SoyMapData)args.get(0);
+                elem = (SoyMapData) args.get(0);
             } else {
-                throw new IllegalArgumentException(
-                        "Argument 1 to " + NAME + "() function is not SoyMapData");
+                throw new IllegalArgumentException("Argument 1 to " + getName()
+                        + "() function is not SoyMapData");
             }
 
             // Find first appropriate child node
-            final SoyListData childNodes = elem.getListData("childNodes");
+            final SoyListData childNodes = elem.getListData(CHILD_NODES.getSoyName());
             SoyData firstNode = null;
             for (SoyData childData : childNodes) {
                 if (!(childData instanceof SoyMapData)) {
                     continue;
                 }
 
-                final SoyMapData child = (SoyMapData)childData;
+                final SoyMapData child = (SoyMapData) childData;
                 String mediaFor = null;
                 try {
                     mediaFor = child.getString("attributes.for");
                 } catch (IllegalArgumentException e) {
-                    // The element has no "for" attribute.  Guice is documented to return null for
-                    // a missing key, but actually throws an exception.  Exception can be safely
+                    // The element has no "for" attribute. Guice is documented to return null for
+                    // a missing key, but actually throws an exception. Exception can be safely
                     // ignored.
                 }
-                if ("element".equals(child.getString("nodeType"))
-                        && cnxmlNamespace.equals(child.getString("namespaceURI"))
-                        && MEDIA_ELEMENTS.contains(child.getString("localName"))) {
+                if ("element".equals(child.getString(NODE_TYPE.getSoyName()))
+                        && cnxmlNamespace.equals(child.getString(NAMESPACE_URI.getSoyName()))
+                        && MEDIA_ELEMENTS.contains(child.getString(LOCAL_NAME.getSoyName()))) {
                     if (OVERRIDE_MEDIA_VALUE.equals(mediaFor)) {
                         // A special for="webview2.0" attribute is used to force the media element
-                        // to be used.  This is necessary to provide backward compatibility with
+                        // to be used. This is necessary to provide backward compatibility with
                         // cnx.org and still allow Mathematica to be embedded.
                         return child;
-                    } else if (!PDF_MEDIA_VALUE.equals(mediaFor) && firstNode == null) {
+                    } else if (!PDF.getSoyName().equals(mediaFor) && firstNode == null) {
                         firstNode = child;
                     }
                 }

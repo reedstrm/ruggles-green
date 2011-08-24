@@ -30,6 +30,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.cnx.cnxml.SoyStringConstants.NODE;
 
 /**
  *  SoyHTMLGenerator converts a CNXML file to HTML using Closure Templates.
@@ -61,7 +62,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
         // Render to HTML
         final SoyMapData params = new SoyMapData(
-                "node", soyDataConverter.convertDomToSoyData(module.getCnxml())
+                NODE.getSoyName(), soyDataConverter.convertDomToSoyData(module.getCnxml())
         );
         return tofu.render(SOY_NAMESPACE + ".main", params, null);
     }

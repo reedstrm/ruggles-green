@@ -34,7 +34,7 @@ public class CommonHack {
     public static final String COLLECTION_MODULE_TEMPLATE_NAME = "org.cnx.web.collectionModule";
     public static final String CONTENT_NAME_SPACE = "/content";
 
-    private static final String REPO_SERVER_URL = "http://100.cnx-repo.appspot.com";
+    private static final String REPO_SERVER_URL = "http://cnx-repo.appspot.com";
 //     public static String REPO_SERVER_URL = "http://localhost:8888";
 
     public static final String REPO_ATOM_PUB_URL = REPO_SERVER_URL + "/atompub";

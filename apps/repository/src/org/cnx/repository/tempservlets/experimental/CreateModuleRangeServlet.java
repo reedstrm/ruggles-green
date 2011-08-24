@@ -32,6 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.cnx.repository.service.impl.operations.Services;
 import org.cnx.repository.service.impl.persistence.OrmModuleEntity;
 
+import com.google.appengine.api.datastore.DatastoreService.KeyRangeState;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.KeyRange;
+
 /**
  * Experimental module to test mixed mode module id allocation.
  * 
@@ -70,11 +74,22 @@ public class CreateModuleRangeServlet extends HttpServlet {
         out.println();
 
         for (long i = 0; i < n; i++) {
+
             final OrmModuleEntity moduleEntity = new OrmModuleEntity(new Date());
             if (base != null) {
-                final String moduleId =
-                    String.format("%s%s", OrmModuleEntity.getSpec().getIdPrefix(), base + i);
-                moduleEntity.setKey(OrmModuleEntity.moduleIdToKey(moduleId));
+                // Handle the key of a forced key.
+                // Reserve this key so it is not allocated later automatically
+                final long numericId = base + i;
+                KeyRange keyRange =
+                        new KeyRange(null, OrmModuleEntity.getSpec().getKeyKind(), numericId, numericId);
+                checkArgument(keyRange.getSize() == 1, "Unexpected range size: %s",
+                        keyRange.getSize());
+                final KeyRangeState state =
+                        DatastoreServiceFactory.getDatastoreService().allocateIdRange(keyRange);
+                checkArgument(state == KeyRangeState.EMPTY, "Unexpected key range state: %s", state);
+
+                // Set entity key
+                moduleEntity.setKey(keyRange.getStart());
             }
             Services.persistence.write(moduleEntity);
             final String msg = String.format("Wrote module %s", moduleEntity.getId());

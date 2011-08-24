@@ -19,6 +19,8 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Date;
+
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -56,9 +58,9 @@ public class OrmModuleVersionEntity extends OrmEntity {
      * @param cnxmlDoc the CNXML doc of this version.
      * @param manifestDoc the resource mapping XML doc of this version.
      */
-    public OrmModuleVersionEntity(Key moduleKey, int versionNumber, String cnxmlDoc,
-        String resourceMapDoc) {
-        super(ENTITY_SPEC, moduleVersionKey(moduleKey, versionNumber));
+    public OrmModuleVersionEntity(Key moduleKey, Date creationDate, int versionNumber,
+        String cnxmlDoc, String resourceMapDoc) {
+        super(ENTITY_SPEC, moduleVersionKey(moduleKey, versionNumber), creationDate);
         this.versionNumber = versionNumber;
         this.cnxmlDoc = checkNotNull(cnxmlDoc);
         this.resourceMapDoc = checkNotNull(resourceMapDoc);
@@ -68,9 +70,10 @@ public class OrmModuleVersionEntity extends OrmEntity {
      * Deserialize a module version entity from a datastore entity.
      */
     public OrmModuleVersionEntity(Entity entity) {
-        this(entity.getKey().getParent(), ((Long) entity.getProperty(VERSION_NUMBER)).intValue(),
-            ((Text) entity.getProperty(CNXML_DOC)).getValue(), ((Text) entity
-                .getProperty(RESOURCE_MAP_DOC)).getValue());
+        super(ENTITY_SPEC, entity);
+        this.versionNumber = ((Long) entity.getProperty(VERSION_NUMBER)).intValue();
+        this.cnxmlDoc = ((Text) entity.getProperty(CNXML_DOC)).getValue();
+        this.resourceMapDoc = ((Text) entity.getProperty(RESOURCE_MAP_DOC)).getValue();
     }
 
     public int getVersionNumber() {

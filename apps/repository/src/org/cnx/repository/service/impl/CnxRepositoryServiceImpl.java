@@ -38,6 +38,7 @@ import org.cnx.repository.service.api.GetModuleListResult;
 import org.cnx.repository.service.api.GetModuleVersionInfoResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
+import org.cnx.repository.service.api.GetResourceListResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeExportResult;
@@ -65,7 +66,7 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateResourceResult>
-    createResource(RepositoryRequestContext context) {
+            createResource(RepositoryRequestContext context) {
         return ResourceOperations.createResource(context);
     }
 
@@ -79,6 +80,12 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     public RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
             String resourceId, HttpServletResponse httpResponse) {
         return ResourceOperations.serveResource(context, resourceId, httpResponse);
+    }
+
+    @Override
+    public RepositoryResponse<GetResourceListResult> getResourceList(
+            RepositoryRequestContext context, String startCursor, int maxResults) {
+        return ResourceOperations.getResourceList(context, startCursor, maxResults);
     }
 
     @Override
@@ -131,8 +138,9 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<GetCollectionListResult> getCollectionList(RepositoryRequestContext context,
-            @Nullable String collectionListCursor, int maxResults) {
+    public RepositoryResponse<GetCollectionListResult>
+            getCollectionList(RepositoryRequestContext context,
+                    @Nullable String collectionListCursor, int maxResults) {
         return CollectionOperations.getCollectionList(context, collectionListCursor, maxResults);
     }
 

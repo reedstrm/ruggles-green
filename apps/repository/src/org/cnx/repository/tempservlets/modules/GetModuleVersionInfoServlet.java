@@ -106,8 +106,9 @@ public class GetModuleVersionInfoServlet extends HttpServlet {
         out.println();
         out.println("Module Version info:");
 
-        out.println("* Module:\n" + result.getModuleId() + "\n");
-        out.println("* Version:\n" + result.getVersionNumber() + "\n");
+        out.println("* Module = " + result.getModuleId());
+        out.println("* Version = " + result.getVersionNumber());
+        out.println("* Created = " + result.getCreationTime());
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }
 }

@@ -59,14 +59,14 @@ public class PersistenceService {
     }
 
     public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
-            throws EntityNotFoundException {
+        throws EntityNotFoundException {
         final Entity entity = datastore.get(key);
         return deserialize(entityClass, entity);
     }
 
-    private static <T extends OrmEntity> T deserialize(Class<T> c, Entity entity) {
+    private static <T extends OrmEntity> T deserialize(Class<T> entityClass, Entity entity) {
         try {
-            final Constructor<T> constructor = c.getConstructor(Entity.class);
+            final Constructor<T> constructor = entityClass.getConstructor(Entity.class);
             return constructor.newInstance(entity);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -86,13 +86,13 @@ public class PersistenceService {
      * @return a list of the child entities.
      */
     public <T extends OrmEntity> List<T> readChildren(Class<T> entityClass, Key parentKey) {
-        final OrmEntitySpec entitySpec = entityClassSpec(entityClass);
+        final OrmEntitySpec entitySpec = OrmEntity.entityClassSpec(entityClass);
 
         final Query query = new Query(entitySpec.getKeyKind());
         query.setAncestor(parentKey);
 
         final List<Entity> entities =
-                datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+            datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         final List<T> ormEntities = Lists.newArrayList();
 
@@ -101,18 +101,6 @@ public class PersistenceService {
         }
 
         return ormEntities;
-    }
-
-    /**
-     * Invoke the getSpec() method of an entity class to get its spec.
-     */
-    private static <T extends OrmEntity> OrmEntitySpec entityClassSpec(Class<T> entityClass) {
-        try {
-            return (OrmEntitySpec) entityClass.getDeclaredMethod("getSpec").invoke(null);
-        } catch (Throwable e) {
-            throw new RuntimeException("Error involing static method getSpec() of class "
-                    + entityClass, e);
-        }
     }
 
     /**
@@ -150,7 +138,7 @@ public class PersistenceService {
      * TODO(tal): consider to use QueryResultIterator instead of QueryResultList for reduced memory
      * footprint.
      * 
-     * @param c the result ORM entity class.
+     * @param entityClass the result ORM entity class.
      * @param maxResults max results to return to the user. May return less than that, even zero.
      * @param startCursor null if to iterate the list from start. Returned end cursor from previous
      *            query to continue. Asserted to be >= 1.
@@ -159,11 +147,11 @@ public class PersistenceService {
      *         reached. Otherwise, caller can issue another call using the end cursor as start
      *         cursor to fetch the next page.
      */
-    public <T extends OrmEntity> Pair<List<Key>, String> entityKeyList(Class<T> c, int maxResults,
-            @Nullable String startCursor) {
+    public <T extends OrmEntity> Pair<List<Key>, String> entityKeyList(Class<T> entityClass,
+            int maxResults, @Nullable String startCursor) {
         checkArgument(maxResults >= 1);
 
-        final OrmEntitySpec entitySpec = entityClassSpec(c);
+        final OrmEntitySpec entitySpec = OrmEntity.entityClassSpec(entityClass);
 
         // Querying for keys only.
         final Query q = new Query(entitySpec.getKeyKind()).setKeysOnly();
@@ -176,10 +164,8 @@ public class PersistenceService {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
         }
 
-        // TODO(tal): should we use a query result iterator instead of a list?
-        //
-        // These entities have keys only since we queried above for keys only. They cannot
-        // be deserialized into ORM entities.
+        // NOTE(tal): these entities have keys only since we queried above for keys only. They
+        // cannot be deserialized into ORM entities.
         final QueryResultList<Entity> results = pq.asQueryResultList(fetchOptions);
 
         final List<Key> keys = Lists.newArrayList();
@@ -188,17 +174,12 @@ public class PersistenceService {
             keys.add(entity.getKey());
         }
 
-        // TODO(tal): we base this termination condition on reverse engineering the app engine
-        // code. Need to confirm with an authorative source.
         final boolean endOfData = (results.size() < maxResults);
 
-        // TODO(tal): what is the semantic of having a null cursor? It is an error? (it does not
-        // seem to be though the signal for end of data since it is non null even at the end
-        // of data, tested on dev environment, Aug 2011).
         @Nullable
         final String endCursor =
-        endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
-            .toWebSafeString();
+            endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
+                .toWebSafeString();
 
         return Pair.of(keys, endCursor);
     }

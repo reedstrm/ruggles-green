@@ -43,7 +43,7 @@ public class CreateCollectionServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateCollectionResult> repositoryResponse =
-                repository.createCollection(context);
+            repository.createCollection(context);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

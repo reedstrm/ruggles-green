@@ -93,10 +93,9 @@ public class GetCollectionInfoServlet extends HttpServlet {
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        // out.println();
         out.println("Collection Info");
-
         out.println("* ID = " + result.getCollectionId());
+        out.println("* Created = " + result.getCreationTime());
         out.println("* Versions = " + result.getVersionCount());
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }

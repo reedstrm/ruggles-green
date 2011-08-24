@@ -23,24 +23,24 @@ import javax.annotation.Nullable;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 /**
- * Result of a successful {@link CnxRepositoryService#getModuleList} operation.
+ * Result of a successful {@link CnxRepositoryService#getResouceList} operation.
  * 
  * @author Tal Dayan
  */
-public class GetModuleListResult {
+public class GetResourceListResult {
 
-    private final ImmutableList<String> moduleIds;
+    private final ImmutableList<String> resourceIds;
 
     @Nullable
     private final String endCursor;
 
     /**
-     * @param moduleIds the result list.
+     * @param resourceIds the result list.
      * @param endCursor if null, end of module list has been reached. Otherwise, can be used in a
      *            successive call to fetch the next chunk of modules.
      */
-    public GetModuleListResult(ImmutableList<String> moduleIds, String endCursor) {
-        this.moduleIds = checkNotNull(moduleIds);
+    public GetResourceListResult(ImmutableList<String> resourceIds, String endCursor) {
+        this.resourceIds = checkNotNull(resourceIds);
         this.endCursor = endCursor;
     }
 
@@ -55,13 +55,13 @@ public class GetModuleListResult {
     }
 
     /**
-     * Test if end of module list has been reached.
+     * Test if end of resource list has been reached.
      */
     public boolean isLast() {
         return (endCursor == null);
     }
 
-    public ImmutableList<String> getModuleIds() {
-        return moduleIds;
+    public ImmutableList<String> getResourceIds() {
+        return resourceIds;
     }
 }

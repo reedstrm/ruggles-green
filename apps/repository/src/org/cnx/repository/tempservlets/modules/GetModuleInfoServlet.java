@@ -92,10 +92,9 @@ public class GetModuleInfoServlet extends HttpServlet {
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        // out.println();
         out.println("Module Info");
-
         out.println("* ID = " + result.getModuleId());
+        out.println("* Created = " + result.getCreationTime());
         out.println("* Versions = " + result.getVersionCount());
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }

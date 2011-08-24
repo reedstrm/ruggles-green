@@ -19,6 +19,8 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Date;
+
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -50,8 +52,9 @@ public class OrmCollectionVersionEntity extends OrmEntity {
      * @param versionNumber version number of this version. Asserted to be >= 1.
      * @param colxmlDoc the COLXML doc of this version.
      */
-    public OrmCollectionVersionEntity(Key collectionKey, int versionNumber, String colxmlDoc) {
-        super(ENTITY_SPEC, collectionVersionKey(collectionKey, versionNumber));
+    public OrmCollectionVersionEntity(Key collectionKey, Date creationTime, int versionNumber,
+        String colxmlDoc) {
+        super(ENTITY_SPEC, collectionVersionKey(collectionKey, versionNumber), creationTime);
         this.versionNumber = versionNumber;
         this.colxmlDoc = checkNotNull(colxmlDoc);
     }
@@ -60,8 +63,9 @@ public class OrmCollectionVersionEntity extends OrmEntity {
      * Deserialize a collection version entity from a datastore entity.
      */
     public OrmCollectionVersionEntity(Entity entity) {
-        this(entity.getKey().getParent(), ((Long) entity.getProperty(VERSION_NUMBER)).intValue(),
-            ((Text) entity.getProperty(COLXML_DOC)).getValue());
+        super(ENTITY_SPEC, entity);
+        this.versionNumber = ((Long) entity.getProperty(VERSION_NUMBER)).intValue();
+        this.colxmlDoc = ((Text) entity.getProperty(COLXML_DOC)).getValue();
     }
 
     public int getVersionNumber() {

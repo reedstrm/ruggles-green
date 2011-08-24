@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 /**
- * Result of a successful {@link CnxRepositoryService#getCollectionList(int, String)()} operation.
+ * Result of a successful {@link CnxRepositoryService#getCollectionList} operation.
  * 
  * @author Tal Dayan
  */

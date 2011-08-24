@@ -99,7 +99,7 @@ public class ExportUtil {
             checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
             // TODO(tal): what should we do if an export type is not allowable in this scope? This
             // can happen for example if we change the export config to be more restrictive.
-            exportInfos.add(new ExportInfo(exportType));
+            exportInfos.add(new ExportInfo(exportType, exportEntity.getCreationTime()));
         }
         return exportInfos;
     }

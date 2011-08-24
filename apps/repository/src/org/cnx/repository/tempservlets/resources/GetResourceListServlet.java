@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.repository.tempservlets.collections;
+package org.cnx.repository.tempservlets.resources;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -27,18 +27,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.GetCollectionListResult;
+import org.cnx.repository.service.api.GetResourceListResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
- * A temp API servlet to get module list.
+ * A temp API servlet to get resource list.
  * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class GetCollectionListServlet extends HttpServlet {
+public class GetResourceListServlet extends HttpServlet {
     private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
@@ -50,8 +50,8 @@ public class GetCollectionListServlet extends HttpServlet {
         final int maxResults = Integer.parseInt(maxResultsParam);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<GetCollectionListResult> repositoryResponse =
-            repository.getCollectionList(context, curosr, maxResults);
+        final RepositoryResponse<GetResourceListResult> repositoryResponse =
+                repository.getResourceList(context, curosr, maxResults);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -73,14 +73,14 @@ public class GetCollectionListServlet extends HttpServlet {
 
         // Map repository OK to API OK
         checkState(repositoryResponse.isOk());
-        final GetCollectionListResult result = repositoryResponse.getResult();
+        final GetResourceListResult result = repositoryResponse.getResult();
 
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
-        out.println("Collections");
-        for (String collectionId : result.getCollectionIds()) {
-            out.printf("Collection [%s]\n", collectionId);
+        out.println("Resources");
+        for (String resourceId : result.getResourceIds()) {
+            out.printf("Module [%s]\n", resourceId);
         }
 
         final String endCursor = result.isLast() ? null : result.getEndCursor();

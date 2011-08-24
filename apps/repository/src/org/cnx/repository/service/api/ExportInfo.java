@@ -18,6 +18,8 @@ package org.cnx.repository.service.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Date;
+
 /**
  * Immutable class with summary info of an export instance.
  * 
@@ -26,18 +28,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ExportInfo {
     private final ExportType exportType;
 
-    // TODO(tal): add more export attributes (user, date, size, etc).
+    private final Date creationTime;
 
-    public ExportInfo(ExportType exportType) {
+    // TODO(tal): add more export attributes (user, size, etc).
+
+    public ExportInfo(ExportType exportType, Date creationTime) {
         this.exportType = checkNotNull(exportType);
+        this.creationTime = checkNotNull(creationTime);
     }
 
     public ExportType getExportType() {
         return exportType;
     }
 
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
     @Override
     public String toString() {
-        return exportType.getId();
+        return "id: " + exportType.getId() + ", time: " + creationTime;
     }
 }

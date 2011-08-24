@@ -16,14 +16,12 @@
 
 package org.cnx.repository.service.impl.persistence;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Date;
 
 import javax.annotation.Nullable;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * A POJO representing a collection entity.
@@ -32,7 +30,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  */
 public class OrmCollectionEntity extends OrmEntity {
 
-    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Collection", "c");
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Collection", "C");
 
     private static final String VERSION_COUNT_PROPERTY = "versions";
 
@@ -48,15 +46,15 @@ public class OrmCollectionEntity extends OrmEntity {
      * 
      * Useful when creating new collections.
      */
-    public OrmCollectionEntity() {
-        super(ENTITY_SPEC, null);
+    public OrmCollectionEntity(Date creationTime) {
+        super(ENTITY_SPEC, null, creationTime);
     }
 
     /**
      * Deserialize a collection version entity from a datastore entity.
      */
     public OrmCollectionEntity(Entity entity) {
-        super(ENTITY_SPEC, checkNotNull(entity.getKey(), "No entity key"));
+        super(ENTITY_SPEC, entity);
         // NOTE(tal): numeric values are stored as Longs.
         this.versionCount = ((Long) entity.getProperty(VERSION_COUNT_PROPERTY)).intValue();
     }
@@ -71,10 +69,7 @@ public class OrmCollectionEntity extends OrmEntity {
     }
 
     public static String collectionKeyToId(Key collectionKey) {
-        checkNotNull(collectionKey);
-        checkArgument(ENTITY_SPEC.getKeyKind().equals(collectionKey.getKind()),
-                "Not a collection key");
-        return IdUtil.idToString(ENTITY_SPEC.getIdPrefix(), collectionKey.getId());
+        return IdUtil.keyToId(ENTITY_SPEC, collectionKey);
     }
 
     /**
@@ -83,9 +78,7 @@ public class OrmCollectionEntity extends OrmEntity {
      */
     @Nullable
     public static Key collectionIdToKey(String collectionId) {
-        final Long collectionIdLong = IdUtil.stringToId(ENTITY_SPEC.getIdPrefix(), collectionId);
-        return (collectionIdLong == null) ? null : KeyFactory.createKey(ENTITY_SPEC.getKeyKind(),
-                collectionIdLong);
+        return IdUtil.idToKey(ENTITY_SPEC, collectionId);
     }
 
     @Override

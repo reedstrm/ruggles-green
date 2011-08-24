@@ -37,11 +37,11 @@ public class ServeExportResult {
 
     /**
      * Name value map of additional HTTP headers.
-     *
+     * 
      * Zero or more HTTP header name/value pairs that must be applied to the HTTP response by the
      * caller. These headers are in additional to other headers that the repository service may
      * already applied to the HTTP response.
-     *
+     * 
      * NOTE(tal): in some implementations of the CNX repository service, the service may not be able
      * to set some response headers due internal technical limitations (e.g. serving from blobstore
      * in Google App Engine).

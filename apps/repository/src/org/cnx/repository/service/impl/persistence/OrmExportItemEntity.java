@@ -19,9 +19,10 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Date;
+
 import org.cnx.repository.service.api.ExportType;
 
-import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -40,21 +41,19 @@ public class OrmExportItemEntity extends OrmEntity {
      */
     private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Export", null);
 
-    private static final String BLOB_KEY_PROPERTY = "blob_key";
+    private final OrmBlobInfo blobInfo;
 
-    // @Persistent
-    private BlobKey blobKey;
-
-    public OrmExportItemEntity(Key key, BlobKey blobKey) {
-        super(ENTITY_SPEC, checkNotNull(key));
-        this.blobKey = checkNotNull(blobKey);
+    public OrmExportItemEntity(Key key, Date creationTime, OrmBlobInfo blobInfo) {
+        super(ENTITY_SPEC, checkNotNull(key), creationTime);
+        this.blobInfo = checkNotNull(blobInfo);
     }
 
     /**
      * Deserialize an export entity from a datastore entity.
      */
     public OrmExportItemEntity(Entity entity) {
-        this(entity.getKey(), (BlobKey) entity.getProperty(BLOB_KEY_PROPERTY));
+        super(ENTITY_SPEC, entity);
+        this.blobInfo = new OrmBlobInfo(entity);
     }
 
     public String getExportTypeId() {
@@ -64,12 +63,8 @@ public class OrmExportItemEntity extends OrmEntity {
         return exportTypeId;
     }
 
-    public BlobKey getBlobKey() {
-        return blobKey;
-    }
-
-    public void setBlobKey(BlobKey blobKey) {
-        this.blobKey = checkNotNull(blobKey);
+    public OrmBlobInfo getBlobInfo() {
+        return blobInfo;
     }
 
     /**
@@ -87,7 +82,7 @@ public class OrmExportItemEntity extends OrmEntity {
 
     @Override
     protected void serializeToEntity(Entity entity) {
-        entity.setProperty(BLOB_KEY_PROPERTY, blobKey);
+        blobInfo.serializeToEntity(entity);
     }
 
     public static OrmEntitySpec getSpec() {

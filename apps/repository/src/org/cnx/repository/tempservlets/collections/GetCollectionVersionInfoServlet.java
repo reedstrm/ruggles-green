@@ -109,8 +109,9 @@ public class GetCollectionVersionInfoServlet extends HttpServlet {
         out.println();
         out.println("Collection Version:");
 
-        out.println("* Collection:\n" + result.getCollectionId() + "\n");
-        out.println("* Version:\n" + result.getVersionNumber() + "\n");
+        out.println("* Collection =" + result.getCollectionId());
+        out.println("* Version = " + result.getVersionNumber());
+        out.println("* Created = " + result.getCreationTime());
         out.println("* Exports = {" + Join.join(", ", result.getExports()) + "}");
     }
 }

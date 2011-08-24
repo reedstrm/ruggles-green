@@ -6,11 +6,9 @@ import (
 	"xml"
 )
 
-const atomNamespace = "http://www.w3.org/2005/Atom"
-
 type PublishAtomEntry struct {
-	XMLName xml.Name
-	Title   string `xml:"title"`
+	XMLName xml.Name `xml:"http://www.w3.org/2005/Atom entry"`
+	Title   string   `xml:"title"`
 	Content *Content
 }
 
@@ -30,25 +28,20 @@ func (entry AtomEntry) URL(rel string) string {
 }
 
 type Content struct {
-	XMLName xml.Name
-	Type    string `xml:"attr"`
-	Content string `xml:"chardata"`
+	XMLName xml.Name `xml:"http://www.w3.org/2005/Atom content"`
+	Type    string   `xml:"attr"`
+	Content string   `xml:"chardata"`
 }
 
 type Link struct {
-	XMLName xml.Name
-	Rel     string `xml:"attr"`
-	Href    string `xml:"attr"`
+	XMLName xml.Name `xml:"http://www.w3.org/2005/Atom link"`
+	Rel     string   `xml:"attr"`
+	Href    string   `xml:"attr"`
 }
 
 const atomEntryType = `application/atom+xml;type=entry;charset="utf-8"`
 
 func post(client *http.Client, url string, entry interface{}) (*AtomEntry, os.Error) {
-	//io.Copy(os.Stdout, marshalReader(entry))
-	//if true {
-	//	return nil, os.NewError("foo")
-	//}
-
 	resp, err := client.Post(url, atomEntryType, marshalReader(entry))
 	if err != nil {
 		return nil, err

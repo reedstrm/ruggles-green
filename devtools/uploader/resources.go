@@ -11,7 +11,7 @@ import (
 
 type ResourceMapping struct {
 	XMLName  xml.Name `xml:"resources"`
-	Version  int      `xml:"attr"`
+	Version  string   `xml:"attr"`
 	Resource []Resource
 }
 
@@ -25,8 +25,7 @@ type Resource struct {
 func uploadToBlobstore(name string, r io.Reader) (*AtomEntry, os.Error) {
 	var client http.Client
 	entry, err := post(&client, repositoryURL+"/resource", PublishAtomEntry{
-		XMLName: xml.Name{atomNamespace, "entry"},
-		Title:   name,
+		Title: name,
 	})
 	if err != nil {
 		return nil, err

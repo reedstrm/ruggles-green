@@ -59,7 +59,7 @@ public class GetResourceInfoServlet extends HttpServlet {
         final String resourceId = matcher.group(1);
 
         final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-                repository.getResourceInfo(new RepositoryRequestContext(null), resourceId);
+            repository.getResourceInfo(new RepositoryRequestContext(null), resourceId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

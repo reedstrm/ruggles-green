@@ -51,7 +51,7 @@ public class GetResourceListServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetResourceListResult> repositoryResponse =
-                repository.getResourceList(context, curosr, maxResults);
+            repository.getResourceList(context, curosr, maxResults);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

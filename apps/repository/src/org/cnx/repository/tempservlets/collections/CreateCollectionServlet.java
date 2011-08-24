@@ -19,6 +19,7 @@ package org.cnx.repository.tempservlets.collections;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,10 +41,12 @@ public class CreateCollectionServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        @Nullable
+        String forcedId = req.getParameter("id");
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateCollectionResult> repositoryResponse =
-            repository.createCollection(context);
+                repository.createCollection(context, forcedId);
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

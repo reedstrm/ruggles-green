@@ -82,10 +82,10 @@ public class CnxAtomModuleServlet {
 
     // URL Pattern = /module/<moduleId>/<version>
     private final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/{"
-        + MODULE_VERSION_PATH_PARAM + "}";
+            + MODULE_VERSION_PATH_PARAM + "}";
     private final String MODULE_VERSION_CNXML_URL = MODULE_VERSION_URL_PATTERN + "/xml";
     private final String MODULE_VERSION_RESOURCE_MAPPING_URL = MODULE_VERSION_URL_PATTERN
-        + "/resources";
+            + "/resources";
 
     private CnxAtomService atomPubService;
     private final CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
@@ -102,7 +102,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
-            repositoryService.createModule(RepositoryUtils.getRepositoryContext());
+                repositoryService.createModule(RepositoryUtils.getRepositoryContext(), null);
 
         if (createdModule.isOk()) {
             /*
@@ -113,19 +113,19 @@ public class CnxAtomModuleServlet {
             CreateModuleResult result = createdModule.getResult();
             Entry entry = new Entry();
             String atomPubId =
-                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(result.getModuleId(),
-                    firstVersion);
+                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(result.getModuleId(),
+                            firstVersion);
             entry.setId(atomPubId);
 
             // TODO(arjuns) : Change URL to URI.
             URL editUrl =
-                atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    firstVersion);
+                    atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
+                            firstVersion);
             entry.setOtherLinks(RepositoryUtils.getListOfLinks(null /* selfUrl */, editUrl));
 
             try {
                 URL modulePath =
-                    atomPubService.getConstants().getModuleAbsPath(result.getModuleId());
+                        atomPubService.getConstants().getModuleAbsPath(result.getModuleId());
                 URI createdLocation = new URI(modulePath.toString());
 
                 String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
@@ -133,7 +133,7 @@ public class CnxAtomModuleServlet {
                 return Response.created(createdLocation).entity(stringEntry).build();
             } catch (URISyntaxException e) {
                 logger.severe("Failed to create Module because : "
-                    + Throwables.getStackTraceAsString(e));
+                        + Throwables.getStackTraceAsString(e));
             } catch (Exception e) {
                 // TODO(arjuns): Auto-generated catch block
                 e.printStackTrace();
@@ -161,8 +161,8 @@ public class CnxAtomModuleServlet {
         Entry postedEntry = null;
         try {
             postedEntry =
-                Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
-                    .getInputStream(), Charsets.UTF_8.displayName())), null);
+                    Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
+                            .getInputStream(), Charsets.UTF_8.displayName())), null);
         } catch (Exception e) {
             // TODO(arjuns): Handle exception.
             throw new RuntimeException(e);
@@ -175,16 +175,16 @@ public class CnxAtomModuleServlet {
         // TODO(arjuns) : Fix this. Move this to common.
         Content encodedModuleEntryContent = (Content) postedEntry.getContents().get(0);
         String decodedModuleEntryValue =
-            atomPubService.getConstants().decodeFrom64BitEncodedString(
-                encodedModuleEntryContent.getValue());
+                atomPubService.getConstants().decodeFrom64BitEncodedString(
+                        encodedModuleEntryContent.getValue());
 
         String cnxmlDoc = getCnxml(decodedModuleEntryValue);
         String resourceMappingDoc = getResourceMappingDoc(decodedModuleEntryValue);
 
         int newVersion = Integer.parseInt(version);
         RepositoryResponse<AddModuleVersionResult> createdModule =
-            repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
-                newVersion, cnxmlDoc, resourceMappingDoc);
+                repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
+                        newVersion, cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -195,8 +195,8 @@ public class CnxAtomModuleServlet {
 
             VersionWrapper repoVersion = new VersionWrapper(result.getNewVersionNumber());
             String atomPubId =
-                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(result.getModuleId(),
-                    repoVersion);
+                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(result.getModuleId(),
+                            repoVersion);
             entry.setId(atomPubId);
             entry.setPublished(new Date());
 
@@ -205,20 +205,20 @@ public class CnxAtomModuleServlet {
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    repoVersion);
+                    atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
+                            repoVersion);
 
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
-                atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    nextVersion);
+                    atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
+                            nextVersion);
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
 
             try {
                 URL moduleVersionPath =
-                    atomPubService.getConstants().getModuleVersionAbsPath(moduleId, repoVersion);
+                        atomPubService.getConstants().getModuleVersionAbsPath(moduleId, repoVersion);
                 URI createdLocation = new URI(moduleVersionPath.toString());
 
                 String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
@@ -227,7 +227,7 @@ public class CnxAtomModuleServlet {
             } catch (Exception e) {
                 // TODO(arjuns) : handle exception.
                 logger.severe("Failed to create Module because : "
-                    + Throwables.getStackTraceAsString(e));
+                        + Throwables.getStackTraceAsString(e));
                 throw new RuntimeException(e);
             }
         }
@@ -264,8 +264,8 @@ public class CnxAtomModuleServlet {
         }
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
-                versionInt);
+                repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
+                        versionInt);
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult result = moduleVersionResult.getResult();
@@ -275,21 +275,21 @@ public class CnxAtomModuleServlet {
             VersionWrapper repoVersion = new VersionWrapper(result.getVersionNumber());
             Entry entry = new Entry();
             String atomPubId =
-                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(moduleId, repoVersion);
+                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(moduleId, repoVersion);
             entry.setId(atomPubId);
             entry.setContents(atomPubService.getConstants().getAtomPubListOfContent(cnxmlDoc,
-                resourceMappingDoc));
+                    resourceMappingDoc));
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    repoVersion);
+                    atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
+                            repoVersion);
 
             VersionWrapper nextVersion = repoVersion.getNextVersion();
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
-                atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
-                    nextVersion);
+                    atomPubService.getConstants().getModuleVersionAbsPath(result.getModuleId(),
+                            nextVersion);
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -327,8 +327,8 @@ public class CnxAtomModuleServlet {
         }
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
-                versionInt);
+                repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
+                        versionInt);
 
         if (moduleVersionResult.isOk()) {
             return Response.ok().entity(moduleVersionResult.getResult().getCnxmlDoc()).build();
@@ -358,12 +358,12 @@ public class CnxAtomModuleServlet {
         }
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
-                versionInt);
+                repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(), moduleId,
+                        versionInt);
 
         if (moduleVersionResult.isOk()) {
             return Response.ok().entity(moduleVersionResult.getResult().getResourceMapDoc())
-                .build();
+                    .build();
         }
 
         // TODO(arjuns) : Add more details here in error message.

@@ -46,24 +46,24 @@ public class AddModuleVersionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String cnxmlDoc =
-                checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
+            checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
         final String resourceMapDoc =
-                checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
+            checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
         final String moduleId =
-                checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
+            checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
         final String expectedVersionParam =
-                checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+            checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
         @Nullable
         final Integer expectedVersionNumber =
-        expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
+            expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
 
         checkArgument(req.getParameterMap().size() == 4, "Expected 4 post parameters, found %s",
                 req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
-                repository.addModuleVersion(context, moduleId, expectedVersionNumber, cnxmlDoc,
-                        resourceMapDoc);
+            repository.addModuleVersion(context, moduleId, expectedVersionNumber, cnxmlDoc,
+                    resourceMapDoc);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

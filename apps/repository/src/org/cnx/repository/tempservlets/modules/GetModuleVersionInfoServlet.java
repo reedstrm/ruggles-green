@@ -49,7 +49,7 @@ public class GetModuleVersionInfoServlet extends HttpServlet {
     private static final Logger log = Logger.getLogger(GetModuleVersionInfoServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern
-            .compile("/module_version_info/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
+        .compile("/module_version_info/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -68,11 +68,11 @@ public class GetModuleVersionInfoServlet extends HttpServlet {
         // Determine version to serve. If latest, leave as null and we will set
         // it up later.
         Integer moduleVersion =
-                moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
+            moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetModuleVersionInfoResult> repositoryResponse =
-                repository.getModuleVersionInfo(context, moduleId, moduleVersion);
+            repository.getModuleVersionInfo(context, moduleId, moduleVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

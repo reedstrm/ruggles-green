@@ -88,9 +88,14 @@ public interface CnxRepositoryService {
      * created and its id is returned in the result. Otherwise, no change is done in the repository.
      * 
      * @param context the query context
+     * @param migrationForcedId this is a temporary parameter for the data migration. Will be
+     *            removed after the successful migration. If not null, the module is created with
+     *            this id. The id need to be a valid module id in the protected range of module
+     *            keys.
      * @return operation response.
      */
-    RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context);
+    RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context,
+            @Nullable String migrationForcedId);
 
     /**
      * Get general module information.
@@ -193,9 +198,14 @@ public interface CnxRepositoryService {
      * created and its id is returned in the result. Otherwise, no change is done in the repository.
      * 
      * @param context the query context
+     * @param migrationForcedId this is a temporary parameter for the data migration. Will be
+     *            removed after the successful migration. If not null, the module is created with
+     *            this id. The id need to be a valid module id in the protected range of module
+     *            keys.
      * @return operation response.
      */
-    RepositoryResponse<CreateCollectionResult> createCollection(RepositoryRequestContext context);
+    RepositoryResponse<CreateCollectionResult> createCollection(RepositoryRequestContext context,
+            @Nullable String migrationForcedId);
 
     /**
      * Get general collection information.

@@ -80,7 +80,7 @@ public class CnxAtomCollectionServlet {
      * /<collectionId>/<collectionVersion>
      */
     private final String COLLECTION_VERSION_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM + "}/{"
-        + COLLECTION_VERSION_PATH_PARAM + "}";
+            + COLLECTION_VERSION_PATH_PARAM + "}";
 
     private final String COLLECTION_VERSION_XML_URL = COLLECTION_VERSION_URL_PATTERN + "/xml";
 
@@ -99,7 +99,7 @@ public class CnxAtomCollectionServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateCollectionResult> createdCollection =
-            repositoryService.createCollection(RepositoryUtils.getRepositoryContext());
+                repositoryService.createCollection(RepositoryUtils.getRepositoryContext(), null);
 
         if (createdCollection.isOk()) {
             /*
@@ -110,13 +110,13 @@ public class CnxAtomCollectionServlet {
 
             VersionWrapper firstVersion = CnxAtomPubConstants.NEW_CNX_COLLECTION_DEFAULT_VERSION;
             String atomPubId =
-                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(result.getCollectionId(),
-                    firstVersion);
+                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(result.getCollectionId(),
+                            firstVersion);
             entry.setId(atomPubId);
 
             URL editUrl =
-                atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
-                    firstVersion);
+                    atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
+                            firstVersion);
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(null /* selfUrl */, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -129,7 +129,7 @@ public class CnxAtomCollectionServlet {
                 return Response.created(createdLocation).entity(stringEntry).build();
             } catch (Exception e) {
                 logger.severe("Failed to create Collection because : "
-                    + Throwables.getStackTraceAsString(e));
+                        + Throwables.getStackTraceAsString(e));
                 throw new RuntimeException(e);
             }
         }
@@ -156,8 +156,8 @@ public class CnxAtomCollectionServlet {
         Entry postedEntry = null;
         try {
             postedEntry =
-                Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
-                    .getInputStream(), Charsets.UTF_8.displayName())), null);
+                    Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
+                            .getInputStream(), Charsets.UTF_8.displayName())), null);
         } catch (Exception e) {
             // TODO(arjuns): Auto-generated catch block
             throw new RuntimeException(e);
@@ -170,13 +170,13 @@ public class CnxAtomCollectionServlet {
 
         // TODO(arjuns) : Fix this.
         String decodedCollXml =
-            atomPubService.getConstants().getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
+                atomPubService.getConstants().getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
 
         // TODO(arjuns) : Add validation for version.
         VersionWrapper newVersion = new VersionWrapper(version);
         RepositoryResponse<AddCollectionVersionResult> createdCollection =
-            repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                collectionId, newVersion.getVersionInt(), decodedCollXml);
+                repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                        collectionId, newVersion.getVersionInt(), decodedCollXml);
 
         if (createdCollection.isOk()) {
             /*
@@ -190,7 +190,7 @@ public class CnxAtomCollectionServlet {
             VersionWrapper createdVersion = new VersionWrapper(result.getNewVersionNumber());
 
             String atomPubId =
-                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId, createdVersion);
+                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId, createdVersion);
 
             entry.setId(atomPubId);
             entry.setPublished(new Date());
@@ -200,14 +200,14 @@ public class CnxAtomCollectionServlet {
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
-                    createdVersion);
+                    atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
+                            createdVersion);
 
             // TODO(arjuns) : Refactor this to a function.
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
-                atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
-                    nextVersion);
+                    atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
+                            nextVersion);
 
             // TODO(arjuns0 : Create a function for this.
             Link selfLink = new Link();
@@ -229,7 +229,7 @@ public class CnxAtomCollectionServlet {
                 return Response.created(createdLocation).entity(stringEntry).build();
             } catch (Exception e) {
                 logger.severe("Failed to create Module because : "
-                    + Throwables.getStackTraceAsString(e));
+                        + Throwables.getStackTraceAsString(e));
                 throw new RuntimeException(e);
             }
         }
@@ -266,8 +266,8 @@ public class CnxAtomCollectionServlet {
         }
 
         RepositoryResponse<GetCollectionVersionResult> collectionVersionResult =
-            repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                collectionId, versionInt);
+                repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                        collectionId, versionInt);
 
         if (collectionVersionResult.isOk()) {
             GetCollectionVersionResult result = collectionVersionResult.getResult();
@@ -276,22 +276,22 @@ public class CnxAtomCollectionServlet {
             VersionWrapper repoVersion = new VersionWrapper(result.getVersionNumber());
             Entry entry = new Entry();
             String atomPubId =
-                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId, repoVersion);
+                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId, repoVersion);
             entry.setId(atomPubId);
 
             entry.setContents(atomPubService.getConstants()
-                .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
+                    .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
-                    repoVersion);
+                    atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
+                            repoVersion);
 
             VersionWrapper nextVersion = repoVersion.getNextVersion();
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
-                atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
-                    nextVersion);
+                    atomPubService.getConstants().getCollectionVersionAbsPath(result.getCollectionId(),
+                            nextVersion);
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
 
@@ -331,8 +331,8 @@ public class CnxAtomCollectionServlet {
         }
 
         RepositoryResponse<GetCollectionVersionResult> collectionVersionResult =
-            repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                collectionId, versionInt);
+                repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                        collectionId, versionInt);
 
         if (collectionVersionResult.isOk()) {
             return Response.ok().entity(collectionVersionResult.getResult().getColxmlDoc()).build();

@@ -66,7 +66,7 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateResourceResult>
-            createResource(RepositoryRequestContext context) {
+    createResource(RepositoryRequestContext context) {
         return ResourceOperations.createResource(context);
     }
 
@@ -89,8 +89,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context) {
-        return ModuleOperations.createModule(context);
+    public RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context, @Nullable String migrationForcedId) {
+        return ModuleOperations.createModule(context, migrationForcedId);
     }
 
     @Override
@@ -127,8 +127,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateCollectionResult> createCollection(
-            RepositoryRequestContext context) {
-        return CollectionOperations.createCollection(context);
+            RepositoryRequestContext context, @Nullable String migrationForcedId) {
+        return CollectionOperations.createCollection(context, migrationForcedId);
     }
 
     @Override
@@ -139,8 +139,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<GetCollectionListResult>
-            getCollectionList(RepositoryRequestContext context,
-                    @Nullable String collectionListCursor, int maxResults) {
+    getCollectionList(RepositoryRequestContext context,
+            @Nullable String collectionListCursor, int maxResults) {
         return CollectionOperations.getCollectionList(context, collectionListCursor, maxResults);
     }
 

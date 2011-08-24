@@ -37,7 +37,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 /**
  * A temp API servlet to get the xml and manifest of a module version.
- *
+ * 
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
@@ -47,7 +47,7 @@ public class GetModuleVersionServlet extends HttpServlet {
     private static final Logger log = Logger.getLogger(GetModuleVersionServlet.class.getName());
 
     private static final Pattern uriPattern = Pattern
-            .compile("/module/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
+        .compile("/module/([a-zA-Z0-9_-]+)/(latest|[0-9]+)");
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -66,11 +66,11 @@ public class GetModuleVersionServlet extends HttpServlet {
         // Determine version to serve. If latest, leave as null and we will set
         // it up later.
         Integer moduleVersion =
-                moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
+            moduleVersionString.equals("latest") ? null : Integer.valueOf(moduleVersionString);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetModuleVersionResult> repositoryResponse =
-                repository.getModuleVersion(context, moduleId, moduleVersion);
+            repository.getModuleVersion(context, moduleId, moduleVersion);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

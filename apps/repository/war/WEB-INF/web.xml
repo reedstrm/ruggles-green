@@ -233,18 +233,6 @@
     <servlet-name>DeleteExportServlet</servlet-name>
     <url-pattern>/exports/delete</url-pattern>
   </servlet-mapping> 
-  
-   <!--  EXPERIMENTAL (TEMP) -->
-  
-  <servlet>
-    <servlet-name>CreateModuleRangeServlet</servlet-name>
-    <servlet-class>org.cnx.repository.tempservlets.experimental.CreateModuleRangeServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>CreateModuleRangeServlet</servlet-name>
-    <url-pattern>/experimental/create_module_range</url-pattern>
-  </servlet-mapping>  
    
   <!-- Repository service -->
 

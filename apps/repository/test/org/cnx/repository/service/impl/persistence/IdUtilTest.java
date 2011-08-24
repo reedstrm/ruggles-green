@@ -18,7 +18,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  * @author Tal Dayan
  */
 
-public class KeyUtilTest {
+public class IdUtilTest {
 
     // TODO(tal): enable after including the test jars
     //

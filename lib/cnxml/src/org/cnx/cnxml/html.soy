@@ -570,31 +570,7 @@
  *  @param node DOM node matching a <m:math> element.
  */
 {template .math}
-    <math>{call .mathChildren data="all"/}</math>
-{/template}
-
-/**
- *  Copy children of a MathML element.
- *
- *  Don't use .main for this purpose, because .main is expecting CNXML.
- *
- *  @param node DOM node for a MathML element
- */
-{template .mathChildren}
-    {foreach $child in $node.childNodes}
-        {mathChildrenJava($child) |noAutoescape }
-    {/foreach}
-{/template}
-
-/**
- *  Copy attributes of a MathML element.
- *
- *  @param node DOM node for a MathML element
- */
-{template .mathAttributes}
-    {foreach $attr in $node.attributeNodes}
-        {sp}{$attr.localName}="{$attr.nodeValue}"
-    {/foreach}
+    <math>{mathChildrenJava($node) |noAutoescape }</math>
 {/template}
 
 /**

@@ -34,15 +34,20 @@ public class UploadedResourceContentInfo {
 
     private final Date contentUploadTime;
 
-    // TODO(tal): any privacy issue with exposing this value via the API?
     private final String contentOriginalFileName;
 
+    private final long size;
+
+    private final String md5Hash;
+
     public UploadedResourceContentInfo(String contentType, Long contentSize,
-        Date contentUploadTime, String contentOriginalFileName) {
+            Date contentUploadTime, String contentOriginalFileName, long size, String md5Hash) {
         this.contentType = checkNotNull(contentType);
         this.contentSize = checkNotNull(contentSize);
         this.contentUploadTime = checkNotNull(contentUploadTime);
         this.contentOriginalFileName = checkNotNull(contentOriginalFileName);
+        this.size = size;
+        this.md5Hash = checkNotNull(md5Hash);
     }
 
     public String getContentType() {
@@ -59,5 +64,13 @@ public class UploadedResourceContentInfo {
 
     public String getContentOriginalFileName() {
         return contentOriginalFileName;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public String getMd5Hash() {
+        return md5Hash;
     }
 }

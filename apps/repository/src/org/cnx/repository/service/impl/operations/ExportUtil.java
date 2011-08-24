@@ -26,6 +26,7 @@ import org.cnx.repository.service.api.ExportInfo;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.ExportScopeType;
 import org.cnx.repository.service.api.ExportType;
+import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
 import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 import org.cnx.repository.service.impl.persistence.PersistenceService;
 
@@ -67,20 +68,20 @@ public class ExportUtil {
      */
     public static ExportReference exportReferenceFromRequestParameters(HttpServletRequest req) {
         final ExportScopeType scopeType =
-            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter(ExportParams.SCOPE.name));
+                ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter(ExportParams.SCOPE.name));
 
         final String objectId = req.getParameter(ExportParams.PARENT_ID.name);
 
         final String versionNumberParam = req.getParameter(ExportParams.PARENT_VERSION.name);
         final Integer versionNumber =
-            versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
+                versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
 
         final ExportType exportType =
-            Services.config.getExportTypes()
+                Services.config.getExportTypes()
                 .get(req.getParameter(ExportParams.EXPORT_TYPE_ID.name));
 
         final ExportReference exportReference =
-            new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
+                new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
         return exportReference;
     }
 
@@ -99,7 +100,10 @@ public class ExportUtil {
             checkNotNull(exportType, "Unknown export type id: %s", exportTypeId);
             // TODO(tal): what should we do if an export type is not allowable in this scope? This
             // can happen for example if we change the export config to be more restrictive.
-            exportInfos.add(new ExportInfo(exportType, exportEntity.getCreationTime()));
+
+            final OrmBlobInfo blobInfo = exportEntity.getBlobInfo();
+            exportInfos.add(new ExportInfo(exportType, exportEntity.getCreationTime(), blobInfo
+                    .getSize(), blobInfo.getMd5Hash()));
         }
         return exportInfos;
     }

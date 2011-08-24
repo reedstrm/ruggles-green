@@ -40,7 +40,6 @@ import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.impl.persistence.IdUtil;
 import org.cnx.repository.service.impl.persistence.OrmCollectionEntity;
 import org.cnx.repository.service.impl.persistence.OrmCollectionVersionEntity;
-import org.cnx.repository.service.impl.persistence.OrmModuleEntity;
 import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;

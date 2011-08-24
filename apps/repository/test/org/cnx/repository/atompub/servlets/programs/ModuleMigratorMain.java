@@ -26,7 +26,9 @@ import org.cnx.repository.atompub.servlets.migrators.ModuleMigrator;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
+ * Migrator for migrating Modules to CNX repository.
  *
+ * TODO(arjuns) : Add java flags.
  * @author Arjun Satyapal
  */
 public class ModuleMigratorMain {
@@ -36,13 +38,13 @@ public class ModuleMigratorMain {
 
     public static void main(String[] args) throws Exception {
 
-        URL url = new URL("http://100.cnx-repo.appspot.com/atompub");
+        URL url = new URL("http://101.cnx-repo.appspot.com/atompub");
         // URL url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT +
         // "/atompub");
         cnxClient = new CnxAtomPubClient(url);
 
-//        String existingModuleId = null;
-        String existingModuleId = "m42355";
+        String existingModuleId = null;
+//        String existingModuleId = "m42355";
         String moduleLocation = "/home/arjuns/mymodule";
 
         final ClientEntry clientEntry;

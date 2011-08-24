@@ -101,7 +101,8 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         // TODO(arjuns) : refactor this.
         String moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleNewVersionEntry.getId());
-        VersionWrapper version = CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
+        VersionWrapper version =
+            CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
         ClientEntry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);
 
         logger.info("New location for [" + ORIGINAL_MODULE_ID + "] is \n"
@@ -120,10 +121,11 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         // TODO(arjuns) : Add test for links.
     }
 
-//    // TODO(arjuns) : Move this test to other file.
+    // TODO(arjuns) : Move this test to other file.
     @Test
     public void testModuleMigrator() throws Exception {
-        File cnxml = new File(COLLECTION_LOCATION + ORIGINAL_MODULE_ID + "/index_auto_generated.cnxml");
+        File cnxml =
+            new File(COLLECTION_LOCATION + ORIGINAL_MODULE_ID + "/index_auto_generated.cnxml");
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
         ModuleMigrator migrator = new ModuleMigrator(cnxClient);
@@ -131,7 +133,8 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         assertNotNull(moduleEntry);
 
         VersionWrapper expectedVersion = new VersionWrapper(1);
-        assertEquals(expectedVersion, CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId()));
+        assertEquals(expectedVersion, CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry
+            .getId()));
     }
 
     @Test
@@ -154,7 +157,8 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
                 new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING));
         ClientEntry clientEntry = cnxClient.getService().getEntry(moduleLatestUrl.toString());
         VersionWrapper expectedVersion = new VersionWrapper(2);
-        VersionWrapper actualVersion = CnxAtomPubConstants.getVersionFromAtomPubId(clientEntry.getId());
+        VersionWrapper actualVersion =
+            CnxAtomPubConstants.getVersionFromAtomPubId(clientEntry.getId());
 
         logger.info("New location : " + moduleLatestUrl);
         assertEquals(expectedVersion, actualVersion);

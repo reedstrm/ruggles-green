@@ -39,7 +39,7 @@ func realMain() (err os.Error) {
 	}
 
 	// Upload resources
-	mapping := ResourceMapping{Version: 1}
+	mapping := ResourceMapping{Version: "1"}
 	directory, err := os.Open(flag.Arg(0))
 	if err != nil {
 		return err
@@ -110,14 +110,19 @@ func showModuleInfo(module string) os.Error {
 
 	var c Container
 	var b bytes.Buffer
-	io.Copy(&b, newDecoder(bytes.NewBufferString(result.Content.Content)))
+	io.Copy(&b, base64.NewDecoder(base64.URLEncoding, bytes.NewBufferString(result.Content.Content)))
 	b.WriteString("e>") // TODO(light): get rid of this
 	err = xml.Unmarshal(&b, &c)
 	if err != nil {
 		return err
 	}
-	io.Copy(os.Stdout, newDecoder(bytes.NewBuffer(c.CNXMLDoc.Data)))
-	io.Copy(os.Stdout, newDecoder(bytes.NewBuffer(c.ResourceMappingDoc.Data)))
+	fmt.Println("CNXML:")
+	io.Copy(os.Stdout, base64.NewDecoder(base64.StdEncoding, bytes.NewBuffer(c.CNXMLDoc.Data)))
+	fmt.Println()
+
+	fmt.Println("Resource Mapping:")
+	io.Copy(os.Stdout, base64.NewDecoder(base64.StdEncoding, bytes.NewBuffer(c.ResourceMappingDoc.Data)))
+	fmt.Println()
 
 	return nil
 }
@@ -137,9 +142,7 @@ func fetchVersionInfo(module, version string) (*AtomEntry, os.Error) {
 }
 
 func createModule() (string, os.Error) {
-	entry, err := post(new(http.Client), repositoryURL+"/module/", PublishAtomEntry{
-		XMLName: xml.Name{atomNamespace, "entry"},
-	})
+	entry, err := post(new(http.Client), repositoryURL+"/module/", PublishAtomEntry{})
 	if err != nil {
 		return "", err
 	}
@@ -153,7 +156,6 @@ func uploadVersion(url string, cnxml io.Reader, resourceMapping ResourceMapping)
 		return err
 	}
 	_, err = update(new(http.Client), url, PublishAtomEntry{
-		XMLName: xml.Name{atomNamespace, "entry"},
 		Content: &Content{
 			Type:    "text",
 			Content: container.Encode(),
@@ -171,7 +173,7 @@ func marshalReader(val interface{}) io.Reader {
 		}
 		pw.Close()
 	}()
-	return pr
+	return io.MultiReader(bytes.NewBufferString(xml.Header), pr)
 }
 
 type Container struct {
@@ -211,41 +213,13 @@ func (c *Container) Encode() string {
 	return string(data)
 }
 
-type encoder struct {
-	e1, e2 io.WriteCloser
-}
-
-func newEncoder(w io.Writer) io.WriteCloser {
-	e := encoder{e1: base64.NewEncoder(base64.URLEncoding, w)}
-	e.e2 = base64.NewEncoder(base64.URLEncoding, e.e1)
-	return e
-}
-
-func (enc encoder) Write(p []byte) (n int, err os.Error) {
-	return enc.e2.Write(p)
-}
-
-func (enc encoder) Close() os.Error {
-	if err := enc.e2.Close(); err != nil {
-		return err
-	}
-	if err := enc.e1.Close(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func encodeReader(r io.Reader) ([]byte, os.Error) {
 	var b bytes.Buffer
-	e := newEncoder(&b)
+	e := base64.NewEncoder(base64.StdEncoding, &b)
 	_, err := io.Copy(e, r)
 	if err != nil {
 		return nil, err
 	}
 	e.Close()
 	return b.Bytes(), nil
-}
-
-func newDecoder(r io.Reader) io.Reader {
-	return base64.NewDecoder(base64.URLEncoding, base64.NewDecoder(base64.URLEncoding, r))
 }

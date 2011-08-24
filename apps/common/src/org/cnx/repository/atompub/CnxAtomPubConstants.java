@@ -378,8 +378,7 @@ public class CnxAtomPubConstants {
      */
     public String decodeFrom64BitEncodedString(String encodedString)
             throws UnsupportedEncodingException {
-        byte[] encodedBytes = Base64.decodeBase64(encodedString);
-        byte[] decodedBytes = Base64.decodeBase64(encodedBytes);
+        byte[] decodedBytes = Base64.decodeBase64(encodedString);
         return new String(decodedBytes, Charsets.UTF_8.displayName());
     }
 
@@ -393,8 +392,7 @@ public class CnxAtomPubConstants {
     public String get64bitEncodedString(String originalString) throws UnsupportedEncodingException {
         byte[] encodedStringBytes =
             Base64.encodeBase64URLSafe(originalString.getBytes(Charsets.UTF_8.displayName()));
-        String encoded64BitString = Base64.encodeBase64URLSafeString(encodedStringBytes);
-        return encoded64BitString;
+        return new String(encodedStringBytes, Charsets.UTF_8.displayName());
     }
 
     /**

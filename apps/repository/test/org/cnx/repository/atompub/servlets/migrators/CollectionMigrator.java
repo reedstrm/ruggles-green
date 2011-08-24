@@ -31,6 +31,7 @@ import org.cnx.repository.atompub.VersionWrapper;
 import org.jdom.JDOMException;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -85,19 +86,20 @@ public class CollectionMigrator {
                 String existingModuleId = currModule.getName();
                 logger.info("Starting to migrate : " + existingModuleId);
                 ModuleMigrator moduleMigrator = new ModuleMigrator(cnxClient);
-                Entry migratedModuleEntry =
+                ClientEntry migratedModuleEntry =
                     moduleMigrator.createNewModule(currModule.getAbsolutePath());
+
+                // TODO(arjuns) : This will always create a new module.
                 mapOfModuleIdToNewModuleEntry.put(existingModuleId, migratedModuleEntry);
-                Link newLink = getSelfLinkFromEntry(migratedModuleEntry);
-                logger.info("Module[" + existingModuleId + "] migrated to : "
-                    + newLink.getHrefResolved());
+                logger.info("Finished migrating : " + existingModuleId + " to : "
+                    + migratedModuleEntry.getEditURI());
                 listOfModulesToUpload.remove(currModule);
-                logger.info("Finished migrating : " + existingModuleId);
                 logger.info("**** Remaining size = " + listOfModulesToUpload.size());
             } catch (Exception e) {
-                logger.severe("Failed to upload module : " + currModule.getName());
+                logger.severe("Failed to upload module : " + currModule.getName() + " due to : "
+                    + Throwables.getStackTraceAsString(e));
                 failureCount++;
-                if(failureCount > 10) {
+                if (failureCount > 10) {
                     throw new RuntimeException("Too many failures. Try again.");
                 }
                 continue;

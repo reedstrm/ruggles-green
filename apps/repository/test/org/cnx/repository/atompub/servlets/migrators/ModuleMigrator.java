@@ -32,6 +32,7 @@ import org.jdom.JDOMException;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -112,14 +113,15 @@ public class ModuleMigrator {
                 listOfEntryForUploadedResources.add(resourceEntry);
                 logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
                     + resourceEntry.getId() + "], and can be found here ["
-                    + cnxClient.getLinkForResource(resourceEntry).getHrefResolved()
-                    + "].");
+                    + cnxClient.getLinkForResource(resourceEntry).getHrefResolved() + "].");
                 logger.info("Remaining resources = " + listOfResourcesToUpload.size());
                 listOfResourcesToUpload.remove(currFile);
             } catch (Exception e) {
-                logger.info("Failed to upload file : " + currFile.getName());
+                logger.info("Failed to upload file : " + currFile.getName() + " due to : "
+                    + Throwables.getStackTraceAsString(e));
+                ;
                 failureCount++;
-                if(failureCount > 10) {
+                if (failureCount > 10) {
                     throw new RuntimeException("Too many failures. Try again.");
                 }
             }
@@ -144,19 +146,19 @@ public class ModuleMigrator {
         if (moduleId == null) {
             Preconditions.checkArgument(currentVersion.getVersionInt() == 1);
             entryToUpdate = cnxClient.createNewModule();
-             moduleId = CnxAtomPubConstants.getIdFromAtomPubId(entryToUpdate.getId());
+            moduleId = CnxAtomPubConstants.getIdFromAtomPubId(entryToUpdate.getId());
         } else {
             entryToUpdate = cnxClient.getService().getEntry(currentModuleUrl.toString());
         }
-
 
         return publishNewVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
     }
 
     public ClientEntry publishNewVersion(ClientEntry entryToUpdate, String cnxmlAsString,
-            String resourceMappingXml) throws ProponoException, JAXBException, JDOMException, IOException {
+            String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
+            IOException {
         ClientEntry createModuleVersionEntry =
-                cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
+            cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
 
         return createModuleVersionEntry;
     }

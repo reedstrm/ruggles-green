@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.cnx.util.RenderTime;
+import org.cnx.util.JdomHtmlSerializer;
 import org.jdom.Attribute;
 import org.jdom.Content;
 import org.jdom.Document;
@@ -329,15 +329,8 @@ import org.jdom.input.DOMBuilder;
             CALS_VALIGN_MIDDLE, HTML_CALS_VALIGN_MIDDLE_CLASS,
             CALS_VALIGN_BOTTOM, HTML_CALS_VALIGN_BOTTOM_CLASS);
 
-    /** These tags do not need a closing tag in HTML. */
-    private final static ImmutableSet<String> HTML_VOID_ELEMENTS = ImmutableSet.of(
-            HTML_LINE_BREAK_TAG,
-            HTML_HORIZONTAL_RULE_TAG,
-            HTML_IMAGE_TAG,
-            HTML_EMBED_TAG,
-            HTML_PARAM_TAG);
-
     private final ImmutableSet<Processor> processors;
+    private final JdomHtmlSerializer jdomHtmlSerializer;
     private final Namespace cnxmlNamespace;
     private Stack<GeneratorFrame> stack;
     private Counter counter;
@@ -369,19 +362,6 @@ import org.jdom.input.DOMBuilder;
     }
 
     /**
-     *  SerializeFrame holds one stack frame of the HTML serialization process.
-     */
-    private static class SerializeFrame {
-        public final Element element;
-        public final Iterator<Content> iterator;
-
-        public SerializeFrame(Element element) {
-            this.element = checkNotNull(element);
-            this.iterator = (Iterator<Content>)element.getContent().iterator();
-        }
-    }
-
-    /**
      *  MediaElementFilter only yields elements that are media children.
      *  <p>
      *  Examples of elements yielded are image, flash, and object.
@@ -404,8 +384,9 @@ import org.jdom.input.DOMBuilder;
     }
 
     @Inject public JdomHtmlGenerator(Set<Processor> processors,
-            @CnxmlNamespace String cnxmlNamespace) {
+            JdomHtmlSerializer jdomHtmlSerializer, @CnxmlNamespace String cnxmlNamespace) {
         this.processors = ImmutableSet.copyOf(processors);
+        this.jdomHtmlSerializer = jdomHtmlSerializer;
         this.cnxmlNamespace = Namespace.getNamespace(cnxmlNamespace);
         this.mediaFilter = new MediaElementFilter(this.cnxmlNamespace);
     }
@@ -425,76 +406,12 @@ import org.jdom.input.DOMBuilder;
         // Render to HTML
         counter = new Counter();
         StringBuilder sb = new StringBuilder();
-        serializeHtmlTree(sb, generateHtmlTree(contentElem));
+        final List<Content> contentList = generateHtmlTree(contentElem);
+        for (Content content : contentList) {
+            jdomHtmlSerializer.serialize(sb, content);
+        }
         counter = null;
         return sb.toString();
-    }
-
-    protected void serializeHtmlTree(StringBuilder sb, List<Content> contentList) {
-        for (Content content : contentList) {
-            serializeHtmlTree(sb, content);
-        }
-    }
-
-    /**
-     *  This method builds a string from an HTML JDOM tree.
-     *
-     *  This serialization follows HTML5 rules: namespaces are not preserved and void elements do
-     *  not have a closing tag.
-     */
-    protected void serializeHtmlTree(StringBuilder sb, Content content) {
-        if (content instanceof Text) {
-            serializeText(sb, (Text)content);
-            return;
-        }
-        if (!(content instanceof Element)) {
-            // Skip it.
-            return;
-        }
-
-        final Stack<SerializeFrame> stack = new Stack<SerializeFrame>();
-        serializeTag(sb, (Element)content);
-        if (!HTML_VOID_ELEMENTS.contains(((Element)content).getName())) {
-            stack.push(new SerializeFrame((Element)content));
-        }
-        while (!stack.empty()) {
-            if (stack.peek().iterator.hasNext()) {
-                final Content child = stack.peek().iterator.next();
-                if (child instanceof Text) {
-                    serializeText(sb, (Text)child);
-                } else if (child instanceof Element) {
-                    serializeTag(sb, (Element)child);
-
-                    // If this element can have children, then push it.
-                    if (!HTML_VOID_ELEMENTS.contains(((Element)child).getName())) {
-                        stack.push(new SerializeFrame((Element)child));
-                    }
-                }
-            } else {
-                final Element elem = stack.pop().element;
-                sb.append("</");
-                sb.append(elem.getName());
-                sb.append('>');
-            }
-        }
-    }
-
-    protected void serializeTag(StringBuilder sb, Element elem) {
-        sb.append('<');
-        sb.append(elem.getName());
-
-        for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
-            sb.append(' ');
-            sb.append(attr.getName());
-            sb.append("=\"");
-            sb.append(StringEscapeUtils.escapeHtml4(attr.getValue()));
-            sb.append('"');
-        }
-        sb.append('>');
-    }
-
-    protected void serializeText(StringBuilder sb, Text text) {
-        sb.append(StringEscapeUtils.escapeHtml4(text.getText()));
     }
 
     /**

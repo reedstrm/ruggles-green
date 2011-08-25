@@ -45,6 +45,16 @@
              target="default"
              dir="${third_party}" />
 
+        <ant antfile="commons-lang/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jdom/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <javac srcdir="src"
                destdir="${classdir}"
                includeantruntime="false"

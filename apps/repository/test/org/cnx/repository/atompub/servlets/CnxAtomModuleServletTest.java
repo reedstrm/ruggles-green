@@ -68,7 +68,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     @Test
     public void testMigrateCompleteModule() throws HttpException, ProponoException, IOException,
             JAXBException, JDOMException {
-        String tempLocation = "/home/arjuns/mymodule";
+        String tempLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete/m34771";
         List<File> listOfResourcesToUpload =
             ModuleMigrator.getListOfResourcesToBeUploaded(tempLocation);
 

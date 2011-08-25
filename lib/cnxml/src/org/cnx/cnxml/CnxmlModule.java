@@ -30,8 +30,6 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
-import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.tofu.SoyTofu;
 
 /**
  *  CnxmlModule is the default configuration for the HTML generator.
@@ -42,24 +40,13 @@ public class CnxmlModule extends AbstractModule {
 
     @Override protected void configure() {
         bind(ModuleFactory.class).to(ModuleFactoryImpl.class);
-        bind(ModuleHTMLGenerator.class).to(SoyHTMLGenerator.class).in(RenderTime.class);
+        bind(ModuleHTMLGenerator.class).to(JdomHtmlGenerator.class).in(RenderTime.class);
         bind(String.class)
                 .annotatedWith(CnxmlNamespace.class)
                 .toInstance("http://cnx.rice.edu/cnxml");
-        install(new SoyExtras());
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
-    }
-
-    @Provides @Singleton @SoyHTMLGenerator.Template
-            SoyTofu provideTofu(SoyFileSet.Builder builder, @CnxmlNamespace String cnxmlNamespace) {
-        return builder
-                .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
-                        .put("cnxmlNamespace", cnxmlNamespace)
-                        .build())
-                .add(SoyHTMLGenerator.class.getResource("html.soy"))
-                .build().compileToJavaObj();
     }
 
     @Provides @Singleton @Named("ContentMathMLProcessor.transformer")

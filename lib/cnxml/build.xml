@@ -48,7 +48,12 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="soy/build.xml"
+        <ant antfile="commons-lang/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jdom/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />

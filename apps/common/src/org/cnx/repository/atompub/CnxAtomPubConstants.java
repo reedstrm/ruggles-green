@@ -240,7 +240,7 @@ public class CnxAtomPubConstants {
     public String getCollXmlDocFromAtomPubCollectionEntry(Entry apCollectionEntry)
             throws UnsupportedEncodingException {
         Content content = (Content) apCollectionEntry.getContents().get(0);
-        return decodeFrom64BitEncodedString(content.getValue());
+        return decodeFromBase64EncodedString(content.getValue());
     }
 
     /** Scheme for AtomPub collection for CnxModules. */
@@ -272,10 +272,10 @@ public class CnxAtomPubConstants {
      */
     public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc)
             throws JAXBException, JDOMException, IOException {
-        String encodedCnxml = encodeTo64BitEncodedString(cnxmlDoc);
-        String encodedResourceMappingDoc = encodeTo64BitEncodedString(resourceMappingDoc);
+        String encodedCnxml = encodeToBase64EncodedString(cnxmlDoc);
+        String encodedResourceMappingDoc = encodeToBase64EncodedString(resourceMappingDoc);
         String moduleEntryXml = getModuleEntryValue(encodedCnxml, encodedResourceMappingDoc);
-        String encodedModuleEntryXml = encodeTo64BitEncodedString(moduleEntryXml);
+        String encodedModuleEntryXml = encodeToBase64EncodedString(moduleEntryXml);
 
         Content content = new Content();
         // TODO(arjuns) : Fix this to common media type.
@@ -294,7 +294,7 @@ public class CnxAtomPubConstants {
      */
     public List<Content> getAtomPubListOfContentForCollectionEntry(String collXmlDoc)
             throws JAXBException, JDOMException, IOException {
-        String encodedCollXml = encodeTo64BitEncodedString(collXmlDoc);
+        String encodedCollXml = encodeToBase64EncodedString(collXmlDoc);
 
         Content content = new Content();
         // TODO(arjuns) : Fix this to common media type.
@@ -332,7 +332,7 @@ public class CnxAtomPubConstants {
 
         Element root = document.getRootElement();
         String encodedXml = root.getChild(childElement).getText();
-        String originalXml = decodeFrom64BitEncodedString(encodedXml);
+        String originalXml = decodeFromBase64EncodedString(encodedXml);
 
         return originalXml;
     }
@@ -372,10 +372,14 @@ public class CnxAtomPubConstants {
      * @return Decoded string.
      * @throws UnsupportedEncodingException
      */
-    public String decodeFrom64BitEncodedString(String encodedString)
+    public String decodeFromBase64EncodedString(String encodedString)
             throws UnsupportedEncodingException {
-        byte[] decodedBytes = Base64.decodeBase64(encodedString);
+        byte[] decodedBytes = decodeBase64EncodedStringToBytes(encodedString);
         return new String(decodedBytes, Charsets.UTF_8.displayName());
+    }
+
+    private byte[] decodeBase64EncodedStringToBytes(String encodedString) {
+        return Base64.decodeBase64(encodedString);
     }
 
     /**
@@ -385,7 +389,7 @@ public class CnxAtomPubConstants {
      * @return 64 bit encoded String.
      * @throws UnsupportedEncodingException
      */
-    public String encodeTo64BitEncodedString(String originalString)
+    public String encodeToBase64EncodedString(String originalString)
             throws UnsupportedEncodingException {
         return Base64.encodeBase64String(originalString.getBytes(Charsets.UTF_8.displayName()));
     }
@@ -405,16 +409,11 @@ public class CnxAtomPubConstants {
         ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<byte[]> encodedCnxmlDoc;
         JAXBElement<byte[]> encodedResourceMappingDoc;
-        try {
-            encodedCnxmlDoc =
-                objectFactory.createCnxmlDoc(decodeFrom64BitEncodedString(encodedCnxml).getBytes());
-            encodedResourceMappingDoc =
-                objectFactory.createResourceMappingDoc(decodeFrom64BitEncodedString(
-                    encodedResourceMappingXml).getBytes());
-        } catch (UnsupportedEncodingException e) {
-            // TODO(arjuns): Auto-generated catch block
-            throw new RuntimeException(e);
-        }
+        encodedCnxmlDoc =
+            objectFactory.createCnxmlDoc(decodeBase64EncodedStringToBytes(encodedCnxml));
+        encodedResourceMappingDoc =
+            objectFactory
+                .createResourceMappingDoc(decodeBase64EncodedStringToBytes(encodedResourceMappingXml));
 
         ResourceEntryValue resourceEntryValue = objectFactory.createResourceEntryValue();
         resourceEntryValue.setCnxmlDoc(encodedCnxmlDoc.getValue());

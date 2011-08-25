@@ -51,11 +51,9 @@
         {$contentHtml|noAutoescape}
     </div>
     {if $javascriptHtml}{$javascriptHtml|noAutoescape}{/if}
-    {if analyticsKey}
+    {if analyticsJs}
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', "{analyticsKey|escapeJs}"]);
-        _gaq.push(['_trackPageview']);
+        {analyticsJs}
 
         (function() {lb}
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;

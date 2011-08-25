@@ -54,7 +54,7 @@ public class WebViewModule extends AbstractModule {
             SoyTofu provideTofu(SoyFileSet.Builder builder) {
         return builder
                 .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
-                        .put("analyticsKey", "")
+                        .put("analyticsJs", "")
                         .build())
                 .add(new File("base.soy"))
                 .add(new File("collection.soy"))

@@ -19,6 +19,7 @@ package org.cnx.repository.tempservlets.collections;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,23 +41,26 @@ public class CreateCollectionServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        @Nullable
+        String forcedId = req.getParameter("id");
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateCollectionResult> repositoryResponse =
-            repository.createCollection(context);
+                (forcedId == null) ? repository.createCollection(context) : repository
+                    .migrationCreateCollectionWithId(context, forcedId);
 
-        // Map repository error to API error
-        if (repositoryResponse.isError()) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    repositoryResponse.getExtendedDescription());
-            return;
-        }
+                // Map repository error to API error
+                if (repositoryResponse.isError()) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            repositoryResponse.getExtendedDescription());
+                    return;
+                }
 
-        // Map repository OK to API OK
-        final CreateCollectionResult result = repositoryResponse.getResult();
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
+                // Map repository OK to API OK
+                final CreateCollectionResult result = repositoryResponse.getResult();
+                resp.setContentType("text/plain");
+                PrintWriter out = resp.getWriter();
 
-        out.println("collection id: " + result.getCollectionId());
+                out.println("collection id: " + result.getCollectionId());
     }
 }

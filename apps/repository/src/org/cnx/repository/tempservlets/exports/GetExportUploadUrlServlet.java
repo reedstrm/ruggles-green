@@ -45,19 +45,19 @@ public class GetExportUploadUrlServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         final ExportScopeType scopeType =
-                ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
+            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
         final String objectId = req.getParameter("id");
         final String exportTypeId = req.getParameter("type");
         final String versionNumberParam = req.getParameter("version");
         final Integer versionNumber =
-                versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
+            versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final ExportReference exportReference =
-                new ExportReference(scopeType, objectId, versionNumber, exportTypeId);
+            new ExportReference(scopeType, objectId, versionNumber, exportTypeId);
 
         RepositoryResponse<GetExportUploadUrlResult> repositoryResponse =
-                repository.getExportUploadUrl(context, exportReference);
+            repository.getExportUploadUrl(context, exportReference);
 
         if (repositoryResponse.isError()) {
             switch (repositoryResponse.getStatus()) {

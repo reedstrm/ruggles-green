@@ -1,18 +1,15 @@
 Repository global todo items
 
-* Add API capability for the migrator to keep entity ids.
-
-* return size and md5 hash for resource and export info results
-* Add API method to lookup resources by size/hash
-
 * Make the IdUtil test to work (requires GAE test jars)
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
 
+* Solve the java formatter issues.
 * Clean up all compilations and startup warnings
 * Delete the temp servlets as soon as the actual API will be ready.
 
 Post Pilot
 * (Security) Add verifications that uploaded completion method are actually called from blobstore and not directly by a user.
+* Add API method to lookup resources by size/hash
 * Incoming XML update/validation (modify incoming XML with repository values (e.g. version)).
 * parameter validations (in the servlets and the service)
 * User authentication (in servlets)
@@ -44,5 +41,7 @@ Done
 + (ETA Aug 15 2011) Remove repository service relative blobstore URL prefixing when app engine 1.3.5 will be available.
 + Return creationTime from all entities (in getInfo).
 + Add service methods to enumerate all resources
++ Add API capability for the migrator to preserve old module and collectins ids.
++ return size and md5 hash for resource and export info results
 
 

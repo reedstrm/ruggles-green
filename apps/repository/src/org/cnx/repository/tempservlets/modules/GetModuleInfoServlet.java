@@ -65,7 +65,7 @@ public class GetModuleInfoServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<GetModuleInfoResult> repositoryResponse =
-                repository.getModuleInfo(context, moduleId);
+            repository.getModuleInfo(context, moduleId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

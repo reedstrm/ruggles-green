@@ -19,6 +19,7 @@ package org.cnx.repository.tempservlets.modules;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,9 +42,14 @@ public class CreateModuleServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
+        @Nullable
+        String forcedId = req.getParameter("id");
+
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        // TODO(tal): why the Eclipse auto formatter require here extra parenthesis?
         final RepositoryResponse<CreateModuleResult> repositoryResponse =
-                repository.createModule(context);
+                ((forcedId == null) ? repository.createModule(context) : repository
+                    .migrationCreateModuleWithId(context, forcedId));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

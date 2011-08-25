@@ -33,7 +33,7 @@ import com.google.appengine.api.datastore.Key;
  */
 public class OrmResourceEntity extends OrmEntity {
 
-    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "R");
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Resource", "r");
 
     private static final String STATE_PROPERTY = "state";
 

@@ -20,15 +20,14 @@ package org.cnx.repository.service.api;
  * Status codes of the repository service operations.
  */
 public enum RepositoryStatus {
-    /**
-     * Operation done ok.
-     */
+    /** Operation done ok. */
     OK,
 
-    /**
-     * Requested object not found.
-     */
+    /** Requested object not found. */
     NOT_FOUND,
+
+    /** Some portion of the reuqest is out of valid range. */
+    OUT_OF_RANGE,
 
     /**
      * Version specification in request does not match object's state. Caller need to resolved the
@@ -51,14 +50,13 @@ public enum RepositoryStatus {
      */
     BAD_REQUEST,
 
-    /**
-     * General error, typically internal to the server.
-     */
+    /** General error, typically internal to the server. */
     SERVER_ERRROR,
 
-    /**
-     * Some portion of the query is too large.
-     */
+    /** Trying to create new data that already exists */
+    ALREADY_EXISTS,
+
+    /** Some portion of the query is too large. */
     OVERSIZE;
 
     public boolean isOk() {

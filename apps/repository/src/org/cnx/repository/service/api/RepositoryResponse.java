@@ -40,13 +40,13 @@ public class RepositoryResponse<T> {
     /**
      * Private constructor. Use static methods to construct.
      */
-    private RepositoryResponse(RepositoryStatus status, @Nullable String statusDescription,
-        @Nullable T result) {
+    private RepositoryResponse(RepositoryStatus status, String statusDescription,
+            @Nullable T result) {
         this.status = checkNotNull(status);
-        this.description = statusDescription;
+        this.description = checkNotNull(statusDescription);
         this.result = result;
 
-        checkArgument(status.isError() == (statusDescription == null), "Status: %s", status);
+        checkArgument(status.isError() == (result == null), "Status: %s", status);
     }
 
     public boolean isOk() {

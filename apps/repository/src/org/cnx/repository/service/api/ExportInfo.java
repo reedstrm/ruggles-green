@@ -30,11 +30,15 @@ public class ExportInfo {
 
     private final Date creationTime;
 
-    // TODO(tal): add more export attributes (user, size, etc).
+    private final long size;
 
-    public ExportInfo(ExportType exportType, Date creationTime) {
+    private final String md5Hash;
+
+    public ExportInfo(ExportType exportType, Date creationTime, long size, String md5Hash) {
         this.exportType = checkNotNull(exportType);
         this.creationTime = checkNotNull(creationTime);
+        this.size = size;
+        this.md5Hash = checkNotNull(md5Hash);
     }
 
     public ExportType getExportType() {
@@ -45,8 +49,17 @@ public class ExportInfo {
         return creationTime;
     }
 
+    public long getSize() {
+        return size;
+    }
+
+    public String getMd5Hash() {
+        return md5Hash;
+    }
+
     @Override
     public String toString() {
-        return "id: " + exportType.getId() + ", time: " + creationTime;
+        return String.format("[id: %s, time: %s, size: %s, hash: %s]", exportType.getId(),
+                creationTime, size, md5Hash);
     }
 }

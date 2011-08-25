@@ -98,6 +98,8 @@ public class GetResourceInfoServlet extends HttpServlet {
             out.println("  - file name: " + contentInfo.getContentOriginalFileName());
             out.println("  - size: " + contentInfo.getContentSize());
             out.println("  - upload time: " + contentInfo.getContentUploadTime());
+            out.println("  - size: " + contentInfo.getSize());
+            out.println("  - md5 hash: " + contentInfo.getMd5Hash());
         }
     }
 }

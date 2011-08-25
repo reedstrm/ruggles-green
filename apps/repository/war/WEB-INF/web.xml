@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <!--  APP ENGINE STATS -->
+
+    <!--  
+    // Commented this section out to reduce log spam. 
+    //
+    // TODO(tal): is there a better way to control the appstat or its logging using a
+    // runtime switch?
+    -->
+    <!--
+    <filter>
+        <filter-name>appstats</filter-name>
+        <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
+        <init-param>
+            <param-name>logMessage</param-name>
+            <param-value>Appstats available: /appstats/details?time={ID}</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>appstats</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+     <servlet>
+        <servlet-name>appstats</servlet-name>
+        <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>appstats</servlet-name>
+        <url-pattern>/appstats/*</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/appstats/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    -->
+  
+  <!-- CNX RESOURCE API (TEMP) -->
+
+  <servlet>
+    <servlet-name>CreateResourceServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.resources.CreateResourceServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>CreateResourceServlet</servlet-name>
+    <url-pattern>/resource_factory/create</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetResourceServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.resources.GetResourceServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetResourceServlet</servlet-name>
+    <url-pattern>/resource/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetResourceInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.resources.GetResourceInfoServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetResourceInfoServlet</servlet-name>
+    <url-pattern>/resource_info/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- CNX MODULES API (TEMP) -->
+
+  <servlet>
+    <servlet-name>CreateModuleServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.CreateModuleServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>CreateModuleServlet</servlet-name>
+    <url-pattern>/module_factory/create</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>AddModuleVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.AddModuleVersionServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>AddModuleVersionServlet</servlet-name>
+    <url-pattern>/module_factory/add_version</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetModuleVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleVersionServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetModuleVersionServlet</servlet-name>
+    <url-pattern>/module/*</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>GetModuleVersionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleVersionInfoServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetModuleVersionInfoServlet</servlet-name>
+    <url-pattern>/module_version_info/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GetModuleInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleInfoServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetModuleInfoServlet</servlet-name>
+    <url-pattern>/module_info/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetModuleListServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.GetModuleListServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetModuleListServlet</servlet-name>
+    <url-pattern>/module_list</url-pattern>
+  </servlet-mapping>
+
+  <!--  CNX COLLECTIONS API (TEMP) -->
+
+  <servlet>
+    <servlet-name>CreateCollectionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.CreateCollectionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CreateCollectionServlet</servlet-name>
+    <url-pattern>/collection_factory/create</url-pattern>
+  </servlet-mapping>  
+  
+  <servlet>
+    <servlet-name>GetCollectionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionInfoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetCollectionInfoServlet</servlet-name>
+    <url-pattern>/collection_info/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>AddCollectionVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.AddCollectionVersionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>AddCollectionVersionServlet</servlet-name>
+    <url-pattern>/collection_factory/add_version</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetCollectionVersionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionVersionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetCollectionVersionServlet</servlet-name>
+    <url-pattern>/collection/*</url-pattern>
+  </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>GetCollectionVersionInfoServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionVersionInfoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetCollectionVersionInfoServlet</servlet-name>
+    <url-pattern>/collection_version_info/*</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>GetCollectionListServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.GetCollectionListServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>GetCollectionListServlet</servlet-name>
+    <url-pattern>/collection_list</url-pattern>
+  </servlet-mapping>
+
+  <!--  CNX EXPORTS API (TEMP) -->
+  
+  <servlet>
+    <servlet-name>GetExportUploadUrlServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.exports.GetExportUploadUrlServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetExportUploadUrlServlet</servlet-name>
+    <url-pattern>/exports/getuploadurl</url-pattern>
+  </servlet-mapping>  
+    
+   <servlet>
+    <servlet-name>GetExportServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.exports.GetExportServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GetExportServlet</servlet-name>
+    <url-pattern>/exports/get</url-pattern>
+  </servlet-mapping> 
+  
+     <servlet>
+    <servlet-name>DeleteExportServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.exports.DeleteExportServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>DeleteExportServlet</servlet-name>
+    <url-pattern>/exports/delete</url-pattern>
+  </servlet-mapping> 
+   
+  <!-- Repository service -->
+
+  <servlet>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ResourceUploadCompletionServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ResourceUploadCompletionServlet</servlet-name>
+    <url-pattern>/_repo/resource_uploaded</url-pattern>
+  </servlet-mapping> 
+  
+  <servlet>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.ExportUploadCompletionServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>ExportUploadCompletionServlet</servlet-name>
+    <url-pattern>/_repo/export_uploaded</url-pattern>
+  </servlet-mapping>   
+  
+  <servlet>
+    <servlet-name>BlobUploadDoneServlet</servlet-name>
+    <servlet-class>org.cnx.repository.service.impl.operations.BlobUploadDoneServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>BlobUploadDoneServlet</servlet-name>
+    <url-pattern>/_repo/done</url-pattern>
+  </servlet-mapping> 
+
+  <!-- Mapping for AtomPub API -->
+  <servlet>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer
+    </servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>
+        org.cnx.repository.atompub.servlets;
+      </param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <url-pattern>/atompub/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>CnxDemo.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>

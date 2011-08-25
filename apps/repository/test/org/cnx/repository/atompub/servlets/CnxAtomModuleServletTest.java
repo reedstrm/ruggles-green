@@ -108,11 +108,6 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         logger.info("New location for [" + ORIGINAL_MODULE_ID + "] is \n"
             + moduleNewVersionEntry.getEditURI());
 
-        Content content = (Content) getEntry.getContents().get(0);
-        String encodedModuleEntry = content.getValue();
-        String moduleEntryXml =
-            cnxClient.getConstants().decodeFrom64BitEncodedString(encodedModuleEntry);
-
         String downloadedCnxmlDoc = cnxClient.getCnxml(getEntry);
         assertEquals(cnxmlAsString, downloadedCnxmlDoc);
 

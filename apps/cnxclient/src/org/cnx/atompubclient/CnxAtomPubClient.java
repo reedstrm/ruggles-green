@@ -311,7 +311,7 @@ public class CnxAtomPubClient {
     public String getCnxml(ClientEntry moduleVersionEntry) throws JDOMException, IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-            constants.decodeFrom64BitEncodedString(encodedModuleEntryValue);
+            constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
         return constants.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
     }
 
@@ -326,7 +326,7 @@ public class CnxAtomPubClient {
             IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-            constants.decodeFrom64BitEncodedString(encodedModuleEntryValue);
+            constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
         return constants.getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
     }
 

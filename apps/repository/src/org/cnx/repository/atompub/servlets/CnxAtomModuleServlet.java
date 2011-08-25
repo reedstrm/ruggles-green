@@ -175,11 +175,14 @@ public class CnxAtomModuleServlet {
         // TODO(arjuns) : Fix this. Move this to common.
         Content encodedModuleEntryContent = (Content) postedEntry.getContents().get(0);
         String decodedModuleEntryValue =
-            atomPubService.getConstants().decodeFrom64BitEncodedString(
+            atomPubService.getConstants().decodeFromBase64EncodedString(
                 encodedModuleEntryContent.getValue());
 
-        String cnxmlDoc = getCnxml(decodedModuleEntryValue);
-        String resourceMappingDoc = getResourceMappingDoc(decodedModuleEntryValue);
+        String cnxmlDoc =
+            atomPubService.getConstants().getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
+        String resourceMappingDoc =
+            atomPubService.getConstants().getResourceMappingDocFromModuleEntryXml(
+                decodedModuleEntryValue);
 
         int newVersion = Integer.parseInt(version);
         RepositoryResponse<AddModuleVersionResult> createdModule =
@@ -368,29 +371,5 @@ public class CnxAtomModuleServlet {
 
         // TODO(arjuns) : Add more details here in error message.
         return Response.serverError().build();
-    }
-
-    // TODO(arjuns) : move this to common.
-    private String getCnxml(String moduleEntryValue) throws JDOMException, IOException {
-        return getDecodedChild("cnxml-doc", moduleEntryValue);
-    }
-
-    // TODO(arjuns) : move this to common.
-    private String getResourceMappingDoc(String moduleEntryValue) throws JDOMException, IOException {
-        return getDecodedChild("resource-mapping-doc", moduleEntryValue);
-    }
-
-    // TODO(arjuns) : move this to common.
-    private String getDecodedChild(String childElement, String moduleEntryValue)
-            throws JDOMException, IOException {
-        // TODO(arjuns): Handle exceptions.
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(new StringReader(moduleEntryValue));
-
-        Element root = document.getRootElement();
-        String encodedXml = root.getChild(childElement).getText();
-        String originalXml = atomPubService.getConstants().decodeFrom64BitEncodedString(encodedXml);
-
-        return originalXml;
     }
 }

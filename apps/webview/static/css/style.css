@@ -41,6 +41,12 @@ body > header > h1 {
     text-align: left;
 }
 
+.feedback {
+    position: absolute;
+    top: 1ex;
+    right: 1em;
+}
+
 h1 {
     margin-bottom: 0;
 }

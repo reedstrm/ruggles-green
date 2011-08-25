@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
     @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.setContentType(MIME_TYPE);
-        resp.getWriter().print(tofu.render(TEMPLATE_NAME, new SoyMapData(), null));
+        resp.getWriter().print(tofu.render(TEMPLATE_NAME, new SoyMapData(
+                "collectionUri", "/content/collection/C52219/latest/"), null));
     }
 }

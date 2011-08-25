@@ -19,7 +19,6 @@ package org.cnx.cnxml;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.template.soy.SoyModule;
 import javax.xml.parsers.DocumentBuilder;
 import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.CnxmlNamespace;
@@ -47,7 +46,6 @@ public class ModuleHTMLGeneratorTests {
         injector = Guice.createInjector(
                 new CnxmlModule(),
                 new MdmlModule(),
-                new SoyModule(),
                 new UtilModule()
         );
     }
@@ -116,7 +114,7 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void textShouldBeCopied() throws Exception {
-        final String s = "Hello, 世界!";
+        final String s = "Hello, \u4e16\u754c!";
         assertEquals(s, generate(doc.createTextNode(s)));
     }
 
@@ -235,28 +233,41 @@ public class ModuleHTMLGeneratorTests {
                             .attr("id", "myid").attr("effect", "normal").text("Hello")));
     }
 
+    @Test public void linkShouldRenderUrl() throws Exception {
+        assertEquals("<a href=\"http://www.example.com/\">Example</a>",
+                generate(builder.element("link")
+                        .attr("url", "http://www.example.com/")
+                        .text("Example")));
+    }
+
+    @Test public void linkShouldRenderTargetId() throws Exception {
+        assertEquals("<a href=\"#myRefId\">Example</a>",
+                generate(builder.element("link").attr("target-id", "myRefId").text("Example")));
+    }
+
     @Test public void foreignShouldRenderAsSpan() throws Exception {
-        assertEquals("<span class=\"foreign\">¡Hola, mundo!</span>",
-                     generate(builder.element("foreign").text("¡Hola, mundo!")));
-        assertEquals("<span class=\"foreign\" id=\"myid\">¡Hola, mundo!</span>",
-                     generate(builder.element("foreign").attr("id", "myid").text("¡Hola, mundo!")));
+        assertEquals("<span class=\"foreign\">&iexcl;Hola, mundo!</span>",
+                generate(builder.element("foreign").text("\u00a1Hola, mundo!")));
+        assertEquals("<span class=\"foreign\" id=\"myid\">&iexcl;Hola, mundo!</span>",
+                generate(builder.element("foreign").attr("id", "myid")
+                        .text("\u00a1Hola, mundo!")));
     }
 
     @Test public void foreignShouldAllowUrlLinks() throws Exception {
         final Node node = builder.element("foreign")
-            .attr("url", "http://www.example.com/")
-            .text("¡Hola, mundo!")
-            .build();
-        assertEquals("<span class=\"foreign\"><a href=\"http://www.example.com/\">¡Hola, mundo!</a></span>",
-                     generate(node));
+                .attr("url", "http://www.example.com/")
+                .text("\u00a1Hola, mundo!")
+                .build();
+        assertEquals("<a class=\"foreign\" href=\"http://www.example.com/\">"
+                + "&iexcl;Hola, mundo!</a>", generate(node));
     }
 
     @Test public void foreignShouldAllowAnchorLinks() throws Exception {
         final Node node = builder.element("foreign")
                 .attr("target-id", "myRefId")
-                .text("¡Hola, mundo!")
+                .text("\u00a1Hola, mundo!")
                 .build();
-        assertEquals("<span class=\"foreign\"><a href=\"#myRefId\">¡Hola, mundo!</a></span>",
+        assertEquals("<a class=\"foreign\" href=\"#myRefId\">&iexcl;Hola, mundo!</a>",
                      generate(node));
     }
 
@@ -272,12 +283,12 @@ public class ModuleHTMLGeneratorTests {
                 .attr("url", "http://www.example.com/")
                 .text("jargon")
                 .build();
-        assertEquals("<span class=\"term\"><a href=\"http://www.example.com/\">jargon</a></span>",
+        assertEquals("<a class=\"term\" href=\"http://www.example.com/\">jargon</a>",
                      generate(node));
     }
 
     @Test public void termShouldAllowAnchorLinks() throws Exception {
-        assertEquals("<span class=\"term\"><a href=\"#myRef\">jargon</a></span>",
+        assertEquals("<a class=\"term\" href=\"#myRef\">jargon</a>",
                      generate(builder.element("term").attr("target-id", "myRef").text("jargon")));
     }
 
@@ -403,6 +414,11 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void defaultNewlineShouldRenderBr() throws Exception {
         assertEquals("<br>", generate(builder.element("newline")));
+    }
+
+    @Test public void defaultNewlineShouldHonorId() throws Exception {
+        assertEquals("<a id=\"myId\"><br></a>", generate(
+                builder.element("newline").attr("id", "myId")));
     }
 
     @Test public void normalNewlineShouldRenderBr() throws Exception {
@@ -544,6 +560,46 @@ public class ModuleHTMLGeneratorTests {
                 generate(node));
     }
 
+    @Test public void definitionShouldRenderAsDiv() throws Exception {
+        final Node node = builder.element("definition").attr("id", "myDef").build();
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1</div><ol></ol></div>", generate(node));
+    }
+
+    @Test public void definitionShouldUseTermAsTitle() throws Exception {
+        final Node node = builder.element("definition")
+                .attr("id", "myDef")
+                .child(builder.element("term").text("snarf"))
+                .build();
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1: snarf</div><ol></ol></div>", generate(node));
+    }
+
+    @Test public void definitionShouldRenderMeaningsInList() throws Exception {
+        final Node node = builder.element("definition")
+                .attr("id", "myDef")
+                .child(builder.element("meaning").text("A noun"))
+                .child(builder.element("meaning").text("A verb"))
+                .build();
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1</div><ol>"
+                + "<li class=\"meaning\">A noun</li><li class=\"meaning\">A verb</li></ol></div>",
+                generate(node));
+    }
+
+    @Test public void fullDefinitionTest() throws Exception {
+        final Node node = builder.element("definition")
+                .attr("id", "myDef")
+                .child(builder.element("term").text("snarf"))
+                .child(builder.element("meaning").text("A noun"))
+                .child(builder.element("meaning").text("A verb"))
+                .build();
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1: snarf</div><ol>"
+                + "<li class=\"meaning\">A noun</li><li class=\"meaning\">A verb</li></ol></div>",
+                generate(node));
+    }
+
     @Test public void exampleShouldRenderAsDiv() throws Exception {
         final Node node = builder.element("example")
                 .attr("id", "my-example")
@@ -627,6 +683,84 @@ public class ModuleHTMLGeneratorTests {
                 builder.element("equation").attr("id", "my-equation").text("2 + 2 = 4").build();
         assertEquals("<div class=\"equation\" id=\"my-equation\">"
                 + "<div class=\"title\">Equation 1</div>2 + 2 = 4</div>", generate(node));
+    }
+
+    @Test public void figureShouldWrapContent() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go").text("Hello").build();
+        assertEquals("<figure id=\"go\">Hello<figcaption>Figure 1</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void figureShouldUseLabel() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go")
+                .child(builder.element("label").text("Fig"))
+                .text("Hello").build();
+        assertEquals("<figure id=\"go\">Hello<figcaption>Fig 1</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void figureShouldUseTitle() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go")
+                .child(builder.element("title").text("The Go Figure"))
+                .text("Hello").build();
+        assertEquals("<div class=\"title\">The Go Figure</div>"
+                + "<figure id=\"go\">Hello<figcaption>Figure 1</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void figureShouldUseCaption() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go")
+                .child(builder.element("caption").text("A caption"))
+                .text("Hello").build();
+        assertEquals("<figure id=\"go\">Hello<figcaption>Figure 1: A caption</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void figureShouldUseTitleLabelCaption() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go")
+                .child(builder.element("title").text("The Go Figure"))
+                .child(builder.element("label").text("Fig"))
+                .child(builder.element("caption").text("A greeting"))
+                .text("Hello").build();
+        assertEquals("<div class=\"title\">The Go Figure</div>"
+                + "<figure id=\"go\">Hello<figcaption>Fig 1: A greeting</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void defaultSubfigureTest() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go")
+                .child(builder.element("subfigure").text("Hello"))
+                .child(builder.element("subfigure").text("World"))
+                .build();
+        assertEquals("<figure id=\"go\" class=\"horizontal\">"
+                + "<div class=\"subfigure\">Hello</div>"
+                + "<div class=\"subfigure\">World</div>"
+                + "<figcaption>Figure 1</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void horizontalSubfigureTest() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go").attr("orient", "horizontal")
+                .child(builder.element("subfigure").text("Hello"))
+                .child(builder.element("subfigure").text("World"))
+                .build();
+        assertEquals("<figure id=\"go\" class=\"horizontal\">"
+                + "<div class=\"subfigure\">Hello</div>"
+                + "<div class=\"subfigure\">World</div>"
+                + "<figcaption>Figure 1</figcaption></figure>",
+                generate(node));
+    }
+
+    @Test public void verticalSubfigureTest() throws Exception {
+        final Node node = builder.element("figure").attr("id", "go").attr("orient", "vertical")
+                .child(builder.element("subfigure").text("Hello"))
+                .child(builder.element("subfigure").text("World"))
+                .build();
+        assertEquals("<figure id=\"go\" class=\"vertical\">"
+                + "<div class=\"subfigure\">Hello</div>"
+                + "<div class=\"subfigure\">World</div>"
+                + "<figcaption>Figure 1</figcaption></figure>",
+                generate(node));
     }
 
     @Test public void defaultListShouldRenderAsUl() throws Exception {
@@ -737,6 +871,19 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<img id=\"myImage\" alt=\"A great image\" "
                      + "src=\"http://www.example.com/foo.png\" width=\"128\" height=\"42\">",
                      generate(node));
+    }
+
+    @Test public void mediaImageShouldRenderWithoutDimensions() throws Exception {
+        final Node node = builder.element("media")
+                .attr("id", "myImage")
+                .attr("alt", "A great image")
+                .child(builder.element("image")
+                        .attr("src", "http://www.example.com/foo.png")
+                        .attr("mime-type", "image/png")
+                )
+                .build();
+        assertEquals("<img id=\"myImage\" alt=\"A great image\" "
+                     + "src=\"http://www.example.com/foo.png\">", generate(node));
     }
 
     @Test public void mediaObjectShouldRenderAsObject() throws Exception {
@@ -860,14 +1007,14 @@ public class ModuleHTMLGeneratorTests {
                         )
                 )
         .build();
-        assertEquals("<table id=\"1000\" class=\"cals calsFrameAll \">"
-                + "<thead class=\"\"><tr class=\"\">"
-                + "<th class=\"\">Name</th><th class=\"\">Type</th><th class=\"\">Value</th>"
+        assertEquals("<table id=\"1000\" class=\"cals calsFrameAll\">"
+                + "<thead><tr>"
+                + "<th>Name</th><th>Type</th><th>Value</th>"
                 + "</tr></thead>"
-                + "<tbody class=\"\"><tr class=\"\">"
-                + "<td class=\"\">answer</td><td class=\"\">int</td><td class=\"\">42</td>"
-                + "</tr><tr class=\"\">"
-                + "<td class=\"\">pi</td><td class=\"\">float</td><td class=\"\">3.14</td>"
+                + "<tbody><tr>"
+                + "<td>answer</td><td>int</td><td>42</td>"
+                + "</tr><tr>"
+                + "<td>pi</td><td>float</td><td>3.14</td>"
                 + "</tr></tbody>"
                 + "<caption><div class=\"title\">Table 1: Information</div>A data table</caption>"
                 + "</table>",

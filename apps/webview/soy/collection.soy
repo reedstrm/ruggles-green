@@ -20,6 +20,7 @@
  *  Collection page.
  *
  *  @param collection Collection object
+ *  @param? firstModuleUri The URI of the first module in the collection.
  */
 {template .collection}
     {call .page}
@@ -29,6 +30,9 @@
             <p class="authors">By {call .actorList}{param actors: $collection.authors/}{/call}</p>
             {if $collection.abstract}
                 <p class="collectionAbstract">{$collection.abstract}</p>
+            {/if}
+            {if $firstModuleUri}
+                <div class="collectionStartLink"><a href="{$firstModuleUri}">Start &#x2794;</a></div>
             {/if}
             <div class="collectionToc">
                 {$collection.contentHtml|noAutoescape}

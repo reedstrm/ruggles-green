@@ -19,22 +19,16 @@ package org.cnx.common.collxml;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.tofu.SoyTofu;
 
 /**
  *  CollxmlModule configures the org.cnx.collxml package for Guice.
  */
 public class CollxmlModule extends AbstractModule {
     @Override protected void configure() {
-        bind(CollectionHTMLGenerator.class).to(SoyHTMLGenerator.class);
+        bind(CollectionHTMLGenerator.class).to(HtmlGeneratorImpl.class);
         bind(CollectionFactory.class).to(CollectionFactoryImpl.class);
-        bind(String.class).annotatedWith(CollxmlNamespace.class).toInstance("http://cnx.rice.edu/collxml");
-    }
-
-    @Provides @Singleton @SoyHTMLGenerator.Template
-            SoyTofu provideTofu(SoyFileSet.Builder builder) {
-        builder.add(SoyHTMLGenerator.class.getResource("collxml.soy"));
-        return builder.build().compileToJavaObj();
+        bind(String.class)
+                .annotatedWith(CollxmlNamespace.class)
+                .toInstance("http://cnx.rice.edu/collxml");
     }
 }

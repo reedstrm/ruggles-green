@@ -66,42 +66,61 @@ public class ModuleOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<CreateModuleResult> createModule(
-            RepositoryRequestContext context, @Nullable String migrationForcedId) {
+            RepositoryRequestContext context) {
+        final String moduleId;
+        final Date transactionTime = new Date();
+        try {
+            final OrmModuleEntity moduleEntity = new OrmModuleEntity(transactionTime);
+            // This also allocates a module id
+            Services.persistence.write(moduleEntity);
+            moduleId = checkNotNull(moduleEntity.getId(), "Null module id");
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error when trying to create a new module", log, e);
+        }
+
+        return ResponseUtil.loggedOk("New module created: " + moduleId, new CreateModuleResult(
+                moduleId), log);
+    }
+
+    /**
+     * See description in {@link CnxRepositoryService}
+     */
+    public static RepositoryResponse<CreateModuleResult> migrationCreateModuleWithId(
+            RepositoryRequestContext context, String forcedId) {
         final String moduleId;
         final Date transactionTime = new Date();
         final Transaction tx = Services.persistence.beginTransaction();
         try {
-            final OrmModuleEntity moduleEntity = new OrmModuleEntity(transactionTime);
-
-            // Handle optional forced id
-            if (migrationForcedId != null) {
-                final Key forcedKey = OrmModuleEntity.moduleIdToKey(migrationForcedId);
-                if (forcedKey == null) {
-                    tx.rollback();
-                    return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                            "Invalid module id " + migrationForcedId, log);
-                }
-                if (!PersistenceMigrationUtil.isModuleKeyProtected(forcedKey)) {
-                    tx.rollback();
-                    return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                            "Forced module id is not out of protected id range " + migrationForcedId, log);
-                }
-                if (Services.persistence.hasObjectWithKey(forcedKey)) {
-                    tx.rollback();
-                    return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                            "A module with this forced id already exists: " + migrationForcedId, log);
-                }
-                moduleEntity.setKey(forcedKey);
+            // Validate forced id
+            final Key forcedKey = OrmModuleEntity.moduleIdToKey(forcedId);
+            if (forcedKey == null) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                        "Invalid forved module id " + forcedId, log);
+            }
+            if (!PersistenceMigrationUtil.isModuleKeyProtected(forcedKey)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.OUT_OF_RANGE,
+                        "Forced module id is not out of protected id range " + forcedId, log);
+            }
+            if (Services.persistence.hasObjectWithKey(forcedKey)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.ALREADY_EXISTS,
+                        "A module with this forced id already exists: " + forcedId, log);
             }
 
-            // If key is not forced, it is assigned here when the entity is first persisted.
+            // Create and save entity
+            final OrmModuleEntity moduleEntity = new OrmModuleEntity(transactionTime);
+            moduleEntity.setKey(forcedKey);
             Services.persistence.write(moduleEntity);
+
             moduleId = checkNotNull(moduleEntity.getId(), "Null module id");
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                    "Error when trying to create a new module", log, e);
+                    "Error when trying to create a new module with forced id: " + forcedId, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active");
         }

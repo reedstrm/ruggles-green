@@ -102,7 +102,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
-                repositoryService.createModule(RepositoryUtils.getRepositoryContext(), null);
+                repositoryService.createModule(RepositoryUtils.getRepositoryContext());
 
         if (createdModule.isOk()) {
             /*

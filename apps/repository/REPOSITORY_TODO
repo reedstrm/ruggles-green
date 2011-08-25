@@ -1,16 +1,15 @@
 Repository global todo items
 
-
-* Add API method to lookup resources by size/hash
-
 * Make the IdUtil test to work (requires GAE test jars)
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
 
+* Solve the java formatter issues.
 * Clean up all compilations and startup warnings
 * Delete the temp servlets as soon as the actual API will be ready.
 
 Post Pilot
 * (Security) Add verifications that uploaded completion method are actually called from blobstore and not directly by a user.
+* Add API method to lookup resources by size/hash
 * Incoming XML update/validation (modify incoming XML with repository values (e.g. version)).
 * parameter validations (in the servlets and the service)
 * User authentication (in servlets)

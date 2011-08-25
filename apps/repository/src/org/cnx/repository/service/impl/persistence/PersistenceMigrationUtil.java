@@ -35,8 +35,10 @@ public class PersistenceMigrationUtil {
 
     private static final Logger log = Logger.getLogger(PersistenceMigrationUtil.class.getName());
 
-    public static final long MODULE_KEY_FIRST_FREE_ID = 50000;
-    public static final long COLLECTION_KEY_FIRST_FREE_ID = 20000;
+    /**
+     * Collections, modules and resource auto ids are allocated starting from this value.
+     */
+    public static final long MIN_NON_RESERVED_KEY_ID = 100000;
 
     /**
      * Protect all key ranges reserved for migration.
@@ -50,9 +52,11 @@ public class PersistenceMigrationUtil {
     public static void protectAllReservedKeys(DatastoreService datastore) {
 
         protectEntityReservedKeys(datastore, OrmCollectionEntity.getSpec(),
-                MODULE_KEY_FIRST_FREE_ID);
+                MIN_NON_RESERVED_KEY_ID);
         protectEntityReservedKeys(datastore, OrmModuleEntity.getSpec(),
-                COLLECTION_KEY_FIRST_FREE_ID);
+                MIN_NON_RESERVED_KEY_ID);
+        protectEntityReservedKeys(datastore, OrmResourceEntity.getSpec(),
+                MIN_NON_RESERVED_KEY_ID);
     }
 
     private static void protectEntityReservedKeys(DatastoreService datastore,
@@ -72,7 +76,7 @@ public class PersistenceMigrationUtil {
     public static boolean isModuleKeyProtected(Key moduleKey) {
         checkArgument(OrmModuleEntity.getSpec().getKeyKind().equals(moduleKey.getKind()),
                 "Not a module key: %s", moduleKey);
-        return (moduleKey.getId() < MODULE_KEY_FIRST_FREE_ID);
+        return (moduleKey.getId() < MIN_NON_RESERVED_KEY_ID);
     }
 
     /**
@@ -81,7 +85,7 @@ public class PersistenceMigrationUtil {
     public static boolean isCollectionKeyProtected(Key collectionKey) {
         checkArgument(OrmCollectionEntity.getSpec().getKeyKind().equals(collectionKey.getKind()),
                 "Not a collection key: %s", collectionKey);
-        return (collectionKey.getId() < COLLECTION_KEY_FIRST_FREE_ID);
+        return (collectionKey.getId() < MIN_NON_RESERVED_KEY_ID);
     }
 
 }

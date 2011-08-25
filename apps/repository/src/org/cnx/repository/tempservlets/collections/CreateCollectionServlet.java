@@ -46,20 +46,21 @@ public class CreateCollectionServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateCollectionResult> repositoryResponse =
-                repository.createCollection(context, forcedId);
+                (forcedId == null) ? repository.createCollection(context) : repository
+                    .migrationCreateCollectionWithId(context, forcedId);
 
-        // Map repository error to API error
-        if (repositoryResponse.isError()) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    repositoryResponse.getExtendedDescription());
-            return;
-        }
+                // Map repository error to API error
+                if (repositoryResponse.isError()) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            repositoryResponse.getExtendedDescription());
+                    return;
+                }
 
-        // Map repository OK to API OK
-        final CreateCollectionResult result = repositoryResponse.getResult();
-        resp.setContentType("text/plain");
-        PrintWriter out = resp.getWriter();
+                // Map repository OK to API OK
+                final CreateCollectionResult result = repositoryResponse.getResult();
+                resp.setContentType("text/plain");
+                PrintWriter out = resp.getWriter();
 
-        out.println("collection id: " + result.getCollectionId());
+                out.println("collection id: " + result.getCollectionId());
     }
 }

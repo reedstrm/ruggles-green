@@ -89,8 +89,14 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context, @Nullable String migrationForcedId) {
-        return ModuleOperations.createModule(context, migrationForcedId);
+    public RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context) {
+        return ModuleOperations.createModule(context);
+    }
+
+    @Override
+    public RepositoryResponse<CreateModuleResult> migrationCreateModuleWithId(
+            RepositoryRequestContext context, String forcedId) {
+        return ModuleOperations.migrationCreateModuleWithId(context, forcedId);
     }
 
     @Override
@@ -127,8 +133,14 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateCollectionResult> createCollection(
-            RepositoryRequestContext context, @Nullable String migrationForcedId) {
-        return CollectionOperations.createCollection(context, migrationForcedId);
+            RepositoryRequestContext context) {
+        return CollectionOperations.createCollection(context);
+    }
+
+    @Override
+    public RepositoryResponse<CreateCollectionResult> migrationCreateCollectionWithId(
+            RepositoryRequestContext context, String forcedId) {
+        return CollectionOperations.migrationCreateCollectionWithId(context, forcedId);
     }
 
     @Override

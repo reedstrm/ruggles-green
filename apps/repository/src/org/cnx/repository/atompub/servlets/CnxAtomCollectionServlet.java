@@ -99,7 +99,7 @@ public class CnxAtomCollectionServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateCollectionResult> createdCollection =
-                repositoryService.createCollection(RepositoryUtils.getRepositoryContext(), null);
+                repositoryService.createCollection(RepositoryUtils.getRepositoryContext());
 
         if (createdCollection.isOk()) {
             /*

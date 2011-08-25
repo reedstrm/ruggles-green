@@ -66,45 +66,67 @@ public class CollectionOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<CreateCollectionResult> createCollection(
-            RepositoryRequestContext context, @Nullable String migrationForcedId) {
+            RepositoryRequestContext context) {
+        final String collectionId;
+
+        final Date transactionTime = new Date();
+
+        try {
+            final OrmCollectionEntity entity = new OrmCollectionEntity(transactionTime);
+            // This also assigns a unique collection id
+            Services.persistence.write(entity);
+            collectionId = checkNotNull(entity.getId(), "Null collection id");
+        } catch (Throwable e) {
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                    "Error when trying to create a new collection", log, e);
+        }
+
+        return ResponseUtil.loggedOk("New collection created: " + collectionId,
+                new CreateCollectionResult(collectionId), log);
+    }
+
+    /**
+     * See description in {@link CnxRepositoryService}
+     */
+    public static RepositoryResponse<CreateCollectionResult> migrationCreateCollectionWithId(
+            RepositoryRequestContext context, String forcedId) {
         final String collectionId;
 
         final Date transactionTime = new Date();
         final Transaction tx = Services.persistence.beginTransaction();
 
         try {
-            final OrmCollectionEntity entity = new OrmCollectionEntity(transactionTime);
 
-            // Handle optional forced id
-            if (migrationForcedId != null) {
-                final Key forcedKey = OrmCollectionEntity.collectionIdToKey(migrationForcedId);
-                if (forcedKey == null) {
-                    tx.rollback();
-                    return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                            "Invalid collection id " + migrationForcedId, log);
-                }
-                if (!PersistenceMigrationUtil.isCollectionKeyProtected(forcedKey)) {
-                    tx.rollback();
-                    return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                            "Forced collection id is not out of protected id range " + migrationForcedId, log);
-                }
-                if (Services.persistence.hasObjectWithKey(forcedKey)) {
-                    tx.rollback();
-                    return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                            "A collection with this forced id already exists: " + migrationForcedId, log);
-                }
-                entity.setKey(forcedKey);
+            // Validate forced id
+            final Key forcedKey = OrmCollectionEntity.collectionIdToKey(forcedId);
+            if (forcedKey == null) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                        "Invalid forced collection id " + forcedId, log);
+            }
+            if (!PersistenceMigrationUtil.isCollectionKeyProtected(forcedKey)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.OUT_OF_RANGE,
+                        "Forced collection id is not out of protected id range " + forcedId, log);
+            }
+            if (Services.persistence.hasObjectWithKey(forcedKey)) {
+                tx.rollback();
+                return ResponseUtil.loggedError(RepositoryStatus.ALREADY_EXISTS,
+                        "A collection with this forced id already exists: " + forcedId, log);
             }
 
-            // If forced id not specified, the unique collection id is assigned here when
-            // the entity is persisted.
+            // Setup and save entity
+            final OrmCollectionEntity entity = new OrmCollectionEntity(transactionTime);
+            entity.setKey(forcedKey);
             Services.persistence.write(entity);
+
             collectionId = checkNotNull(entity.getId(), "Null collection id");
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
-                    "Error when trying to create a new collection", log, e);
+                    "Error when trying to create a new collection with forced id: " + forcedId,
+                    log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active");
         }

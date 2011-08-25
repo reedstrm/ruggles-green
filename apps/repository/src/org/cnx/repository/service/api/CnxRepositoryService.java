@@ -222,16 +222,6 @@ public interface CnxRepositoryService {
             String forcedId);
 
     /**
-     * Create a new collection with enforced id.
-     * 
-     * Temp method for migration. Accepts the id that should be assigned to the new module. The
-     * id must be in the range of protected module ids. See {@link PersistenceMigrationUtil}
-     * for more details.
-     * 
-     * TODO(tal): remove this method after completing the migration.
-     */
-
-    /**
      * Get general collection information.
      * 
      * @param context the request context.

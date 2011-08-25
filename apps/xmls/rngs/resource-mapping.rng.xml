@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!-- This schema defines the mapping between Pretty name chosen by an Author for a Resource
+     and ResourceId assigned by Repsoitory to that resource. -->
 <grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="element-location-repository">
     <element name="repository">

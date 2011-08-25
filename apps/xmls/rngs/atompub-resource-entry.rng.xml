@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!-- This schema defines how to send CNXML and associated ResourceMapping doc in one call. -->
 <grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="element-atompub-resource-entry-value">
     <element name="resource-entry-value">

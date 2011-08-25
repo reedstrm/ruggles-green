@@ -25,9 +25,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.cnxml.LinkResolver;
 import org.cnx.common.collxml.Collection;
 import org.cnx.common.collxml.CollectionHTMLGenerator;
 import org.cnx.common.collxml.CollxmlNamespace;
+import org.cnx.common.collxml.ModuleLink;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.util.RenderScope;
@@ -37,6 +39,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
+import java.net.URI;
 
 @Singleton public class RenderCollectionServlet extends HttpServlet {
     private static final String TEMPLATE_NAME = "org.cnx.web.collection";
@@ -48,16 +51,18 @@ import com.google.template.soy.tofu.SoyTofu;
     private final SoyTofu tofu;
     private final XmlFetcher fetcher;
     private final Provider<CollectionHTMLGenerator> generatorProvider;
+    private final LinkResolver linkResolver;
     private final RenderScope renderScope;
     private final String collxmlNamespace;
 
     @Inject public RenderCollectionServlet(@WebViewTemplate SoyTofu tofu, XmlFetcher fetcher,
             Provider<CollectionHTMLGenerator> generatorProvider, RenderScope renderScope,
-            @CollxmlNamespace String collxmlNamespace) {
+            LinkResolver linkResolver, @CollxmlNamespace String collxmlNamespace) {
         this.tofu = tofu;
         this.fetcher = fetcher;
         this.generatorProvider = generatorProvider;
         this.renderScope = renderScope;
+        this.linkResolver = linkResolver;
         this.collxmlNamespace = collxmlNamespace;
     }
 
@@ -103,6 +108,24 @@ import com.google.template.soy.tofu.SoyTofu;
             return;
         }
 
+        // Get start link
+        URI firstModuleUri = null;
+        renderScope.enter();
+        try {
+            renderScope.seed(Collection.class, coll);
+            if (!coll.getModuleLinks().isEmpty()) {
+                final ModuleLink link = coll.getModuleLinks().get(0);
+                firstModuleUri = linkResolver.resolveDocument(
+                        link.getModuleId(), link.getModuleVersion());
+            }
+        } catch (Exception e) {
+            log.log(Level.WARNING, "Error while resolving first module link", e);
+            // TODO(light): 500
+            return;
+        } finally {
+            renderScope.exit();
+        }
+
         resp.setContentType(MIME_TYPE);
         final SoyMapData params = new SoyMapData(
                 "collection", new SoyMapData(
@@ -112,7 +135,8 @@ import com.google.template.soy.tofu.SoyTofu;
                         "abstract", abstractText,
                         "authors", Utils.convertActorListToSoyData(authors),
                         "contentHtml", contentHtml
-                )
+                ),
+                "firstModuleUri", (firstModuleUri != null ? firstModuleUri.toString() : null)
         );
         resp.getWriter().print(tofu.render(TEMPLATE_NAME, params, null));
     }

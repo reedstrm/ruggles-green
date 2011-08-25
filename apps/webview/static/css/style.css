@@ -247,3 +247,7 @@ table.cals th, table.cals td {
 .collectionToc {
     margin-top: 1.5em;
 }
+
+.collectionStartLink {
+    font-weight: bold;
+}

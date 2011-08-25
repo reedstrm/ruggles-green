@@ -1,0 +1,6 @@
+rome-propono was downloaded from http://java.net/projects/rome/sources/svn/show/trunk/subprojects/propono
+and then source was compiled and converted to jar.
+
+Since rome-propono client uses HttpClient which cannot run on AppEngine, so its original
+code was patched and HttpClient was overriden with CustomHttpClient which wraps
+UrlFetch calls, so that it can work on AppEngine.

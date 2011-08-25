@@ -1,0 +1,5 @@
+jersey framework is used to provide REST services.
+
+jersey-core-1.8 was downloaded from : http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.8/
+
+jersey-server-1.8 was downloaded from : http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.8/ 

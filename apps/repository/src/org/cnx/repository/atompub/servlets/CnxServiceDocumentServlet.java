@@ -43,9 +43,8 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 public class CnxServiceDocumentServlet {
     private final String SERVICE_DOCUMENT_GET = "/";
 
-    // @Produces(CustomMediaTypes.APPLICATION_ATOMSVC_XML)
     @GET
-    @Produces(CnxMediaTypes.APPLICATION_ATOMSVC_XML)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(SERVICE_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
             @Context HttpServletResponse res) {

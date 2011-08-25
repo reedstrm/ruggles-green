@@ -102,7 +102,7 @@ public class CollectionOperations {
             if (forcedKey == null) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                        "Invalid forced collection id " + forcedId, log);
+                        "Invalid forced collection id format " + forcedId, log);
             }
             if (!PersistenceMigrationUtil.isCollectionKeyProtected(forcedKey)) {
                 tx.rollback();

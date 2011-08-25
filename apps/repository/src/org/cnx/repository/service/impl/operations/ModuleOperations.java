@@ -97,7 +97,7 @@ public class ModuleOperations {
             if (forcedKey == null) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                        "Invalid forved module id " + forcedId, log);
+                        "Invalid forced module id format " + forcedId, log);
             }
             if (!PersistenceMigrationUtil.isModuleKeyProtected(forcedKey)) {
                 tx.rollback();

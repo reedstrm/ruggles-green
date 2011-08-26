@@ -15,8 +15,8 @@
  */
 
 /**
- * CNX repository service implementation for Google App Engine
- * 
+ * CNX repository service implementation for Google App Engine.
+ * <p>
  * This package is the root package of the implementation of
  * {@link org.cnx.repository.service.api.CnxRepositoryService} for the Google App Engine.
  */

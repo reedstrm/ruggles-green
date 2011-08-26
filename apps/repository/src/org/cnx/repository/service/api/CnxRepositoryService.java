@@ -19,8 +19,6 @@ package org.cnx.repository.service.api;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
-import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
-
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
  * 

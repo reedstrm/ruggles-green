@@ -75,14 +75,17 @@ public class ArjunRenderModuleServlet {
 
     // TODO(arjuns) : Move this to a better place.
     private CnxAtomPubClient cnxClient;
-    Injector injector;
+    private Injector injector;
+    private WebviewConfiguration configuration;
 
     public ArjunRenderModuleServlet() {
         URL url = null;
         try {
-            url = new URL(CommonHack.REPO_ATOM_PUB_URL);
-            cnxClient = new CnxAtomPubClient(url);
             injector = Guice.createInjector(new ArjunGuiceConfig());
+            configuration = injector.getInstance(WebviewConfiguration.class);
+            url = new URL(configuration.getRepositoryAtomPubUrl());
+            cnxClient = new CnxAtomPubClient(url);
+
         } catch (Exception e) {
             // TODO(arjuns): Auto-generated catch block
             throw new RuntimeException(e);
@@ -95,6 +98,10 @@ public class ArjunRenderModuleServlet {
     public Response getModuleVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
+
+        WebviewConfiguration configuration = new WebviewConfiguration();
+
+
         // TODO(arjuns) : Handle exception.
         StringBuilder builder = new StringBuilder();
 

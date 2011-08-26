@@ -45,12 +45,14 @@ public class ArjunLinkResolver implements LinkResolver {
     private static final String BASE = "/staticxml/";
     private final Provider<Collection> collectionProvider;
     private final Provider<Module> moduleProvider;
+    private final WebviewConfiguration configuration;
 
     @Inject
     public ArjunLinkResolver(Provider<Collection> collectionProvider,
-        Provider<Module> moduleProvider) {
+        Provider<Module> moduleProvider, WebviewConfiguration configuration) {
         this.collectionProvider = collectionProvider;
         this.moduleProvider = moduleProvider;
+        this.configuration = configuration;
     }
 
     @Override
@@ -64,7 +66,8 @@ public class ArjunLinkResolver implements LinkResolver {
                 if (currResource.getName().equals(uri.toString())) {
                     String resourceId =
                         currResource.getLocationInformation().getRepository().getResourceId();
-                    String test = CommonHack.REPO_ATOM_PUB_URL + "/resource/" + resourceId;
+                    String test =
+                        configuration.getRepositoryAtomPubUrl() + "/resource/" + resourceId;
 
                     return new URI(test);
                 }
@@ -88,13 +91,12 @@ public class ArjunLinkResolver implements LinkResolver {
             // TODO(arjuns): TODO(light) collection version
             final String collectionVersion = "1";
 
-            uriBuilder.append("/collection/").append(collection.getId()).append(
-                "/").append(collectionVersion);
+            uriBuilder.append("/collection/").append(collection.getId()).append("/").append(
+                collectionVersion);
         }
 
         // TODO(arjuns) : See how to get rid of this string.
-        uriBuilder.append("/module/").append(moduleId).append("/").append(
-            moduleVersion);
+        uriBuilder.append("/module/").append(moduleId).append("/").append(moduleVersion);
         return new URI(uriBuilder.toString());
     }
 

@@ -92,13 +92,17 @@ public class ArjunRenderCollectionServlet {
     private final String COLLECTION_MODULE_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN + "/module"
         + ArjunRenderModuleServlet.MODULE_VERSION_URL_PATTERN;
 
+    private final WebviewConfiguration configuration;
     // TODO(arjuns) : Move this to a better place.
     private CnxAtomPubClient cnxClient;
+    private Injector injector;
 
     public ArjunRenderCollectionServlet() {
         URL url = null;
         try {
-            url = new URL(CommonHack.REPO_ATOM_PUB_URL);
+            injector = Guice.createInjector(new ArjunGuiceConfig());
+            configuration = injector.getInstance(WebviewConfiguration.class);
+            url = new URL(configuration.getRepositoryAtomPubUrl());
             cnxClient = new CnxAtomPubClient(url);
         } catch (Exception e) {
             // TODO(arjuns): Auto-generated catch block

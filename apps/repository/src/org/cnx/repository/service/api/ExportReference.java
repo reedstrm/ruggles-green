@@ -45,11 +45,11 @@ public class ExportReference {
      *            MODULE_VERSION than this is a module id.
      * @param versionNumber If the scope type is version than this is the version id or null to
      *            refer to the latest version. If scope type is not version, this should be null.
-     * @export exportTypeId the export type id. Must match one of the ids returned by
-     *         {@link CnxRepositoryService#getExportTypes()}.
+     * @param exportTypeId the export type id. Must match one of the ids returned by
+     *         {@link CnxRepositoryService#getConfiguration()}.
      */
     public ExportReference(ExportScopeType scopeType, String objectId,
-        @Nullable Integer versionNumber, String exportTypeId) {
+            @Nullable Integer versionNumber, String exportTypeId) {
         this.scopeType = checkNotNull(scopeType);
         this.objectId = checkNotNull(objectId);
         this.versionNumber = versionNumber;

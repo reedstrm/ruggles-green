@@ -36,7 +36,7 @@ public class ResourceUtil {
      * Return a resource id parameter from a request encoded by
      * {@link #encodeUploadCompletionParameters}.
      * 
-     * @param the incoming request
+     * @param req the incoming request
      * @param defaultValue a String to return if param not found
      * 
      * @return the param value or defaultValue if param not found.
@@ -50,7 +50,7 @@ public class ResourceUtil {
      * Construct request parameters representing a given export reference.
      * 
      * @return a string with the encoded parameters in the form name=value&name=value&... This
-     *         encoding is compatible with {@link #exportReferenceFromRequestParameters}
+     *         encoding is compatible with {@link #getResourceIdParam(HttpServletRequest, String)}
      */
     public static String encodeUploadCompletionParameters(String resourceId) {
         return RESOURCE_ID_PARAM + "=" + resourceId;

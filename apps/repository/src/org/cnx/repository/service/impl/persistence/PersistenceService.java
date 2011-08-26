@@ -150,7 +150,7 @@ public class PersistenceService {
      * guarantees returning all the matching entities that existed before from before the first call
      * until the end of the last call.
      * 
-     * IMPORTANT, callers should impose a reasonable max on {@link maxResults} to avoid memory
+     * IMPORTANT, callers should impose a reasonable max on {@code maxResults}} to avoid memory
      * explosion.
      * 
      * TODO(tal): consider to use QueryResultIterator instead of QueryResultList for reduced memory

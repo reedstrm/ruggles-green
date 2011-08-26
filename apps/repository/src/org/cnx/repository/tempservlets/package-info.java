@@ -14,14 +14,10 @@
  * the License.
  */
 
-package org.cnx.repository.service.api;
-
 /**
- * Result of a successful
- * {@link CnxRepositoryService#deleteExport(RepositoryRequestContext, ExportReference)} operation.
+ * CNX repository service implementation for Google App Engine
  * 
- * @author Tal Dayan
+ * This package is the root package of the implementation of
+ * {@link org.cnx.repository.service.api.CnxRepositoryService} for the Google App Engine.
  */
-public class DeleteExportResult {
-
-}
+package org.cnx.repository.tempservlets;

@@ -47,7 +47,7 @@ public class GetModuleListResult {
     /**
      * Return end cursor to use in successive query as start cursor.
      * 
-     * The method asserts that {@link isLast()} is false.
+     * The method asserts that {@link #isLast()} is false.
      */
     public String getEndCursor() {
         checkNotNull(endCursor, "No end cursor, at end of data");

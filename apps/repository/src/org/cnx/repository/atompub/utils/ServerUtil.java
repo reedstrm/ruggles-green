@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -38,10 +38,6 @@ public class ServerUtil {
     public static String computeHostUrl(HttpServletRequest httpRequest) {
         final String scheme = httpRequest.getScheme();
         final int port = httpRequest.getLocalPort();
-
-        // Is the default port for this scheme?
-        final boolean isDefaultPort =
-            ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
 
         final URL serverUrl;
         try {

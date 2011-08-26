@@ -120,7 +120,6 @@ public class RenderCollectionServlet {
     @Path(COLLECTION_VERSION_URL_PATTERN)
     public Response getCollectionVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res,
-            @Context ServletContext context,
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
             throws Exception {
@@ -219,7 +218,6 @@ public class RenderCollectionServlet {
     @Path(COLLECTION_MODULE_URL_PATTERN)
     public Response getModuleVersionUnderCollectionVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res,
-            @Context ServletContext context,
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString,
             @PathParam(RenderModuleServlet.MODULE_ID_PATH_PARAM) String moduleId,

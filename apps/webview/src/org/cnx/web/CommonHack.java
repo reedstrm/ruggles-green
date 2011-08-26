@@ -41,6 +41,7 @@ public class CommonHack {
     public static final String COLLECTION_MODULE_TEMPLATE_NAME = "org.cnx.web.collectionModule";
     public static final String CONTENT_NAME_SPACE = "/content";
     public static final String COLLECTION_URI_PREFIX = CONTENT_NAME_SPACE + "/collection/";
+    public static final String MODULE_URI_PREFIX = CONTENT_NAME_SPACE + "/module/";
 
     public static Document parseXmlString(final DocumentBuilder builder, final String source)
             throws SAXException, IOException {

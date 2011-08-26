@@ -59,7 +59,7 @@ public class WebViewLinkResolver implements LinkResolver {
             return uri;
         } else {
             // TODO(arjuns) : ensure that this is not called in context of collection parsing..
-            return resolveResource(null, null, uri.toString());
+            return resolveResource(null /* document */, null /* version */, uri.toString());
         }
     }
 
@@ -74,17 +74,20 @@ public class WebViewLinkResolver implements LinkResolver {
         StringBuilder uriBuilder = new StringBuilder(CommonHack.CONTENT_NAME_SPACE);
         if (collection != null && collection.hasModule(moduleId)) {
             // TODO(arjuns): TODO(light) collection version
-            final String collectionVersion = "1";
+            final String collectionVersion = CnxAtomPubConstants.LATEST_VERSION_STRING;
 
             uriBuilder
-                    .append("/collection/")
+                    .append(CommonHack.COLLECTION_URI_PREFIX)
                     .append(collection.getId())
                     .append("/")
                     .append(collectionVersion);
         }
 
-        // TODO(arjuns) : See how to get rid of this string.
-        uriBuilder.append("/module/").append(moduleId).append("/").append(moduleVersion);
+        uriBuilder
+                .append(CommonHack.MODULE_URI_PREFIX)
+                .append(moduleId)
+                .append("/")
+                .append(moduleVersion);
         return new URI(uriBuilder.toString());
     }
 

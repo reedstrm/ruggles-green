@@ -101,7 +101,6 @@ public class RenderModuleServlet {
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response getModuleVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res,
-            @Context ServletContext context,
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
 
@@ -114,7 +113,6 @@ public class RenderModuleServlet {
         if (!VersionWrapper.isValidVersion(moduleVersionString)) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        final Injector injector = (Injector)context.getAttribute(Injector.class.getName());
 
         final VersionWrapper moduleVersionInt = new VersionWrapper(moduleVersionString);
 

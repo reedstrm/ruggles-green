@@ -29,13 +29,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.web.CommonHack;
 import org.cnx.web.WebViewTemplate;
 import org.cnx.web.WebViewConfiguration;
 
 public class FrontPageServlet extends HttpServlet {
-    private static final String MIME_TYPE = "text/html; charset=utf-8";
-
     private Injector injector;
 
     @Override public void init(final ServletConfig config) throws ServletException {
@@ -46,7 +45,7 @@ public class FrontPageServlet extends HttpServlet {
             throws IOException {
         final SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
         final WebViewConfiguration configuration = injector.getInstance(WebViewConfiguration.class);
-        resp.setContentType(MIME_TYPE);
+        resp.setContentType(TEXT_HTML_UTF8);
         resp.getWriter().print(tofu.render(CommonHack.FRONT_PAGE_TEMPLATE_NAME, new SoyMapData(
                 "collectionUri", configuration.getRichsCollectionUrl()), null));
     }

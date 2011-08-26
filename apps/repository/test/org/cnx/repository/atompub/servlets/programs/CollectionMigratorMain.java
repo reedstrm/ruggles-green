@@ -19,7 +19,8 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.servlets.migrators.CollectionMigrator;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.servlets.migrators.ParallelCollectionMigrator;
 
 import com.sun.syndication.propono.atom.client.ClientEntry;
 
@@ -34,19 +35,24 @@ public class CollectionMigratorMain {
     private static CnxAtomPubClient cnxClient;
 
     public static void main(String[] args) throws Exception {
+        long startTime = System.currentTimeMillis();
         // TODO(arjuns) : Convert this into an AppEngine app.
-        URL url = new URL("http://101.cnx-repo.appspot.com/atompub");
-//         URL url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT +
-//         "/atompub");
+
+        // TODO(arjuns) : Read this from properties file.
+        URL url = new URL("http://qa-cnx-repo.appspot.com/atompub");
+        url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
         cnxClient = new CnxAtomPubClient(url);
 
         String originalCollectionId = null;
         String collectionLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete";
         // TODO(arjuns) : Add support so that new version for a collection can be posted.
 
-        CollectionMigrator migrator = new CollectionMigrator(cnxClient);
-        ClientEntry clientEntry = migrator.migrateCollection(originalCollectionId, collectionLocation);
+        ParallelCollectionMigrator migrator = new ParallelCollectionMigrator(cnxClient);
+        ClientEntry clientEntry =
+            migrator.migrateCollection(originalCollectionId, collectionLocation);
 
+        long endTime = System.currentTimeMillis();
+        logger.info("Time taken to create new collection : " + (endTime - startTime) / 1000);
         logger.info("New collection created at : " + clientEntry.getEditURI());
     }
 }

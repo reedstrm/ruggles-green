@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.servlets.migrators.CollectionMigrator;
 import org.junit.Before;
 import org.junit.Test;
 

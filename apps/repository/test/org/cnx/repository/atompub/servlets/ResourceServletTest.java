@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.servlets.migrators.ResourceMigrator;
+import org.cnx.repository.atompub.servlets.migrators.ParallelResourceMigrator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -81,7 +81,7 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(blobStoreLink.getHref());
 
         // Now upload blob to AppEngine.
-        cnxClient.uploadFileToBlobStore(ResourceMigrator.getResourceNameForResourceMappingDoc(file
+        cnxClient.uploadFileToBlobStore(ParallelResourceMigrator.getResourceNameForResourceMappingDoc(file
             .getName()), file);
 
         // TODO(arjuns) : Add test for get once it works.
@@ -92,9 +92,9 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
     // TODO(arjuns) : Move this to separate test.
     @Test
     public void testResourceMigrator() throws HttpException, ProponoException, IOException {
-        ResourceMigrator resourceMigrator = new ResourceMigrator(cnxClient);
+        ParallelResourceMigrator resourceMigrator = new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
 
-        ClientEntry createResourceEntry = resourceMigrator.migrateResource(file.getAbsolutePath());
+        ClientEntry createResourceEntry = resourceMigrator.migrateResource();
         createResourceEntry.getEditURI();
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());

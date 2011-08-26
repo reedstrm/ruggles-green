@@ -26,6 +26,7 @@
     <target name="war_common"
             depends="compile"
             description="Assemble the application directory">
+        <delete dir="${war.dir}" />
         <mkdir dir="${war.dir}/WEB-INF" />
         <mkdir dir="${war.dir}/WEB-INF/classes" />
         <mkdir dir="${war.dir}/WEB-INF/lib" />
@@ -53,11 +54,6 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
-
-        <!-- Individual dependent wars should copy their own properties file. -->
-        <delete>
-            <fileset dir="${war.dir}/WEB-INF/classes" includes="*.properties" />
-        </delete>
         <enhance_war war="${war.dir}" />
     </target>
 

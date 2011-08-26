@@ -307,7 +307,9 @@ public class CnxAtomPubConstants {
     /**
      * Get CNXML-doc from ModuleEntry XML.
      *
-     * @return 64 bit encoded CNXML.
+     * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
+     *     moduleEntryXml is already decoded.
+     * @return CNXML (response is already decoded).
      */
     public String getCnxmlFromModuleEntryXml(String moduleEntryXml) throws JDOMException,
             IOException {
@@ -315,9 +317,10 @@ public class CnxAtomPubConstants {
     }
 
     /**
-     * Get ResourceMapping doc from ModuleEntry XML.
-     *
-     * @return 64 bit encoded ResourceMapping Doc.
+     * Get ResourceMapping doc from decoded ModuleEntry XML.
+     * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
+     *     moduleEntryXml is already decoded.
+     * @return ResourceMapping XML (response is already decoded).
      */
     public String getResourceMappingDocFromModuleEntryXml(String moduleEntryXml)
             throws JDOMException, IOException {

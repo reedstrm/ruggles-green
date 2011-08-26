@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!-- This schema defines how Client and Server will exchange CNXML and corresponding ResourceMapping
+     doc in single Call. -->
+<!--  TODO(arjuns) : Rename this file. -->
 <grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="element-atompub-resource-entry-value">
     <element name="resource-entry-value">

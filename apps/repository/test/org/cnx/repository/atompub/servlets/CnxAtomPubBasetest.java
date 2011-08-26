@@ -64,7 +64,7 @@ public abstract class CnxAtomPubBasetest extends JerseyTest {
         // TODO(arjuns) : Fix warning : Aug 14, 2011 6:55:43 AM
         // com.sun.syndication.propono.atom.client.ClientEntry addToCollection
         // WARNING: WARNING added entry, but no location header returned
-        cnxServerAtomPubUrl = new URL("http://101.cnx-repo.appspot.com/atompub");
+        cnxServerAtomPubUrl = new URL("http://qa-cnx-repo.appspot.com/atompub");
 //        cnxServerAtomPubUrl =
 //            new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
 

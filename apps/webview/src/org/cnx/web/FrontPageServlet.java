@@ -25,20 +25,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.web.servlets.CommonHack;
+import org.cnx.web.servlets.WebviewConfiguration;
+
 @Singleton public class FrontPageServlet extends HttpServlet {
-    private static final String TEMPLATE_NAME = "org.cnx.web.index";
+
     private static final String MIME_TYPE = "text/html; charset=utf-8";
+    private final WebviewConfiguration configuration;
 
     protected final SoyTofu tofu;
 
-    @Inject public FrontPageServlet(@WebViewTemplate SoyTofu tofu) {
+
+    @Inject public FrontPageServlet(@WebViewTemplate SoyTofu tofu, WebviewConfiguration configuration) {
         this.tofu = tofu;
+        this.configuration = configuration;
     }
 
     @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.setContentType(MIME_TYPE);
-        resp.getWriter().print(tofu.render(TEMPLATE_NAME, new SoyMapData(
-                "collectionUri", "/content/collection/C52219/latest/"), null));
+        resp.getWriter().print(tofu.render(CommonHack.FRONT_PAGE_TEMPLATE_NAME, new SoyMapData(
+                "collectionUri", configuration.getRichsCollectionUrl()), null));
     }
 }

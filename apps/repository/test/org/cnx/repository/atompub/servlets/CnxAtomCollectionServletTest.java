@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.servlets.migrators.CollectionMigrator;
 import org.junit.Before;
 import org.junit.Test;
 

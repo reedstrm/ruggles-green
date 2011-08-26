@@ -20,8 +20,7 @@ import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.servlets.migrators.ModuleMigrator;
+import org.cnx.repository.atompub.servlets.migrators.ParallelModuleMigrator;
 
 import com.sun.syndication.propono.atom.client.ClientEntry;
 
@@ -39,38 +38,24 @@ public class ModuleMigratorMain {
 
     public static void main(String[] args) throws Exception {
 
-        URL url = new URL("http://101.cnx-repo.appspot.com/atompub");
-        url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
+        // TODO(arjuns) : Read this from properties file.
+        URL url = new URL("http://qa-cnx-repo.appspot.com/atompub");
+         url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
         cnxClient = new CnxAtomPubClient(url);
 
-        String existingModuleId = null;
         // String existingModuleId = "m42355";
-        String moduleLocation = "/home/arjuns/mymodule";
+        String moduleLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete/m10085";
 
-        final ClientEntry clientEntry;
-        final String moduleId;
-        final VersionWrapper currentVersion;
+        ParallelModuleMigrator migrator =
+            new ParallelModuleMigrator(cnxClient, moduleLocation, null/* cnxModuleId */,
+                null/* aerModuleId */, null /* version */);
 
-        ModuleMigrator migrator = new ModuleMigrator(cnxClient);
-        if (existingModuleId == null) {
-            // Create a new module.
-            clientEntry = migrator.createNewModule(moduleLocation);
-            logger.info("Created new module at : " + clientEntry.getEditURI());
-        } else {
-            URL moduleLatestUrl =
-                cnxClient.getConstants().getModuleVersionAbsPath(existingModuleId,
-                    new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING));
-            clientEntry = cnxClient.getService().getEntry(moduleLatestUrl.toString());
-            currentVersion = CnxAtomPubConstants.getVersionFromAtomPubId(clientEntry.getId());
+        Thread thread = new Thread(migrator);
+        thread.start();
+        thread.join();
 
-            migrator.migrateVersion(existingModuleId, currentVersion, moduleLocation);
-            moduleLatestUrl =
-                cnxClient.getConstants().getModuleVersionAbsPath(existingModuleId,
-                    new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING));
-            ClientEntry newclientEntry =
-                cnxClient.getService().getEntry(moduleLatestUrl.toString());
+        ClientEntry newclientEntry = migrator.getModuleVersionEntry();
 
-            logger.info("Latest url = " + newclientEntry.getEditURI());
-        }
+        logger.info("Latest url = " + newclientEntry.getEditURI());
     }
 }

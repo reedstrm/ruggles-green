@@ -202,7 +202,7 @@
     <url-pattern>/collection_list</url-pattern>
   </servlet-mapping>
 
-  <!--  CNX EXPORTS API (TEMP) -->
+   <!--  CNX EXPORTS API (TEMP) -->
   
   <servlet>
     <servlet-name>GetExportUploadUrlServlet</servlet-name>

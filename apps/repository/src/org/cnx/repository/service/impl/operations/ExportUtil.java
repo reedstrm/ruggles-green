@@ -63,7 +63,7 @@ public class ExportUtil {
     /**
      * Construct export reference from the parameters of an request.
      * 
-     * @param an incoming request that contains parameters encoded by
+     * @param req an incoming request that contains parameters encoded by
      *            {@link #exportReferenceToRequestParameters}
      */
     public static ExportReference exportReferenceFromRequestParameters(HttpServletRequest req) {

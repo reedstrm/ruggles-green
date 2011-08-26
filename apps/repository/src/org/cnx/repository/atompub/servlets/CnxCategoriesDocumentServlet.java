@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -49,7 +49,7 @@ public class CnxCategoriesDocumentServlet {
     private final String CATEGORY_DOCUMENT_GET = "/";
 
     @GET
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(CATEGORY_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
             @Context HttpServletResponse response) {
@@ -59,7 +59,7 @@ public class CnxCategoriesDocumentServlet {
         // TODO(arjuns) : get a better way to get the context.
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomService =
-            new CnxAtomService(ServerUtil.computeHostUrl(req));
+                new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         // TODO(arjuns) : Fix this.
         CnxAtomPubConstants constants = atomService.getConstants();
@@ -68,9 +68,9 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));
         categories.addCategory(getCnxCollectionCategoryEle(constants
-            .getCollectionCnxCollectionScheme()));
+                .getCollectionCnxCollectionScheme()));
 
         return Response.ok().entity(
-            PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
+                PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
     }
 }

@@ -17,7 +17,8 @@
 package org.cnx.repository.service.api;
 
 /**
- * Result of a successful {@link CnxRepositoryService#deleteExport()} operation.
+ * Result of a successful
+ * {@link CnxRepositoryService#deleteExport(RepositoryRequestContext, ExportReference)} operation.
  * 
  * @author Tal Dayan
  */

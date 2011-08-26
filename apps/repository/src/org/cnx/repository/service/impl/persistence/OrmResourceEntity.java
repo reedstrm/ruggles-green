@@ -94,8 +94,8 @@ public class OrmResourceEntity extends OrmEntity {
     }
 
     /**
-     * Transition the entity from {@link State#UPLOAD_PENDING} state to {@link State#UPLOADED}
-     * state.
+     * Transition the entity from {@link State#UPLOAD_PENDING} state to
+     * {@link State#UPLOAD_COMPLETE} state.
      * 
      * Asserts that the entity has key and is in {@link State#UPLOAD_PENDING} state.
      * 

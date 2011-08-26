@@ -33,6 +33,10 @@
         <mkdir dir="${war.dir}/WEB-INF/classes" />
         <mkdir dir="${war.dir}/WEB-INF/lib" />
 
+        <copy todir="${war.dir}/WEB-INF">
+            <fileset dir="${web.inf.common}" includes="*.xml" />
+        </copy>
+
         <copy todir="${war.dir}/WEB-INF/lib">
             <fileset dir="${output.jars}" includes="*.jar" />
         </copy>
@@ -65,7 +69,7 @@
             </fileset>
         </copy>
         <copy todir="${war.dir}/WEB-INF/classes">
-            <fileset dir="${properties.prod}" includes="*.properties" />
+            <fileset dir="${properties.qa}" includes="*.properties" />
         </copy>
     </target>
 

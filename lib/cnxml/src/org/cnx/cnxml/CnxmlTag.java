@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 public enum CnxmlTag {
     INVALID(null),
 
+    CONTENT("content"),
     TITLE("title"),
     LABEL("label"),
     PARAGRAPH("para"),

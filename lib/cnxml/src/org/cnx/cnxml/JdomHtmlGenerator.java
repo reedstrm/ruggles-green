@@ -155,7 +155,7 @@ import org.jdom.input.DOMBuilder;
         }
 
         public GeneratorFrame(Element contentElement, Element htmlParent, boolean unwrapContent) {
-            this((Iterator<Content>)contentElement.getContent().iterator(),
+            this((Iterator<Content>)checkNotNull(contentElement).getContent().iterator(),
                     htmlParent, unwrapContent);
         }
 
@@ -207,7 +207,10 @@ import org.jdom.input.DOMBuilder;
         // TODO(light): don't use DOMBuilder: it uses recursion
         final Document jdomDocument = new DOMBuilder().build(module.getCnxml());
         final Element contentElem = jdomDocument.getRootElement()
-                .getChild("content", cnxmlNamespace);
+                .getChild(CnxmlTag.CONTENT.getTag(), cnxmlNamespace);
+        if (contentElem == null) {
+            return "";
+        }
 
         // Render to HTML
         counter = new Counter();
@@ -226,6 +229,7 @@ import org.jdom.input.DOMBuilder;
      *  @param contentRoot The content element from the CNXML
      */
     protected List<Content> generateHtmlTree(Element contentRoot) {
+        checkNotNull(contentRoot);
         stack = new Stack<GeneratorFrame>();
 
         // Create a dummy element so that top-level elements can still add to htmlParent.

@@ -309,7 +309,7 @@ public class CnxAtomCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(COLLECTION_VERSION_XML_URL)
     public Response getCnxCollectionVersionXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res,

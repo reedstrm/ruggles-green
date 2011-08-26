@@ -49,7 +49,7 @@ public class CnxCategoriesDocumentServlet {
     private final String CATEGORY_DOCUMENT_GET = "/";
 
     @GET
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(CATEGORY_DOCUMENT_GET)
     public Response getServiceDocument(@Context HttpServletRequest req,
             @Context HttpServletResponse response) {

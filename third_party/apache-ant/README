@@ -1,0 +1,3 @@
+Apache Ant is used for doing the builds.
+
+This library is modified to include ant-contrib tasks.

@@ -135,12 +135,13 @@ public class ArjunRenderCollectionServlet {
         XmlFetcher fetcher = injector.getInstance(XmlFetcher.class);
         Collection collection = fetcher.getCollection(collectionId, collXml);
         // Get metadata
-        String title = "";
+        String title = "", abstractText = null;
         List<Actor> authors = null;
         final Metadata metadata = collection.getMetadata();
         if (metadata != null) {
             try {
                 title = metadata.getTitle();
+                abstractText = metadata.getAbstract();
                 authors = metadata.getAuthors();
             } catch (Exception e) {
                 // TODO(arjuns) : handle exception.
@@ -151,7 +152,6 @@ public class ArjunRenderCollectionServlet {
         RenderScope renderScope = injector.getInstance(RenderScope.class);
         // Render content
         String contentHtml;
-        // List<Actor> authors;
         renderScope.enter();
         try {
             renderScope.seed(Collection.class, collection);
@@ -164,11 +164,34 @@ public class ArjunRenderCollectionServlet {
             renderScope.exit();
         }
 
+        // Get start link
+        URI firstModuleUri = null;
+        renderScope.enter();
+        try {
+            renderScope.seed(Collection.class, collection);
+            if (!collection.getModuleLinks().isEmpty()) {
+                final ModuleLink link = collection.getModuleLinks().get(0);
+                final LinkResolver linkResolver = injector.getInstance(LinkResolver.class);
+                firstModuleUri = linkResolver.resolveDocument(
+                        link.getModuleId(), link.getModuleVersion());
+            }
+        } catch (Exception e) {
+            // TODO(light): handle exception.
+            return Response.serverError().build();
+        } finally {
+            renderScope.exit();
+        }
+
         SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
-        final SoyMapData params =
-            new SoyMapData("collection", new SoyMapData("id", collectionId, "version",
-                collectionVersion.toString(), "title", title, "authors", Utils
-                    .convertActorListToSoyData(authors), "contentHtml", contentHtml));
+        final SoyMapData params = new SoyMapData(
+                "collection", new SoyMapData(
+                        "id", collectionId,
+                        "version", collectionVersion.toString(),
+                        "title", title,
+                        "abstract", abstractText,
+                        "authors", Utils.convertActorListToSoyData(authors),
+                        "contentHtml", contentHtml),
+                "firstModuleUri", (firstModuleUri != null ? firstModuleUri.toString() : null));
 
         String generatedCollectionHtml =
             tofu.render(CommonHack.COLLECTION_TEMPLATE_NAME, params, null);

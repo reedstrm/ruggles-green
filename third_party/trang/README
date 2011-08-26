@@ -1,0 +1,4 @@
+trang is used to convert rng files to xsd, which are then used to create java code using
+jaxb.
+
+Trang was downloaded from : http://code.google.com/p/jing-trang/downloads/detail?name=trang-20091111.zip

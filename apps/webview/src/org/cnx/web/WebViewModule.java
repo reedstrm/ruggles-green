@@ -18,12 +18,17 @@ package org.cnx.web;
 
 import java.io.File;
 
+import org.cnx.cnxml.CnxmlModule;
+import org.cnx.cnxml.DefaultProcessorModule;
 import org.cnx.cnxml.LinkProcessor;
+import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.Processor;
-import org.cnx.cnxml.LinkResolver;
 import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.CollxmlModule;
+import org.cnx.mdml.MdmlModule;
 import org.cnx.util.RenderTime;
+import org.cnx.util.UtilModule;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -32,6 +37,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.SoyModule;
 import com.google.template.soy.tofu.SoyTofu;
 
 /**
@@ -42,12 +48,18 @@ public class WebViewModule extends AbstractModule {
         bind(String.class)
                 .annotatedWith(Names.named("javax.xml.transform.TransformerFactory"))
                 .toInstance("org.apache.xalan.processor.TransformerFactoryImpl");
-        bind(XmlFetcher.class).to(StaticXmlFetcher.class);
-        bind(LinkResolver.class).to(StaticLinkResolver.class);
+        bind(LinkResolver.class).to(WebViewLinkResolver.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
         processorBinder.addBinding().to(LinkProcessor.class);
+
+        install(new CnxmlModule());
+        install(new CollxmlModule());
+        install(new DefaultProcessorModule());
+        install(new MdmlModule());
+        install(new SoyModule());
+        install(new UtilModule());
     }
 
     @Provides @Singleton @WebViewTemplate

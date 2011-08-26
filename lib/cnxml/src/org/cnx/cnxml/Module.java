@@ -16,7 +16,7 @@
 
 package org.cnx.cnxml;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
 import javax.annotation.Nullable;
 import org.cnx.mdml.Metadata;
 import org.cnx.resourcemapping.Resources;
@@ -38,17 +38,11 @@ public class Module {
 
     public Module(String id, Document cnxml, Resources resources,
             @Nullable Metadata metadata, @CnxmlNamespace String cnxmlNamespace) {
-        Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(cnxml);
-        // TODO(arjuns) : uncomment this later.
-//        Preconditions.checkNotNull(resources);
-        Preconditions.checkNotNull(cnxmlNamespace);
-
-        this.id = id;
-        this.cnxml= cnxml;
-        this.resources = resources;
+        this.id = checkNotNull(id);
+        this.cnxml= checkNotNull(cnxml);
+        this.resources = checkNotNull(resources);
         this.metadata = metadata;
-        this.cnxmlNamespace = cnxmlNamespace;
+        this.cnxmlNamespace = checkNotNull(cnxmlNamespace);
     }
 
     public String getId() {

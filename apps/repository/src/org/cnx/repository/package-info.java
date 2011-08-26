@@ -14,14 +14,9 @@
  * the License.
  */
 
-package org.cnx.repository.service.api;
-
 /**
- * Result of a successful
- * {@link CnxRepositoryService#deleteExport(RepositoryRequestContext, ExportReference)} operation.
- * 
- * @author Tal Dayan
+ * Temporary package for initial development.
+ * <p>
+ * TODO(tal): delete this package.
  */
-public class DeleteExportResult {
-
-}
+package org.cnx.repository;

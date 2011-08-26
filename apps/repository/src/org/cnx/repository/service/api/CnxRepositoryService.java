@@ -64,7 +64,7 @@ public interface CnxRepositoryService {
      * 
      * @param context the query context
      * @param resourceId a valid id of the resource to serve.
-     * @param resp a HTTP servlet response in which the resource is served.
+     * @param httpResponse a HTTP servlet response in which the resource is served.
      * @return operation response.
      */
     RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
@@ -96,7 +96,7 @@ public interface CnxRepositoryService {
      * Create a new module with enforced id.
      * 
      * Temp method for migration. Accepts the id that should be assigned to the new module. The
-     * id must be in the range of protected module ids. See {@link PersistenceMigrationUtil}
+     * id must be in the range of protected module ids. See {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil}
      * for more details.
      * 
      * TODO(tal): remove this method after completing the migration.
@@ -311,7 +311,7 @@ public interface CnxRepositoryService {
      * is required from the servlet.
      * 
      * @param context the query context
-     * @param exportRererence reference to the export to be served
+     * @param exportReference reference to the export to be served
      * @param httpResponse the HttpResponse to which the export should be served.
      */
     RepositoryResponse<ServeExportResult> serveExport(RepositoryRequestContext context,

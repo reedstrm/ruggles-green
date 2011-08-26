@@ -23,7 +23,8 @@ import javax.annotation.Nullable;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 /**
- * Result of a successful {@link CnxRepositoryService#getResouceList} operation.
+ * Result of a successful
+ * {@link CnxRepositoryService#getResourceList(RepositoryRequestContext, String, int)} operation.
  * 
  * @author Tal Dayan
  */
@@ -47,7 +48,7 @@ public class GetResourceListResult {
     /**
      * Return end cursor to use in successive query as start cursor.
      * 
-     * The method asserts that {@link isLast()} is false.
+     * The method asserts that {@link #isLast()} is false.
      */
     public String getEndCursor() {
         checkNotNull(endCursor, "No end cursor, at end of data");

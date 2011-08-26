@@ -35,29 +35,6 @@ import org.jdom.Text;
  */
 public class JdomHtmlSerializer {
     /**
-     *  These tags do not need a closing tag in HTML.
-     *  <p>
-     *  This list comes from the HTML5 spec: http://dev.w3.org/html5/spec/syntax.html#void-elements
-     */
-    private final static ImmutableSet<String> HTML_VOID_ELEMENTS = ImmutableSet.of(
-            "area",
-            "base",
-            "br",
-            "col",
-            "command",
-            "embed",
-            "hr",
-            "img",
-            "input",
-            "keygen",
-            "link",
-            "meta",
-            "param",
-            "source",
-            "track",
-            "wbr");
-
-    /**
      *  SerializerFrame holds one stack frame of the HTML serialization process.
      */
     private static class SerializerFrame {
@@ -95,7 +72,8 @@ public class JdomHtmlSerializer {
 
         final Stack<SerializerFrame> stack = new Stack<SerializerFrame>();
         serializeStartTag(sb, (Element)content);
-        if (!HTML_VOID_ELEMENTS.contains(((Element)content).getName())) {
+        final HtmlTag tag = HtmlTag.of(((Element)content).getName());
+        if (tag == null || !tag.isVoidTag()) {
             stack.push(new SerializerFrame((Element)content));
         }
         while (!stack.empty()) {
@@ -107,7 +85,8 @@ public class JdomHtmlSerializer {
                     serializeStartTag(sb, (Element)child);
 
                     // If this element can have children, then push it.
-                    if (!HTML_VOID_ELEMENTS.contains(((Element)child).getName())) {
+                    final HtmlTag childTag = HtmlTag.of(((Element)child).getName());
+                    if (childTag == null || !childTag.isVoidTag()) {
                         stack.push(new SerializerFrame((Element)child));
                     }
                 }

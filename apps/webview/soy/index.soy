@@ -18,6 +18,8 @@
 
 /**
  *  Render the front page.
+ *
+ *  @param collectionUri URI for the main collection
  */
 {template .index}
     {call .page}
@@ -28,7 +30,7 @@
         {param contentHtml}
             <div id="contentArea">
             <h1>Welcome to Connexions 2.0</h1>
-            <p>View the <a href="/content/collection/C52219/latest/">Signals and Systems</a> collection.</p>
+            <p>View the <a href="{$collectionUri}">Signals and Systems</a> collection.</p>
             <p style="font-size: 80%">
                 Confused? You may be looking for the <a href="http://cnx.org/">original Connexions
                 website.</a>

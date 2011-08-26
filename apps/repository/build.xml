@@ -39,9 +39,14 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
+        
+        <!-- Individual dependent wars should copy their own properties file. -->
+        <delete>
+            <fileset dir="${war.dir}/WEB-INF/classes" includes="*.properties" />
+        </delete>
         <enhance_war war="${war.dir}" />
     </target>
-    
+
     <target name="war_prod"
             depends="war_common"
             description="Assemble the application for production deployment.">
@@ -67,13 +72,15 @@
             <fileset dir="${properties.prod}" includes="*.properties" />
         </copy>
     </target>
-    
+
 
     <property name="target_dir" value="${basedir}/${output.jars}" />
     <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
     <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
 
-    <target name="compile" description="Compile the application servlet code" depends="prepare-for-test-compile">
+    <target name="compile"
+            description="Compile the application servlet code"
+            depends="prepare-for-test-compile">
         <mkdir dir="${classdir}" />
         <mkdir dir="${output.jars}" />
 
@@ -169,7 +176,7 @@
              target="test"
              dir="${third_party}" />
     </target>
-    
+
     <target name="test-compile"
             description="Compile Unit Tests."
             depends="compile">
@@ -224,7 +231,9 @@
              dir="${basedir}/${cnxclientdir}" />
     </target>
 
-    <target name="runserver" depends="war_qa" description="Run the dev_appserver">
+    <target name="runserver"
+            depends="war_qa"
+            description="Run the dev_appserver">
         <dev_appserver war="${war.dir}" port="${http.port}" />
     </target>
 
@@ -247,7 +256,7 @@
             description="Uploads the application, including indexes">
         <appcfg action="update" war="${war.dir}" />
     </target>
-    
+
     <target name="update_qa"
             depends="war_qa"
             description="Uploads the application, including indexes">
@@ -259,7 +268,7 @@
             description="Uploads only the application's indexes">
         <appcfg action="update_indexes" war="${war.dir}" />
     </target>
-        
+
     <target name="update_indexes_qa"
             depends="war_qa"
             description="Uploads only the application's indexes">
@@ -271,7 +280,7 @@
             description="Rolls back any in-progress application update for Production env.">
         <appcfg action="rollback" war="${war.dir}" />
     </target>
-    
+
     <target name="rollback_qa"
             depends="war_qa"
             description="Rolls back any in-progress application update for QA env.">

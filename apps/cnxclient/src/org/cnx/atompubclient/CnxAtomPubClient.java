@@ -57,6 +57,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * AtomPub client for CNX Repository.
+ * This client is thread safe.
  *
  * @author Arjun Satyapal
  */
@@ -204,6 +205,14 @@ public class CnxAtomPubClient {
         return resourceEntry;
     }
 
+    /**
+     * CNX AtomPub API should return the resourceUrl with
+     * rel={@code CnxAtomPubConstants.REL_TAG_FOR_SELF_URL} and href=<resource URL>.
+     *
+     *
+     * @param entry AtomPub entry returned by server.
+     * @return Link containing Resource URL.
+     */
     public Link getLinkForResource(ClientEntry entry) {
         @SuppressWarnings("unchecked")
         List<Link> otherLinks = entry.getOtherLinks();
@@ -217,6 +226,14 @@ public class CnxAtomPubClient {
         throw new IllegalStateException("Resource url not found in entry.");
     }
 
+    /**
+     * CNX AtomPub API should return the BlobStoreUrl with
+     * rel={@code CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL} and href=<blobstore url>
+     * where clients are expected to post the blobs.
+     *
+     * @param entry AtomPub entry returned by Server.
+     * @return Link containing Blobstore URL.
+     */
     public Link getLinkForBlobStore(ClientEntry entry) {
         @SuppressWarnings("unchecked")
         List<Link> otherLinks = entry.getOtherLinks();
@@ -301,13 +318,12 @@ public class CnxAtomPubClient {
         return service.getEntry(moduleVersionUrl.toString());
     }
 
-    // TODO(arjuns) : Move this to common.
-    public String getCnxml(String moduleId, VersionWrapper version) throws HttpException,
-            IOException, JDOMException, ProponoException {
-        return getCnxml(getModuleVersionEntry(moduleId, version));
-    }
-
-    // TODO(arjuns) : Move this to common.
+    /**
+     * Get CNXML from AtomEntry for a Module-Version.
+     *
+     * @param moduleVersionEntry Atom Entry returned by Server for a particular module-version.
+     * @return Returns CNXML (response is already decoded).
+     */
     public String getCnxml(ClientEntry moduleVersionEntry) throws JDOMException, IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
@@ -315,13 +331,16 @@ public class CnxAtomPubClient {
         return constants.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
     }
 
-    // TODO(arjuns) : Move this to common.
+    /**
+     * Get ResourceMapping XML from AtomEntry for a ModuleVersion.
+     *
+     *
+     */
     public String getModuleVersionResourceMappingXml(String moduleId, VersionWrapper version)
             throws HttpException, JDOMException, IOException, ProponoException {
         return getResourceMappingXml(getModuleVersionEntry(moduleId, version));
     }
 
-    // TODO(arjuns) : Move this to common.
     public String getResourceMappingXml(ClientEntry moduleVersionEntry) throws JDOMException,
             IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();

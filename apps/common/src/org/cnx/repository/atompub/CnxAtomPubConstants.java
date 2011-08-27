@@ -53,6 +53,18 @@ public class CnxAtomPubConstants {
     /** Sub-domain for AtomPub relative to host. */
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
+    /**
+     * URLs ending with XML will point to
+     * CNXML : for modules.
+     * CollXml : For collections.
+     */
+    public static final String END_URL_XML = "/xml";
+
+    /**
+     * URLs ending with resources will point to ResourceMappingDoc for Collections.
+     */
+    public static final String END_URL_RESOURCES = "/resources";
+
     /** Path for REST URL for ATOMPUB API */
     public final URL atomPubRestUrl;
 
@@ -114,11 +126,23 @@ public class CnxAtomPubConstants {
         }
     }
 
-    /** Get URL for ModuleVersion to fetch via AtomPub. */
+    /** Get URL for Collection-Version to fetch via AtomPub. */
     public URL getCollectionVersionAbsPath(String collectionId, VersionWrapper version) {
         try {
             return new URL(getCollectionCnxCollectionsAbsPath() + "/" + collectionId + "/"
                 + version);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Get URL for CollectionXml for a Collection-Version. */
+    public URL getCollectionVersionXmlAbsPath(String collectionId, VersionWrapper version) {
+        try {
+            URL url = getCollectionVersionAbsPath(collectionId, version);
+            return new URL(url.toString() + END_URL_XML);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
             // TODO(arjuns): Create a CNXAtomPubException to handle this.
@@ -199,7 +223,30 @@ public class CnxAtomPubConstants {
             // TODO(arjuns): Create a CNXAtomPubException to handle this.
             throw new RuntimeException(e);
         }
+    }
 
+    /** Get URL for CNXML for a ModuleVersion. */
+    public URL getModuleVersionXmlAbsPath(String moduleId, VersionWrapper version) {
+        try {
+            return new URL(getModuleVersionAbsPath(moduleId, version).toString() + END_URL_XML);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Get URL for ResourceMapping XML for a ModuleVersion. */
+    public URL getModuleVersionResourceMappingAbsPath(String moduleId, VersionWrapper version) {
+        try {
+            return new URL(getModuleVersionAbsPath(moduleId, version).toString() + END_URL_RESOURCES);
+        } catch (MalformedURLException e) {
+            logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
+
+            // TODO(arjuns): Create a CNXAtomPubException to handle this.
+            throw new RuntimeException(e);
+        }
     }
 
     /** Scheme for AtomPub collection for CnxModules. */

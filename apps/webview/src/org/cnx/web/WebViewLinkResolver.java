@@ -77,14 +77,16 @@ public class WebViewLinkResolver implements LinkResolver {
             final String collectionVersion = CnxAtomPubConstants.LATEST_VERSION_STRING;
 
             uriBuilder
-                    .append(CommonHack.COLLECTION_URI_PREFIX)
+                    .append(CommonHack.COLLECTION)
+                    .append("/")
                     .append(collection.getId())
                     .append("/")
                     .append(collectionVersion);
         }
 
         uriBuilder
-                .append(CommonHack.MODULE_URI_PREFIX)
+                .append(CommonHack.MODULE)
+                .append("/")
                 .append(moduleId)
                 .append("/")
                 .append(moduleVersion);

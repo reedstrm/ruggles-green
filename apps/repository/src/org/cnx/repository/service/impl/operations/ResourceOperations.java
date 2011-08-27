@@ -47,13 +47,13 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * Implementation of the resource related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ResourceOperations {
 
     /**
-     * Result count limit for {@link getResourceList}. If the caller asks for a larger max value, it
+     * Result count limit for {@link #getResourceList}. If the caller asks for a larger max value, it
      * is trim silently to this value.
      */
     private static final int MAX_RESOURCE_PER_LIST_QUERY = 1000;

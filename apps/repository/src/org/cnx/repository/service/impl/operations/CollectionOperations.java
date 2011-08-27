@@ -50,12 +50,12 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 /**
  * Implementation of the collection related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class CollectionOperations {
     /**
-     * Result count limit for {@link getCollectionList}. If the caller asks for a larger max value,
+     * Result count limit for {@link #getCollectionList}. If the caller asks for a larger max value,
      * it is trim silently to this value.
      */
     private static final int MAX_COLLECTIONS_PER_LIST_QUERY = 1000;

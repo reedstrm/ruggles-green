@@ -1,60 +1,78 @@
 <?xml version="1.0"?>
-<!-- Copyright 2011 Google Inc. Licensed under the Apache License, Version 2.0 (the 
-  "License"); you may not use this file except in compliance with the License. You 
-  may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
-  required by applicable law or agreed to in writing, software distributed under the 
-  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
-  KIND, either express or implied. See the License for the specific language governing 
-  permissions and limitations under the License. -->
+<!--
+    Copyright 2011 Google Inc.
 
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-     version="2.5">
-     <display-name>CNX Live Web View</display-name>
-     <listener>
-         <listener-class>org.cnx.web.GuiceContextListener</listener-class>
-     </listener>
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-     <servlet-mapping>
-         <servlet-name>home</servlet-name>
-         <url-pattern>/home</url-pattern>
-     </servlet-mapping>
-     <servlet>
-         <servlet-name>home</servlet-name>
-         <servlet-class>org.cnx.web.servlets.FrontPageServlet</servlet-class>
-     </servlet>
+        http://www.apache.org/licenses/LICENSE-2.0
 
-     <servlet-mapping>
-         <servlet-name>clear-cache</servlet-name>
-         <url-pattern>/clear-cache</url-pattern>
-     </servlet-mapping>
-     <servlet>
-         <servlet-name>clear-cache</servlet-name>
-         <servlet-class>org.cnx.web.servlets.ClearCacheServlet</servlet-class>
-     </servlet>
-     <security-constraint>
-         <web-resource-collection>
-             <url-pattern>/clear-cache</url-pattern>
-         </web-resource-collection>
-         <auth-constraint>
-             <role-name>admin</role-name>
-         </auth-constraint>
-     </security-constraint>
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
 
-     <!-- Mapping for REST Servlets for serving content. -->
-     <servlet>
-         <servlet-name>Jersey Web Application</servlet-name>
-         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-         <init-param>
-             <param-name>com.sun.jersey.config.property.packages</param-name>
-             <param-value>org.cnx.web.servlets;</param-value>
-         </init-param>
-         <load-on-startup>1</load-on-startup>
-     </servlet>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  version="2.5">
+  <display-name>CNX Live Web View</display-name>
+  <listener>
+    <listener-class>org.cnx.web.GuiceContextListener</listener-class>
+  </listener>
 
-     <servlet-mapping>
-         <servlet-name>Jersey Web Application</servlet-name>
-         <url-pattern>/content/*</url-pattern>
-     </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>home</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>home</servlet-name>
+    <servlet-class>org.cnx.web.servlets.FrontPageServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>config</servlet-name>
+    <url-pattern>/config</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>config</servlet-name>
+    <servlet-class>org.cnx.web.servlets.ConfigDisplayServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>clear-cache</servlet-name>
+    <url-pattern>/clear-cache</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>clear-cache</servlet-name>
+    <servlet-class>org.cnx.web.servlets.ClearCacheServlet</servlet-class>
+  </servlet>
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/config</url-pattern>
+      <url-pattern>/clear-cache</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- Mapping for REST Servlets for serving content. -->
+  <servlet>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer
+    </servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>org.cnx.web.servlets;</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <url-pattern>/content/*</url-pattern>
+  </servlet-mapping>
 </web-app>

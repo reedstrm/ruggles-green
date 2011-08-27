@@ -17,7 +17,6 @@
 package org.cnx.common.collxml;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Collections;
 import javax.annotation.Nullable;
 import org.cnx.mdml.Metadata;
 import com.google.common.base.Objects;

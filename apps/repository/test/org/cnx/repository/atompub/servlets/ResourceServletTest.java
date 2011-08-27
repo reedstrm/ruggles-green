@@ -19,11 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.servlets.migrators.ParallelResourceMigrator;
@@ -91,7 +89,7 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
 
     // TODO(arjuns) : Move this to separate test.
     @Test
-    public void testResourceMigrator() throws HttpException, ProponoException, IOException {
+    public void testResourceMigrator() {
         ParallelResourceMigrator resourceMigrator = new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
 
         ClientEntry createResourceEntry = resourceMigrator.migrateResource();

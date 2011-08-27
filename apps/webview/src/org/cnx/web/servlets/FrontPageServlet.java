@@ -16,28 +16,27 @@
 
 package org.cnx.web.servlets;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.template.soy.data.SoyMapData;
-import com.google.template.soy.tofu.SoyTofu;
-
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.web.CommonHack;
-import org.cnx.web.WebViewTemplate;
 import org.cnx.web.WebViewConfiguration;
+import org.cnx.web.WebViewTemplate;
+
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.tofu.SoyTofu;
 
 public class FrontPageServlet extends HttpServlet {
     private Injector injector;
 
-    @Override public void init(final ServletConfig config) throws ServletException {
+    @Override public void init(final ServletConfig config) {
         this.injector = (Injector)config.getServletContext().getAttribute(Injector.class.getName());
     }
 
@@ -45,7 +44,7 @@ public class FrontPageServlet extends HttpServlet {
             throws IOException {
         final SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
         final WebViewConfiguration configuration = injector.getInstance(WebViewConfiguration.class);
-        resp.setContentType(TEXT_HTML_UTF8);
+        resp.setContentType(CnxMediaTypes.TEXT_HTML_UTF8);
         resp.getWriter().print(tofu.render(CommonHack.FRONT_PAGE_TEMPLATE_NAME, new SoyMapData(
                 "collectionUri", configuration.getRichsCollectionUrl()), null));
     }

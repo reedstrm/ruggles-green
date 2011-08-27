@@ -28,7 +28,7 @@ import com.google.appengine.api.datastore.Text;
 
 /**
  * A POJO class representing a module version entity.
- * 
+ *
  * @author Tal Dayan
  */
 // @PersistenceCapable(table = SchemaConsts.MODULE_VERSION_KEY_KIND)
@@ -56,7 +56,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
      * @param moduleKey key of parent module
      * @param versionNumber version number of this version. Asserted to be >= 1.
      * @param cnxmlDoc the CNXML doc of this version.
-     * @param manifestDoc the resource mapping XML doc of this version.
+     * @param resourceMapDoc the resource mapping XML doc of this version.
      */
     public OrmModuleVersionEntity(Key moduleKey, Date creationDate, int versionNumber,
         String cnxmlDoc, String resourceMapDoc) {
@@ -90,7 +90,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
 
     /**
      * Construct a module version key.
-     * 
+     *
      * @param moduleKey the key of the parent module entity.
      * @param versionNumber version number (asserted to be >= 1)
      * @return the module version key.

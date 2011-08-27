@@ -50,12 +50,12 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 /**
  * Implementation of the module related operations of the repository service.
- * 
+ *
  * @author Tal Dayan
  */
 public class ModuleOperations {
     /**
-     * Result count limit for {@link getModuleList}. If the caller asks for a larger max value, it
+     * Result count limit for {@link #getModuleList}. If the caller asks for a larger max value, it
      * is trim silently to this value.
      */
     private static final int MAX_MODULES_PER_LIST_QUERY = 1000;

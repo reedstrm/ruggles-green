@@ -17,6 +17,7 @@
 package org.cnx.web;
 
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -38,6 +39,16 @@ public class WebViewConfiguration {
         }
     }
 
+    public String getConfiguration() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Entry<Object, Object> currKeyValue : configProperties.entrySet()) {
+            builder.append(getPropertyHtmlString(currKeyValue.getKey(), currKeyValue.getValue()));
+        }
+
+        return builder.toString();
+    }
+
     public String getRepositoryServerUrl() {
         return configProperties.get("cnx.repo.server.url").toString();
     }
@@ -50,5 +61,9 @@ public class WebViewConfiguration {
         String collectionId = configProperties.getProperty("rich.collection.id");
 
         return "/content/collection/" + collectionId + "/latest/";
+    }
+
+    public static String getPropertyHtmlString(Object key, Object value) {
+        return key + "=" + value + "<br/>";
     }
 }

@@ -15,10 +15,15 @@
  */
 package org.cnx.web.servlets;
 
+import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_RESOURCES;
+import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;
+import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
+import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
+import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
+
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -40,14 +45,12 @@ import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.mdml.Actor;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.resourcemapping.Resources;
 import org.cnx.util.RenderScope;
 import org.cnx.web.CommonHack;
 import org.cnx.web.Utils;
 import org.cnx.web.WebViewConfiguration;
 import org.cnx.web.WebViewTemplate;
 
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.template.soy.data.SoyMapData;
@@ -59,18 +62,11 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
  *
  * @author Arjun Satyapal
  */
-// TODO(arjuns) : Fix this hardcoding.
-@Path("/module")
+@Path(CommonHack.MODULE)
 public class RenderModuleServlet {
-    private static final Logger logger = Logger.getLogger(RenderModuleServlet.class.getName());
-
-    static final String MODULE_ID_PATH_PARAM = "moduleId";
-    // TODO(arjuns) : move these to common.
-    static final String MODULE_VERSION_PATH_PARAM = "moduleVersion";
-    static final String LATEST_VERSION = "latest";
-
     /**
-     * This will fetch the specific version. Possible value for version = [{version}, {latest}]
+     * This will fetch specific version for a Module. Possible value for version = [{version},
+     * {"latest"}]
      *
      * URL Pattern wrt /module = /<moduleId>/<version>
      */
@@ -78,6 +74,22 @@ public class RenderModuleServlet {
         + MODULE_VERSION_PATH_PARAM + "}";
 
     private Injector injector;
+
+    /**
+     * This will fetch CNXML for a given module-version.
+     *
+     * URL Pattern wrt /module = /<moduleId>/<version>/xml
+     */
+    static final String MODULE_VERSION_XML_URL_PATTERN = MODULE_VERSION_URL_PATTERN + END_URL_XML;
+
+    /**
+     * This will fetch ResourceMapping XML for a given module-version.
+     *
+     * URL Pattern wrt /module = /<moduleId>/<version>/resources
+     */
+    static final String MODULE_VERSION_RESOURCES_URL_PATTERN = MODULE_VERSION_URL_PATTERN
+        + END_URL_RESOURCES;
+
     // TODO(arjuns) : Move this to a better place.
     private CnxAtomPubClient cnxClient;
     private WebViewConfiguration configuration;
@@ -85,7 +97,7 @@ public class RenderModuleServlet {
     public RenderModuleServlet(@Context ServletContext context) {
         URL url = null;
         try {
-            injector = (Injector)context.getAttribute(Injector.class.getName());
+            injector = (Injector) context.getAttribute(Injector.class.getName());
             configuration = injector.getInstance(WebViewConfiguration.class);
             url = new URL(configuration.getRepositoryAtomPubUrl());
             cnxClient = new CnxAtomPubClient(url);
@@ -103,10 +115,6 @@ public class RenderModuleServlet {
             @Context HttpServletResponse res,
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-
-        WebViewConfiguration configuration = new WebViewConfiguration();
-
-
         // TODO(arjuns) : Handle exception.
         StringBuilder builder = new StringBuilder();
 
@@ -115,8 +123,6 @@ public class RenderModuleServlet {
         }
 
         final VersionWrapper moduleVersionInt = new VersionWrapper(moduleVersionString);
-
-        final String moduleContentHtmlCacheKey = "moduleContentHtml " + " " + moduleId;
 
         String finalHtml = null;
 
@@ -127,8 +133,8 @@ public class RenderModuleServlet {
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);
             String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-            Module module = injector.getInstance(ModuleFactory.class).create(
-                    moduleId,
+            Module module =
+                injector.getInstance(ModuleFactory.class).create(moduleId,
                     CommonHack.parseXmlString(injector.getInstance(DocumentBuilder.class), cnxml),
                     CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
@@ -154,13 +160,13 @@ public class RenderModuleServlet {
             } finally {
                 renderScope.exit();
             }
-            final SoyMapData params = new SoyMapData(
-                    "module", new SoyMapData(
-                            "id", moduleId,
-                            "version", moduleVersionString,
-                            "title", title,
-                            "authors", Utils.convertActorListToSoyData(authors),
-                            "contentHtml", contentHtml));
+            final SoyMapData params =
+                new SoyMapData("module", new SoyMapData(
+                    "id", moduleId,
+                    "version", moduleVersionString,
+                    "title", title,
+                    "authors", Utils.convertActorListToSoyData(authors),
+                    "contentHtml", contentHtml));
 
             SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
 
@@ -174,4 +180,30 @@ public class RenderModuleServlet {
         return myresponse.build();
     }
 
+    @GET
+    @Produces(CnxMediaTypes.TEXT_XML)
+    @Path(MODULE_VERSION_XML_URL_PATTERN)
+    public Response getModuleVersionXml(@Context HttpServletRequest req,
+            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
+        // TODO(arjuns) : Handle excepiton.
+        VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
+        URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(moduleId, versionWrapper);
+
+        return fetchFromRepositoryAndReturn(url);
+    }
+
+    @GET
+    @Produces(CnxMediaTypes.TEXT_XML)
+    @Path(MODULE_VERSION_RESOURCES_URL_PATTERN)
+    public Response getModuleVersionResources(@Context HttpServletRequest req,
+            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
+        VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
+        URL url =
+            cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(moduleId,
+                versionWrapper);
+
+        return fetchFromRepositoryAndReturn(url);
+    }
 }

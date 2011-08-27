@@ -53,6 +53,7 @@ public abstract class CollectionItem implements Iterable<CollectionItem> {
 
     public abstract ImmutableList<CollectionItem> getChildren();
 
+    @Override
     public final Iterator<CollectionItem> iterator() {
         return getChildren().iterator();
     }

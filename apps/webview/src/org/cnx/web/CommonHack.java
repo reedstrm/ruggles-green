@@ -16,10 +16,15 @@
 package org.cnx.web;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.URL;
 
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -39,9 +44,17 @@ public class CommonHack {
     public static final String MODULE_TEMPLATE_NAME = "org.cnx.web.module";
     public static final String COLLECTION_TEMPLATE_NAME = "org.cnx.web.collection";
     public static final String COLLECTION_MODULE_TEMPLATE_NAME = "org.cnx.web.collectionModule";
+
+
     public static final String CONTENT_NAME_SPACE = "/content";
-    public static final String COLLECTION_URI_PREFIX = CONTENT_NAME_SPACE + "/collection/";
-    public static final String MODULE_URI_PREFIX = CONTENT_NAME_SPACE + "/module/";
+    public static final String COLLECTION = "/collection";
+    public static final String MODULE = "/module";
+    public static final String CONFIG = "/config";
+
+    public static final String MODULE_ID_PATH_PARAM = "moduleId";
+    public static final String MODULE_VERSION_PATH_PARAM = "moduleVersion";
+    public static final String COLLECTION_ID_PATH_PARAM = "collectionId";
+    public static final String COLLECTION_VERSION_PATH_PARAM = "collectionVersion";
 
     public static Document parseXmlString(final DocumentBuilder builder, final String source)
             throws SAXException, IOException {
@@ -60,5 +73,11 @@ public class CommonHack {
             // TODO(arjuns): Auto-generated catch block
             throw new RuntimeException(e);
         }
+    }
+
+    public static Response fetchFromRepositoryAndReturn(URL url) throws IOException {
+        String cnxml = CharStreams.toString(new InputStreamReader(url.openStream()));
+
+        return Response.ok(cnxml).build();
     }
 }

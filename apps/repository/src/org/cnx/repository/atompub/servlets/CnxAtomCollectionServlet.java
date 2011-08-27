@@ -15,6 +15,8 @@
  */
 package org.cnx.repository.atompub.servlets;
 
+import static org.cnx.repository.atompub.CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -67,7 +69,7 @@ import com.sun.syndication.propono.atom.server.AtomRequestImpl;
  *
  * @author Arjun Satyapal
  */
-@Path(CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH)
+@Path(COLLECTION_CNX_COLLECTION_REL_PATH)
 public class CnxAtomCollectionServlet {
     Logger logger = Logger.getLogger(CnxAtomCollectionServlet.class.getName());
     private final String COLLECTION_CNX_COLLECTION_POST = "/";
@@ -76,7 +78,7 @@ public class CnxAtomCollectionServlet {
     private final String COLLECTION_VERSION_PATH_PARAM = "collectionVersion";
 
     /**
-     * URL Pattern wrt {@link CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH}
+     * URL Pattern wrt {@link #COLLECTION_CNX_COLLECTION_REL_PATH}
      * /<collectionId>/<collectionVersion>
      */
     private final String COLLECTION_VERSION_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM + "}/{"
@@ -238,7 +240,7 @@ public class CnxAtomCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(CnxMediaTypes.TEXT_XML)
     @Path(COLLECTION_VERSION_URL_PATTERN)
     public Response getCnxCollectionVersion(@Context HttpServletRequest req,
             @Context HttpServletResponse res,

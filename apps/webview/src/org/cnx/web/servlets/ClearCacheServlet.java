@@ -16,38 +16,30 @@
 
 package org.cnx.web.servlets;
 
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.common.io.ByteStreams;
-import com.google.inject.Injector;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.atompub.CnxMediaTypes;
+
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.common.io.ByteStreams;
+
 public class ClearCacheServlet extends HttpServlet {
     private static final String TEMPLATE_FILE = "clear-cache.html";
-    private static final String MIME_TYPE = "text/html; charset=utf-8";
 
     private static final Logger log =
             Logger.getLogger(ClearCacheServlet.class.getName());
 
-    private Injector injector;
-
-    @Override public void init(final ServletConfig config) throws ServletException {
-        this.injector = (Injector)config.getServletContext().getAttribute(Injector.class.getName());
-    }
-
     @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        resp.setContentType(MIME_TYPE);
+        resp.setContentType(CnxMediaTypes.TEXT_HTML_UTF8);
         ByteStreams.copy(new FileInputStream(new File(TEMPLATE_FILE)), resp.getOutputStream());
     }
 

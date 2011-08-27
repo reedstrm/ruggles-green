@@ -40,12 +40,12 @@ public class ModuleMigratorMain {
 
         // TODO(arjuns) : Read this from properties file.
         URL url = new URL("http://qa-cnx-repo.appspot.com/atompub");
-         url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
+//         url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
         cnxClient = new CnxAtomPubClient(url);
 
         // String existingModuleId = "m42355";
-        String moduleLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete/m10085";
-
+        String moduleLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete/m34670";
+        long startTime = System.currentTimeMillis();
         ParallelModuleMigrator migrator =
             new ParallelModuleMigrator(cnxClient, moduleLocation, null/* cnxModuleId */,
                 null/* aerModuleId */, null /* version */);
@@ -55,7 +55,9 @@ public class ModuleMigratorMain {
         thread.join();
 
         ClientEntry newclientEntry = migrator.getModuleVersionEntry();
+        long endTime = System.currentTimeMillis();
 
+        logger.info("Time to migrate = " + (endTime - startTime) / 1000);
         logger.info("Latest url = " + newclientEntry.getEditURI());
     }
 }

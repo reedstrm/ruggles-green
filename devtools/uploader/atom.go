@@ -1,10 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"http"
+	"io"
 	"os"
 	"xml"
 )
+
+type AtomError struct {
+	URL        string
+	Op         string
+	StatusCode int
+}
+
+func (err AtomError) String() string {
+	return fmt.Sprintf("%s %s: server returned status code %d", err.Op, err.URL, err.StatusCode)
+}
 
 type PublishAtomEntry struct {
 	XMLName xml.Name `xml:"http://www.w3.org/2005/Atom entry"`
@@ -41,14 +53,24 @@ type Link struct {
 
 const atomEntryType = `application/atom+xml;type=entry;charset="utf-8"`
 
-func post(client *http.Client, url string, entry interface{}) (*AtomEntry, os.Error) {
-	resp, err := client.Post(url, atomEntryType, marshalReader(entry))
+func create(client *http.Client, url string, entry interface{}) (*AtomEntry, os.Error) {
+	resp, err := client.Post(url, atomEntryType, pipe(func(w io.Writer) os.Error {
+		w.Write([]byte(xml.Header))
+		return xml.Marshal(w, entry)
+	}))
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// TODO(light): Check response code
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		return nil, AtomError{
+			URL:        url,
+			Op:         "create",
+			StatusCode: resp.StatusCode,
+		}
+	}
+
 	var fullEntry AtomEntry
 	if err := xml.Unmarshal(resp.Body, &fullEntry); err != nil {
 		return nil, err
@@ -57,18 +79,29 @@ func post(client *http.Client, url string, entry interface{}) (*AtomEntry, os.Er
 }
 
 func update(client *http.Client, url string, entry interface{}) (*AtomEntry, os.Error) {
-	req, err := http.NewRequest("PUT", url, marshalReader(entry))
+	req, err := http.NewRequest("PUT", url, pipe(func(w io.Writer) os.Error {
+		w.Write([]byte(xml.Header))
+		return xml.Marshal(w, entry)
+	}))
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", atomEntryType)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// TODO(light): Check response code
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		return nil, AtomError{
+			URL:        url,
+			Op:         "update",
+			StatusCode: resp.StatusCode,
+		}
+	}
+
 	var fullEntry AtomEntry
 	if err := xml.Unmarshal(resp.Body, &fullEntry); err != nil {
 		return nil, err

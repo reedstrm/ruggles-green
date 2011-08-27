@@ -1,11 +1,6 @@
 package main
 
 import (
-	"http"
-	"io"
-	"mime"
-	"os"
-	"path"
 	"xml"
 )
 
@@ -16,27 +11,22 @@ type ResourceMapping struct {
 }
 
 type Resource struct {
-	XMLName      xml.Name `xml:"resource"`
-	Name         string   `xml:"attr"`
-	RepositoryID string   `xml:"location-information>repository>repository-id"`
-	ResourceID   string   `xml:"location-information>repository>resource-id"`
+	XMLName             xml.Name `xml:"resource"`
+	Name                string   `xml:"attr"`
+	LocationInformation LocationInfo
+
+	// TODO(light): When my patch to xml goes through.
+	//RepositoryID string   `xml:"location-information>repository>repository-id"`
+	//ResourceID   string   `xml:"location-information>repository>resource-id"`
 }
 
-func uploadToBlobstore(name string, r io.Reader) (*AtomEntry, os.Error) {
-	var client http.Client
-	entry, err := post(&client, repositoryURL+"/resource", PublishAtomEntry{
-		Title: name,
-	})
-	if err != nil {
-		return nil, err
-	}
+type LocationInfo struct {
+	XMLName    xml.Name `xml:"location-information"`
+	Repository RepositoryInfo
+}
 
-	resp, err := client.Post(entry.URL("blobstore"), mime.TypeByExtension(path.Ext(name)), r)
-	// TODO(light): check response
-	if err != nil {
-		return nil, err
-	}
-	resp.Body.Close()
-
-	return entry, nil
+type RepositoryInfo struct {
+	XMLName      xml.Name `xml:"repository"`
+	RepositoryID string   `xml:"repository-id"`
+	ResourceID   string   `xml:"resource-id"`
 }

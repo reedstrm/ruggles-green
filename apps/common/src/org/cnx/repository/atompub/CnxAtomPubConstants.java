@@ -272,9 +272,7 @@ public class CnxAtomPubConstants {
      */
     public List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc)
             throws JAXBException, JDOMException, IOException {
-        String encodedCnxml = encodeToBase64EncodedString(cnxmlDoc);
-        String encodedResourceMappingDoc = encodeToBase64EncodedString(resourceMappingDoc);
-        String moduleEntryXml = getModuleEntryValue(encodedCnxml, encodedResourceMappingDoc);
+        String moduleEntryXml = getModuleEntryValue(cnxmlDoc, resourceMappingDoc);
         String encodedModuleEntryXml = encodeToBase64EncodedString(moduleEntryXml);
 
         Content content = new Content();
@@ -386,37 +384,36 @@ public class CnxAtomPubConstants {
     }
 
     /**
-     * Encode a String to 64 bit string.
+     * Encode a String to a Base64-encoded string.
      *
      * @param originalString : String to be encoded.
-     * @return 64 bit encoded String.
+     * @return Base64-encoded String.
      * @throws UnsupportedEncodingException
      */
     public String encodeToBase64EncodedString(String originalString)
             throws UnsupportedEncodingException {
-        return Base64.encodeBase64String(originalString.getBytes(Charsets.UTF_8.displayName()));
+        return new String(Base64.encodeBase64(originalString.getBytes(Charsets.UTF_8)),
+                Charsets.UTF_8);
     }
 
     /**
      * Get XML for Module Entry. This consists of 64 bit encoded CNXML and 64 bit encoded
      * ResourceMapping Doc. This is used to create {@link ResourceEntryValue}
      *
-     * @param encodedCnxml 64 bit encoded cnxmlDoc.
-     * @param encodedResourceMappingXml 64 bit encoded cnxmlDoc.
+     * @param encodedCnxml CNXML source
+     * @param encodedResourceMappingXml Resource mapping XML source
      *
      * @return XML representation for {@link ResourceEntryValue}
      * @throws JAXBException
      */
-    public String getModuleEntryValue(String encodedCnxml, String encodedResourceMappingXml)
+    public String getModuleEntryValue(String cnxml, String resourceMappingXml)
             throws JAXBException {
         ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<byte[]> encodedCnxmlDoc;
         JAXBElement<byte[]> encodedResourceMappingDoc;
-        encodedCnxmlDoc =
-            objectFactory.createCnxmlDoc(decodeBase64EncodedStringToBytes(encodedCnxml));
-        encodedResourceMappingDoc =
-            objectFactory
-                .createResourceMappingDoc(decodeBase64EncodedStringToBytes(encodedResourceMappingXml));
+        encodedCnxmlDoc = objectFactory.createCnxmlDoc(cnxml.getBytes(Charsets.UTF_8));
+        encodedResourceMappingDoc = objectFactory.createResourceMappingDoc(
+                resourceMappingXml.getBytes(Charsets.UTF_8));
 
         ResourceEntryValue resourceEntryValue = objectFactory.createResourceEntryValue();
         resourceEntryValue.setCnxmlDoc(encodedCnxmlDoc.getValue());

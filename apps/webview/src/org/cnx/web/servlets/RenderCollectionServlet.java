@@ -218,15 +218,10 @@ public class RenderCollectionServlet {
 
         SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
         final SoyMapData params =
-            new SoyMapData(
-                "collection", new SoyMapData(
-                    "id", collectionId,
-                    "version", collectionVersion.toString(),
-                    "title", title,
-                    "abstract", abstractText,
-                    "authors", Utils.convertActorListToSoyData(authors),
-                    "contentHtml", contentHtml),
-                    "firstModuleUri", (firstModuleUri != null ? firstModuleUri.toString() : null));
+            new SoyMapData("collection", new SoyMapData("id", collectionId, "version",
+                collectionVersion.toString(), "title", title, "abstract", abstractText, "authors",
+                Utils.convertActorListToSoyData(authors), "contentHtml", contentHtml),
+                "firstModuleUri", (firstModuleUri != null ? firstModuleUri.toString() : null));
 
         String generatedCollectionHtml =
             tofu.render(CommonHack.COLLECTION_TEMPLATE_NAME, params, null);
@@ -374,7 +369,7 @@ public class RenderCollectionServlet {
                 "collection", new SoyMapData(
                     "id", collectionId,
                     "version", collectionVersion.toString(),
-                    "uri", getCollectionUri() + collectionId + "/" + collectionVersion + "/",
+                    "uri", getCollectionUri(collectionId, collectionVersion),
                     "title", collectionTitle),
                 "module", new SoyMapData(
                     "id", moduleId,
@@ -394,8 +389,9 @@ public class RenderCollectionServlet {
         return myresponse.build();
     }
 
-    private String getCollectionUri() {
-        return CommonHack.CONTENT_NAME_SPACE + CommonHack.COLLECTION;
+    private String getCollectionUri(String collectionId, VersionWrapper collectionVersion) {
+        return CommonHack.CONTENT_NAME_SPACE + CommonHack.COLLECTION + "/" + collectionId + "/"
+            + collectionVersion.toString();
     }
 
     @GET
@@ -435,10 +431,8 @@ public class RenderCollectionServlet {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not obtain title for module link", e);
         }
-        return new SoyMapData("id", link.getModuleId(),
-            "version", link.getModuleVersion(),
-            "title", title,
-            "uri", (uri != null ? uri.toString() : null));
+        return new SoyMapData("id", link.getModuleId(), "version", link.getModuleVersion(),
+            "title", title, "uri", (uri != null ? uri.toString() : null));
     }
 
     private static final URI getModuleLinkUri(LinkResolver linkResolver, ModuleLink link)

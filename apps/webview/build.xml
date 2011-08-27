@@ -47,7 +47,7 @@
         </copy>
 
         <copy todir="${war.dir}/WEB-INF">
-            <fileset dir="${web.inf.common}" includes="*.xml" />
+            <fileset dir="${web.inf.common}" includes="*.*" />
         </copy>
 
         <copy todir="${war.dir}/WEB-INF/lib">
@@ -57,7 +57,6 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${classdir}" includes="**/*.class" />
         </copy>
-        <enhance_war war="${war.dir}" />
     </target>
 
     <target name="war_prod"

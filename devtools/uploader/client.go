@@ -4,24 +4,19 @@ import (
 	"bytes"
 	"encoding/base64"
 	"flag"
-	"fmt"
 	"http"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"sync"
 	"xml"
-)
-
-var (
-	repositoryURL string
-	repositoryID  string
 )
 
 func main() {
 	err := realMain()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	os.Exit(0)
 }
@@ -29,9 +24,13 @@ func main() {
 const cnxmlName = "index_auto_generated.cnxml"
 
 func realMain() (err os.Error) {
+	repo := Repository{
+		Client: http.DefaultClient,
+	}
+
 	module := flag.String("module", "", "upload a new version of an existing module")
-	flag.StringVar(&repositoryURL, "url", "http://100.cnx-repo.appspot.com/atompub", "base URL for repository")
-	flag.StringVar(&repositoryID, "repo-id", "cnx-repo", "repository ID")
+	flag.StringVar(&repo.URL, "url", "http://100.cnx-repo.appspot.com/atompub", "base URL for repository")
+	flag.StringVar(&repo.ID, "repo-id", "cnx-repo", "repository ID")
 	flag.Parse()
 
 	if flag.NArg() != 1 {
@@ -50,38 +49,46 @@ func realMain() (err os.Error) {
 	if err != nil {
 		return err
 	}
+
+	resourceChan := make(chan Resource)
+	wg := new(sync.WaitGroup)
 	for _, info := range fi {
 		if info.IsRegular() && info.Name != cnxmlName && info.Name[0] != '.' {
-			fmt.Println(info.Name)
-			f, err := os.Open(filepath.Join(flag.Arg(0), info.Name))
-			if err == nil {
-				entry, err := uploadToBlobstore(info.Name, f)
-				f.Close()
-				if err == nil {
-					mapping.Resource = append(mapping.Resource, Resource{
-						Name:         info.Name,
-						RepositoryID: repositoryID,
-						ResourceID:   entry.ID,
-					})
-				} else {
-					fmt.Printf("error uploading %s: %v\n", info.Name, err)
-				}
-			} else {
-				fmt.Printf("error uploading %s: %v\n", info.Name, err)
+			if f, err := os.Open(filepath.Join(flag.Arg(0), info.Name)); err == nil {
+				wg.Add(1)
+				go func(name string, f *os.File) {
+					defer f.Close()
+					defer wg.Done()
+					r, err := uploadFile(&repo, name, f)
+					if err != nil {
+						log.Printf("error uploading %s: %v", name, err)
+						return
+					}
+					log.Printf("uploaded %s", name)
+					resourceChan <- r
+				}(info.Name, f)
 			}
 		}
+	}
+	go func() {
+		wg.Wait()
+		close(resourceChan)
+	}()
+
+	for r := range resourceChan {
+		mapping.Resource = append(mapping.Resource, r)
 	}
 
 	// Create module
 	var editURL string
 	if *module == "" {
-		editURL, err = createModule()
+		editURL, err = repo.CreateModule()
 		if err != nil {
 			return err
 		}
-		fmt.Println("Created", editURL)
+		log.Printf("Created %s", editURL)
 	} else {
-		entry, err := fetchVersionInfo(*module, "latest")
+		entry, err := repo.VersionInfo(*module, "latest")
 		if err != nil {
 			return err
 		}
@@ -89,91 +96,42 @@ func realMain() (err os.Error) {
 	}
 
 	// Upload version
-	fmt.Println("Uploading to", editURL)
+	log.Printf("Uploading to %s", editURL)
 	cnxmlFile, err := os.Open(filepath.Join(flag.Arg(0), cnxmlName))
 	if err != nil {
 		return err
 	}
 	defer cnxmlFile.Close()
-	return uploadVersion(editURL, cnxmlFile, mapping)
+	return repo.UploadVersion(editURL, cnxmlFile, mapping)
 }
 
-func showModuleInfo(module string) os.Error {
-	result, err := fetchVersionInfo(module, "latest")
+func uploadFile(repo *Repository, name string, f *os.File) (Resource, os.Error) {
+	entry, err := repo.UploadResource(name, f)
 	if err != nil {
-		return err
+		return Resource{}, err
 	}
-	fmt.Printf("id=%s\n", result.ID)
-	for _, link := range result.Link {
-		fmt.Printf("link rel=%s href=%s\n", link.Rel, link.Href)
-	}
-
-	var c Container
-	var b bytes.Buffer
-	io.Copy(&b, base64.NewDecoder(base64.URLEncoding, bytes.NewBufferString(result.Content.Content)))
-	b.WriteString("e>") // TODO(light): get rid of this
-	err = xml.Unmarshal(&b, &c)
-	if err != nil {
-		return err
-	}
-	fmt.Println("CNXML:")
-	io.Copy(os.Stdout, base64.NewDecoder(base64.StdEncoding, bytes.NewBuffer(c.CNXMLDoc.Data)))
-	fmt.Println()
-
-	fmt.Println("Resource Mapping:")
-	io.Copy(os.Stdout, base64.NewDecoder(base64.StdEncoding, bytes.NewBuffer(c.ResourceMappingDoc.Data)))
-	fmt.Println()
-
-	return nil
-}
-
-func fetchVersionInfo(module, version string) (*AtomEntry, os.Error) {
-	var client http.Client
-	r, err := client.Get(repositoryURL + "/module/" + module + "/" + version)
-	if err != nil {
-		return nil, err
-	}
-	var entry AtomEntry
-	err = xml.Unmarshal(r.Body, &entry)
-	if err != nil {
-		return nil, err
-	}
-	return &entry, err
-}
-
-func createModule() (string, os.Error) {
-	entry, err := post(new(http.Client), repositoryURL+"/module/", PublishAtomEntry{})
-	if err != nil {
-		return "", err
-	}
-	return entry.URL("edit"), err
-}
-
-func uploadVersion(url string, cnxml io.Reader, resourceMapping ResourceMapping) os.Error {
-	container, err := NewContainer(cnxml, marshalReader(resourceMapping))
-	io.Copy(os.Stdout, marshalReader(resourceMapping))
-	if err != nil {
-		return err
-	}
-	_, err = update(new(http.Client), url, PublishAtomEntry{
-		Content: &Content{
-			Type:    "text",
-			Content: container.Encode(),
+	return Resource{
+		Name: name,
+		LocationInformation: LocationInfo{
+			Repository: RepositoryInfo{
+				RepositoryID: repo.ID,
+				ResourceID:   entry.ID,
+			},
 		},
-	})
-	return err
+	}, nil
 }
 
-func marshalReader(val interface{}) io.Reader {
+func pipe(f func(io.Writer) os.Error) io.Reader {
 	pr, pw := io.Pipe()
 	go func() {
-		err := xml.Marshal(pw, val)
+		err := f(pw)
 		if err != nil {
 			pw.CloseWithError(err)
+			return
 		}
 		pw.Close()
 	}()
-	return io.MultiReader(bytes.NewBufferString(xml.Header), pr)
+	return pr
 }
 
 type Container struct {

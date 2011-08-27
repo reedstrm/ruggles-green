@@ -122,7 +122,9 @@ public class ParallelCollectionMigrator {
             for (String cnxModuleId : mapOfModuleIdToNewModuleEntry.keySet()) {
                 Entry newModuleEntry = mapOfModuleIdToNewModuleEntry.get(cnxModuleId);
                 String aerModuleId = CnxAtomPubConstants.getIdFromAtomPubId(newModuleEntry.getId());
-                collXmlAsString = collXmlAsString.replaceAll(cnxModuleId, aerModuleId);
+                String oldString = "\"" + cnxModuleId + "\"";
+                String newString = "\"" + aerModuleId + "\"";
+                collXmlAsString = collXmlAsString.replaceAll(oldString, newString);
                 logger.info("Old ModuleId = " + cnxModuleId + " New ModuleId = " + aerModuleId);
             }
 

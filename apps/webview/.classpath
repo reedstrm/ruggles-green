@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="config/qa/properties"/>
+	<classpathentry kind="src" output="build/eclipse" path="config/qa/properties"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxclient.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxml.latest.jar"/>

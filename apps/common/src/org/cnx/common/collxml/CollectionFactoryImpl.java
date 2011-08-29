@@ -76,7 +76,6 @@ public class CollectionFactoryImpl implements CollectionFactory {
                         elem.getAttribute(DOCUMENT_ATTR_NAME),
                         elem.getAttribute(VERSION_ATTR_NAME),
                         metadataFactory.create(elem)));
-                index++;
             } else if (SUBCOLLECTION_TAG_NAME.equals(localName)) {
                 final Element content = DOMUtils.findFirstChild(elem, collxmlNamespace,
                         CONTENT_TAG_NAME);
@@ -85,7 +84,10 @@ public class CollectionFactoryImpl implements CollectionFactory {
                     nodes.add(new Subcollection(depth, index, subnodes,
                             metadataFactory.create(elem)));
                 }
+            } else {
+                continue;
             }
+            index++;
         }
         return nodes;
     }

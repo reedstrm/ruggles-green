@@ -33,6 +33,7 @@ public class Collection {
     private final Document collxml;
     private final Metadata metadata;
     private final ImmutableList<CollectionItem> topItems;
+    private final ImmutableList<CollectionItem> items;
     private final ImmutableList<ModuleLink> moduleLinks;
 
     /** Create a collection. This is package-private; others should use CollectionFactory. */
@@ -42,21 +43,22 @@ public class Collection {
         this.collxml = checkNotNull(collxml);
         this.metadata = metadata;
         this.topItems = ImmutableList.copyOf(checkNotNull(topItems));
-        this.moduleLinks = findModuleLinks();
+
+        final ArrayList<CollectionItem> items = new ArrayList<CollectionItem>();
+        final ArrayList<ModuleLink> moduleLinks = new ArrayList<ModuleLink>();
+        buildLists(items, moduleLinks, this.topItems);
+        this.items = ImmutableList.copyOf(items);
+        this.moduleLinks = ImmutableList.copyOf(moduleLinks);
     }
 
-    private ImmutableList<ModuleLink> findModuleLinks() {
-        final ArrayList<ModuleLink> links = new ArrayList<ModuleLink>();
-        findModuleLinks(links, topItems);
-        return ImmutableList.copyOf(links);
-    }
-
-    private void findModuleLinks(ArrayList<ModuleLink> links, ImmutableList<CollectionItem> list) {
+    private void buildLists(ArrayList<CollectionItem> items, ArrayList<ModuleLink> moduleLinks,
+            ImmutableList<CollectionItem> list) {
         for (CollectionItem item : list) {
+            items.add(item);
             if (item instanceof ModuleLink) {
-                links.add((ModuleLink)item);
+                moduleLinks.add((ModuleLink)item);
             } else if (!item.getChildren().isEmpty()) {
-                findModuleLinks(links, item.getChildren());
+                buildLists(items, moduleLinks, item.getChildren());
             }
         }
     }
@@ -73,8 +75,14 @@ public class Collection {
         return metadata;
     }
 
+    /** This method returns all items in the collection with depth 0. */
     public ImmutableList<CollectionItem> getTopItems() {
         return topItems;
+    }
+
+    /** This method returns all items in the collection in pre-order. */
+    public ImmutableList<CollectionItem> getItems() {
+        return items;
     }
 
     public ImmutableList<ModuleLink> getModuleLinks() {

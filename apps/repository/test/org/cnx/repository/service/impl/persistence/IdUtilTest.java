@@ -71,8 +71,8 @@ public class IdUtilTest {
             final long id = rnd.nextLong();
             // Only key ids >= 1 are valid and used.
             //
-            // NOTE(tal): since Random is deterministic, one this test converge,
-            // it will always converge (no risk for a long sequence of < 1 ids).
+            // NOTE(tal): since class Random is deterministic, once this test converges,
+            // it will always converge (no risk of a long sequence of < 1 ids).
             if (id >= 1) {
                 i++;
                 final Key actual = KeyFactory.createKey("spec", id);

@@ -20,7 +20,6 @@ import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxModule
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxResourceCategoryEle;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -31,13 +30,9 @@ import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
-import org.cnx.repository.service.api.RepositoryRequestContext;
 
 import com.sun.syndication.propono.atom.common.Categories;
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * REST Resource for fetching ServiceDocument.
@@ -51,19 +46,13 @@ public class CnxCategoriesDocumentServlet {
     @GET
     @Produces(CnxMediaTypes.TEXT_XML)
     @Path(CATEGORY_DOCUMENT_GET)
-    public Response getServiceDocument(@Context HttpServletRequest req,
-            @Context HttpServletResponse response) {
+    public Response getServiceDocument(@Context HttpServletRequest req) {
         // TODO(arjuns) : Add caching and exception handling.
 
-        AtomRequest areq = new AtomRequestImpl(req);
-        // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomService =
                 new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        // TODO(arjuns) : Fix this.
         CnxAtomPubConstants constants = atomService.getConstants();
-        // new CnxAtomPubConstants(req.getRequestURL().toString(), req.getServerPort());
         Categories categories = new Categories();
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));

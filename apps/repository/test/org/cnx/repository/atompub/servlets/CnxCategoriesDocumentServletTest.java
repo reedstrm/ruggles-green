@@ -39,6 +39,8 @@ public class CnxCategoriesDocumentServletTest extends CnxAtomPubBasetest {
         HttpClient httpClient = new HttpClient();
         GetMethod getMethod = new GetMethod(getConstants().getCategoryDocumentAbsPath());
         httpClient.executeMethod(getMethod);
+        // TODO(arjuns) : fix this.
+        @SuppressWarnings("unused")
         String response = getMethod.getResponseBodyAsString();
 
         // TODO(arjuns) : Add more tests for CategoryDocument.

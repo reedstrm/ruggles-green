@@ -54,8 +54,6 @@ import com.google.common.base.Throwables;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.impl.Atom10Parser;
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Jersey Servlets for Cnx Resources.
@@ -75,12 +73,8 @@ public class CnxAtomResourceServlet {
     @POST
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_RESOURCE_POST)
-    public Response postNewResource(@Context HttpServletRequest req,
-            @Context HttpServletResponse res) {
+    public Response postNewResource(@Context HttpServletRequest req) {
         // TODO(arjuns): Handle exceptions.
-        AtomRequest areq = new AtomRequestImpl(req);
-        // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         Entry postedEntry = null;
@@ -150,12 +144,10 @@ public class CnxAtomResourceServlet {
     // TODO(arjuns) : Repository should start sending the content-type.
     @GET
     @Path(RESOURCE_GET_URL_PATTERN)
-    public Response getResource(@Context HttpServletRequest req, @Context HttpServletResponse res,
+    public Response getResource(@Context HttpServletResponse res,
             @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
-        AtomRequest areq = new AtomRequestImpl(req);
         // TODO(arjuns) : get a better way to get the context.
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
-        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
             repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(), resourceId, res);

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import org.cnx.util.RenderTime;
 import org.cnx.util.HtmlTag;
@@ -122,6 +123,8 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_CALS_FRAME_BOTTOM_CLASS = "calsFrameBottom";
     private final static String HTML_CALS_FRAME_TOPBOTTOM_CLASS = "calsFrameTopBottom";
 
+    private final static Logger log = Logger.getLogger(JdomHtmlGenerator.class.getName());
+
     private final ImmutableSet<Processor> processors;
     private final JdomHtmlSerializer jdomHtmlSerializer;
     private final Namespace cnxmlNamespace;
@@ -185,10 +188,19 @@ import org.jdom.input.DOMBuilder;
     }
 
     @Override public String generate(Module module) throws Exception {
+        long startTime, endTime;
+
         // Apply processors
+        startTime = System.currentTimeMillis();
+
         for (Processor processor : processors) {
             module = processor.process(module);
         }
+
+        endTime = System.currentTimeMillis();
+        log.fine("Processors took " + (endTime - startTime) + " ms");
+
+        startTime = System.currentTimeMillis();
 
         // Convert to JDOM
         // TODO(light): don't use DOMBuilder: it uses recursion
@@ -199,14 +211,20 @@ import org.jdom.input.DOMBuilder;
             return "";
         }
 
-        // Render to HTML
+        // Generate HTML tree
         counter = new Counter();
         StringBuilder sb = new StringBuilder();
         final List<Content> contentList = generateHtmlTree(contentElem);
+        counter = null;
+
+        // Serialize HTML
         for (Content content : contentList) {
             jdomHtmlSerializer.serialize(sb, content);
         }
-        counter = null;
+
+        endTime = System.currentTimeMillis();
+        log.fine("Rendered in " + (endTime - startTime) + " ms");
+
         return sb.toString();
     }
 
@@ -362,6 +380,7 @@ import org.jdom.input.DOMBuilder;
     }
     
     protected void unrecognized(final Element elem) {
+        log.warning("Found unrecognized element: " + elem.getName());
         addHtmlElement(new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, "unhandled")
                 .setText("Unrecognized Content: " + elem.getName()));

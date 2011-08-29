@@ -126,7 +126,7 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void unhandledContentShouldBeReported() throws Exception {
         final DOMBuilder b = builder.element("greeting").text("Hello, World");
-        assertEquals("<!--\n<greeting>...</greeting>\n-->"
+        assertEquals("<!--\n&lt;greeting&gt;...&lt;/greeting&gt;\n-->"
                 + "<div class=\"unhandled\">Unrecognized Content: greeting</div>",
                 generate(b));
     }

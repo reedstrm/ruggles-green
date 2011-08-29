@@ -105,7 +105,7 @@ public class JdomHtmlSerializer {
             }
         } else if (content instanceof Comment) {
             sb.append("<!--\n");
-            sb.append(content.getValue().replace("-", ""));
+            sb.append(StringEscapeUtils.escapeHtml4(content.getValue().replace("-", "")));
             sb.append("\n-->");
         }
     }

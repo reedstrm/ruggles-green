@@ -385,9 +385,13 @@ import org.jdom.input.DOMBuilder;
         }
     }
     
+    protected void unrecognized(final Element elem) {
+        unrecognized(elem, elem.getName());
+    }
+
     /** Display a placeholder for an unrecognized element. */
     @SuppressWarnings("unchecked")
-    protected void unrecognized(final Element elem) {
+    protected void unrecognized(final Element elem, final String message) {
         // Create a simpler version of the element for serialization
         final Element simpleElem = new Element(elem.getName())
                 .setText(UNRECOGNIZED_CONTENT_INNER_TEXT);
@@ -778,8 +782,10 @@ import org.jdom.input.DOMBuilder;
                 elem.getAttributeValue(CnxmlAttributes.LIST_TYPE),
                 CnxmlAttributes.ListType.BULLETED);
 
-        // TODO(light): handle inline lists
         if (display == CnxmlAttributes.Display.INLINE) {
+            // TODO(light): handle inline lists
+            unrecognized(elem, elem.getName()
+                    + " " + CnxmlAttributes.DISPLAY + "=" + display.getValue());
             return;
         }
 
@@ -800,6 +806,8 @@ import org.jdom.input.DOMBuilder;
             break;
         default:
             // TODO(light): gracefully handle other list types
+            unrecognized(elem, elem.getName()
+                    + " " + CnxmlAttributes.LIST_TYPE + "=" + type.getValue());
             return;
         }
 
@@ -848,7 +856,7 @@ import org.jdom.input.DOMBuilder;
             try {
                 count = Integer.valueOf(countAttr);
             } catch (NumberFormatException e) {
-                // TODO(light): Log invalid CNXML
+                log.severe("count is not a number; CNXML was not validated");
                 return;
             }
         }

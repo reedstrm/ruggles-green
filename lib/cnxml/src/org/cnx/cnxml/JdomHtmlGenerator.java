@@ -922,6 +922,7 @@ import org.jdom.input.DOMBuilder;
         case IMAGE:
             generateImage(child);
             break;
+        case FLASH:
         case OBJECT:
             final String type = child.getAttributeValue(CnxmlAttributes.OBJECT_TYPE);
             if (CDF_MIME_TYPE.equals(type) || CDF_TEXT_MIME_TYPE.equals(type)) {

@@ -918,15 +918,21 @@ import org.jdom.input.DOMBuilder;
             return;
         }
 
-        if (CnxmlTag.IMAGE.getTag().equals(child.getName())) {
+        switch (CnxmlTag.of(child.getName())) {
+        case IMAGE:
             generateImage(child);
-        } else if (CnxmlTag.OBJECT.getTag().equals(child.getName())) {
+            break;
+        case OBJECT:
             final String type = child.getAttributeValue(CnxmlAttributes.OBJECT_TYPE);
             if (CDF_MIME_TYPE.equals(type) || CDF_TEXT_MIME_TYPE.equals(type)) {
                 generateMathematica(child);
             } else {
                 generateObject(child);
             }
+            break;
+        default:
+            unrecognized(child);
+            break;
         }
     }
 

@@ -53,9 +53,11 @@ import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.CollectionFactory;
 import org.cnx.common.collxml.CollectionHTMLGenerator;
 import org.cnx.common.collxml.ModuleLink;
+import org.cnx.common.collxml.Subcollection;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.repository.atompub.CnxMediaTypes;
@@ -66,10 +68,12 @@ import org.cnx.web.Utils;
 import org.cnx.web.WebViewConfiguration;
 import org.cnx.web.WebViewTemplate;
 
+import static com.google.common.base.Preconditions.*;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.template.soy.data.SoyData;
+import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import com.sun.syndication.feed.atom.Entry;
@@ -123,8 +127,27 @@ public class RenderCollectionServlet {
     private final String COLLECTION_MODULE_RESOURCES_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN
         + MODULE + MODULE_VERSION_RESOURCES_URL_PATTERN;
 
+    // Soy parameters
+    private static final String AUTHORS_PARAM = "authors";
+    private static final String COLLECTION_ITEM_DEPTH_PARAM = "depth";
+    private static final String COLLECTION_ITEM_INDEX_PARAM = "index";
+    private static final String COLLECTION_ITEM_TYPE_PARAM = "type";
+    private static final String COLLECTION_PARAM = "collection";
+    private static final String CONTENT_HTML_PARAM = "contentHtml";
+    private static final String ID_PARAM = "id";
+    private static final String ITEMS_PARAM = "items";
+    private static final String MODULE_LINK_TYPE = "module";
+    private static final String MODULE_PARAM = "module";
+    private static final String NEXT_MODULE_PARAM = "nextModule";
+    private static final String PREVIOUS_MODULE_PARAM = "previousModule";
+    private static final String SUBCOLLECTION_TYPE = "subcollection";
+    private static final String TITLE_PARAM = "title";
+    private static final String URI_PARAM = "uri";
+    private static final String VERSION_PARAM = "version";
+
     private final Injector injector;
     private final WebViewConfiguration configuration;
+    private final Provider<LinkResolver> linkResolverProvider;
     // TODO(arjuns) : Move this to a better place.
     private final CnxAtomPubClient cnxClient;
 
@@ -132,6 +155,7 @@ public class RenderCollectionServlet {
         URL url = null;
         try {
             injector = (Injector) context.getAttribute(Injector.class.getName());
+            linkResolverProvider = injector.getProvider(LinkResolver.class);
             configuration = injector.getInstance(WebViewConfiguration.class);
             url = new URL(configuration.getRepositoryAtomPubUrl());
             cnxClient = new CnxAtomPubClient(url);
@@ -261,8 +285,6 @@ public class RenderCollectionServlet {
             @PathParam(CommonHack.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
             throws Exception {
         // TODO(arjuns) : handle exceptions.
-        StringBuilder builder = new StringBuilder();
-
         if (!VersionWrapper.isValidVersion(collectionVersionString)) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -305,6 +327,8 @@ public class RenderCollectionServlet {
                 CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
         final ModuleLink[] links = collection.getPreviousNext(moduleId);
+        SoyData prevLink, nextLink;
+        final SoyListData items = new SoyListData();
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml = null;
@@ -330,6 +354,15 @@ public class RenderCollectionServlet {
                 collectionTitle = collection.getMetadata().getTitle();
             }
 
+            // Get collection items
+            for (CollectionItem item : collection.getItems()) {
+                items.add(convertCollectionItemToSoyData(item));
+            }
+
+            // Get next/previous links
+            prevLink = convertCollectionItemToSoyData(links[0]);
+            nextLink = convertCollectionItemToSoyData(links[1]);
+
             // Get module title
             if (currentModuleLink.getMetadata() != null) {
                 moduleTitle = currentModuleLink.getMetadata().getTitle();
@@ -343,18 +376,6 @@ public class RenderCollectionServlet {
             } else {
                 moduleAuthors = Collections.<Actor> emptyList();
             }
-
-            // Get collection previous/next links
-            @SuppressWarnings("unchecked")
-            Provider<LinkResolver> linkResolverProvider = injector.getProvider(LinkResolver.class);
-
-            final LinkResolver linkResolver = linkResolverProvider.get();
-            if (links[0] != null) {
-                previousModuleUri = getModuleLinkUri(linkResolver, links[0]);
-            }
-            if (links[1] != null) {
-                nextModuleUri = getModuleLinkUri(linkResolver, links[1]);
-            }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error while rendering", e);
             // TODO(arjuns): handle exception.
@@ -363,30 +384,29 @@ public class RenderCollectionServlet {
             renderScope.exit();
         }
 
-        SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
-        final SoyMapData params =
-            new SoyMapData(
-                "collection", new SoyMapData(
-                    "id", collectionId,
-                    "version", collectionVersion.toString(),
-                    "uri", getCollectionUri(collectionId, collectionVersion),
-                    "title", collectionTitle),
-                "module", new SoyMapData(
-                    "id", moduleId,
-                    "version", moduleVersion.toString(),
-                    "title", moduleTitle,
-                    "authors", Utils.convertActorListToSoyData(moduleAuthors),
-                    "contentHtml", moduleContentHtml),
-                    "previousModule", convertModuleLinkToSoyData(links[0], previousModuleUri),
-                    "nextModule", convertModuleLinkToSoyData(links[1], nextModuleUri));
 
-        String renderedModuleHtml =
-            tofu.render(CommonHack.COLLECTION_MODULE_TEMPLATE_NAME, params, null);
-        builder.append(renderedModuleHtml);
-        ResponseBuilder myresponse = Response.ok();
-        myresponse.entity(builder.toString());
+        final SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
+        final SoyMapData params = new SoyMapData(
+                COLLECTION_PARAM, new SoyMapData(
+                        ID_PARAM, collectionId,
+                        VERSION_PARAM, collectionVersion.toString(),
+                        URI_PARAM, getCollectionUri(collectionId, collectionVersion),
+                        TITLE_PARAM, collectionTitle,
+                        ITEMS_PARAM, items
+                ),
+                MODULE_PARAM, new SoyMapData(
+                        ID_PARAM, moduleId,
+                        VERSION_PARAM, moduleVersion.toString(),
+                        TITLE_PARAM, moduleTitle,
+                        AUTHORS_PARAM, Utils.convertActorListToSoyData(moduleAuthors),
+                        CONTENT_HTML_PARAM, moduleContentHtml
+                ),
+                PREVIOUS_MODULE_PARAM, prevLink,
+                NEXT_MODULE_PARAM, nextLink);
 
-        return myresponse.build();
+        final String renderedModuleHtml =
+                tofu.render(CommonHack.COLLECTION_MODULE_TEMPLATE_NAME, params, null);
+        return Response.ok().entity(renderedModuleHtml).build();
     }
 
     private String getCollectionUri(String collectionId, VersionWrapper collectionVersion) {
@@ -420,19 +440,44 @@ public class RenderCollectionServlet {
         return fetchFromRepositoryAndReturn(url);
     }
 
-    private static final SoyData convertModuleLinkToSoyData(@Nullable ModuleLink link,
-            @Nullable URI uri) {
-        if (link == null) {
+    private SoyData convertCollectionItemToSoyData(@Nullable CollectionItem item) {
+        if (item == null) {
             return SoyData.createFromExistingData(null);
         }
         String title = null;
         try {
-            title = link.getMetadata().getTitle();
+            title = item.getMetadata().getTitle();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not obtain title for module link", e);
+            logger.log(Level.WARNING, "Could not obtain title for collection item", e);
         }
-        return new SoyMapData("id", link.getModuleId(), "version", link.getModuleVersion(),
-            "title", title, "uri", (uri != null ? uri.toString() : null));
+
+        final SoyMapData map = new SoyMapData(
+                TITLE_PARAM, title,
+                COLLECTION_ITEM_DEPTH_PARAM, item.getDepth(),
+                COLLECTION_ITEM_INDEX_PARAM, item.getIndex());
+
+        if (item instanceof ModuleLink) {
+            map.put(COLLECTION_ITEM_TYPE_PARAM, MODULE_LINK_TYPE);
+            convertModuleLinkToSoyData(map, (ModuleLink)item);
+        } else if (item instanceof Subcollection) {
+            map.put(COLLECTION_ITEM_TYPE_PARAM, SUBCOLLECTION_TYPE);
+        }
+
+        return map;
+    }
+
+    private void convertModuleLinkToSoyData(SoyMapData data, ModuleLink link) {
+        checkNotNull(data);
+        checkNotNull(link);
+        URI uri = null;
+        try {
+            uri = getModuleLinkUri(linkResolverProvider.get(), link);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not obtain URI for module link", e);
+        }
+        data.put(ID_PARAM, link.getModuleId());
+        data.put(VERSION_PARAM, link.getModuleVersion());
+        data.put(URI_PARAM, (uri != null ? uri.toString() : null));
     }
 
     private static final URI getModuleLinkUri(LinkResolver linkResolver, ModuleLink link)

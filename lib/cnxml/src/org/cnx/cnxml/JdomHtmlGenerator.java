@@ -122,19 +122,6 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_CALS_FRAME_BOTTOM_CLASS = "calsFrameBottom";
     private final static String HTML_CALS_FRAME_TOPBOTTOM_CLASS = "calsFrameTopBottom";
 
-    private final static ImmutableMap<CnxmlAttributes.CalsAlign, String>
-            CALS_ALIGN_HTML_CLASS_MAP = ImmutableMap.of(
-                    CnxmlAttributes.CalsAlign.LEFT, HTML_CALS_ALIGN_LEFT_CLASS,
-                    CnxmlAttributes.CalsAlign.RIGHT, HTML_CALS_ALIGN_RIGHT_CLASS,
-                    CnxmlAttributes.CalsAlign.CENTER, HTML_CALS_ALIGN_CENTER_CLASS,
-                    CnxmlAttributes.CalsAlign.JUSTIFY, HTML_CALS_ALIGN_JUSTIFY_CLASS);
-
-    private final static ImmutableMap<CnxmlAttributes.CalsVerticalAlign, String>
-            CALS_VALIGN_HTML_CLASS_MAP = ImmutableMap.of(
-                    CnxmlAttributes.CalsVerticalAlign.TOP, HTML_CALS_VALIGN_TOP_CLASS,
-                    CnxmlAttributes.CalsVerticalAlign.MIDDLE, HTML_CALS_VALIGN_MIDDLE_CLASS,
-                    CnxmlAttributes.CalsVerticalAlign.BOTTOM, HTML_CALS_VALIGN_BOTTOM_CLASS);
-
     private final ImmutableSet<Processor> processors;
     private final JdomHtmlSerializer jdomHtmlSerializer;
     private final Namespace cnxmlNamespace;

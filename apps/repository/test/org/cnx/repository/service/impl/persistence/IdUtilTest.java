@@ -4,10 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 /**
  * TODO(tal): make this test to work. Requires testing jars as explained in
@@ -18,21 +23,20 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 public class IdUtilTest {
 
-    // TODO(tal): enable after including the test jars
-    //
-    //    private final LocalServiceTestHelper helper =
-    //        new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig()
-    //            .setDefaultHighRepJobPolicyUnappliedJobPercentage(100));
-    //
-    //    @Before
-    //    public void setUp() {
-    //        helper.setUp();
-    //    }
-    //
-    //    @After
-    //    public void tearDown() {
-    //        helper.tearDown();
-    //    }
+    private final LocalServiceTestHelper helper =
+            new LocalServiceTestHelper(
+                    new LocalDatastoreServiceTestConfig()
+                    .setDefaultHighRepJobPolicyUnappliedJobPercentage(100));
+
+    @Before
+    public void setUp() {
+        helper.setUp();
+    }
+
+    @After
+    public void tearDown() {
+        helper.tearDown();
+    }
 
     @Test
     public void keyToId() {
@@ -65,7 +69,7 @@ public class IdUtilTest {
     public void randomCompatibility() {
         final Random rnd = new Random(1);
         final OrmEntitySpec spec = new OrmEntitySpec("spec", "X");
-        for (int i= 0; i < 10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             final long id = rnd.nextLong();
             final Key actual = KeyFactory.createKey("spec", id);
             final Key expected = IdUtil.idToKey(spec, IdUtil.keyToId(spec, actual));

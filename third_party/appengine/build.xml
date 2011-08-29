@@ -38,6 +38,7 @@
 
     <resources id="appengine-1.5.3.testing" >
         <fileset dir="appengine/appengine-java-sdk-1.5.3/lib/testing" includes="*.jar" />
+        <fileset dir="appengine/appengine-java-sdk-1.5.3/lib/impl" includes="appengine-*api*.jar" />
     </resources>
 
     <target name="default">

@@ -35,6 +35,7 @@ import org.cnx.util.HtmlAttributes;
 import org.cnx.util.JdomHtmlSerializer;
 
 import org.jdom.Attribute;
+import org.jdom.Comment;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -122,6 +123,9 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_CALS_FRAME_TOP_CLASS = "calsFrameTop";
     private final static String HTML_CALS_FRAME_BOTTOM_CLASS = "calsFrameBottom";
     private final static String HTML_CALS_FRAME_TOPBOTTOM_CLASS = "calsFrameTopBottom";
+
+    private final static String UNRECOGNIZED_CONTENT_INNER_TEXT = "...";
+    private final static String UNRECOGNIZED_CONTENT_MESSAGE = "Unrecognized Content: ";
 
     private final static Logger log = Logger.getLogger(JdomHtmlGenerator.class.getName());
 
@@ -381,11 +385,22 @@ import org.jdom.input.DOMBuilder;
         }
     }
     
+    /** Display a placeholder for an unrecognized element. */
+    @SuppressWarnings("unchecked")
     protected void unrecognized(final Element elem) {
-        log.warning("Found unrecognized element: " + elem.getName());
+        // Create a simpler version of the element for serialization
+        final Element simpleElem = new Element(elem.getName())
+                .setText(UNRECOGNIZED_CONTENT_INNER_TEXT);
+        for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
+            simpleElem.setAttribute(attr.getName(), attr.getValue(), attr.getNamespace());
+        }
+        final String simpleText = jdomHtmlSerializer.serialize(simpleElem);
+
+        log.warning("Found unrecognized element: " + simpleText);
+        addHtmlContent(new Comment(simpleText));
         addHtmlContent(new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, "unhandled")
-                .setText("Unrecognized Content: " + elem.getName()));
+                .setText(UNRECOGNIZED_CONTENT_MESSAGE + elem.getName()));
     }
 
     /**

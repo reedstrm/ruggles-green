@@ -375,22 +375,22 @@ import org.jdom.input.DOMBuilder;
             // Copy math without modification.  If we add it directly, it detaches from the original
             // CNXML tree.
             // TODO(light): Don't use clone, it's recursive.
-            addHtmlElement((Element)elem.clone());
+            addHtmlContent((Element)elem.clone());
         }
     }
     
     protected void unrecognized(final Element elem) {
         log.warning("Found unrecognized element: " + elem.getName());
-        addHtmlElement(new Element(HtmlTag.DIV.getTag())
+        addHtmlContent(new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, "unhandled")
                 .setText("Unrecognized Content: " + elem.getName()));
     }
 
     /**
-     *  This method adds the HTML element to the top parent in the stack.
+     *  This method adds the HTML content to the top parent in the stack.
      */
-    protected void addHtmlElement(final Element htmlElem) {
-        stack.peek().htmlParent.addContent(htmlElem);
+    protected void addHtmlContent(final Content content) {
+        stack.peek().htmlParent.addContent(content);
     }
 
     /**
@@ -398,7 +398,7 @@ import org.jdom.input.DOMBuilder;
      *  stack, using the given element for children.
      */
     protected void pushHtmlElement(final Element elem, final Element htmlElem) {
-        addHtmlElement(htmlElem);
+        addHtmlContent(htmlElem);
         stack.push(new GeneratorFrame(elem, htmlElem));
     }
 
@@ -414,7 +414,7 @@ import org.jdom.input.DOMBuilder;
         final Element htmlElem = copyId(elem, new Element(HtmlTag.PARAGRAPH.getTag()));
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
         if (title != null) {
-            addHtmlElement(new Element(HtmlTag.DIV.getTag())
+            addHtmlContent(new Element(HtmlTag.DIV.getTag())
                     .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
                     .setText(title));
         }
@@ -509,7 +509,7 @@ import org.jdom.input.DOMBuilder;
             pushHtmlElement(elem, htmlElem.setAttribute(HtmlAttributes.STYLE, CSS_DISPLAY_NONE));
             break;
         case BLOCK:
-            addHtmlElement(
+            addHtmlContent(
                     new Element(HtmlTag.PREFORMAT.getTag()).addContent(htmlElem));
             stack.push(new GeneratorFrame(elem, htmlElem));
             break;
@@ -619,7 +619,7 @@ import org.jdom.input.DOMBuilder;
         // TODO(light): Allow interspersed examples with meanings
         final Element htmlMeaningList = new Element(HtmlTag.ORDERED_LIST.getTag());
 
-        addHtmlElement(htmlElem);
+        addHtmlContent(htmlElem);
         final List<Content> children = (List<Content>)elem.getContent(new Filter() {
             @Override public boolean matches(Object obj) {
                 if (obj instanceof Element) {
@@ -665,7 +665,7 @@ import org.jdom.input.DOMBuilder;
     protected void generateFigure(final Element elem) {
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
         if (title != null) {
-            addHtmlElement(new Element(HtmlTag.DIV.getTag())
+            addHtmlContent(new Element(HtmlTag.DIV.getTag())
                     .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
                     .setText(title));
         }
@@ -695,7 +695,7 @@ import org.jdom.input.DOMBuilder;
         }
 
         final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
-        addHtmlElement(htmlElem.addContent(tempSpan).addContent(htmlCaptionElem));
+        addHtmlContent(htmlElem.addContent(tempSpan).addContent(htmlCaptionElem));
         stack.push(new GeneratorFrame(elem, tempSpan, true));
     }
 
@@ -918,7 +918,7 @@ import org.jdom.input.DOMBuilder;
         if (height != null) {
             htmlElem.setAttribute(HtmlAttributes.IMAGE_HEIGHT, height);
         }
-        addHtmlElement(htmlElem);
+        addHtmlContent(htmlElem);
     }
 
     protected void generateObject(final Element elem) {
@@ -937,7 +937,7 @@ import org.jdom.input.DOMBuilder;
             htmlElem.setAttribute(HtmlAttributes.OBJECT_HEIGHT, height);
         }
         htmlElem.setText(mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
-        addHtmlElement(htmlElem);
+        addHtmlContent(htmlElem);
     }
 
     protected void generateMathematica(final Element elem) {
@@ -1008,7 +1008,7 @@ import org.jdom.input.DOMBuilder;
 
         htmlElem.setAttribute(HtmlAttributes.CLASS, Joiner.on(' ').join(classList));
 
-        addHtmlElement(htmlElem);
+        addHtmlContent(htmlElem);
 
         // This must be done in reverse order (for the stack).
         pushTablePart(tgroup, CnxmlTag.TABLE_FOOT, htmlElem, HtmlTag.TABLE_FOOT);

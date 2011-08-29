@@ -43,4 +43,19 @@ public interface CnxRepositoryConfiguration {
      * are allowed.
      */
     long getMaxResourceSize();
+
+    /**
+     * Get max allowable CNXML doc size.
+     */
+    long getMaxCnxmlDocSize();
+
+    /**
+     * Get max allowable module resource map doc size.
+     */
+    long getMaxResourceMapDocSize();
+
+    /**
+     * Get max allowable COLXML doc size.
+     */
+    long getMaxColxmlDocSize();
 }

@@ -50,7 +50,7 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 /**
  * Implementation of the module related operations of the repository service.
- *
+ * 
  * @author Tal Dayan
  */
 public class ModuleOperations {
@@ -80,7 +80,7 @@ public class ModuleOperations {
         }
 
         return ResponseUtil.loggedOk("New module created: " + moduleId, new CreateModuleResult(
-                moduleId), log);
+            moduleId), log);
     }
 
     /**
@@ -126,7 +126,7 @@ public class ModuleOperations {
         }
 
         return ResponseUtil.loggedOk("New module created: " + moduleId, new CreateModuleResult(
-                moduleId), log);
+            moduleId), log);
     }
 
     /**
@@ -170,7 +170,7 @@ public class ModuleOperations {
         return ResponseUtil.loggedOk(
                 "Retrieved info of module " + moduleId,
                 new GetModuleInfoResult(moduleId, moduleEntity.getCreationTime(), moduleEntity
-                        .getVersionCount(), exports), log);
+                    .getVersionCount(), exports), log);
     }
 
     /**
@@ -185,18 +185,18 @@ public class ModuleOperations {
 
         if (maxResults > MAX_MODULES_PER_LIST_QUERY) {
             log.info("Reducing caller module maxResults from " + maxResults + " to "
-                    + MAX_MODULES_PER_LIST_QUERY);
+                + MAX_MODULES_PER_LIST_QUERY);
             maxResults = MAX_MODULES_PER_LIST_QUERY;
         }
 
         Pair<List<Key>, String> results =
-                Services.persistence.entityKeyList(OrmModuleEntity.class, maxResults, startCursor);
+            Services.persistence.entityKeyList(OrmModuleEntity.class, maxResults, startCursor);
 
         final ImmutableList<String> moduleIds =
-                IdUtil.keysToIds(OrmModuleEntity.class, results.first);
+            IdUtil.keysToIds(OrmModuleEntity.class, results.first);
 
         return ResponseUtil.loggedOk("Retrieve module list page with " + moduleIds.size()
-                + " module ids", new GetModuleListResult(moduleIds, results.second), log);
+            + " module ids", new GetModuleListResult(moduleIds, results.second), log);
     }
 
     /**
@@ -209,7 +209,7 @@ public class ModuleOperations {
         if (expectedVersionNumber != null && expectedVersionNumber < 1) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Invalid expected version number: " + expectedVersionNumber
-                    + ", should be >= 1", log);
+                        + ", should be >= 1", log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
@@ -218,7 +218,20 @@ public class ModuleOperations {
                     "Cannot add module version, module id has bad format: [" + moduleId + "]", log);
         }
 
-        // We read the module entity and its child export entities in one transation. This is
+        if (cnxmlDoc.length() > Services.config.getMaxCnxmlDocSize()) {
+            return ResponseUtil.loggedError(RepositoryStatus.OVERSIZE, "CNXML doc oversize, limit:"
+                + Services.config.getMaxCnxmlDocSize() + ", found: " + cnxmlDoc.length(), log);
+        }
+
+        if (resourceMapDoc.length() > Services.config.getMaxResourceMapDocSize()) {
+            return ResponseUtil.loggedError(
+                    RepositoryStatus.OVERSIZE,
+                    "Module resource map doc oversize, limit:"
+                        + Services.config.getMaxResourceMapDocSize() + ", found: "
+                        + resourceMapDoc.length(), log);
+        }
+
+        // We read the module entity and its child export entities in one transaction. This is
         // OK since they are in the same entity group.
 
         final Date transactionTime = new Date();
@@ -244,13 +257,13 @@ public class ModuleOperations {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
                         "Version conflict in module " + moduleId + ", expected: "
-                                + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+                            + expectedVersionNumber + ", actual: " + newVersionNumber, log);
             }
 
             // Create new version entity
             final OrmModuleVersionEntity versionEntity =
-                    new OrmModuleVersionEntity(moduleKey, transactionTime, newVersionNumber, cnxmlDoc,
-                            resourceMapDoc);
+                new OrmModuleVersionEntity(moduleKey, transactionTime, newVersionNumber, cnxmlDoc,
+                    resourceMapDoc);
 
             // Sanity check that we don't overwrite an existing version. Should never be
             // triggered if the persisted data is consistent.
@@ -324,10 +337,10 @@ public class ModuleOperations {
 
             // Fetch module version entity
             final Key moduleVersionKey =
-                    OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
+                OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
 
             versionEntity =
-                    Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
+                Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
@@ -337,8 +350,8 @@ public class ModuleOperations {
         }
 
         final GetModuleVersionResult result =
-                new GetModuleVersionResult(moduleId, versionEntity.getVersionNumber(),
-                        versionEntity.getCNXMLDoc(), versionEntity.getResourceMapDoc());
+            new GetModuleVersionResult(moduleId, versionEntity.getVersionNumber(),
+                versionEntity.getCNXMLDoc(), versionEntity.getResourceMapDoc());
         return ResponseUtil.loggedOk("Fetched module version", result, log);
     }
 
@@ -391,10 +404,10 @@ public class ModuleOperations {
 
             // Fetch the module version entity
             final Key moduleVersionKey =
-                    OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
+                OrmModuleVersionEntity.moduleVersionKey(moduleKey, versionToServe);
 
             versionEntity =
-                    Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
+                Services.persistence.read(OrmModuleVersionEntity.class, moduleVersionKey);
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
@@ -413,8 +426,8 @@ public class ModuleOperations {
         }
 
         final GetModuleVersionInfoResult result =
-                new GetModuleVersionInfoResult(moduleId, versionEntity.getVersionNumber(),
-                        versionEntity.getCreationTime(), exports);
+            new GetModuleVersionInfoResult(moduleId, versionEntity.getVersionNumber(),
+                versionEntity.getCreationTime(), exports);
         return ResponseUtil.loggedOk("Fetched module version info", result, log);
     }
 }

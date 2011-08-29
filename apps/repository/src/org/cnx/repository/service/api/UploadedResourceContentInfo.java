@@ -41,7 +41,7 @@ public class UploadedResourceContentInfo {
     private final String md5Hash;
 
     public UploadedResourceContentInfo(String contentType, Long contentSize,
-            Date contentUploadTime, String contentOriginalFileName, long size, String md5Hash) {
+        Date contentUploadTime, String contentOriginalFileName, long size, String md5Hash) {
         this.contentType = checkNotNull(contentType);
         this.contentSize = checkNotNull(contentSize);
         this.contentUploadTime = checkNotNull(contentUploadTime);

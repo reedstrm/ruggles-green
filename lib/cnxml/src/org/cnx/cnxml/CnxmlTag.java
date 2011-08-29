@@ -59,6 +59,7 @@ public enum CnxmlTag {
     FLASH("flash"),
     IMAGE("image"),
     OBJECT("object"),
+    LABVIEW("labview"),
     FIGURE("figure"),
     FIGURE_CAPTION("caption"),
     SUBFIGURE("subfigure"),
@@ -99,5 +100,6 @@ public enum CnxmlTag {
     public final static ImmutableSet<CnxmlTag> MEDIA_CHILDREN = ImmutableSet.of(
             FLASH,
             IMAGE,
-            OBJECT);
+            OBJECT,
+            LABVIEW);
 }

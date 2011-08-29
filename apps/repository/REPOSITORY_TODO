@@ -17,7 +17,7 @@ Post Pilot
 * Impose size limits on posted items
 * Perfornamce optimization
 * Support for search
-* Add ability to take down (e.g. 'invisible' flag in entities)
+* Add ability to take down content (e.g. 'invisible' flag in CNXML and resource entities)
 
 Done
 + Add support for collections

@@ -174,6 +174,11 @@
              inheritAll="true"
              target="test"
              dir="${third_party}" />
+
+        <ant antfile="appengine/build.xml"
+             inheritAll="true"
+             target="testing"
+             dir="${third_party}" />
     </target>
 
     <target name="test-compile"

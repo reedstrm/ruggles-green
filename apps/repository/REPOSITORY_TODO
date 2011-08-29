@@ -1,6 +1,5 @@
 Repository global todo items
 
-* Make the IdUtil test to work (requires GAE test jars)
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
 
 * Solve the java formatter issues.
@@ -12,11 +11,10 @@ Post Pilot
 * Add API method to lookup resources by size/hash
 * Incoming XML update/validation (modify incoming XML with repository values (e.g. version)).
 * parameter validations (in the servlets and the service)
-* User authentication (in servlets)
+* User authentication (in Atompub API)
 * User authorization (in service)
-* Impose size limits on posted items
-* Perfornamce optimization
-* Support for search
+* Support for search ??? (or will CNX do that?)
+* Consider to have some support for automatic resource/export content type determination if user did not provide.
 * Add ability to take down content (e.g. 'invisible' flag in CNXML and resource entities)
 
 Done
@@ -43,5 +41,8 @@ Done
 + Add service methods to enumerate all resources
 + Add API capability for the migrator to preserve old module and collectins ids.
 + return size and md5 hash for resource and export info results
++ Make the IdUtil test to work (requires GAE test jars)
++ Impose size limits on posted items and XML docs
++ Perfornamce optimization
 
 

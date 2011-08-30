@@ -96,7 +96,7 @@
 
         <ant antfile="junit/build.xml"
              inheritAll="true"
-             target="default"
+             target="test"
              dir="${third_party}" />
 
         <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />

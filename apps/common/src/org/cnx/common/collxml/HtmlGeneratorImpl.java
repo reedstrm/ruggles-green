@@ -60,7 +60,7 @@ public class HtmlGeneratorImpl implements CollectionHTMLGenerator {
     /** {@inheritDoc} */
     @Override public String generate(final Collection coll) throws Exception {
         final Stack<GeneratorFrame> stack = new Stack<GeneratorFrame>();
-        final Element root = new Element(HtmlTag.ORDERED_LIST.getTag())
+        final Element root = new Element(HtmlTag.UNORDERED_LIST.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_COLLECTION_CLASS);
         for (CollectionItem item : Lists.reverse(coll.getTopItems())) {
             stack.push(new GeneratorFrame(item, root));
@@ -80,7 +80,7 @@ public class HtmlGeneratorImpl implements CollectionHTMLGenerator {
                                 .setText(link.getMetadata().getTitle())));
             } else if (frame.item instanceof Subcollection) {
                 final Subcollection sub = (Subcollection)frame.item;
-                final Element newParent = new Element(HtmlTag.ORDERED_LIST.getTag());
+                final Element newParent = new Element(HtmlTag.UNORDERED_LIST.getTag());
                 frame.parent.addContent(new Element(HtmlTag.LIST_ITEM.getTag())
                         .setAttribute(HtmlAttributes.CLASS, HTML_SUBCOLLECTION_CLASS)
                         .addContent(new Element(HtmlTag.SPAN.getTag())

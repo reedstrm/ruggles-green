@@ -34,7 +34,7 @@
         <mkdir dir="${war.dir}/WEB-INF/lib" />
 
         <copy todir="${war.dir}/WEB-INF">
-            <fileset dir="${web.inf.common}" includes="*.*" />
+            <fileset dir="${web.inf.common}" includes="*" />
         </copy>
 
         <copy todir="${war.dir}/WEB-INF/lib">

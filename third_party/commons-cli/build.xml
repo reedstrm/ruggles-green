@@ -14,13 +14,13 @@
     limitations under the License.
 -->
 
-<project name="junit" default="default">
+<project name="commons-cli" default="default">
     <description>
-        Copies Junit jar to ${target_dir}.
+        Copies commons-cli jar to ${target_dir}.
     </description>
 
-    <fileset id="junit-4.8.2"
-             dir="junit/junit-4.8.2"
+    <fileset id="commons-cli-1.2"
+             dir="commons-cli/commons-cli-1.2"
              includes="*.jar" />
 
     <target name="test">
@@ -35,7 +35,7 @@
         </fail>
 
         <copy todir="${test_lib_dir}">
-            <fileset refid="junit-4.8.2" />
+            <fileset refid="commons-cli-1.2" />
         </copy>
     </target>
 </project>

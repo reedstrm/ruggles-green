@@ -164,10 +164,14 @@
 
 
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
-
-        <ant antfile="junit/build.xml"
+        <ant antfile="appengine/build.xml"
              inheritAll="true"
-             target="default"
+             target="test"
+             dir="${third_party}" />
+
+        <ant antfile="commons-cli/build.xml"
+             inheritAll="true"
+             target="test"
              dir="${third_party}" />
 
         <ant antfile="jersey/build.xml"
@@ -175,9 +179,9 @@
              target="test"
              dir="${third_party}" />
 
-        <ant antfile="appengine/build.xml"
+        <ant antfile="junit/build.xml"
              inheritAll="true"
-             target="testing"
+             target="test"
              dir="${third_party}" />
     </target>
 

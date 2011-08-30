@@ -31,7 +31,7 @@
     <servlet-name>home</servlet-name>
     <servlet-class>org.cnx.web.servlets.FrontPageServlet</servlet-class>
   </servlet>
-
+  
   <servlet-mapping>
     <servlet-name>config</servlet-name>
     <url-pattern>/config</url-pattern>
@@ -66,7 +66,7 @@
     </servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>org.cnx.web.servlets;</param-value>
+      <param-value>org.cnx.web.jerseyservlets;</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>

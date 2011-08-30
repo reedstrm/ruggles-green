@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets;
+package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,8 +31,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.servlets.migrators.ParallelModuleMigrator;
-import org.cnx.repository.atompub.servlets.migrators.ParallelResourceMigrator;
+import org.cnx.repository.atompub.jerseyservlets.migrators.ParallelModuleMigrator;
+import org.cnx.repository.atompub.jerseyservlets.migrators.ParallelResourceMigrator;
 import org.jdom.JDOMException;
 import org.junit.Before;
 import org.junit.Test;

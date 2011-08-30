@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets;
+package org.cnx.repository.atompub.jerseyservlets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;

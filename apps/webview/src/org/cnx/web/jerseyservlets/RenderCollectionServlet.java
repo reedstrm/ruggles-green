@@ -13,8 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.web.servlets;
+package org.cnx.web.jerseyservlets;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;
 import static org.cnx.web.CommonHack.COLLECTION_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.COLLECTION_VERSION_PATH_PARAM;
@@ -22,9 +23,9 @@ import static org.cnx.web.CommonHack.MODULE;
 import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
-import static org.cnx.web.servlets.RenderModuleServlet.MODULE_VERSION_RESOURCES_URL_PATTERN;
-import static org.cnx.web.servlets.RenderModuleServlet.MODULE_VERSION_URL_PATTERN;
-import static org.cnx.web.servlets.RenderModuleServlet.MODULE_VERSION_XML_URL_PATTERN;
+import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_RESOURCES_URL_PATTERN;
+import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_URL_PATTERN;
+import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_XML_URL_PATTERN;
 
 import java.net.URI;
 import java.net.URL;
@@ -53,9 +54,9 @@ import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.common.collxml.Collection;
-import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.CollectionFactory;
 import org.cnx.common.collxml.CollectionHTMLGenerator;
+import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
 import org.cnx.mdml.Actor;
@@ -68,7 +69,6 @@ import org.cnx.web.Utils;
 import org.cnx.web.WebViewConfiguration;
 import org.cnx.web.WebViewTemplate;
 
-import static com.google.common.base.Preconditions.*;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;

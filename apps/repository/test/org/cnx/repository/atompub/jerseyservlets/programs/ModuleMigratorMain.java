@@ -13,46 +13,51 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.servlets.programs;
+package org.cnx.repository.atompub.jerseyservlets.programs;
 
 import java.net.URL;
 import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.servlets.migrators.ParallelCollectionMigrator;
+import org.cnx.repository.atompub.jerseyservlets.migrators.ParallelModuleMigrator;
+import org.cnx.repository.atompub.jerseyservlets.programs.ModuleMigratorMain;
 
 import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
+ * Migrator for migrating Modules to CNX repository.
+ *
+ * TODO(arjuns) : Add java flags.
  *
  * @author Arjun Satyapal
  */
-public class CollectionMigratorMain {
-
+public class ModuleMigratorMain {
     private static Logger logger = Logger.getLogger(ModuleMigratorMain.class.getName());
 
     private static CnxAtomPubClient cnxClient;
 
     public static void main(String[] args) throws Exception {
-        long startTime = System.currentTimeMillis();
-        // TODO(arjuns) : Convert this into an AppEngine app.
 
         // TODO(arjuns) : Read this from properties file.
         URL url = new URL("http://qa-cnx-repo.appspot.com/atompub");
-        url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
+//         url = new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
         cnxClient = new CnxAtomPubClient(url);
 
-        String originalCollectionId = null;
-        String collectionLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete";
-        // TODO(arjuns) : Add support so that new version for a collection can be posted.
+        // String existingModuleId = "m42355";
+        String moduleLocation = "/home/arjuns/cnxmodules/col10064_1.12_complete/m34670";
+        long startTime = System.currentTimeMillis();
+        ParallelModuleMigrator migrator =
+            new ParallelModuleMigrator(cnxClient, moduleLocation, null/* cnxModuleId */,
+                null/* aerModuleId */, null /* version */);
 
-        ParallelCollectionMigrator migrator = new ParallelCollectionMigrator(cnxClient);
-        ClientEntry clientEntry =
-            migrator.migrateCollection(originalCollectionId, collectionLocation);
+        Thread thread = new Thread(migrator);
+        thread.start();
+        thread.join();
 
+        ClientEntry newclientEntry = migrator.getModuleVersionEntry();
         long endTime = System.currentTimeMillis();
-        logger.info("Time taken to create new collection : " + (endTime - startTime) / 1000);
-        logger.info("New collection created at : " + clientEntry.getEditURI());
+
+        logger.info("Time to migrate = " + (endTime - startTime) / 1000);
+        logger.info("Latest url = " + newclientEntry.getEditURI());
     }
 }

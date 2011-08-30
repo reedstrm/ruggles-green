@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.web.servlets;
+package org.cnx.web.jerseyservlets;
 
 import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_RESOURCES;
 import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;

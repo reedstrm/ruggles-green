@@ -858,6 +858,23 @@ public class ModuleHTMLGeneratorTests {
                      generate(node));
     }
 
+    @Test public void labeledItemListTest() throws Exception {
+        final Node node = builder.element("list")
+                .attr("id", "mylist")
+                .attr("list-type", "labeled-item")
+                .child(
+                        builder.element("item").child(builder.element("label").text("First item"))
+                                .text("One"),
+                        builder.element("item").text("Two")
+                )
+        .build();
+        assertEquals("<ul class=\"labeled\" id=\"mylist\">"
+                + "<li><span class=\"title\">First item</span>One</li>"
+                + "<li>Two</li>"
+                +"</ul>",
+                generate(node));
+    }
+
     @Test public void mediaImageShouldRenderAsImg() throws Exception {
         final Node node = builder.element("media")
                 .attr("id", "myImage")

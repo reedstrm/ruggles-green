@@ -32,6 +32,9 @@
         <mkdir dir="${war.dir}/WEB-INF/lib" />
 
         <copy todir="${war.dir}">
+            <fileset dir="src">
+                <include name="*.jsp" />
+            </fileset>
             <fileset dir="soy">
                 <exclude name="**/.hg/**" />
                 <exclude name="**/*~" />

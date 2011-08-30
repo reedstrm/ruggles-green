@@ -49,8 +49,30 @@
         {param title}{$module.title}{/param}
         {param javascriptHtml}
             {call .mathjax/}
+            <script type="text/javascript" src="/static/js/toc-dropdown.js"></script>
         {/param}
         {param contentHtml}
+            <div id="tocDropdownBox">
+                <select id="tocDropdown">
+                    {foreach $item in $collection.items}
+                        {switch $item.type}
+                            {case 'subcollection'}
+                                <option class="subcollection" disabled>
+                                    {call .indent data="$item"/}
+                                    {$item.title}
+                                </option>
+                            {case 'module'}
+                                <option value="{$item.uri}"
+                                        {sp}class="module{if $item.id == $module.id} selected{/if}"
+                                        {if $item.id == $module.id}{sp}selected{/if}>
+                                    {call .indent data="$item"/}
+                                    {$item.title}
+                                </option>
+                        {/switch}
+                    {/foreach}
+                </select>
+                <button onclick="onSelectTocDropdown();">Go</button>
+            </div>
             <hgroup>
                 <h1 class="collectionTitle"><a href="{$collection.uri}">{$collection.title}</a></h1>
                 <h1 class="moduleTitle">{$module.title}</h1>
@@ -60,6 +82,17 @@
             {call .collectionNavBar data="all"/}
         {/param}
     {/call}
+{/template}
+
+/**
+ *  Indent an item.
+ *
+ *  @param depth Indentation level
+ *  @param index Position in node
+ */
+{template .indent private="true"}
+    {for $i in range($depth)}&nbsp;&nbsp;&nbsp;&nbsp;{/for}
+    {$index + 1}.{sp}
 {/template}
 
 /**

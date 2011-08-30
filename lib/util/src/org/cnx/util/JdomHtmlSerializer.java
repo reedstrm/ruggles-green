@@ -26,6 +26,7 @@ import java.util.Stack;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import org.jdom.Attribute;
+import org.jdom.Comment;
 import org.jdom.Content;
 import org.jdom.Element;
 import org.jdom.Text;
@@ -37,6 +38,7 @@ public class JdomHtmlSerializer {
     /**
      *  SerializerFrame holds one stack frame of the HTML serialization process.
      */
+    @SuppressWarnings("unchecked")
     private static class SerializerFrame {
         public final Element element;
         public final Iterator<Content> iterator;
@@ -61,35 +63,12 @@ public class JdomHtmlSerializer {
      *  not have a closing tag.
      */
     public void serialize(final StringBuilder sb, final Content content) {
-        if (content instanceof Text) {
-            serializeText(sb, (Text)content);
-            return;
-        }
-        if (!(content instanceof Element)) {
-            // Skip it.
-            return;
-        }
-
         final Stack<SerializerFrame> stack = new Stack<SerializerFrame>();
-        serializeStartTag(sb, (Element)content);
-        final HtmlTag tag = HtmlTag.of(((Element)content).getName());
-        if (tag == null || !tag.isVoidTag()) {
-            stack.push(new SerializerFrame((Element)content));
-        }
+        serializeContent(sb, stack, content);
+
         while (!stack.empty()) {
             if (stack.peek().iterator.hasNext()) {
-                final Content child = stack.peek().iterator.next();
-                if (child instanceof Text) {
-                    serializeText(sb, (Text)child);
-                } else if (child instanceof Element) {
-                    serializeStartTag(sb, (Element)child);
-
-                    // If this element can have children, then push it.
-                    final HtmlTag childTag = HtmlTag.of(((Element)child).getName());
-                    if (childTag == null || !childTag.isVoidTag()) {
-                        stack.push(new SerializerFrame((Element)child));
-                    }
-                }
+                serializeContent(sb, stack, stack.peek().iterator.next());
             } else {
                 final Element elem = stack.pop().element;
                 sb.append("</");
@@ -99,21 +78,35 @@ public class JdomHtmlSerializer {
         }
     }
 
-    private void serializeStartTag(final StringBuilder sb, final Element elem) {
-        sb.append('<');
-        sb.append(elem.getName());
+    @SuppressWarnings("unchecked")
+    private void serializeContent(final StringBuilder sb, final Stack<SerializerFrame> stack,
+            final Content content) {
+        if (content instanceof Text) {
+            sb.append(StringEscapeUtils.escapeHtml4(((Text)content).getText()));
+        } else if (content instanceof Element) {
+            final Element elem = (Element)content;
 
-        for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
-            sb.append(' ');
-            sb.append(attr.getName());
-            sb.append("=\"");
-            sb.append(StringEscapeUtils.escapeHtml4(attr.getValue()));
-            sb.append('"');
+            sb.append('<');
+            sb.append(elem.getName());
+
+            for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
+                sb.append(' ');
+                sb.append(attr.getName());
+                sb.append("=\"");
+                sb.append(StringEscapeUtils.escapeHtml4(attr.getValue()));
+                sb.append('"');
+            }
+            sb.append('>');
+
+            // If this element can have children, then push it.
+            final HtmlTag tag = HtmlTag.of(elem.getName());
+            if (tag == null || !tag.isVoidTag()) {
+                stack.push(new SerializerFrame(elem));
+            }
+        } else if (content instanceof Comment) {
+            sb.append("<!--\n");
+            sb.append(StringEscapeUtils.escapeHtml4(content.getValue().replace("-", "")));
+            sb.append("\n-->");
         }
-        sb.append('>');
-    }
-
-    private void serializeText(final StringBuilder sb, final Text text) {
-        sb.append(StringEscapeUtils.escapeHtml4(text.getText()));
     }
 }

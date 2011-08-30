@@ -26,5 +26,9 @@
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="build/test/classes"/>
 	<classpathentry kind="lib" path="war/WEB-INF/classes"/>
+	<classpathentry kind="lib" path="build/test/lib/appengine-api-labs.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/appengine-api-stubs.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/appengine-api.jar"/>
+	<classpathentry kind="lib" path="build/test/lib/appengine-testing.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

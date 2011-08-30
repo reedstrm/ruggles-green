@@ -1,0 +1,6 @@
+This is an example of a repository client written in Go.  It only uploads
+modules right now, but it can be easily extended to perform other operations.
+
+This program requires Go weekly 2011-08-17 or later.  Once Go is installed,
+you can run "gomake" and the client program will be created in the current
+directory.  Run "client -help" for usage.

@@ -19,6 +19,8 @@ package org.cnx.repository.service.api;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
+import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
+
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
  * 
@@ -85,7 +87,8 @@ public interface CnxRepositoryService {
      * Create a new module.
      * 
      * If the returned response has an OK status than a new module, with no version, has been
-     * created and the id allocated to it is returned in the result. Otherwise, no change is done in the repository.
+     * created and the id allocated to it is returned in the result. Otherwise, no change is done in
+     * the repository.
      * 
      * @param context the query context
      * @return operation response.
@@ -95,14 +98,15 @@ public interface CnxRepositoryService {
     /**
      * Create a new module with enforced id.
      * 
-     * Temp method for migration. Accepts the id that should be assigned to the new module. The
-     * id must be in the range of protected module ids. See {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil}
-     * for more details.
+     * Temp method for migration. Accepts the id that should be assigned to the new module. The id
+     * must be in the range of protected module ids. See
+     * {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil} for more
+     * details.
      * 
      * TODO(tal): remove this method after completing the migration.
      */
-    RepositoryResponse<CreateModuleResult> migrationCreateModuleWithId(RepositoryRequestContext context,
-            String forcedId);
+    RepositoryResponse<CreateModuleResult> migrationCreateModuleWithId(
+            RepositoryRequestContext context, String forcedId);
 
     /**
      * Get general module information.
@@ -202,7 +206,8 @@ public interface CnxRepositoryService {
      * Create a new collection.
      * 
      * If the returned response has an OK status than a new collection, with no version, has been
-     * created and the id allocated to it is returned in the result. Otherwise, no change is done in the repository.
+     * created and the id allocated to it is returned in the result. Otherwise, no change is done in
+     * the repository.
      * 
      * @param context the query context
      * @return operation response.
@@ -213,13 +218,13 @@ public interface CnxRepositoryService {
      * Create a new collected with enforced id.
      * 
      * Temp method for migration. Accepts the id that should be assigned to the new collection. The
-     * id must be in the range of protected collection ids. See {@link PersistenceMigrationUtil}
-     * for more details.
+     * id must be in the range of protected collection ids. See {@link PersistenceMigrationUtil} for
+     * more details.
      * 
      * TODO(tal): remove this method after completing the migration.
      */
-    RepositoryResponse<CreateCollectionResult> migrationCreateCollectionWithId(RepositoryRequestContext context,
-            String forcedId);
+    RepositoryResponse<CreateCollectionResult> migrationCreateCollectionWithId(
+            RepositoryRequestContext context, String forcedId);
 
     /**
      * Get general collection information.

@@ -40,8 +40,7 @@ public class RepositoryResponse<T> {
     /**
      * Private constructor. Use static methods to construct.
      */
-    private RepositoryResponse(RepositoryStatus status, String statusDescription,
-            @Nullable T result) {
+    private RepositoryResponse(RepositoryStatus status, String statusDescription, @Nullable T result) {
         this.status = checkNotNull(status);
         this.description = checkNotNull(statusDescription);
         this.result = result;

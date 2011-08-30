@@ -29,8 +29,8 @@ import com.google.common.collect.ImmutableMap;
  * @author Tal Dayan
  */
 public class CnxRepositoryConfigurationImpl implements CnxRepositoryConfiguration {
-
-    private static final long MB = 1024 * 1024;
+    private static final long KB = 1024;
+    private static final long MB = 1024 * KB;
 
     /**
      * The singleton instance.
@@ -53,7 +53,7 @@ public class CnxRepositoryConfigurationImpl implements CnxRepositoryConfiguratio
      */
     private static ImmutableMap<String, ExportType> constructExportMap() {
         final ImmutableMap.Builder<String, ExportType> builder =
-            new ImmutableMap.Builder<String, ExportType>();
+                new ImmutableMap.Builder<String, ExportType>();
 
         // Canonical PDF
         addType(builder, "pdf_std", "application/pdf", 50 * MB, ExportScopeType.MODULE,
@@ -74,8 +74,8 @@ public class CnxRepositoryConfigurationImpl implements CnxRepositoryConfiguratio
     private static void addType(ImmutableMap.Builder<String, ExportType> builder, String id,
             String contentType, long maxSizeInBytes, ExportScopeType... allowedScopeTypes) {
         builder
-            .put(id,
-                    new ExportType(id, contentType, maxSizeInBytes, Sets
+        .put(id,
+                new ExportType(id, contentType, maxSizeInBytes, Sets
                         .newHashSet(allowedScopeTypes)));
     }
 
@@ -91,5 +91,22 @@ public class CnxRepositoryConfigurationImpl implements CnxRepositoryConfiguratio
 
     public static CnxRepositoryConfiguration getInstance() {
         return instance;
+    }
+
+    @Override
+    public long getMaxCnxmlDocSize() {
+        // NOTE(tal): if larger size is needed, can add compression in OrmModuleEntity.
+        return 800 * KB;
+    }
+
+    @Override
+    public long getMaxResourceMapDocSize() {
+        // This is stored in the OrmModuleEntity in addition to the CNXML doc.
+        return 100 * KB;
+    }
+
+    @Override
+    public long getMaxColxmlDocSize() {
+        return 500 * KB;
     }
 }

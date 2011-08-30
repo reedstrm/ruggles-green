@@ -404,7 +404,7 @@ import org.jdom.input.DOMBuilder;
         addHtmlContent(new Comment(simpleText));
         addHtmlContent(new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, "unhandled")
-                .setText(UNRECOGNIZED_CONTENT_MESSAGE + elem.getName()));
+                .setText(UNRECOGNIZED_CONTENT_MESSAGE + message));
     }
 
     /**

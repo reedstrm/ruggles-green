@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.servlets.migrators.ParallelModuleMigrator;
 
 import com.sun.syndication.propono.atom.client.ClientEntry;

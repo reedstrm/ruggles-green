@@ -67,10 +67,6 @@ public class ParallelCollectionMigrator {
         try {
             List<File> listOfModulesToUpload = getListOfModulesToBeUploaded(collectionLocation);
 
-            StringBuilder stringBuilder = new StringBuilder();
-
-            List<File> listOfFailedModules = Lists.newArrayList();
-
             List<ParallelModuleMigrator> listOfModuleMigrators = Lists.newArrayList();
             List<Thread> listOfThreads = Lists.newArrayList();
 

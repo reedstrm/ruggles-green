@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -49,18 +48,16 @@ import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
-import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 import org.jdom.JDOMException;
+
 import com.google.cloud.sql.jdbc.internal.Charsets;
 import com.google.common.base.Throwables;
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.impl.Atom10Parser;
-import com.sun.syndication.propono.atom.server.AtomRequest;
-import com.sun.syndication.propono.atom.server.AtomRequestImpl;
 
 /**
  * Servlet to Handle CNX Resources.
@@ -88,12 +85,7 @@ public class CnxAtomModuleServlet {
     @POST
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_MODULE_POST)
-    public Response createNewModule(@Context HttpServletRequest req,
-            @Context HttpServletResponse res) {
-        AtomRequest areq = new AtomRequestImpl(req);
-
-        // TODO(arjuns) : See better way of getting URL.
-        RepositoryRequestContext context = RepositoryUtils.getRepositoryContext();
+    public Response createNewModule(@Context HttpServletRequest req) {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
@@ -142,15 +134,11 @@ public class CnxAtomModuleServlet {
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response createNewModuleVersion(@Context HttpServletRequest req,
-            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String version) throws JDOMException, IOException {
         // TODO(arjuns) : Have check with VersionWrapper.
-
         // TODO(arjuns) : Handle exceptions.
-        AtomRequest areq = new AtomRequestImpl(req);
 
-        // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         Entry postedEntry = null;
@@ -238,16 +226,11 @@ public class CnxAtomModuleServlet {
     @Produces(CnxMediaTypes.TEXT_XML)
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response getModuleVersion(@Context HttpServletRequest req,
-            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) throws JAXBException,
             JDOMException, IOException {
         // TODO(arjuns) : Have check with VersionWrapper.
-
         // TODO(arjuns) : Handle exceptions.
-
-        AtomRequest areq = new AtomRequestImpl(req);
-        // TODO(arjuns) : get a better way to get the context.
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         final Integer versionInt;
@@ -308,8 +291,7 @@ public class CnxAtomModuleServlet {
     @GET
     @Produces(CnxMediaTypes.TEXT_XML)
     @Path(MODULE_VERSION_CNXML_URL)
-    public Response getModuleVersionXml(@Context HttpServletRequest req,
-            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+    public Response getModuleVersionXml(@PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) {
         // TODO(arjuns) : Have check with VersionWrapper.
 
@@ -339,8 +321,7 @@ public class CnxAtomModuleServlet {
     @GET
     @Produces(CnxMediaTypes.TEXT_XML)
     @Path(MODULE_VERSION_RESOURCE_MAPPING_URL)
-    public Response getModuleVersionResourceMapping(@Context HttpServletRequest req,
-            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+    public Response getModuleVersionResourceMapping(@PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) {
         // TODO(arjuns) : Have check with VersionWrapper.
 

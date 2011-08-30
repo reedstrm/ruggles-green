@@ -118,8 +118,6 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     // TODO(arjuns) : Move this test to other file.
     @Test
     public void testModuleMigrator() throws Exception {
-        File cnxml = new File(COLLECTION_LOCATION + CNX_MODULE_ID + "/index_auto_generated.cnxml");
-        String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
         ParallelModuleMigrator migrator =
             new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, CNX_MODULE_ID,
                 null /* aerModuleId */, null /*version*/);

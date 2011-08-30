@@ -135,9 +135,11 @@ public class RenderCollectionServlet {
     private static final String COLLECTION_PARAM = "collection";
     private static final String CONTENT_HTML_PARAM = "contentHtml";
     private static final String ID_PARAM = "id";
-    private static final String ITEMS_PARAM = "items";
+    private static final String MODULE_LINKS_PARAM = "moduleLinks";
     private static final String MODULE_LINK_TYPE = "module";
     private static final String MODULE_PARAM = "module";
+    private static final String MODULE_INDEX_PARAM = "moduleIndex";
+    private static final String MODULE_COUNT_PARAM = "moduleCount";
     private static final String NEXT_MODULE_PARAM = "nextModule";
     private static final String PREVIOUS_MODULE_PARAM = "previousModule";
     private static final String SUBCOLLECTION_TYPE = "subcollection";
@@ -309,13 +311,14 @@ public class RenderCollectionServlet {
                 CommonHack.parseXmlString(injector.getInstance(DocumentBuilder.class), collXml));
 
         // Ensure module is part of the collection
-        final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
-        if (currentModuleLink == null) {
+        final int moduleIndex = collection.getModuleIndex(moduleId);
+        if (moduleIndex == -1) {
             logger.log(Level.INFO, "Collection " + collectionId + " does not contain module "
                 + moduleId);
             // TODO(arjuns): Fix this.
             return Response.serverError().build();
         }
+        final ModuleLink currentModuleLink = collection.getModuleLinks().get(moduleIndex);
 
         ClientEntry moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleId, moduleVersion);
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
@@ -328,13 +331,10 @@ public class RenderCollectionServlet {
 
         final ModuleLink[] links = collection.getPreviousNext(moduleId);
         SoyData prevLink, nextLink;
-        final SoyListData items = new SoyListData();
         URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml = null;
         List<Actor> moduleAuthors;
-        final String moduleContentHtmlCacheKey =
-            "moduleContentHtml " + collectionId + " " + moduleId;
 
         RenderScope renderScope = injector.getInstance(RenderScope.class);
 
@@ -343,20 +343,12 @@ public class RenderCollectionServlet {
             renderScope.seed(Collection.class, collection);
             renderScope.seed(Module.class, module);
 
-            if (moduleContentHtml == null) {
-                logger.info("moduleContentHtml missed cache");
-                ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
-                moduleContentHtml = generator.generate(module);
-            }
+            final ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
+            moduleContentHtml = generator.generate(module);
 
             // Get collection title
             if (collection.getMetadata() != null) {
                 collectionTitle = collection.getMetadata().getTitle();
-            }
-
-            // Get collection items
-            for (CollectionItem item : collection.getItems()) {
-                items.add(convertCollectionItemToSoyData(item));
             }
 
             // Get next/previous links
@@ -391,8 +383,7 @@ public class RenderCollectionServlet {
                         ID_PARAM, collectionId,
                         VERSION_PARAM, collectionVersion.toString(),
                         URI_PARAM, getCollectionUri(collectionId, collectionVersion),
-                        TITLE_PARAM, collectionTitle,
-                        ITEMS_PARAM, items
+                        TITLE_PARAM, collectionTitle
                 ),
                 MODULE_PARAM, new SoyMapData(
                         ID_PARAM, moduleId,
@@ -401,6 +392,8 @@ public class RenderCollectionServlet {
                         AUTHORS_PARAM, Utils.convertActorListToSoyData(moduleAuthors),
                         CONTENT_HTML_PARAM, moduleContentHtml
                 ),
+                MODULE_INDEX_PARAM, moduleIndex,
+                MODULE_COUNT_PARAM, collection.getModuleLinks().size(),
                 PREVIOUS_MODULE_PARAM, prevLink,
                 NEXT_MODULE_PARAM, nextLink);
 

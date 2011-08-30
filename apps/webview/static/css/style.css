@@ -68,6 +68,20 @@ hgroup > h1.moduleTitle {
     margin-top: 0;
 }
 
+#sandbar {
+    color: white;
+    background: #555;
+    padding: 0.5ex 1em;
+}
+
+#sandbar a {
+    color: inherit;
+}
+
+#sandbar > * {
+    margin-right: 1em;
+}
+
 .collectionNavBar {
     display: table;
     table-layout: fixed;

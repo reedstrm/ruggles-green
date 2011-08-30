@@ -22,6 +22,7 @@
  *
  *  @param title Title of page (must not contain markup, just text)
  *  @param contentHtml Page content
+ *  @param? sandbarHtml Sandbar
  *  @param? headerHtml Header content (defaults to small logo)
  *  @param? javascriptHtml JavaScript imports
  */
@@ -47,6 +48,7 @@
             <a href="http://code.google.com/p/ruggles-green/issues/entry">Site Feedback</a>
         </div>
     </header>
+    {if $sandbarHtml}{$sandbarHtml|noAutoescape}{/if}
     <div id="contentArea">
         {$contentHtml|noAutoescape}
     </div>

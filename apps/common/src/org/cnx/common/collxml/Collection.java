@@ -105,16 +105,29 @@ public class Collection {
     /**
      *  This method finds the module link inside the collection.
      *
+     *  @return The index of module associated with the ID in the moduleLinks list, or -1 if not
+     *          found.
+     */
+    public int getModuleIndex(String moduleId) {
+        checkNotNull(moduleId);
+        int index = 0;
+        for (ModuleLink link : moduleLinks) {
+            if (moduleId.equals(link.getModuleId())) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    /**
+     *  This method finds the module link inside the collection.
+     *
      *  @return The module link associated with the ID, or null if not found.
      */
     public ModuleLink getModuleLink(String moduleId) {
-        checkNotNull(moduleId);
-        for (ModuleLink link : moduleLinks) {
-            if (moduleId.equals(link.getModuleId())) {
-                return link;
-            }
-        }
-        return null;
+        final int index = getModuleIndex(checkNotNull(moduleId));
+        return index >= 0 ? moduleLinks.get(index) : null;
     }
 
     /**

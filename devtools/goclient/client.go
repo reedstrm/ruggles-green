@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"flag"
+	"fmt"
 	"http"
 	"io"
 	"log"
@@ -13,7 +14,12 @@ import (
 	"xml"
 )
 
+var programName string
+
 func main() {
+	programName = filepath.Base(os.Args[0])
+	log.SetOutput(os.Stdout)
+
 	err := realMain()
 	if err != nil {
 		log.Fatal(err)
@@ -21,54 +27,71 @@ func main() {
 	os.Exit(0)
 }
 
-const cnxmlName = "index_auto_generated.cnxml"
-
 func realMain() (err os.Error) {
 	repo := Repository{
 		Client: http.DefaultClient,
 	}
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: %s [options] CNXML [RESOURCE [...]]\n", programName)
+		flag.PrintDefaults()
+	}
 	module := flag.String("module", "", "upload a new version of an existing module")
 	flag.StringVar(&repo.URL, "url", "http://cnx-repo.appspot.com/atompub", "base URL for repository")
 	flag.StringVar(&repo.ID, "repo-id", "cnx-repo", "repository ID")
 	flag.Parse()
 
-	if flag.NArg() != 1 {
-		return os.NewError("client takes 1 argument")
+	if flag.NArg() == 0 {
+		return fmt.Errorf("usage: %s takes 1 or more arguments", programName)
+	}
+
+	// Open CNXML file
+	cnxmlFile, err := os.Open(flag.Arg(0))
+	if err != nil {
+		return err
+	}
+	defer cnxmlFile.Close()
+
+	// Create module
+	var editURL string
+	if *module == "" {
+		editURL, err = repo.CreateModule()
+		if err != nil {
+			return err
+		}
+		log.Printf("created %s", editURL)
+	} else {
+		entry, err := repo.VersionInfo(*module, "latest")
+		if err != nil {
+			return err
+		}
+		editURL = entry.URL("edit")
+		log.Printf("using module %s, edit URL: %s", *module, editURL)
 	}
 
 	// Upload resources
+	log.Print("starting resource upload")
 	mapping := ResourceMapping{Version: "1"}
-	directory, err := os.Open(flag.Arg(0))
-	if err != nil {
-		return err
-	}
-	defer directory.Close()
-
-	fi, err := directory.Readdir(0)
-	if err != nil {
-		return err
-	}
-
 	resourceChan := make(chan Resource)
 	wg := new(sync.WaitGroup)
-	for _, info := range fi {
-		if info.IsRegular() && info.Name != cnxmlName && info.Name[0] != '.' {
-			if f, err := os.Open(filepath.Join(flag.Arg(0), info.Name)); err == nil {
-				wg.Add(1)
-				go func(name string, f *os.File) {
-					defer f.Close()
-					defer wg.Done()
-					r, err := uploadFile(&repo, name, f)
-					if err != nil {
-						log.Printf("error uploading %s: %v", name, err)
-						return
-					}
-					log.Printf("uploaded %s", name)
-					resourceChan <- r
-				}(info.Name, f)
-			}
+	for _, arg := range flag.Args()[1:] {
+		f, err := os.Open(arg)
+		if err != nil {
+			log.Printf("could not open %s: %v", arg, err)
+			continue
 		}
+		wg.Add(1)
+		go func(name string, f *os.File) {
+			defer f.Close()
+			defer wg.Done()
+			r, err := uploadFile(&repo, name, f)
+			if err != nil {
+				log.Printf("error uploading %s: %v", name, err)
+				return
+			}
+			log.Printf("uploaded %s", name)
+			resourceChan <- r
+		}(filepath.Base(arg), f)
 	}
 	go func() {
 		wg.Wait()
@@ -79,29 +102,8 @@ func realMain() (err os.Error) {
 		mapping.Resource = append(mapping.Resource, r)
 	}
 
-	// Create module
-	var editURL string
-	if *module == "" {
-		editURL, err = repo.CreateModule()
-		if err != nil {
-			return err
-		}
-		log.Printf("Created %s", editURL)
-	} else {
-		entry, err := repo.VersionInfo(*module, "latest")
-		if err != nil {
-			return err
-		}
-		editURL = entry.URL("edit")
-	}
-
 	// Upload version
-	log.Printf("Uploading to %s", editURL)
-	cnxmlFile, err := os.Open(filepath.Join(flag.Arg(0), cnxmlName))
-	if err != nil {
-		return err
-	}
-	defer cnxmlFile.Close()
+	log.Printf("uploading to %s", editURL)
 	return repo.UploadVersion(editURL, cnxmlFile, mapping)
 }
 

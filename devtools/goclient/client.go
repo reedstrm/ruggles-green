@@ -29,7 +29,7 @@ func realMain() (err os.Error) {
 	}
 
 	module := flag.String("module", "", "upload a new version of an existing module")
-	flag.StringVar(&repo.URL, "url", "http://100.cnx-repo.appspot.com/atompub", "base URL for repository")
+	flag.StringVar(&repo.URL, "url", "http://cnx-repo.appspot.com/atompub", "base URL for repository")
 	flag.StringVar(&repo.ID, "repo-id", "cnx-repo", "repository ID")
 	flag.Parse()
 

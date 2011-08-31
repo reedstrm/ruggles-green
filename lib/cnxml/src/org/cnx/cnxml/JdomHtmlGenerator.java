@@ -97,6 +97,7 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_SUBFIGURE_CLASS = "subfigure";
     private final static String HTML_FIGURE_VERTICAL_CLASS = "vertical";
     private final static String HTML_FIGURE_HORIZONTAL_CLASS = "horizontal";
+    private final static String HTML_LABELED_ITEM_LIST_CLASS = "labeled";
 
     private final static String CDF_MIME_TYPE = "application/vnd.wolfram.cdf";
     private final static String CDF_TEXT_MIME_TYPE = "application/vnd.wolfram.cdf.text";
@@ -804,6 +805,11 @@ import org.jdom.input.DOMBuilder;
                 htmlElem.setAttribute(HtmlAttributes.LIST_START_VALUE, startValue);
             }
             break;
+        case LABELED_ITEM:
+            htmlElem = new Element(HtmlTag.UNORDERED_LIST.getTag())
+                    .setAttribute(HtmlAttributes.CLASS, HTML_LABELED_ITEM_LIST_CLASS);
+            copyId(elem, htmlElem);
+            break;
         default:
             // TODO(light): gracefully handle other list types
             unrecognized(elem, elem.getName()
@@ -819,13 +825,26 @@ import org.jdom.input.DOMBuilder;
     }
 
     protected void generateListItem(final Element elem) {
+        final Element listElem = (Element)elem.getParent();
         final Element htmlElem = copyId(elem, new Element(HtmlTag.LIST_ITEM.getTag()));
         final GeneratorFrame parentFrame = stack.peek();
 
+        // Labeled item lists must copy the label element.
+        final CnxmlAttributes.ListType type = CnxmlAttributes.ListType.of(
+                listElem.getAttributeValue(CnxmlAttributes.LIST_TYPE),
+                CnxmlAttributes.ListType.BULLETED);
+        if (type == CnxmlAttributes.ListType.LABELED_ITEM) {
+            final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+            if (label != null) {
+                htmlElem.addContent(new Element(HtmlTag.SPAN.getTag())
+                        .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                        .setText(label));
+            }
+        }
+
         // If the list has an item separator and this is not the last item, then add the separator.
         if (parentFrame.iterator.hasNext()) {
-            final String itemSep = ((Element)elem.getParent())
-                    .getAttributeValue(CnxmlAttributes.LIST_ITEM_SEP);
+            final String itemSep = listElem.getAttributeValue(CnxmlAttributes.LIST_ITEM_SEP);
             if (itemSep != null) {
                 final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
                 parentFrame.htmlParent.addContent(htmlElem

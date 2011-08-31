@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import javax.annotation.Nullable;
 import org.cnx.mdml.Metadata;
-import org.w3c.dom.Document;
+import org.jdom.Document;
 
 /**
  *  A Collection is a POJO container for CollXML collections.

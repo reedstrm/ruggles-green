@@ -16,18 +16,20 @@
 
 package org.cnx.common.collxml;
 
+import static org.junit.Assert.*;
+
 import com.google.common.collect.ImmutableList;
-import org.cnx.util.DocumentBuilderProvider;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import static org.junit.Assert.*;
+
+import org.jdom.Document;
 
 public class CollectionTests {
     private Document collxml;
 
     @Before public void createDummyDocument() {
-        collxml = new DocumentBuilderProvider().get().newDocument();
+        collxml = new Document();
     }
 
     @Test public void hasModuleShouldNotFindMissingModule() {

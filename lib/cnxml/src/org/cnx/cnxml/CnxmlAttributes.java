@@ -16,9 +16,10 @@
 
 package org.cnx.cnxml;
 
-import java.util.EnumSet;
-import static com.google.common.base.Preconditions.checkNotNull;
 import javax.annotation.Nullable;
+
+import org.cnx.util.ValueEnum;
+import org.cnx.util.ValueEnums;
 
 /**
  *  CnxmlAttributes holds constants for all CNXML attributes.
@@ -29,6 +30,8 @@ public class CnxmlAttributes {
     public final static String LINK_URL = "url";
     public final static String LINK_TARGET_ID = "target-id";
     public final static String LINK_DOCUMENT = "document";
+    public final static String LINK_RESOURCE = "resource";
+    public final static String LINK_VERSION = "version";
     public final static String EFFECT = "effect";
     public final static String DISPLAY = "display";
     public final static String LIST_ITEM_SEP = "item-sep";
@@ -38,10 +41,9 @@ public class CnxmlAttributes {
     public final static String NEWLINE_COUNT = "count";
     public final static String NEWLINE_EFFECT = "effect";
     public final static String MEDIA_ALT = "alt";
-    public final static String IMAGE_SOURCE = "src";
+    public final static String MEDIA_CHILD_SOURCE = "src";
     public final static String IMAGE_WIDTH = "width";
     public final static String IMAGE_HEIGHT = "height";
-    public final static String OBJECT_SOURCE = "src";
     public final static String OBJECT_TYPE = "mime-type";
     public final static String OBJECT_WIDTH = "width";
     public final static String OBJECT_HEIGHT = "height";
@@ -53,24 +55,6 @@ public class CnxmlAttributes {
     public final static String CALS_COLSEP = "colsep";
     public final static String CALS_ROWSEP = "rowsep";
     public final static String CALS_FRAME = "frame";
-
-    private static interface ValueEnum {
-        public String getValue();
-    }
-
-    private static <E extends Enum<E>> E findEnum(final Class<E> enumClass,
-            @Nullable final String value, @Nullable final E defaultEnum) {
-        checkNotNull(enumClass);
-        if (value == null) {
-            return defaultEnum;
-        }
-        for (E v : EnumSet.allOf(enumClass)) {
-            if (((ValueEnum)v).getValue().equals(value)) {
-                return v;
-            }
-        }
-        return defaultEnum;
-    }
 
     public static enum EmphasisEffect implements ValueEnum {
         BOLD("bold"),
@@ -90,12 +74,12 @@ public class CnxmlAttributes {
         }
 
         public static EmphasisEffect of(@Nullable final String value) {
-            return findEnum(EmphasisEffect.class, value, null);
+            return ValueEnums.findEnum(EmphasisEffect.class, value, null);
         }
 
         public static EmphasisEffect of(@Nullable final String value,
                 @Nullable final EmphasisEffect defaultValue) {
-            return findEnum(EmphasisEffect.class, value, defaultValue);
+            return ValueEnums.findEnum(EmphasisEffect.class, value, defaultValue);
         }
     }
 
@@ -115,12 +99,12 @@ public class CnxmlAttributes {
         }
 
         public static Display of(@Nullable final String value) {
-            return findEnum(Display.class, value, null);
+            return ValueEnums.findEnum(Display.class, value, null);
         }
 
         public static Display of(@Nullable final String value,
                 @Nullable final Display defaultValue) {
-            return findEnum(Display.class, value, defaultValue);
+            return ValueEnums.findEnum(Display.class, value, defaultValue);
         }
     }
 
@@ -142,12 +126,12 @@ public class CnxmlAttributes {
         }
 
         public static NoteType of(@Nullable final String value) {
-            return findEnum(NoteType.class, value, null);
+            return ValueEnums.findEnum(NoteType.class, value, null);
         }
 
         public static NoteType of(@Nullable final String value,
                 @Nullable final NoteType defaultValue) {
-            return findEnum(NoteType.class, value, defaultValue);
+            return ValueEnums.findEnum(NoteType.class, value, defaultValue);
         }
     }
 
@@ -170,12 +154,12 @@ public class CnxmlAttributes {
         }
 
         public static RuleType of(@Nullable final String value) {
-            return findEnum(RuleType.class, value, null);
+            return ValueEnums.findEnum(RuleType.class, value, null);
         }
 
         public static RuleType of(@Nullable final String value,
                 @Nullable final RuleType defaultValue) {
-            return findEnum(RuleType.class, value, defaultValue);
+            return ValueEnums.findEnum(RuleType.class, value, defaultValue);
         }
     }
 
@@ -195,12 +179,12 @@ public class CnxmlAttributes {
         }
 
         public static ListType of(@Nullable final String value) {
-            return findEnum(ListType.class, value, null);
+            return ValueEnums.findEnum(ListType.class, value, null);
         }
 
         public static ListType of(@Nullable final String value,
                 @Nullable final ListType defaultValue) {
-            return findEnum(ListType.class, value, defaultValue);
+            return ValueEnums.findEnum(ListType.class, value, defaultValue);
         }
     }
 
@@ -219,12 +203,12 @@ public class CnxmlAttributes {
         }
 
         public static NewlineEffect of(@Nullable final String value) {
-            return findEnum(NewlineEffect.class, value, null);
+            return ValueEnums.findEnum(NewlineEffect.class, value, null);
         }
 
         public static NewlineEffect of(@Nullable final String value,
                 @Nullable final NewlineEffect defaultValue) {
-            return findEnum(NewlineEffect.class, value, defaultValue);
+            return ValueEnums.findEnum(NewlineEffect.class, value, defaultValue);
         }
     }
 
@@ -245,12 +229,12 @@ public class CnxmlAttributes {
         }
 
         public static MediaChildFor of(@Nullable final String value) {
-            return findEnum(MediaChildFor.class, value, null);
+            return ValueEnums.findEnum(MediaChildFor.class, value, null);
         }
 
         public static MediaChildFor of(@Nullable final String value,
                 @Nullable final MediaChildFor defaultValue) {
-            return findEnum(MediaChildFor.class, value, defaultValue);
+            return ValueEnums.findEnum(MediaChildFor.class, value, defaultValue);
         }
     }
 
@@ -269,12 +253,12 @@ public class CnxmlAttributes {
         }
 
         public static FigureOrientation of(@Nullable final String value) {
-            return findEnum(FigureOrientation.class, value, null);
+            return ValueEnums.findEnum(FigureOrientation.class, value, null);
         }
 
         public static FigureOrientation of(@Nullable final String value,
                 @Nullable final FigureOrientation defaultValue) {
-            return findEnum(FigureOrientation.class, value, defaultValue);
+            return ValueEnums.findEnum(FigureOrientation.class, value, defaultValue);
         }
     }
 
@@ -295,12 +279,12 @@ public class CnxmlAttributes {
         }
 
         public static CalsAlign of(@Nullable final String value) {
-            return findEnum(CalsAlign.class, value, null);
+            return ValueEnums.findEnum(CalsAlign.class, value, null);
         }
 
         public static CalsAlign of(@Nullable final String value,
                 @Nullable final CalsAlign defaultValue) {
-            return findEnum(CalsAlign.class, value, defaultValue);
+            return ValueEnums.findEnum(CalsAlign.class, value, defaultValue);
         }
     }
 
@@ -320,12 +304,12 @@ public class CnxmlAttributes {
         }
 
         public static CalsVerticalAlign of(@Nullable final String value) {
-            return findEnum(CalsVerticalAlign.class, value, null);
+            return ValueEnums.findEnum(CalsVerticalAlign.class, value, null);
         }
 
         public static CalsVerticalAlign of(@Nullable final String value,
                 @Nullable final CalsVerticalAlign defaultValue) {
-            return findEnum(CalsVerticalAlign.class, value, defaultValue);
+            return ValueEnums.findEnum(CalsVerticalAlign.class, value, defaultValue);
         }
     }
 
@@ -349,12 +333,12 @@ public class CnxmlAttributes {
         }
 
         public static CalsFrame of(@Nullable final String value) {
-            return findEnum(CalsFrame.class, value, null);
+            return ValueEnums.findEnum(CalsFrame.class, value, null);
         }
 
         public static CalsFrame of(@Nullable final String value,
                 @Nullable final CalsFrame defaultValue) {
-            return findEnum(CalsFrame.class, value, defaultValue);
+            return ValueEnums.findEnum(CalsFrame.class, value, defaultValue);
         }
     }
 }

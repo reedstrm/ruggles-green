@@ -36,7 +36,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.SAXParser;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.Module;
@@ -90,15 +90,17 @@ public class RenderModuleServlet {
     static final String MODULE_VERSION_RESOURCES_URL_PATTERN = MODULE_VERSION_URL_PATTERN
         + END_URL_RESOURCES;
 
+    private final SAXParser saxParser;
     // TODO(arjuns) : Move this to a better place.
-    private CnxAtomPubClient cnxClient;
-    private WebViewConfiguration configuration;
+    private final CnxAtomPubClient cnxClient;
+    private final WebViewConfiguration configuration;
 
     public RenderModuleServlet(@Context ServletContext context) {
         URL url = null;
         try {
             injector = (Injector) context.getAttribute(Injector.class.getName());
             configuration = injector.getInstance(WebViewConfiguration.class);
+            saxParser = injector.getInstance(SAXParser.class);
             url = new URL(configuration.getRepositoryAtomPubUrl());
             cnxClient = new CnxAtomPubClient(url);
 
@@ -133,9 +135,8 @@ public class RenderModuleServlet {
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);
             String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-            Module module =
-                injector.getInstance(ModuleFactory.class).create(moduleId,
-                    CommonHack.parseXmlString(injector.getInstance(DocumentBuilder.class), cnxml),
+            final Module module = injector.getInstance(ModuleFactory.class).create(moduleId,
+                    CommonHack.parseXmlString(saxParser, cnxml),
                     CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
             RenderScope renderScope = injector.getInstance(RenderScope.class);

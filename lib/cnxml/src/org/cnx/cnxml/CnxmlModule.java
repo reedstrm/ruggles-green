@@ -41,9 +41,6 @@ public class CnxmlModule extends AbstractModule {
     @Override protected void configure() {
         bind(ModuleFactory.class).to(ModuleFactoryImpl.class);
         bind(ModuleHTMLGenerator.class).to(JdomHtmlGenerator.class).in(RenderTime.class);
-        bind(String.class)
-                .annotatedWith(CnxmlNamespace.class)
-                .toInstance("http://cnx.rice.edu/cnxml");
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);

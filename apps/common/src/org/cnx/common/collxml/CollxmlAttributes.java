@@ -14,17 +14,12 @@
  *  limitations under the License.
  */
 
-package org.cnx.cnxml;
+package org.cnx.common.collxml;
 
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-@BindingAnnotation
-@Target({ FIELD, PARAMETER, METHOD })
-@Retention(RUNTIME)
-public @interface CnxmlNamespace {}
+/**
+ *  CollxmlTag holds constants for all CollXML attributes.
+ */
+public class CollxmlAttributes {
+    public static final String MODULE_DOCUMENT = "document";
+    public static final String MODULE_VERSION = "version";
+}

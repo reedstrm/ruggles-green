@@ -17,7 +17,8 @@
 package org.cnx.util;
 
 import com.google.inject.AbstractModule;
-import javax.xml.parsers.DocumentBuilder;
+
+import javax.xml.parsers.SAXParser;
 import javax.xml.transform.TransformerFactory;
 
 /**
@@ -25,12 +26,10 @@ import javax.xml.transform.TransformerFactory;
  */
 public class UtilModule extends AbstractModule {
     @Override protected void configure() {
-        bind(DocumentBuilder.class)
-                .toProvider(DocumentBuilderProvider.class)
-                .asEagerSingleton();
         bind(TransformerFactory.class)
                 .toProvider(TransformerFactoryProvider.class)
                 .asEagerSingleton();
+        bind(SAXParser.class).toProvider(SAXParserProvider.class);
 
         RenderScope scope = new RenderScope();
         bindScope(RenderTime.class, scope);

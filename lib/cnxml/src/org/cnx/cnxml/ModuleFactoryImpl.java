@@ -17,31 +17,29 @@
 package org.cnx.cnxml;
 
 import com.google.inject.Inject;
+
 import org.cnx.mdml.Metadata;
 import org.cnx.mdml.MdmlMetadata;
 import org.cnx.resourcemapping.Resources;
-import org.cnx.util.DOMUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.jdom.Document;
+import org.jdom.Element;
 
 public class ModuleFactoryImpl implements ModuleFactory {
-    private static final String METADATA_TAG_NAME = "metadata";
     private final MdmlMetadata.Factory metadataFactory;
-    private final String cnxmlNamespace;
 
-    @Inject public ModuleFactoryImpl(MdmlMetadata.Factory metadataFactory,
-            @CnxmlNamespace String cnxmlNamespace) {
+    @Inject public ModuleFactoryImpl(MdmlMetadata.Factory metadataFactory) {
         this.metadataFactory = metadataFactory;
-        this.cnxmlNamespace = cnxmlNamespace;
     }
 
-    @Override public Module create(String id, Document cnxml, Resources resources) {
+    @Override
+    public Module create(String id, Document cnxml, Resources resources) {
         Metadata metadata = null;
-        Element elem = DOMUtils.findFirstChild(cnxml.getDocumentElement(),
-                cnxmlNamespace, METADATA_TAG_NAME);
+        final Element elem = cnxml.getRootElement()
+                .getChild(CnxmlTag.METADATA.getTag(), CnxmlTag.NAMESPACE);
         if (elem != null) {
             metadata = metadataFactory.create(elem);
         }
-        return new Module(id, cnxml, resources, metadata, cnxmlNamespace);
+        return new Module(id, cnxml, resources, metadata);
     }
 }

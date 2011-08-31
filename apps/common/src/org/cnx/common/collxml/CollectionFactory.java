@@ -16,7 +16,7 @@
 
 package org.cnx.common.collxml;
 
-import org.w3c.dom.Document;
+import org.jdom.Document;
 
 public interface CollectionFactory {
     public Collection create(String id, Document collxml);

@@ -46,7 +46,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.SAXParser;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.LinkResolver;
@@ -150,6 +150,7 @@ public class RenderCollectionServlet {
     private final Injector injector;
     private final WebViewConfiguration configuration;
     private final Provider<LinkResolver> linkResolverProvider;
+    private final SAXParser saxParser;
     // TODO(arjuns) : Move this to a better place.
     private final CnxAtomPubClient cnxClient;
 
@@ -159,6 +160,7 @@ public class RenderCollectionServlet {
             injector = (Injector) context.getAttribute(Injector.class.getName());
             linkResolverProvider = injector.getProvider(LinkResolver.class);
             configuration = injector.getInstance(WebViewConfiguration.class);
+            saxParser = injector.getInstance(SAXParser.class);
             url = new URL(configuration.getRepositoryAtomPubUrl());
             cnxClient = new CnxAtomPubClient(url);
         } catch (Exception e) {
@@ -191,9 +193,8 @@ public class RenderCollectionServlet {
             cnxClient.getConstants()
                 .getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
 
-        Collection collection =
-            injector.getInstance(CollectionFactory.class).create(collectionId,
-                CommonHack.parseXmlString(injector.getInstance(DocumentBuilder.class), collXml));
+        final Collection collection = injector.getInstance(CollectionFactory.class)
+                .create(collectionId, CommonHack.parseXmlString(saxParser, collXml));
         // Get metadata
         String title = "", abstractText = null;
         List<Actor> authors = null;
@@ -306,9 +307,8 @@ public class RenderCollectionServlet {
             cnxClient.getConstants()
                 .getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
 
-        Collection collection =
-            injector.getInstance(CollectionFactory.class).create(collectionId,
-                CommonHack.parseXmlString(injector.getInstance(DocumentBuilder.class), collXml));
+        final Collection collection = injector.getInstance(CollectionFactory.class)
+                .create(collectionId, CommonHack.parseXmlString(saxParser, collXml));
 
         // Ensure module is part of the collection
         final int moduleIndex = collection.getModuleIndex(moduleId);
@@ -324,9 +324,8 @@ public class RenderCollectionServlet {
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
         String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-        Module module =
-            injector.getInstance(ModuleFactory.class).create(moduleId,
-                CommonHack.parseXmlString(injector.getInstance(DocumentBuilder.class), cnxml),
+        final Module module = injector.getInstance(ModuleFactory.class).create(moduleId,
+                CommonHack.parseXmlString(saxParser, cnxml),
                 CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
         final ModuleLink[] links = collection.getPreviousNext(moduleId);

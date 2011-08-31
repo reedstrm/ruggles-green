@@ -24,29 +24,29 @@ import javax.annotation.Nullable;
  */
 public class Person extends Actor {
     private final String firstName;
-    private final String surname;
+    private final String lastName;
 
-    public Person(String fullName, String firstName, String surname) {
-        this(fullName, firstName, surname, null, null);
+    public Person(String fullName, String firstName, String lastName) {
+        this(fullName, firstName, lastName, null, null);
     }
 
-    public Person(String fullName, String firstName, String surname, @Nullable String emailAddress,
+    public Person(String fullName, String firstName, String lastName, @Nullable String emailAddress,
             @Nullable String homepage) {
         super(fullName, emailAddress, homepage);
         this.firstName = firstName;
-        this.surname = surname;
+        this.lastName = lastName;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
     public int hashCode() {
-        return Objects.hashCode(firstName, surname, super.hashCode());
+        return Objects.hashCode(firstName, lastName, super.hashCode());
     }
 
     public boolean equals(Object o) {
@@ -59,7 +59,6 @@ public class Person extends Actor {
 
         // If Actor says we're equal, then the classes are identical.
         Person other = (Person)o;
-        return Objects.equal(firstName, other.firstName)
-                && Objects.equal(surname, other.surname);
+        return Objects.equal(firstName, other.firstName) && Objects.equal(lastName, other.lastName);
     }
 }

@@ -45,7 +45,7 @@ public class Utils {
                 "type", "person",
                 "fullName", person.getFullName(),
                 "firstName", person.getFirstName(),
-                "surname", person.getSurname(),
+                "lastName", person.getLastName(),
                 "emailAddress", person.getEmailAddress(),
                 "homepage", person.getHomepage()
         );

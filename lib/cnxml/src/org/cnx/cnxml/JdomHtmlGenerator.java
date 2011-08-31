@@ -132,7 +132,6 @@ import org.jdom.input.DOMBuilder;
 
     private final ImmutableSet<Processor> processors;
     private final JdomHtmlSerializer jdomHtmlSerializer;
-    private final Namespace cnxmlNamespace;
     private Stack<GeneratorFrame> stack;
     private Counter counter;
     private final MediaElementFilter mediaFilter;
@@ -169,16 +168,10 @@ import org.jdom.input.DOMBuilder;
      *  Examples of elements yielded are image, flash, and object.
      */
     private static class MediaElementFilter implements Filter {
-        private final Namespace cnxmlNamespace;
-
-        public MediaElementFilter(final Namespace cnxmlNamespace) {
-            this.cnxmlNamespace = checkNotNull(cnxmlNamespace);
-        }
-
         @Override public boolean matches(Object obj) {
             if (obj instanceof Element) {
                 final Element elem = (Element)obj;
-                return cnxmlNamespace.getURI().equals(elem.getNamespaceURI())
+                return CnxmlTag.NAMESPACE_URI.equals(elem.getNamespaceURI())
                         && CnxmlTag.MEDIA_CHILDREN.contains(CnxmlTag.of(elem.getName()));
             }
             return false;
@@ -186,11 +179,10 @@ import org.jdom.input.DOMBuilder;
     }
 
     @Inject public JdomHtmlGenerator(Set<Processor> processors,
-            JdomHtmlSerializer jdomHtmlSerializer, @CnxmlNamespace String cnxmlNamespace) {
+            JdomHtmlSerializer jdomHtmlSerializer) {
         this.processors = ImmutableSet.copyOf(processors);
         this.jdomHtmlSerializer = jdomHtmlSerializer;
-        this.cnxmlNamespace = Namespace.getNamespace(cnxmlNamespace);
-        this.mediaFilter = new MediaElementFilter(this.cnxmlNamespace);
+        this.mediaFilter = new MediaElementFilter();
     }
 
     @Override public String generate(Module module) throws Exception {
@@ -209,10 +201,8 @@ import org.jdom.input.DOMBuilder;
         startTime = System.currentTimeMillis();
 
         // Convert to JDOM
-        // TODO(light): don't use DOMBuilder: it uses recursion
-        final Document jdomDocument = new DOMBuilder().build(module.getCnxml());
-        final Element contentElem = jdomDocument.getRootElement()
-                .getChild(CnxmlTag.CONTENT.getTag(), cnxmlNamespace);
+        final Element contentElem = module.getCnxml().getRootElement()
+                .getChild(CnxmlTag.CONTENT.getTag(), CnxmlTag.NAMESPACE);
         if (contentElem == null) {
             return "";
         }
@@ -277,7 +267,7 @@ import org.jdom.input.DOMBuilder;
         final GeneratorFrame frame = stack.peek();
         final String name = elem.getName();
 
-        if (cnxmlNamespace.getURI().equals(elem.getNamespaceURI())) {
+        if (CnxmlTag.NAMESPACE.getURI().equals(elem.getNamespaceURI())) {
             switch (CnxmlTag.of(name)) {
             case PARAGRAPH:
                 generateParagraph(elem);
@@ -434,7 +424,7 @@ import org.jdom.input.DOMBuilder;
 
     protected void generateParagraph(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.PARAGRAPH.getTag()));
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
                     .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
@@ -445,7 +435,7 @@ import org.jdom.input.DOMBuilder;
 
     protected void generateSection(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.SECTION.getTag()));
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             htmlElem.addContent(new Element(HtmlTag.HEADING.getTag()).setText(title));
         }
@@ -554,7 +544,7 @@ import org.jdom.input.DOMBuilder;
                 .setAttribute(HtmlAttributes.CLASS, HTML_NOTE_CLASS);
         copyId(elem, htmlElem);
 
-        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
             final CnxmlAttributes.NoteType type = CnxmlAttributes.NoteType.of(
                     elem.getAttributeValue(CnxmlAttributes.TYPE),
@@ -580,7 +570,7 @@ import org.jdom.input.DOMBuilder;
 
         final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             htmlTitleElem.setText(label + ": " + title);
         } else {
@@ -601,14 +591,14 @@ import org.jdom.input.DOMBuilder;
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, className));
 
-        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
             label = defaultLabel;
         }
 
         final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
         if (title != null) {
             htmlTitleElem.setText(label + " " + number + ": " + title);
@@ -625,9 +615,9 @@ import org.jdom.input.DOMBuilder;
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_DEFINITION_CLASS));
 
-        final Element term = elem.getChild(CnxmlTag.TERM.getTag(), cnxmlNamespace);
+        final Element term = elem.getChild(CnxmlTag.TERM.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
-        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
             label = DEFINITION_LABEL;
         }
@@ -647,7 +637,7 @@ import org.jdom.input.DOMBuilder;
             @Override public boolean matches(Object obj) {
                 if (obj instanceof Element) {
                     final Element elem = (Element)obj;
-                    return !(cnxmlNamespace.getURI().equals(elem.getNamespaceURI())
+                    return !(CnxmlTag.NAMESPACE.getURI().equals(elem.getNamespaceURI())
                             && CnxmlTag.TERM.getTag().equals(elem.getName()));
                 }
                 return true;
@@ -686,7 +676,7 @@ import org.jdom.input.DOMBuilder;
     }
 
     protected void generateFigure(final Element elem) {
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
                     .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
@@ -694,7 +684,7 @@ import org.jdom.input.DOMBuilder;
         }
 
         final Element htmlElem = copyId(elem, new Element(HtmlTag.FIGURE.getTag()));
-        if (elem.getChild(CnxmlTag.SUBFIGURE.getTag(), cnxmlNamespace) != null) {
+        if (elem.getChild(CnxmlTag.SUBFIGURE.getTag(), CnxmlTag.NAMESPACE) != null) {
             final CnxmlAttributes.FigureOrientation orient = CnxmlAttributes.FigureOrientation.of(
                     elem.getAttributeValue(CnxmlAttributes.FIGURE_ORIENT),
                     CnxmlAttributes.FigureOrientation.HORIZONTAL);
@@ -709,8 +699,9 @@ import org.jdom.input.DOMBuilder;
         }
 
         final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
-        final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
-        final String caption = elem.getChildText(CnxmlTag.FIGURE_CAPTION.getTag(), cnxmlNamespace);
+        final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
+        final String caption = elem.getChildText(
+                CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
         htmlCaptionElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
         if (caption != null) {
@@ -834,7 +825,7 @@ import org.jdom.input.DOMBuilder;
                 listElem.getAttributeValue(CnxmlAttributes.LIST_TYPE),
                 CnxmlAttributes.ListType.BULLETED);
         if (type == CnxmlAttributes.ListType.LABELED_ITEM) {
-            final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+            final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
             if (label != null) {
                 htmlElem.addContent(new Element(HtmlTag.SPAN.getTag())
                         .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
@@ -962,7 +953,7 @@ import org.jdom.input.DOMBuilder;
                 .setAttribute(HtmlAttributes.IMAGE_ALT,
                         mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT))
                 .setAttribute(HtmlAttributes.IMAGE_SOURCE,
-                        elem.getAttributeValue(CnxmlAttributes.IMAGE_SOURCE));
+                        elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE));
         final String width = elem.getAttributeValue(CnxmlAttributes.IMAGE_WIDTH);
         if (width != null) {
             htmlElem.setAttribute(HtmlAttributes.IMAGE_WIDTH, width);
@@ -978,7 +969,7 @@ import org.jdom.input.DOMBuilder;
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.OBJECT.getTag()))
                 .setAttribute(HtmlAttributes.OBJECT_SOURCE,
-                        elem.getAttributeValue(CnxmlAttributes.OBJECT_SOURCE))
+                        elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
                 .setAttribute(HtmlAttributes.OBJECT_TYPE,
                         elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE));
         final String width = elem.getAttributeValue(CnxmlAttributes.OBJECT_WIDTH);
@@ -996,7 +987,7 @@ import org.jdom.input.DOMBuilder;
     protected void generateMathematica(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final String type = elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE);
-        final String source = elem.getAttributeValue(CnxmlAttributes.OBJECT_SOURCE);
+        final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
         final String width = elem.getAttributeValue(CnxmlAttributes.OBJECT_WIDTH);
         final String height = elem.getAttributeValue(CnxmlAttributes.OBJECT_HEIGHT);
 
@@ -1029,7 +1020,7 @@ import org.jdom.input.DOMBuilder;
 
     // TODO(light): allow multiple tgroups
     protected void generateTable(final Element elem) {
-        final Element tgroup = elem.getChild(CnxmlTag.TABLE_GROUP.getTag(), cnxmlNamespace);
+        final Element tgroup = elem.getChild(CnxmlTag.TABLE_GROUP.getTag(), CnxmlTag.NAMESPACE);
         final Element htmlElem = copyId(elem, new Element(HtmlTag.TABLE.getTag()));
 
         final List<String> classList = computeTableClasses(tgroup);
@@ -1069,7 +1060,7 @@ import org.jdom.input.DOMBuilder;
         pushTablePart(tgroup, CnxmlTag.TABLE_HEAD, htmlElem, HtmlTag.TABLE_HEAD);
 
         final Element htmlCaptionElem = new Element(HtmlTag.TABLE_CAPTION.getTag());
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         final String summary = elem.getAttributeValue(CnxmlAttributes.CALS_TABLE_SUMMARY);
         final int number = getNumber(elem);
 
@@ -1090,7 +1081,7 @@ import org.jdom.input.DOMBuilder;
 
     protected void pushTablePart(final Element tableGroupElem, final CnxmlTag cnxmlTag,
             final Element htmlTableElem, final HtmlTag htmlTag) {
-        final Element elem = tableGroupElem.getChild(cnxmlTag.getTag(), cnxmlNamespace);
+        final Element elem = tableGroupElem.getChild(cnxmlTag.getTag(), CnxmlTag.NAMESPACE);
         if (elem == null) {
             return;
         }

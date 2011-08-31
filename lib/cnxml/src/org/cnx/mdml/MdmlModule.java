@@ -24,9 +24,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
  */
 public class MdmlModule extends AbstractModule {
     @Override protected void configure() {
-        bind(String.class)
-                .annotatedWith(MdmlNamespace.class)
-                .toInstance("http://cnx.rice.edu/mdml");
         install(new FactoryModuleBuilder()
                 .implement(MdmlMetadata.class, MdmlMetadata.class)
                 .build(MdmlMetadata.Factory.class));

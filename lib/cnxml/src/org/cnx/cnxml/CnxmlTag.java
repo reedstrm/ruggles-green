@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.base.Objects;
 
 import javax.annotation.Nullable;
+import org.jdom.Namespace;
 
 /**
  *  CnxmlTag holds constants for all CNXML elements.
@@ -27,51 +28,59 @@ import javax.annotation.Nullable;
 public enum CnxmlTag {
     INVALID(null),
 
-    CONTENT("content"),
-    TITLE("title"),
-    LABEL("label"),
-    PARAGRAPH("para"),
-    SECTION("section"),
-    EMPHASIS("emphasis"),
-    LINK("link"),
-    FOREIGN("foreign"),
-    TERM("term"),
-    SUP("sup"),
-    SUB("sub"),
-    PREFORMAT("preformat"),
+    APPLET("java-applet"),
+    AUDIO("audio"),
     CODE("code"),
-    NOTE("note"),
-    DEFINITION("definition"),
-    MEANING("meaning"),
-    EXERCISE("exercise"),
     COMMENTARY("commentary"),
-    PROBLEM("problem"),
-    SOLUTION("solution"),
+    CONTENT("content"),
+    DEFINITION("definition"),
+    DOWNLOAD("download"),
+    EMPHASIS("emphasis"),
     EQUATION("equation"),
-    RULE("rule"),
-    STATEMENT("statement"),
-    PROOF("proof"),
     EXAMPLE("example"),
-    LIST("list"),
-    LIST_ITEM("item"),
-    NEWLINE("newline"),
-    MEDIA("media"),
-    FLASH("flash"),
-    IMAGE("image"),
-    OBJECT("object"),
-    LABVIEW("labview"),
+    EXERCISE("exercise"),
     FIGURE("figure"),
     FIGURE_CAPTION("caption"),
+    FLASH("flash"),
+    FOREIGN("foreign"),
+    IMAGE("image"),
+    LABEL("label"),
+    LABVIEW("labview"),
+    LINK("link"),
+    LIST("list"),
+    LIST_ITEM("item"),
+    MEANING("meaning"),
+    MEDIA("media"),
+    METADATA("metadata"),
+    NEWLINE("newline"),
+    NOTE("note"),
+    OBJECT("object"),
+    PARAGRAPH("para"),
+    PREFORMAT("preformat"),
+    PROBLEM("problem"),
+    PROOF("proof"),
+    RULE("rule"),
+    SECTION("section"),
+    SOLUTION("solution"),
+    STATEMENT("statement"),
+    SUB("sub"),
     SUBFIGURE("subfigure"),
+    SUP("sup"),
     TABLE("table"),
-    TABLE_GROUP("tgroup"),
-    TABLE_ROW("row"),
-    TABLE_CELL("entry"),
-    TABLE_HEAD("thead"),
     TABLE_BODY("tbody"),
-    TABLE_FOOT("tfoot");
+    TABLE_CELL("entry"),
+    TABLE_FOOT("tfoot"),
+    TABLE_GROUP("tgroup"),
+    TABLE_HEAD("thead"),
+    TABLE_ROW("row"),
+    TERM("term"),
+    TITLE("title"),
+    VIDEO("video");
 
     private final String tag;
+
+    public static final String NAMESPACE_URI = "http://cnx.rice.edu/cnxml";
+    public static final Namespace NAMESPACE = Namespace.getNamespace(NAMESPACE_URI);
 
     private CnxmlTag(@Nullable String tag) {
         this.tag = tag;
@@ -98,8 +107,12 @@ public enum CnxmlTag {
     }
 
     public final static ImmutableSet<CnxmlTag> MEDIA_CHILDREN = ImmutableSet.of(
+            APPLET,
+            AUDIO,
+            DOWNLOAD,
             FLASH,
             IMAGE,
+            LABVIEW,
             OBJECT,
-            LABVIEW);
+            VIDEO);
 }

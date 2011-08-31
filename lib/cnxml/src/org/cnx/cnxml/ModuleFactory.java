@@ -17,7 +17,7 @@
 package org.cnx.cnxml;
 
 import org.cnx.resourcemapping.Resources;
-import org.w3c.dom.Document;
+import org.jdom.Document;
 
 public interface ModuleFactory {
     public Module create(String id, Document cnxml, Resources resources);

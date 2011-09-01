@@ -23,8 +23,30 @@ import javax.annotation.Nullable;
  *  A LinkResolver looks up abstract links and returns URIs.
  */
 public interface LinkResolver {
-    public URI resolveURI(URI uri) throws Exception;
-    public URI resolveDocument(String document, @Nullable String version) throws Exception;
-    public URI resolveResource(@Nullable String document, @Nullable String version, String resource)
+    /**
+     *  Resolve a URI into another URI.
+     *  <p>
+     *  URIs may be any valid URI.  Returning the argument is always acceptable.
+     */
+    public URI resolveUri(URI uri) throws Exception;
+
+    /**
+     *  Resolve a document into a URI.
+     *  <p>
+     *  One of the parameters will not be null.
+     *
+     *  @param document A document identifier
+     *  @param version A version string
+     */
+    public URI resolveDocument(@Nullable String document, @Nullable String version) throws Exception;
+
+    /**
+     *  Resolve a resource into a URI.
+     *
+     *  @param document A document identifier
+     *  @param version A version string
+     *  @param resource A relative URI for the resource
+     */
+    public URI resolveResource(@Nullable String document, @Nullable String version, URI resource)
             throws Exception;
 }

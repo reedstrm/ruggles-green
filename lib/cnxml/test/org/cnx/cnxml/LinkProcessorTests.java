@@ -35,7 +35,7 @@ public class LinkProcessorTests {
     private LinkProcessor processor;
 
     private static class MockLinkResolver implements LinkResolver {
-        @Override public URI resolveURI(URI uri) throws Exception {
+        @Override public URI resolveUri(URI uri) throws Exception {
             return new URI("test", "uri", uri.toString());
         }
 
@@ -47,16 +47,16 @@ public class LinkProcessorTests {
             return new URI("document", document, version);
         }
 
-        @Override public URI resolveResource(String document, String version, String resource)
+        @Override public URI resolveResource(String document, String version, URI resource)
                 throws Exception {
             assert resource != null;
             if (document == null) {
                 document = "current";
             }
             if (version == null) {
-                return new URI("resource", document, resource);
+                return new URI("resource", document, resource.toString());
             } else {
-                return new URI("resource", document + ":" + version, resource);
+                return new URI("resource", document + ":" + version, resource.toString());
             }
         }
     }

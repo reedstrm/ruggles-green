@@ -42,6 +42,8 @@ import org.jdom.filter.ElementFilter;
 public class LinkProcessor implements Processor {
     private static final Logger logger = Logger.getLogger(LinkProcessor.class.getName());
 
+    private static final String FRAGMENT = "#";
+
     private static final ImmutableSet<CnxmlTag> LINK_TAGS = ImmutableSet.of(
             CnxmlTag.FOREIGN,
             CnxmlTag.LINK,
@@ -83,10 +85,12 @@ public class LinkProcessor implements Processor {
         URI target = null;
         if (url != null) {
             // URL
-            target = resolver.resolveURI(new URI(url));
+            target = resolver.resolveUri(Links.convertLinkAttributeToUri(url));
         } else if (resource != null) {
             // Resource reference
-            target = resolver.resolveResource(document, version, resource);
+            final URI resourceUri =
+                    (resource != null ? Links.convertFileNameToUri(resource) : null);
+            target = resolver.resolveResource(document, version, resourceUri);
         } else if (document != null || version != null) {
             // Document reference
             target = resolver.resolveDocument(document, version);
@@ -95,7 +99,7 @@ public class LinkProcessor implements Processor {
             }
         } else if (targetId != null) {
             // ID reference
-            target = resolver.resolveURI(new URI(null, null, targetId));
+            target = resolver.resolveUri(Links.convertLinkAttributeToUri(FRAGMENT + targetId));
         }
 
         if (target != null) {
@@ -109,18 +113,8 @@ public class LinkProcessor implements Processor {
     }
 
     @VisibleForTesting void resolveMedia(final Element elem) throws Exception {
-        URI src, target;
-
         final String attr = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
-        try {
-            src = new URI(attr);
-        } catch (URISyntaxException e) {
-            // TODO(arjuns), TODO(light) : do same approach for other Attributes.
-            logger.severe("Forcing string escape for : " + attr);
-            String escapedString = URLEncoder.encode(attr, Charsets.UTF_8.displayName());
-            src = new URI(escapedString);
-        }
-        target = resolver.resolveURI(src);
+        final URI target = resolver.resolveUri(Links.convertLinkAttributeToUri(attr));
         if (target != null) {
             elem.setAttribute(CnxmlAttributes.MEDIA_CHILD_SOURCE, target.toString());
         }

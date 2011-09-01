@@ -15,8 +15,28 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import static org.cnx.repository.atompub.CommonUtils.getURI;
+import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
+import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
+import static org.cnx.repository.atompub.utils.ServerUtil.getPostedEntry;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+
+import org.cnx.exceptions.CnxException;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.service.CnxAtomService;
+import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
+import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.GetResourceInfoResult;
+import org.cnx.repository.service.api.RepositoryRequestContext;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
@@ -34,35 +54,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
-import org.cnx.repository.atompub.utils.RepositoryUtils;
-import org.cnx.repository.atompub.utils.ServerUtil;
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateResourceResult;
-import org.cnx.repository.service.api.GetResourceInfoResult;
-import org.cnx.repository.service.api.RepositoryRequestContext;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.ServeResourceResult;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.impl.Atom10Parser;
+import javax.ws.rs.core.Response.Status;
 
 /**
- * Jersey Servlets for Cnx Resources.
- *
+ * Jersey Servlet for CNX Resources.
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH)
 public class CnxAtomResourceServlet {
-    Logger logger = Logger.getLogger(CnxAtomResourceServlet.class.getName());
+    private Logger logger = Logger.getLogger(CnxAtomResourceServlet.class.getName());
+    // TODO(arjuns) : Move these servlet strings to a common place.
     private final String COLLECTION_RESOURCE_POST = "/";
 
     private final String RESOURCE_GET_PATH_PARAM = "resourceId";
@@ -70,23 +72,17 @@ public class CnxAtomResourceServlet {
 
     private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
+    /**
+     * Clients should post to {@link #COLLECTION_RESOURCE_POST} in order to get a new ResourceId and
+     * Blobstore URL where client will upload the blob.
+     */
     @POST
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(COLLECTION_RESOURCE_POST)
-    public Response postNewResource(@Context HttpServletRequest req) {
-        // TODO(arjuns): Handle exceptions.
+    public Response postNewResource(@Context HttpServletRequest req) throws CnxException {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        Entry postedEntry = null;
-        try {
-            postedEntry =
-                Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(req
-                    .getInputStream(), Charsets.UTF_8.displayName())), null);
-            logger.info(PrettyXmlOutputter.prettyXmlOutputEntry(postedEntry));
-        } catch (Exception e1) {
-            // TODO(arjuns): Auto-generated catch block
-            throw new RuntimeException(e1);
-        }
+        Entry postedEntry = getPostedEntry(logger, req);
 
         RepositoryResponse<CreateResourceResult> createdResource =
             repositoryService.createResource(RepositoryUtils.getRepositoryContext());
@@ -95,48 +91,36 @@ public class CnxAtomResourceServlet {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */
-            CreateResourceResult result = createdResource.getResult();
+            CreateResourceResult repoResult = createdResource.getResult();
             Entry entry = new Entry();
-            entry.setId(result.getResourceId());
+            entry.setId(repoResult.getResourceId());
             entry.setTitle(postedEntry.getTitle());
             entry.setPublished(new Date());
 
-            try {
-                // TODO(arjuns) : Create a function for this.
-                // URL to fetch the Module published now.
-                URL selfUrl =
-                    atomPubService.getConstants().getResourceAbsPath(result.getResourceId());
-                List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
+            // TODO(arjuns) : Create a function for this.
+            // URL to fetch the Module published now.
+            URL selfUrl = atomPubService.getConstants().getResourceAbsPath(repoResult.getResourceId());
+            List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
 
-                // TODO(arjuns) : Temporary hack.
-                // URL client is expected to post the blob.
-                String uploadUrl = result.getResourceUploadUrl();
-                if (!uploadUrl.startsWith("http")) {
-                    uploadUrl = ServerUtil.computeHostUrl(req) + uploadUrl;
-                }
-
-                URL editUrl = new URL(uploadUrl);
-                Link blobstoreLink = new Link();
-                blobstoreLink.setRel(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL);
-                blobstoreLink.setHref(editUrl.toString());
-
-                listOfLinks.add(blobstoreLink);
-                entry.setOtherLinks(listOfLinks);
-
-                URI createdLocation = new URI(selfUrl.toString());
-                String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
-                logger.info("ResponseEntry = " + stringEntry);
-                return Response.created(createdLocation).entity(stringEntry).build();
-            } catch (Exception e) {
-                logger.severe("Failed to create Resource because : "
-                    + Throwables.getStackTraceAsString(e));
-                // TODO(arjuns) : Handle exceptions.
-                throw new RuntimeException(e);
+            // TODO(arjuns) : Temporary hack.
+            // URL client is expected to post the blob.
+            String uploadUrl = repoResult.getResourceUploadUrl();
+            if (!uploadUrl.startsWith("http")) {
+                uploadUrl = ServerUtil.computeHostUrl(req) + uploadUrl;
             }
+
+            URI editUrl = getURI(uploadUrl);
+            Link blobstoreLink = new Link();
+            blobstoreLink.setRel(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL);
+            blobstoreLink.setHref(editUrl.toString());
+
+            listOfLinks.add(blobstoreLink);
+            entry.setOtherLinks(listOfLinks);
+
+            return logAndReturn(logger, Status.CREATED, entry, getURI(selfUrl.toString()));
         }
 
-        // TODO(arjuns) : Add more errors here.
-        return Response.serverError().build();
+        return fromRepositoryError(logger, createdResource);
     }
 
     // TODO(arjuns) : Do we need URL to return AtomEntry for Resources?
@@ -155,15 +139,16 @@ public class CnxAtomResourceServlet {
         if (serveResourceResult.isOk()) {
 
             ResponseBuilder responseBuilder = Response.ok();
-            ServeResourceResult result = serveResourceResult.getResult();
+            ServeResourceResult repoResult = serveResourceResult.getResult();
 
-            for (Map.Entry<String, String> header : result.getAdditionalHeaders().entrySet()) {
+            for (Map.Entry<String, String> header : repoResult.getAdditionalHeaders().entrySet()) {
                 responseBuilder.header(header.getKey(), header.getValue());
             }
 
             RepositoryResponse<GetResourceInfoResult> repositoryInfo =
-                    repositoryService.getResourceInfo(repositoryContext, resourceId);
+                repositoryService.getResourceInfo(repositoryContext, resourceId);
 
+            // TODO(arjuns) : Repository should return this.
             if (repositoryInfo.isOk()) {
                 String fileName =
                     repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
@@ -175,7 +160,6 @@ public class CnxAtomResourceServlet {
             return responseBuilder.build();
         }
 
-        // TODO(arjuns) : Add more errors here.
-        return Response.serverError().build();
+        return fromRepositoryError(logger, serveResourceResult);
     }
 }

@@ -169,11 +169,6 @@
              target="test"
              dir="${third_party}" />
 
-        <ant antfile="commons-cli/build.xml"
-             inheritAll="true"
-             target="test"
-             dir="${third_party}" />
-
         <ant antfile="jersey/build.xml"
              inheritAll="true"
              target="test"

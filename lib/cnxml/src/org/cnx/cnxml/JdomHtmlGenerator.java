@@ -103,6 +103,8 @@ import org.jdom.input.DOMBuilder;
     private final static String CDF_TEXT_MIME_TYPE = "application/vnd.wolfram.cdf.text";
     private final static String HTML_CDF_DOWNLOAD_LABEL = "Download CDF";
 
+    private final static String HTML_DOWNLOAD_LABEL = "Download ";
+
     private final static String HTML_CALS_TABLE_CLASS = "cals";
     private final static String HTML_CALS_ALIGN_LEFT_CLASS = "calsAlignLeft";
     private final static String HTML_CALS_ALIGN_RIGHT_CLASS = "calsAlignRight";
@@ -941,6 +943,10 @@ import org.jdom.input.DOMBuilder;
                 generateObject(child);
             }
             break;
+        case LABVIEW:
+        case DOWNLOAD:
+            generateDownloadLink(child);
+            break;
         default:
             unrecognized(child);
             break;
@@ -981,6 +987,18 @@ import org.jdom.input.DOMBuilder;
             htmlElem.setAttribute(HtmlAttributes.OBJECT_HEIGHT, height);
         }
         htmlElem.setText(mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
+        addHtmlContent(htmlElem);
+    }
+
+    protected void generateDownloadLink(final Element elem) {
+        final Element mediaElem = (Element)elem.getParent();
+        final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.LINK.getTag()))
+                .setAttribute(HtmlAttributes.LINK_URL,
+                        elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
+                .setAttribute(HtmlAttributes.LINK_TYPE,
+                        elem.getAttributeValue(CnxmlAttributes.DOWNLOAD_TYPE));
+        htmlElem.setText(HTML_DOWNLOAD_LABEL
+                + mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
         addHtmlContent(htmlElem);
     }
 

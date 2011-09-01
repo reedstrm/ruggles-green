@@ -806,6 +806,32 @@ public class ModuleHTMLGeneratorTests {
                                 .setAttribute("width", "128"))));
     }
 
+    @Test public void mediaDownloadShouldRenderAsLink() throws Exception {
+        assertEquals("<a id=\"thing\" "
+                + "href=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\">"
+                + "Download Epic widget</a>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "thing")
+                        .setAttribute("alt", "Epic widget")
+                        .addContent(new Element("download", ns)
+                                .setAttribute("src", "http://www.example.com/my-widget")
+                                .setAttribute("mime-type", "application/x-widget"))));
+    }
+
+    @Test public void mediaLabviewShouldRenderAsLink() throws Exception {
+        assertEquals("<a id=\"lbv\" "
+                + "href=\"http://www.example.com/content.vi\" "
+                + "type=\"application/x-labview-vi\">"
+                + "Download A LabVIEW Thing</a>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "lbv")
+                        .setAttribute("alt", "A LabVIEW Thing")
+                        .addContent(new Element("labview", ns)
+                                .setAttribute("src", "http://www.example.com/content.vi")
+                                .setAttribute("mime-type", "application/x-labview-vi"))));
+    }
+
     @Test public void mediaShouldIgnorePdf() throws Exception {
         assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">Epic widget</object>",

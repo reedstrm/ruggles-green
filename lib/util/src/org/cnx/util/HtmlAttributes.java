@@ -24,6 +24,7 @@ public class HtmlAttributes {
     public static final String CLASS = "class";
     public static final String STYLE = "style";
     public static final String LINK_URL = "href";
+    public static final String LINK_TYPE = "type";
     public static final String LIST_NUMBER_STYLE = "type";
     public static final String LIST_START_VALUE = "start";
     public static final String IMAGE_ALT = "alt";

@@ -47,6 +47,7 @@ public class CnxmlAttributes {
     public final static String OBJECT_TYPE = "mime-type";
     public final static String OBJECT_WIDTH = "width";
     public final static String OBJECT_HEIGHT = "height";
+    public final static String DOWNLOAD_TYPE = "mime-type";
     public final static String MEDIA_CHILD_FOR = "for";
     public final static String FIGURE_ORIENT = "orient";
     public final static String CALS_TABLE_SUMMARY = "summary";

@@ -94,7 +94,7 @@ public class AtomPubResponseUtils {
 
         responseBuilder.entity(responseString);
 
-        logger.info("Returning response : " + responseString);
+        logger.fine("Returning response : " + responseString);
         return responseBuilder.build();
     }
 

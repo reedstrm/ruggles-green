@@ -95,7 +95,7 @@ public class ServerUtil {
             throw new CnxBadRequestException("FeedException.", e);
         }
 
-        logger.info("Received Entry : " + prettyXmlOutputEntry(postedEntry));
+        logger.fine("Received Entry : " + prettyXmlOutputEntry(postedEntry));
         return postedEntry;
     }
 }

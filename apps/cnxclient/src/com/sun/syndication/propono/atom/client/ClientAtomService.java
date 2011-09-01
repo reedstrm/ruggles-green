@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011 The CNX Authors.
  * Copyright 2007 Sun Microsystems, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,19 +18,23 @@ package com.sun.syndication.propono.atom.client;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.io.impl.Atom10Parser;
-import com.sun.syndication.propono.utils.ProponoException;
 import com.sun.syndication.propono.atom.common.AtomService;
-import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.List;
+import com.sun.syndication.propono.utils.ProponoException;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.exceptions.CnxRuntimeException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -66,6 +71,10 @@ public class ClientAtomService extends AtomService {
         authStrategy.addAuthentication(httpClient, method);
         try {
             httpClient.executeMethod(method);
+            // TODO(arjuns) : Handle exception with code.
+            if (method.getStatusCode() == 404) {
+                throw new CnxInvalidUrlException("Entry for [" + uri + "] not found.", null);
+            }
             if (method.getStatusCode() != 200) {
                 throw new ProponoException("ERROR HTTP status code=" + method.getStatusCode());
             }
@@ -76,6 +85,8 @@ public class ClientAtomService extends AtomService {
             } else {
                 return new ClientMediaEntry(this, null, romeEntry, false);
             }
+        } catch (CnxInvalidUrlException e) {
+            throw new CnxRuntimeException(e.getJerseyStatus(), e.getMessage(), e.getCause());
         } catch (Exception e) {
             throw new ProponoException("ERROR: getting or parsing entry/media", e);
         } finally {

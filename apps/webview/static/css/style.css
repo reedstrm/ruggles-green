@@ -168,12 +168,11 @@ p.authors {
 .moduleContent .equation {
     display: table;
     width: 100%;
-    table-layout: fixed;
 }
 
 .moduleContent .equationContent {
     display: table-cell;
-    width: 95%;
+    width: 90%;
     text-align: center;
     vertical-align: middle;
 }
@@ -181,7 +180,8 @@ p.authors {
 .moduleContent .equationNumber {
     display: table-cell;
     width: 5%;
-    text-align: center;
+    padding-left: 5%;
+    text-align: right;
     vertical-align: middle;
 }
 

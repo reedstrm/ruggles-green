@@ -29,6 +29,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.exceptions.CnxRuntimeException;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.jdom.JDOMException;
 
@@ -54,10 +55,10 @@ public class ParallelModuleMigrator implements Runnable {
     private final CnxAtomPubClient cnxClient;
     private final String moduleLocation;
     private final String collXmlModuleId;
-    private String cnxModuleId;
-    private String aerModuleId;
-
+    private final IdWrapper cnxModuleId;
+    private final IdWrapper aerModuleId;
     private final VersionWrapper currentVersion;
+    
     private boolean success = false;
     private ClientEntry moduleVersionEntry;
 
@@ -73,7 +74,7 @@ public class ParallelModuleMigrator implements Runnable {
      * @param currentVersion Current Version.
      */
     public ParallelModuleMigrator(CnxAtomPubClient cnxClient, String moduleLocation,
-            String collXmlModuleId, String cnxModuleId, String aerModuleId,
+            String collXmlModuleId, IdWrapper cnxModuleId, IdWrapper aerModuleId,
             VersionWrapper currentVersion) {
         this.cnxClient = cnxClient;
         this.moduleLocation = moduleLocation;
@@ -215,7 +216,6 @@ public class ParallelModuleMigrator implements Runnable {
                                 currentVersion);
                     entryToUpdate = cnxClient.getService().getEntry(currentModuleUrl.toString());
                 }
-
                 moduleVersionEntry =
                     publishNewVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
                 success = true;
@@ -263,7 +263,7 @@ public class ParallelModuleMigrator implements Runnable {
         return moduleVersionEntry;
     }
 
-    public String getCnxModuleId() {
+    public IdWrapper getCnxModuleId() {
         return cnxModuleId;
     }
 }

@@ -17,9 +17,8 @@ package org.cnx.repository.scripts.programs;
 
 import com.google.common.base.Preconditions;
 
-import com.sun.syndication.propono.atom.client.ClientEntry;
-
 import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.scripts.migrators.ParallelCollectionMigrator;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.kohsuke.args4j.CmdLineException;
@@ -69,8 +68,8 @@ public class MigratorMain {
     private boolean preserveModuleIds = false;
 
     private final static String USAGE =
-        "\n\t-migrateModule -[aerModuleId | cnxModuleId] <id> -localFolder <location>"
-            + "\n\t-migrateCollection -[aerModuleId | cnxModuleId] <id> -localFolder <location> <-preserveModuleIds>";
+            "\n\t -migrateModule -[aerModuleId | cnxModuleId] <id> -localFolder <location> [-repositoryUrl <url>]"
+                    + "\n\t-migrateCollection -[aerCollectionId | cnxCollectionId] <id> -localFolder <location> <-preserveModuleIds> [-repositoryUrl <url>]";
 
     public static void main(String[] args) throws Exception {
 
@@ -79,7 +78,7 @@ public class MigratorMain {
             builder.append(currArg).append(" ");
         }
 
-        System.out.println("Args : " + builder.toString());
+        logger.info("Args : " + builder.toString());
 
         new MigratorMain().doMain(args);
     }
@@ -94,7 +93,7 @@ public class MigratorMain {
 
             StringBuilder builder = new StringBuilder();
             builder.append("MigrateModule = ").append(migrateModule);
-            System.out.println(builder.toString());
+
             if (migrateModule == migrateCollection) {
                 printErrAndExit("Usage = " + USAGE);
             }
@@ -120,21 +119,25 @@ public class MigratorMain {
     }
 
     private void migrateCollection() throws InterruptedException {
+        IdWrapper cnxCollectionIdWrapper = null;
+        IdWrapper aerCollectionIdWrapper = null;
         if (aerCollectionId != null) {
             Preconditions.checkArgument(cnxCollectionId == null);
+            aerCollectionIdWrapper = IdWrapper.getIdWrapperFromUrlId(aerCollectionId);
         } else if (cnxCollectionId != null) {
             Preconditions.checkArgument(aerCollectionId == null);
+            cnxCollectionIdWrapper = IdWrapper.getIdWrapperFromUrlId(cnxCollectionId);
         }
 
         ParallelCollectionMigrator migrator =
-            new ParallelCollectionMigrator(cnxClient, localFolder, cnxCollectionId,
-                    aerCollectionId, null /* version */, preserveModuleIds);
+                new ParallelCollectionMigrator(cnxClient, localFolder, cnxCollectionIdWrapper,
+                        aerCollectionIdWrapper, null /* version */, preserveModuleIds);
 
         Thread thread = new Thread(migrator);
         thread.start();
         thread.join();
         // TODO(arjuns) : Check for exit status for thread.
-        ClientEntry newclientEntry = migrator.getCollectionVersionEntry();
+        // ClientEntry newclientEntry = migrator.getCollectionVersionEntry();
     }
 
     public void printErrAndExit(String errmMsg) {
@@ -143,22 +146,25 @@ public class MigratorMain {
     }
 
     private void migrateModule() throws InterruptedException {
+        IdWrapper aerModuleIdWrapper = null;
+        IdWrapper cnxModuleIdWrapper = null;
         if (aerModuleId != null) {
             Preconditions.checkArgument(cnxModuleId == null);
+            aerModuleIdWrapper = IdWrapper.getIdWrapperFromUrlId(aerModuleId);
         } else if (cnxModuleId != null) {
             Preconditions.checkArgument(aerModuleId == null);
+            cnxModuleIdWrapper = IdWrapper.getIdWrapperFromUrlId(cnxModuleId);
         }
 
         ParallelModuleMigrator migrator =
-            new ParallelModuleMigrator(cnxClient, localFolder, null /* collXmlModuleId */,
-                    cnxModuleId, aerModuleId, null /* version */);
+                new ParallelModuleMigrator(cnxClient, localFolder, null /* collXmlModuleId */,
+                        cnxModuleIdWrapper, aerModuleIdWrapper, null /* version */);
 
         Thread thread = new Thread(migrator);
         thread.start();
         thread.join();
         // TODO(arjuns) : Check for exit status for thread.
-        ClientEntry newclientEntry = migrator.getModuleVersionEntry();
-        long endTime = System.currentTimeMillis();
+        // ClientEntry newclientEntry = migrator.getModuleVersionEntry();
     }
 
     public void validateCollectionDetails() {

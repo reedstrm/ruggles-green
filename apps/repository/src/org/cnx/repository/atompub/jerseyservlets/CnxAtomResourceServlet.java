@@ -26,6 +26,7 @@ import com.sun.syndication.feed.atom.Link;
 import org.cnx.exceptions.CnxException;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
@@ -85,7 +86,7 @@ public class CnxAtomResourceServlet {
         Entry postedEntry = getPostedEntry(logger, req);
 
         RepositoryResponse<CreateResourceResult> createdResource =
-            repositoryService.createResource(RepositoryUtils.getRepositoryContext());
+                repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
         if (createdResource.isOk()) {
             /*
@@ -99,7 +100,11 @@ public class CnxAtomResourceServlet {
 
             // TODO(arjuns) : Create a function for this.
             // URL to fetch the Module published now.
-            URL selfUrl = atomPubService.getConstants().getResourceAbsPath(repoResult.getResourceId());
+
+            IdWrapper repoIdWrapper =
+                    IdWrapper.getIdWrapperFromRepositoryId(repoResult.getResourceId());
+
+            URL selfUrl = atomPubService.getConstants().getResourceAbsPath(repoIdWrapper);
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
 
             // TODO(arjuns) : Temporary hack.
@@ -130,11 +135,12 @@ public class CnxAtomResourceServlet {
     @Path(RESOURCE_GET_URL_PATTERN)
     public Response getResource(@Context HttpServletResponse res,
             @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
-        // TODO(arjuns) : get a better way to get the context.
+        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(resourceId);
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(), resourceId, res);
+                repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
+                        idWrapper.getIdForRepository(), res);
 
         if (serveResourceResult.isOk()) {
 
@@ -146,12 +152,13 @@ public class CnxAtomResourceServlet {
             }
 
             RepositoryResponse<GetResourceInfoResult> repositoryInfo =
-                repositoryService.getResourceInfo(repositoryContext, resourceId);
+                    repositoryService.getResourceInfo(repositoryContext,
+                            idWrapper.getIdForRepository());
 
             // TODO(arjuns) : Repository should return this.
             if (repositoryInfo.isOk()) {
                 String fileName =
-                    repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
+                        repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
                 if (fileName.endsWith(".cdf")) {
                     responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf.text");
                 }

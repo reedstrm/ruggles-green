@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +34,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomCollectionServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
@@ -57,28 +58,30 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
         String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
         ClientEntry createCollectionEntry = cnxClient.createNewCollection();
-        String collectionId = CnxAtomPubConstants.getIdFromAtomPubId(createCollectionEntry.getId());
+        IdWrapper collectionId =
+                CnxAtomPubConstants.getIdFromAtomPubId(createCollectionEntry.getId());
 
         // TODO(arjuns) : Add a regex test here.
         String expectedCollectionUrl =
-            cnxClient.getConstants().getAtomPubRestUrl() + "/collection/" + collectionId + "/1";
+                cnxClient.getConstants().getAtomPubRestUrl() + "/collection/"
+                        + collectionId.getIdForUrls() + "/1";
         assertEquals(expectedCollectionUrl, createCollectionEntry.getEditURI().toString());
 
         ClientEntry cnxCollectionNewVersionEntry =
-            cnxClient.createNewCollectionVersion(createCollectionEntry, collXmlAsString);
+                cnxClient.createNewCollectionVersion(createCollectionEntry, collXmlAsString);
 
         assertEquals(expectedCollectionUrl, cnxCollectionNewVersionEntry.getEditURI());
 
         logger.info("New location for collection = \n" + expectedCollectionUrl);
 
         // TODO(arjuns) : fix this test.
-//        VersionWrapper version =
-//            CnxAtomPubConstants.getVersionFromAtomPubId(cnxCollectionNewVersionEntry.getId());
-//        Entry getEntry = cnxClient.getCollectionVersionEntry(collectionId, version);
+        // VersionWrapper version =
+        // CnxAtomPubConstants.getVersionFromAtomPubId(cnxCollectionNewVersionEntry.getId());
+        // Entry getEntry = cnxClient.getCollectionVersionEntry(collectionId, version);
 
-//        String downloadedCollXml =
-//            cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(getEntry);
+        // String downloadedCollXml =
+        // cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(getEntry);
         // TODO(arjuns) : Uncomment this once we start using the original ids.
-//        assertEquals(collXmlAsString, downloadedCollXml);
+        // assertEquals(collXmlAsString, downloadedCollXml);
     }
 }

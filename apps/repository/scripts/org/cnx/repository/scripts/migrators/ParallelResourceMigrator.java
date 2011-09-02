@@ -15,17 +15,18 @@
  */
 package org.cnx.repository.scripts.migrators;
 
-import java.io.File;
-import java.util.logging.Logger;
+import com.google.common.base.Throwables;
+
+import com.sun.syndication.propono.atom.client.ClientEntry;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 
-import com.google.common.base.Throwables;
-import com.sun.syndication.propono.atom.client.ClientEntry;
+import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * Migrator for a resource.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class ParallelResourceMigrator implements Runnable {
@@ -59,9 +60,7 @@ public class ParallelResourceMigrator implements Runnable {
         for (int i = 0; i < 10; i++) {
             try {
                 logger.info("Trying to upload : " + resourceLocation);
-                resourceEntry =
-                    cnxClient.uploadFileToBlobStore(getResourceNameForResourceMappingDoc(file
-                        .getName()), file);
+                resourceEntry = cnxClient.uploadFileToBlobStore(file.getName(), file);
                 success = true;
                 String resourceUrl = cnxClient.getLinkForResource(resourceEntry).getHrefResolved();
                 logger.info("Successfully uploaded : " + resourceLocation + " to : " + resourceUrl);
@@ -81,11 +80,6 @@ public class ParallelResourceMigrator implements Runnable {
         logger.severe("Failed to upload Resource after 10 attempts : " + resourceLocation);
         System.exit(1);
         return null;
-    }
-
-    // This is done to remove all the whitespaces from resourceName.
-    public static String getResourceNameForResourceMappingDoc(String name) {
-        return name.replace(" ", "");
     }
 
     @Override

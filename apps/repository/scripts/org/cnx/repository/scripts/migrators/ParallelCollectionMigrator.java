@@ -31,6 +31,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.exceptions.CnxRuntimeException;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.jdom.JDOMException;
 
@@ -54,16 +55,17 @@ public class ParallelCollectionMigrator implements Runnable {
 
     private Map<String, Entry> mapOfModuleIdToNewModuleEntry;
     private final CnxAtomPubClient cnxClient;
-    private String cnxCollectionId;
-    private String aerCollectionId;
+    private final IdWrapper cnxCollectionId;
+    private final IdWrapper aerCollectionId;
     private final String collectionLocation;
     private final VersionWrapper currentVersion;
+    private final boolean preserveModuleIds;
+    
     private boolean success = false;
     private ClientEntry collectionVersionEntry;
-    private boolean preserveModuleIds;
 
     public ParallelCollectionMigrator(CnxAtomPubClient cnxClient, String collectionLocation,
-            String cnxCollectionId, String aerCollectionId, VersionWrapper currentVersion,
+            IdWrapper cnxCollectionId, IdWrapper aerCollectionId, VersionWrapper currentVersion,
             boolean preserveModuleIds) {
         this.cnxClient = cnxClient;
         this.collectionLocation = collectionLocation;
@@ -110,29 +112,28 @@ public class ParallelCollectionMigrator implements Runnable {
                 String cnxModuleId = currModule.getName();
                 logger.info("Starting to migrate : " + cnxModuleId);
 
-                String requiredCnxModuleId = null;
-                String requiredAerModuleId = null;
+                IdWrapper requiredCnxModuleId = null;
+                IdWrapper requiredAerModuleId = null;
                 VersionWrapper requiredVersion = null;
 
                 if (cnxCollectionId != null && preserveModuleIds) {
                     // Publish version in restricted range.
-                    requiredCnxModuleId = cnxModuleId;
+                    requiredCnxModuleId = IdWrapper.getIdWrapperFromUrlId(cnxModuleId);
                     requiredVersion = CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
                 }
 
                 if (aerCollectionId != null && preserveModuleIds) {
-                    requiredAerModuleId = cnxModuleId;
+                    requiredAerModuleId = IdWrapper.getIdWrapperFromUrlId(cnxModuleId);
                 }
 
                 ParallelModuleMigrator moduleMigrator =
-                    new ParallelModuleMigrator(cnxClient, currModule.getAbsolutePath(),
-                            currModule.getName(), requiredCnxModuleId, requiredAerModuleId,
-                            requiredVersion);
+                        new ParallelModuleMigrator(cnxClient, currModule.getAbsolutePath(),
+                                currModule.getName(), requiredCnxModuleId, requiredAerModuleId,
+                                requiredVersion);
                 listOfModuleMigrators.add(moduleMigrator);
 
                 Thread thread = new Thread(moduleMigrator);
                 listOfThreads.add(thread);
-
                 thread.start();
 
                 int remainingModules = listOfModulesToUpload.size() - counter;
@@ -163,11 +164,13 @@ public class ParallelCollectionMigrator implements Runnable {
 
             for (String cnxModuleId : mapOfModuleIdToNewModuleEntry.keySet()) {
                 Entry newModuleEntry = mapOfModuleIdToNewModuleEntry.get(cnxModuleId);
-                String aerModuleId = CnxAtomPubConstants.getIdFromAtomPubId(newModuleEntry.getId());
+                IdWrapper aerModuleId =
+                        CnxAtomPubConstants.getIdFromAtomPubId(newModuleEntry.getId());
                 String oldString = "\"" + cnxModuleId + "\"";
-                String newString = "\"" + aerModuleId + "\"";
+                String newString = "\"" + aerModuleId.getIdForUrls() + "\"";
                 collXmlAsString = collXmlAsString.replaceAll(oldString, newString);
-                logger.info("Old ModuleId = " + cnxModuleId + " New ModuleId = " + aerModuleId);
+                logger.info("Old ModuleId = " + cnxModuleId + " New ModuleId = "
+                        + aerModuleId.getIdForUrls());
             }
 
             ClientEntry entryToUpdate = null;
@@ -181,8 +184,8 @@ public class ParallelCollectionMigrator implements Runnable {
 
                 try {
                     existingEntry =
-                        cnxClient
-                                .getCollectionVersionEntry(cnxCollectionId, LATEST_VERSION_WRAPPER);
+                            cnxClient.getCollectionVersionEntry(cnxCollectionId,
+                                    LATEST_VERSION_WRAPPER);
                 } catch (CnxRuntimeException e) {
                     if (e.getJerseyStatus() == Status.NOT_FOUND) {
                         // Expected.
@@ -205,13 +208,13 @@ public class ParallelCollectionMigrator implements Runnable {
                  */
                 Preconditions.checkNotNull(currentVersion);
                 entryToUpdate =
-                    cnxClient.getCollectionVersionEntry(aerCollectionId, currentVersion);
+                        cnxClient.getCollectionVersionEntry(aerCollectionId, currentVersion);
             }
 
             collectionVersionEntry = publishNewVersion(entryToUpdate, collXmlAsString);
             success = true;
             logger.info("Successfully uploaded Collection : " + collectionLocation + " to : "
-                + collectionVersionEntry.getEditURI());
+                    + collectionVersionEntry.getEditURI());
             return collectionVersionEntry;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -221,7 +224,7 @@ public class ParallelCollectionMigrator implements Runnable {
     private ClientEntry publishNewVersion(ClientEntry entryToUpdate, String collXmlAsString)
             throws ProponoException, JAXBException, JDOMException, IOException {
         ClientEntry createCollectionVersionEntry =
-            cnxClient.createNewCollectionVersion(entryToUpdate, collXmlAsString);
+                cnxClient.createNewCollectionVersion(entryToUpdate, collXmlAsString);
 
         return createCollectionVersionEntry;
     }

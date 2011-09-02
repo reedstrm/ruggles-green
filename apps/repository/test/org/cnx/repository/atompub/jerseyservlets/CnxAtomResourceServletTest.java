@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,16 +35,16 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 /**
  * Test for {@link CnxAtomResourceServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
-public class ResourceServletTest extends CnxAtomPubBasetest {
+public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
     private CnxAtomPubClient cnxClient;
 
     // TODO(arjuns) : Create file dynamically.
     private final File file = new File("/home/arjuns/test_file.txt");
 
-    public ResourceServletTest() throws Exception {
+    public CnxAtomResourceServletTest() throws Exception {
         super();
     }
 
@@ -58,9 +59,11 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
-        String expectedResourceUrl = getConstants().getResourceAbsPath(resourceId).toString();
+        String expectedResourceUrl =
+                getConstants().getResourceAbsPath(IdWrapper.getIdWrapperFromUrlId(resourceId))
+                        .toString();
         assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
-            .getHrefResolved());
+                .getHrefResolved());
 
         /*
          * There should be two links in following order :<br> 1. Link for Blobstore.<br> 2. Link for
@@ -79,8 +82,9 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(blobStoreLink.getHref());
 
         // Now upload blob to AppEngine.
-        cnxClient.uploadFileToBlobStore(ParallelResourceMigrator.getResourceNameForResourceMappingDoc(file
-            .getName()), file);
+        cnxClient
+                .uploadFileToBlobStore(ParallelResourceMigrator
+                        .getResourceNameForResourceMappingDoc(file.getName()), file);
 
         // TODO(arjuns) : Add test for get once it works.
         // TODO(arjuns) : Add link in entry for get.

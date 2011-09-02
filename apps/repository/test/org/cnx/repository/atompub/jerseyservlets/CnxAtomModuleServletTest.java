@@ -27,6 +27,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
@@ -95,7 +96,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         // TODO(arjuns) : Add more validations here.
 
         // TODO(arjuns) : refactor this.
-        String moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleNewVersionEntry.getId());
+        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleNewVersionEntry.getId());
         VersionWrapper version =
             CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
         ClientEntry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);

@@ -25,6 +25,7 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
@@ -73,7 +74,7 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
                     null /* cnxModuleId */, null/* aerModuleId */, null /* version */);
         Entry moduleEntry = migrator.migrateModuleVersion();
 
-        String aerModuleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        IdWrapper aerModuleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
 
         VersionWrapper firstVersion = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
         // Now publishing second version.

@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.resourceentry.ResourceEntryValue;
 import org.cnx.resourcemapping.LocationInformation;
@@ -124,10 +125,11 @@ public class CnxAtomPubClient {
         constants = new CnxAtomPubConstants(atomPubServerUrl);
 
         URL serviceDocumentUri =
-            new URL(atomPubServerUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
+                new URL(atomPubServerUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
 
         service =
-            AtomClientFactory.getAtomService(serviceDocumentUri.toString(), new NoAuthStrategy());
+                AtomClientFactory.getAtomService(serviceDocumentUri.toString(),
+                        new NoAuthStrategy());
 
         @SuppressWarnings("unchecked")
         List<ClientWorkspace> listOfWorkspaces = service.getWorkspaces();
@@ -293,13 +295,14 @@ public class CnxAtomPubClient {
      * @throws IllegalAccessException
      */
     @SuppressWarnings("deprecation")
-    public ClientEntry createNewModuleForMigration(String cnxModuleId) throws IOException,
+    public ClientEntry createNewModuleForMigration(IdWrapper cnxModuleId) throws IOException,
             ProponoException, IllegalArgumentException, JDOMException, FeedException,
             IllegalAccessException, InvocationTargetException {
         // TODO(arjuns) : Create a function for URL appending.
         // TODO(arjuns) : move this url to constants.
         String migrateModule =
-            constants.getAtomPubRestUrl().toString() + "/module/migration/" + cnxModuleId;
+                constants.getAtomPubRestUrl().toString() + "/module/migration/"
+                        + cnxModuleId.getIdForUrls();
         return handlePostForMigration(migrateModule);
     }
 
@@ -323,9 +326,9 @@ public class CnxAtomPubClient {
                 resourceMappingDoc));
         moduleVersionEntry.update();
 
-        String moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleVersionEntry.getId());
+        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleVersionEntry.getId());
         VersionWrapper currentVersion =
-            CnxAtomPubConstants.getVersionFromAtomPubId(moduleVersionEntry.getId());
+                CnxAtomPubConstants.getVersionFromAtomPubId(moduleVersionEntry.getId());
 
         moduleVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(moduleId,
                 currentVersion));
@@ -341,7 +344,7 @@ public class CnxAtomPubClient {
      * @param version
      * @throws ProponoException
      */
-    public ClientEntry getModuleVersionEntry(String moduleId, VersionWrapper version)
+    public ClientEntry getModuleVersionEntry(IdWrapper moduleId, VersionWrapper version)
             throws ProponoException {
         URL moduleVersionUrl = constants.getModuleVersionAbsPath(moduleId, version);
 
@@ -357,7 +360,7 @@ public class CnxAtomPubClient {
     public String getCnxml(ClientEntry moduleVersionEntry) throws JDOMException, IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-            constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
+                constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
         return constants.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
     }
 
@@ -365,7 +368,7 @@ public class CnxAtomPubClient {
      * Get ResourceMapping XML from AtomEntry for a ModuleVersion.
      * 
      */
-    public String getModuleVersionResourceMappingXml(String moduleId, VersionWrapper version)
+    public String getModuleVersionResourceMappingXml(IdWrapper moduleId, VersionWrapper version)
             throws HttpException, JDOMException, IOException, ProponoException {
         return getResourceMappingXml(getModuleVersionEntry(moduleId, version));
     }
@@ -374,7 +377,7 @@ public class CnxAtomPubClient {
             IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-            constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
+                constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
         return constants.getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
     }
 
@@ -435,7 +438,7 @@ public class CnxAtomPubClient {
     /**
      * Create New Module on CNX Repository for Migration.
      * 
-     * @param cnxModuleId Original CNX Module id on cnx.org.
+     * @param cnxCollectionId Original CNX Module id on cnx.org.
      * @throws IOException
      * @throws ProponoException
      * @throws FeedException
@@ -445,26 +448,19 @@ public class CnxAtomPubClient {
      * @throws IllegalAccessException
      */
     @SuppressWarnings("deprecation")
-    public ClientEntry createNewCollectionForMigration(String cnxCollectionId) throws IOException,
-            ProponoException, IllegalArgumentException, JDOMException, FeedException,
-            IllegalAccessException, InvocationTargetException {
+    public ClientEntry createNewCollectionForMigration(IdWrapper cnxCollectionId)
+            throws IOException, ProponoException, IllegalArgumentException, JDOMException,
+            FeedException, IllegalAccessException, InvocationTargetException {
         // TODO(arjuns) : Create a function for URL appending.
         // TODO(arjuns) : move this url to constants.
+        // TODO(arjuns): Handle exceptions.
         String migrateModule =
-            constants.getAtomPubRestUrl().toString() + "/collection/migration/" + cnxCollectionId;
+                constants.getAtomPubRestUrl().toString() + "/collection/migration/"
+                        + cnxCollectionId.getIdForUrls();
         return handlePostForMigration(migrateModule);
     }
 
-    /**
-     * @param migrateModule
-     * @return
-     * @throws IOException
-     * @throws ProponoException
-     * @throws JDOMException
-     * @throws FeedException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
+    @SuppressWarnings("deprecation")
     private ClientEntry handlePostForMigration(String migrateModule) throws IOException,
             ProponoException, JDOMException, FeedException, IllegalAccessException,
             InvocationTargetException {
@@ -478,7 +474,7 @@ public class CnxAtomPubClient {
         code = postMethod.getStatusCode();
         if (code != 200 && code != 201) {
             throw new ProponoException("ERROR HTTP status=" + code + " : "
-                + Utilities.streamToString(is));
+                    + Utilities.streamToString(is));
         }
         Entry romeEntry = Atom10Parser.parseEntry(new InputStreamReader(is), null /* baseUri */);
         BeanUtils.copyProperties(this, romeEntry);
@@ -501,12 +497,13 @@ public class CnxAtomPubClient {
             createNewCollectionVersion(ClientEntry collXmlVersionEntry, String collXmlDoc)
                     throws ProponoException, JAXBException, JDOMException, IOException {
         collXmlVersionEntry.setContents(constants
-            .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
+                .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
         collXmlVersionEntry.update();
 
-        String collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collXmlVersionEntry.getId());
+        IdWrapper collectionId =
+                CnxAtomPubConstants.getIdFromAtomPubId(collXmlVersionEntry.getId());
         VersionWrapper currentVersion =
-            CnxAtomPubConstants.getVersionFromAtomPubId(collXmlVersionEntry.getId());
+                CnxAtomPubConstants.getVersionFromAtomPubId(collXmlVersionEntry.getId());
 
         collXmlVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId,
                 currentVersion));
@@ -521,7 +518,7 @@ public class CnxAtomPubClient {
      * @param version
      * @throws ProponoException
      */
-    public ClientEntry getCollectionVersionEntry(String collectionId, VersionWrapper version)
+    public ClientEntry getCollectionVersionEntry(IdWrapper collectionId, VersionWrapper version)
             throws ProponoException {
         URL collectionVersionUrl = constants.getCollectionVersionAbsPath(collectionId, version);
 

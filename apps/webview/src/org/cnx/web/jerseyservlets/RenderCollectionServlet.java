@@ -15,7 +15,7 @@
  */
 package org.cnx.web.jerseyservlets;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;
 import static org.cnx.web.CommonHack.COLLECTION_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.COLLECTION_VERSION_PATH_PARAM;
@@ -26,6 +26,38 @@ import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_RESOURCES_URL_PATTERN;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_URL_PATTERN;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_XML_URL_PATTERN;
+
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.template.soy.data.SoyData;
+import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.tofu.SoyTofu;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.propono.atom.client.ClientEntry;
+
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.cnxml.LinkResolver;
+import org.cnx.cnxml.Module;
+import org.cnx.cnxml.ModuleFactory;
+import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.common.collxml.Collection;
+import org.cnx.common.collxml.CollectionFactory;
+import org.cnx.common.collxml.CollectionHTMLGenerator;
+import org.cnx.common.collxml.CollectionItem;
+import org.cnx.common.collxml.ModuleLink;
+import org.cnx.common.collxml.Subcollection;
+import org.cnx.mdml.Actor;
+import org.cnx.mdml.Metadata;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.util.RenderScope;
+import org.cnx.web.CommonHack;
+import org.cnx.web.Utils;
+import org.cnx.web.WebViewConfiguration;
+import org.cnx.web.WebViewTemplate;
 
 import java.net.URI;
 import java.net.URL;
@@ -45,45 +77,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 import javax.xml.parsers.SAXParser;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.cnxml.LinkResolver;
-import org.cnx.cnxml.Module;
-import org.cnx.cnxml.ModuleFactory;
-import org.cnx.cnxml.ModuleHTMLGenerator;
-import org.cnx.common.collxml.Collection;
-import org.cnx.common.collxml.CollectionFactory;
-import org.cnx.common.collxml.CollectionHTMLGenerator;
-import org.cnx.common.collxml.CollectionItem;
-import org.cnx.common.collxml.ModuleLink;
-import org.cnx.common.collxml.Subcollection;
-import org.cnx.mdml.Actor;
-import org.cnx.mdml.Metadata;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.util.RenderScope;
-import org.cnx.web.CommonHack;
-import org.cnx.web.Utils;
-import org.cnx.web.WebViewConfiguration;
-import org.cnx.web.WebViewTemplate;
-
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.template.soy.data.SoyData;
-import com.google.template.soy.data.SoyListData;
-import com.google.template.soy.data.SoyMapData;
-import com.google.template.soy.tofu.SoyTofu;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * Servlet to Handle CNX Resources.
- *
+ * 
  * TODO(arjuns) : Create separate package for jersey servlets vs httpservlets.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CommonHack.COLLECTION)
@@ -92,40 +92,40 @@ public class RenderCollectionServlet {
 
     /**
      * This will fetch the specific version. Possible value for version = [{version}, {latest}]
-     *
+     * 
      * URL Pattern = /collection/<collectionId>/<collectionVersion>
      */
     private final String COLLECTION_VERSION_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM + "}/{"
-        + COLLECTION_VERSION_PATH_PARAM + "}";
+            + COLLECTION_VERSION_PATH_PARAM + "}";
 
     /**
      * This will fetch the CollXml for specific collection-version.
-     *
+     * 
      * URL Pattern = /collection/<collectionId>/<collectionVersion>/xml
      */
     private final String COLLECTION_VERSION_XML_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM
-        + "}/{" + COLLECTION_VERSION_PATH_PARAM + "}" + END_URL_XML;
+            + "}/{" + COLLECTION_VERSION_PATH_PARAM + "}" + END_URL_XML;
 
     /**
      * URL Pattern wrt /collection
      * /<collectionId>/<collectionVersion>/module/<moduleId>/<moduleVersion>
      */
     private final String COLLECTION_MODULE_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN + MODULE
-        + MODULE_VERSION_URL_PATTERN;
+            + MODULE_VERSION_URL_PATTERN;
 
     /**
      * URL Pattern wrt /collection
      * /<collectionId>/<collectionVersion>/module/<moduleId>/<moduleVersion>/xml
      */
     private final String COLLECTION_MODULE_XML_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN
-        + MODULE + MODULE_VERSION_XML_URL_PATTERN;
+            + MODULE + MODULE_VERSION_XML_URL_PATTERN;
 
     /**
      * URL Pattern wrt /collection
      * /<collectionId>/<collectionVersion>/module/<moduleId>/<moduleVersion>/resources
      */
     private final String COLLECTION_MODULE_RESOURCES_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN
-        + MODULE + MODULE_VERSION_RESOURCES_URL_PATTERN;
+            + MODULE + MODULE_VERSION_RESOURCES_URL_PATTERN;
 
     // Soy parameters
     private static final String AUTHORS_PARAM = "authors";
@@ -135,7 +135,6 @@ public class RenderCollectionServlet {
     private static final String COLLECTION_PARAM = "collection";
     private static final String CONTENT_HTML_PARAM = "contentHtml";
     private static final String ID_PARAM = "id";
-    private static final String MODULE_LINKS_PARAM = "moduleLinks";
     private static final String MODULE_LINK_TYPE = "module";
     private static final String MODULE_PARAM = "module";
     private static final String NEXT_MODULE_PARAM = "nextModule";
@@ -176,23 +175,21 @@ public class RenderCollectionServlet {
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
             throws Exception {
         // TODO(arjuns) : Handle exception.
+        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(collectionId);
+        final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
+
         StringBuilder builder = new StringBuilder();
-
-        if (!VersionWrapper.isValidVersion(collectionVersionString)) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-
-        final VersionWrapper collectionVersion = new VersionWrapper(collectionVersionString);
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
         Entry collectionVersionEntry =
-            cnxClient.getCollectionVersionEntry(collectionId, collectionVersion);
+                cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
         String collXml =
-            cnxClient.getConstants()
-                .getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
+                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
+                        collectionVersionEntry);
 
-        final Collection collection = injector.getInstance(CollectionFactory.class)
-                .create(collectionId, CommonHack.parseXmlString(saxParser, collXml));
+        final Collection collection =
+                injector.getInstance(CollectionFactory.class).create(collectionId,
+                        CommonHack.parseXmlString(saxParser, collXml));
         // Get metadata
         String title = "", abstractText = null;
         List<Actor> authors = null;
@@ -232,7 +229,7 @@ public class RenderCollectionServlet {
                 final ModuleLink link = collection.getModuleLinks().get(0);
                 final LinkResolver linkResolver = injector.getInstance(LinkResolver.class);
                 firstModuleUri =
-                    linkResolver.resolveDocument(link.getModuleId(), link.getModuleVersion());
+                        linkResolver.resolveDocument(link.getModuleId(), link.getModuleVersion());
             }
         } catch (Exception e) {
             // TODO(light): handle exception.
@@ -242,14 +239,17 @@ public class RenderCollectionServlet {
         }
 
         SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
+
+        SoyMapData collectionSoyMapData =
+                new SoyMapData("id", collectionId, "version", versionWrapper.toString(), "title",
+                        title, "abstract", abstractText, "authors",
+                        Utils.convertActorListToSoyData(authors), "contentHtml", contentHtml);
+        String uriString = (firstModuleUri != null ? firstModuleUri.toString() : null);
         final SoyMapData params =
-            new SoyMapData("collection", new SoyMapData("id", collectionId, "version",
-                collectionVersion.toString(), "title", title, "abstract", abstractText, "authors",
-                Utils.convertActorListToSoyData(authors), "contentHtml", contentHtml),
-                "firstModuleUri", (firstModuleUri != null ? firstModuleUri.toString() : null));
+                new SoyMapData("collection", collectionSoyMapData, "firstModuleUri", uriString);
 
         String generatedCollectionHtml =
-            tofu.render(CommonHack.COLLECTION_TEMPLATE_NAME, params, null);
+                tofu.render(CommonHack.COLLECTION_TEMPLATE_NAME, params, null);
         builder.append(generatedCollectionHtml);
 
         ResponseBuilder myresponse = Response.ok();
@@ -266,9 +266,11 @@ public class RenderCollectionServlet {
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
             throws Exception {
         // TODO(arjuns) : Handle exception.
-        VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(collectionId);
+        final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
+
         URL url =
-            cnxClient.getConstants().getCollectionVersionXmlAbsPath(collectionId, versionWrapper);
+                cnxClient.getConstants().getCollectionVersionXmlAbsPath(idWrapper, versionWrapper);
 
         return fetchFromRepositoryAndReturn(url);
     }
@@ -278,7 +280,6 @@ public class RenderCollectionServlet {
     @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
     @Path(COLLECTION_MODULE_URL_PATTERN)
     public Response getModuleVersionUnderCollectionVersion(@Context HttpServletRequest req,
-
             @Context HttpServletResponse res,
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString,
@@ -286,48 +287,44 @@ public class RenderCollectionServlet {
             @PathParam(CommonHack.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
             throws Exception {
         // TODO(arjuns) : handle exceptions.
-        if (!VersionWrapper.isValidVersion(collectionVersionString)) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-
+        final IdWrapper collectionIdWrapper = IdWrapper.getIdWrapperFromUrlId(collectionId);
         final VersionWrapper collectionVersion = new VersionWrapper(collectionVersionString);
 
-        if (!VersionWrapper.isValidVersion(moduleVersionString)) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-
+        final IdWrapper moduleIdWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
         final VersionWrapper moduleVersion = new VersionWrapper(moduleVersionString);
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
         Entry collectionVersionEntry =
-            cnxClient.getCollectionVersionEntry(collectionId, collectionVersion);
+                cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
         String collXml =
-            cnxClient.getConstants()
-                .getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
+                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
+                        collectionVersionEntry);
 
-        final Collection collection = injector.getInstance(CollectionFactory.class)
-                .create(collectionId, CommonHack.parseXmlString(saxParser, collXml));
+        final Collection collection =
+                injector.getInstance(CollectionFactory.class).create(collectionId,
+                        CommonHack.parseXmlString(saxParser, collXml));
 
         // Ensure module is part of the collection
         final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
         if (currentModuleLink == null) {
             logger.log(Level.INFO, "Collection " + collectionId + " does not contain module "
-                + moduleId);
+                    + moduleId);
             // TODO(arjuns): Fix this.
             return Response.serverError().build();
         }
 
-        ClientEntry moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleId, moduleVersion);
+        ClientEntry moduleVersionEntry =
+                cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
         String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-        final Module module = injector.getInstance(ModuleFactory.class).create(moduleId,
-                CommonHack.parseXmlString(saxParser, cnxml),
-                CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+        final Module module =
+                injector.getInstance(ModuleFactory.class).create(moduleId,
+                        CommonHack.parseXmlString(saxParser, cnxml),
+                        CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
         final ModuleLink[] links = collection.getPreviousNext(moduleId);
         SoyData prevLink, nextLink;
-        URI previousModuleUri = null, nextModuleUri = null;
         String collectionTitle = null, moduleTitle;
         String moduleContentHtml = null;
         List<Actor> moduleAuthors;
@@ -372,24 +369,22 @@ public class RenderCollectionServlet {
             renderScope.exit();
         }
 
-
         final SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
-        final SoyMapData params = new SoyMapData(
-                COLLECTION_PARAM, new SoyMapData(
-                        ID_PARAM, collectionId,
-                        VERSION_PARAM, collectionVersion.toString(),
-                        URI_PARAM, getCollectionUri(collectionId, collectionVersion),
-                        TITLE_PARAM, collectionTitle
-                ),
-                MODULE_PARAM, new SoyMapData(
-                        ID_PARAM, moduleId,
-                        VERSION_PARAM, moduleVersion.toString(),
-                        TITLE_PARAM, moduleTitle,
-                        AUTHORS_PARAM, Utils.convertActorListToSoyData(moduleAuthors),
-                        CONTENT_HTML_PARAM, moduleContentHtml
-                ),
-                PREVIOUS_MODULE_PARAM, prevLink,
-                NEXT_MODULE_PARAM, nextLink);
+        final SoyMapData collectionSoyMapData =
+                new SoyMapData(ID_PARAM, collectionId, VERSION_PARAM, collectionVersion.toString(),
+                        URI_PARAM, getCollectionUri(collectionId, collectionVersion), TITLE_PARAM,
+                        collectionTitle);
+
+        final SoyMapData moduleSoyMapData =
+                new SoyMapData(ID_PARAM, moduleId, VERSION_PARAM, moduleVersion.toString(),
+                        TITLE_PARAM, moduleTitle, AUTHORS_PARAM,
+                        Utils.convertActorListToSoyData(moduleAuthors), CONTENT_HTML_PARAM,
+                        moduleContentHtml);
+
+        final SoyMapData params =
+                new SoyMapData(COLLECTION_PARAM, collectionSoyMapData, MODULE_PARAM,
+                        moduleSoyMapData, PREVIOUS_MODULE_PARAM, prevLink, NEXT_MODULE_PARAM,
+                        nextLink);
 
         final String renderedModuleHtml =
                 tofu.render(CommonHack.COLLECTION_MODULE_TEMPLATE_NAME, params, null);
@@ -398,7 +393,7 @@ public class RenderCollectionServlet {
 
     private String getCollectionUri(String collectionId, VersionWrapper collectionVersion) {
         return CommonHack.CONTENT_NAME_SPACE + CommonHack.COLLECTION + "/" + collectionId + "/"
-            + collectionVersion.toString();
+                + collectionVersion.toString();
     }
 
     @GET
@@ -407,8 +402,9 @@ public class RenderCollectionServlet {
     public Response getModuleVersionXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
+        IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
         VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
-        URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(moduleId, versionWrapper);
+        URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(idWrapper, versionWrapper);
 
         return fetchFromRepositoryAndReturn(url);
     }
@@ -419,10 +415,11 @@ public class RenderCollectionServlet {
     public Response getModuleVersionResourcesUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
+        IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
         VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
         URL url =
-            cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(moduleId,
-                versionWrapper);
+                cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(idWrapper,
+                        versionWrapper);
 
         return fetchFromRepositoryAndReturn(url);
     }
@@ -438,14 +435,13 @@ public class RenderCollectionServlet {
             logger.log(Level.WARNING, "Could not obtain title for collection item", e);
         }
 
-        final SoyMapData map = new SoyMapData(
-                TITLE_PARAM, title,
-                COLLECTION_ITEM_DEPTH_PARAM, item.getDepth(),
-                COLLECTION_ITEM_INDEX_PARAM, item.getIndex());
+        final SoyMapData map =
+                new SoyMapData(TITLE_PARAM, title, COLLECTION_ITEM_DEPTH_PARAM, item.getDepth(),
+                        COLLECTION_ITEM_INDEX_PARAM, item.getIndex());
 
         if (item instanceof ModuleLink) {
             map.put(COLLECTION_ITEM_TYPE_PARAM, MODULE_LINK_TYPE);
-            convertModuleLinkToSoyData(map, (ModuleLink)item);
+            convertModuleLinkToSoyData(map, (ModuleLink) item);
         } else if (item instanceof Subcollection) {
             map.put(COLLECTION_ITEM_TYPE_PARAM, SUBCOLLECTION_TYPE);
         }

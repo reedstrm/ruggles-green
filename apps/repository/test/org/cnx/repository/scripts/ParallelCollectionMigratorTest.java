@@ -27,17 +27,17 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelCollectionMigrator;
-import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
 
 /**
- * Test for {@link ParallelModuleMigrator}
+ * Test for {@link ParallelCollectionMigrator}
  * 
  * @author Arjun Satyapal
  */
@@ -80,7 +80,7 @@ public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
 
         Entry collectionEntry = migrator.migrateCollectionVersion();
 
-        String aerCollectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
+        IdWrapper aerCollectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
 
         // TODO(arjuns) : Rename to NEW_COLLECTION_DEFAULT_VERSION
         VersionWrapper firstVersion = CnxAtomPubConstants.NEW_CNX_COLLECTION_DEFAULT_VERSION;

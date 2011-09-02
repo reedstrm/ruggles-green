@@ -22,6 +22,7 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.junit.Before;
@@ -53,15 +54,17 @@ public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
     @Test
     public void testResourceMigrator() {
         ParallelResourceMigrator resourceMigrator =
-            new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
+                new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
 
         ClientEntry createResourceEntry = resourceMigrator.migrateResource();
         createResourceEntry.getEditURI();
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
-        String expectedResourceUrl = getConstants().getResourceAbsPath(resourceId).toString();
+        String expectedResourceUrl =
+                getConstants().getResourceAbsPath(IdWrapper.getIdWrapperFromUrlId(resourceId))
+                        .toString();
         assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
-            .getHrefResolved());
+                .getHrefResolved());
     }
 }

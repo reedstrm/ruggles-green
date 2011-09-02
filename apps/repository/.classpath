@@ -7,30 +7,29 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
 	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
-	<classpathentry kind="lib" path="build/jars/rome-1.0.jar" />
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar" />
+	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar" />
+	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.common.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.xmlschema.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxclient.latest.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/grizzly-servlet-webserver-1.9.18-i.jar"/>
-	<classpathentry kind="lib" path="build/test/lib/jersey-client-1.8.jar" />
+	<classpathentry kind="lib" path="build/test/lib/jersey-client-1.8.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-core-1.8.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/jersey-test-framework-grizzly-1.8.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="build/test/classes"/>
-	<classpathentry kind="lib" path="war/WEB-INF/classes"/>
 	<classpathentry kind="lib" path="build/test/lib/appengine-api-labs.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/appengine-api-stubs.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/appengine-api.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/appengine-testing.jar"/>
-	<classpathentry kind="lib" path="build/test/lib/args4j-2.0.12.jar" />
+	<classpathentry kind="lib" path="build/test/lib/args4j-2.0.12.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

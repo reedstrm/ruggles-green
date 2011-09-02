@@ -21,6 +21,27 @@ import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.tofu.SoyTofu;
+
+import com.sun.syndication.propono.atom.client.ClientEntry;
+
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.cnxml.Module;
+import org.cnx.cnxml.ModuleFactory;
+import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.mdml.Actor;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.util.RenderScope;
+import org.cnx.web.CommonHack;
+import org.cnx.web.Utils;
+import org.cnx.web.WebViewConfiguration;
+import org.cnx.web.WebViewTemplate;
+
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -35,31 +56,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 import javax.xml.parsers.SAXParser;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.cnxml.Module;
-import org.cnx.cnxml.ModuleFactory;
-import org.cnx.cnxml.ModuleHTMLGenerator;
-import org.cnx.mdml.Actor;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.util.RenderScope;
-import org.cnx.web.CommonHack;
-import org.cnx.web.Utils;
-import org.cnx.web.WebViewConfiguration;
-import org.cnx.web.WebViewTemplate;
-
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.template.soy.data.SoyMapData;
-import com.google.template.soy.tofu.SoyTofu;
-import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * Servlet to Handle CNX Resources.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CommonHack.MODULE)
@@ -67,28 +68,28 @@ public class RenderModuleServlet {
     /**
      * This will fetch specific version for a Module. Possible value for version = [{version},
      * {"latest"}]
-     *
+     * 
      * URL Pattern wrt /module = /<moduleId>/<version>
      */
     static final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/{"
-        + MODULE_VERSION_PATH_PARAM + "}";
+            + MODULE_VERSION_PATH_PARAM + "}";
 
     private Injector injector;
 
     /**
      * This will fetch CNXML for a given module-version.
-     *
+     * 
      * URL Pattern wrt /module = /<moduleId>/<version>/xml
      */
     static final String MODULE_VERSION_XML_URL_PATTERN = MODULE_VERSION_URL_PATTERN + END_URL_XML;
 
     /**
      * This will fetch ResourceMapping XML for a given module-version.
-     *
+     * 
      * URL Pattern wrt /module = /<moduleId>/<version>/resources
      */
     static final String MODULE_VERSION_RESOURCES_URL_PATTERN = MODULE_VERSION_URL_PATTERN
-        + END_URL_RESOURCES;
+            + END_URL_RESOURCES;
 
     private final SAXParser saxParser;
     // TODO(arjuns) : Move this to a better place.
@@ -114,30 +115,27 @@ public class RenderModuleServlet {
     @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
     @Path(MODULE_VERSION_URL_PATTERN)
     public Response getModuleVersion(@Context HttpServletRequest req,
-            @Context HttpServletResponse res,
-            @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+            @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
         // TODO(arjuns) : Handle exception.
         StringBuilder builder = new StringBuilder();
 
-        if (!VersionWrapper.isValidVersion(moduleVersionString)) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-
-        final VersionWrapper moduleVersionInt = new VersionWrapper(moduleVersionString);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
 
         String finalHtml = null;
 
         if (finalHtml == null) {
             // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
             ClientEntry moduleVersionEntry =
-                cnxClient.getModuleVersionEntry(moduleId, moduleVersionInt);
+                    cnxClient.getModuleVersionEntry(idWrapper, versionWrapper);
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);
             String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-            final Module module = injector.getInstance(ModuleFactory.class).create(moduleId,
-                    CommonHack.parseXmlString(saxParser, cnxml),
-                    CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+            final Module module =
+                    injector.getInstance(ModuleFactory.class).create(moduleId,
+                            CommonHack.parseXmlString(saxParser, cnxml),
+                            CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
             RenderScope renderScope = injector.getInstance(RenderScope.class);
 
@@ -162,12 +160,9 @@ public class RenderModuleServlet {
                 renderScope.exit();
             }
             final SoyMapData params =
-                new SoyMapData("module", new SoyMapData(
-                    "id", moduleId,
-                    "version", moduleVersionString,
-                    "title", title,
-                    "authors", Utils.convertActorListToSoyData(authors),
-                    "contentHtml", contentHtml));
+                    new SoyMapData("module", new SoyMapData("id", moduleId, "version",
+                            moduleVersionString, "title", title, "authors",
+                            Utils.convertActorListToSoyData(authors), "contentHtml", contentHtml));
 
             SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
 
@@ -187,9 +182,10 @@ public class RenderModuleServlet {
     public Response getModuleVersionXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        // TODO(arjuns) : Handle excepiton.
-        VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
-        URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(moduleId, versionWrapper);
+        // TODO(arjuns) : Handle exceptions.
+        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
+        URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(idWrapper, versionWrapper);
 
         return fetchFromRepositoryAndReturn(url);
     }
@@ -200,10 +196,11 @@ public class RenderModuleServlet {
     public Response getModuleVersionResources(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
         URL url =
-            cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(moduleId,
-                versionWrapper);
+                cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(idWrapper,
+                        versionWrapper);
 
         return fetchFromRepositoryAndReturn(url);
     }

@@ -882,10 +882,26 @@ public class ModuleHTMLGeneratorTests {
                 + "data=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\" "
                 + "width=\"128\" height=\"42\">"
-                + "Epic widget</object>",
+                + "Download Epic widget</object>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "Epic widget")
+                        .addContent(new Element("object", ns)
+                                .setAttribute("src", "http://www.example.com/my-widget")
+                                .setAttribute("mime-type", "application/x-widget")
+                                .setAttribute("height", "42")
+                                .setAttribute("width", "128"))));
+    }
+
+    @Test public void mediaObjectShouldShowUriForEmptyAlt() throws Exception {
+        assertEquals("<object id=\"thing\" "
+                + "data=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\" "
+                + "width=\"128\" height=\"42\">"
+                + "Download http://www.example.com/my-widget</object>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "thing")
+                        .setAttribute("alt", "")
                         .addContent(new Element("object", ns)
                                 .setAttribute("src", "http://www.example.com/my-widget")
                                 .setAttribute("mime-type", "application/x-widget")
@@ -906,6 +922,19 @@ public class ModuleHTMLGeneratorTests {
                                 .setAttribute("mime-type", "application/x-widget"))));
     }
 
+    @Test public void mediaDownloadShouldShowUriForEmptyAlt() throws Exception {
+        assertEquals("<a id=\"thing\" "
+                + "href=\"http://www.example.com/my-widget\" "
+                + "type=\"application/x-widget\">"
+                + "Download http://www.example.com/my-widget</a>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "thing")
+                        .setAttribute("alt", "")
+                        .addContent(new Element("download", ns)
+                                .setAttribute("src", "http://www.example.com/my-widget")
+                                .setAttribute("mime-type", "application/x-widget"))));
+    }
+
     @Test public void mediaLabviewShouldRenderAsLink() throws Exception {
         assertEquals("<a id=\"lbv\" "
                 + "href=\"http://www.example.com/content.vi\" "
@@ -919,9 +948,22 @@ public class ModuleHTMLGeneratorTests {
                                 .setAttribute("mime-type", "application/x-labview-vi"))));
     }
 
+    @Test public void mediaLabviewShouldShowUriForEmptyAlt() throws Exception {
+        assertEquals("<a id=\"lbv\" "
+                + "href=\"http://www.example.com/content.vi\" "
+                + "type=\"application/x-labview-vi\">"
+                + "Download http://www.example.com/content.vi</a>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "lbv")
+                        .setAttribute("alt", "")
+                        .addContent(new Element("labview", ns)
+                                .setAttribute("src", "http://www.example.com/content.vi")
+                                .setAttribute("mime-type", "application/x-labview-vi"))));
+    }
+
     @Test public void mediaShouldIgnorePdf() throws Exception {
         assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
-                + "type=\"application/x-widget\">Epic widget</object>",
+                + "type=\"application/x-widget\">Download Epic widget</object>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "Epic widget")
@@ -936,7 +978,7 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void mediaShouldAlwaysUseOverride() throws Exception {
         assertEquals("<object id=\"thing\" data=\"http://www.example.com/my-widget\" "
-                + "type=\"application/x-widget\">Epic widget</object>",
+                + "type=\"application/x-widget\">Download Epic widget</object>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "Epic widget")
@@ -969,10 +1011,33 @@ public class ModuleHTMLGeneratorTests {
                 + "type=\"application/vnd.wolfram.cdf.text\" "
                 + "width=\"128\" height=\"42\">"
                 + "</object>"
-                + "<div class=\"downloadLink\"><a href=\"MYFILENAME.cdf\">Download CDF</a></div>",
+                + "<div class=\"downloadLink\"><a href=\"MYFILENAME.cdf\">"
+                + "Download Mathematica Test</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "mycdf")
                         .setAttribute("alt", "Mathematica Test")
+                        .addContent(new Element("object", ns)
+                                .setAttribute("src", "MYFILENAME.cdf")
+                                .setAttribute("mime-type", "application/vnd.wolfram.cdf.text")
+                                .setAttribute("height", "42")
+                                .setAttribute("width", "128"))));
+    }
+
+    @Test public void mathematicaShouldShowUriForEmptyAlt() throws Exception {
+        assertEquals("<object id=\"mycdf\" "
+                + "data=\"MYFILENAME.cdf\" "
+                + "type=\"application/vnd.wolfram.cdf.text\" "
+                + "width=\"128\" height=\"42\">"
+                + "<param name=\"src\" value=\"MYFILENAME.cdf\">"
+                + "<embed src=\"MYFILENAME.cdf\" "
+                + "type=\"application/vnd.wolfram.cdf.text\" "
+                + "width=\"128\" height=\"42\">"
+                + "</object>"
+                + "<div class=\"downloadLink\"><a href=\"MYFILENAME.cdf\">"
+                + "Download MYFILENAME.cdf</a></div>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "mycdf")
+                        .setAttribute("alt", "")
                         .addContent(new Element("object", ns)
                                 .setAttribute("src", "MYFILENAME.cdf")
                                 .setAttribute("mime-type", "application/vnd.wolfram.cdf.text")

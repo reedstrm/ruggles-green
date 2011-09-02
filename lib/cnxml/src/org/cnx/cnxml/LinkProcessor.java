@@ -117,6 +117,7 @@ public class LinkProcessor implements Processor {
         final URI target = resolver.resolveUri(Links.convertLinkAttributeToUri(attr));
         if (target != null) {
             elem.setAttribute(CnxmlAttributes.MEDIA_CHILD_SOURCE, target.toString());
+            elem.setAttribute(ProcessorData.ORIGINAL_SOURCE_ATTR, attr, ProcessorData.NAMESPACE);
         }
 
         if (CnxmlTag.IMAGE.getTag().equals(elem.getName())) {

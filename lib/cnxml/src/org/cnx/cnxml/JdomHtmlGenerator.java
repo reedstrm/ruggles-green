@@ -18,6 +18,7 @@ package org.cnx.cnxml;
 
 import static com.google.common.base.Preconditions.*;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
@@ -105,7 +106,6 @@ import org.jdom.input.DOMBuilder;
 
     private final static String CDF_MIME_TYPE = "application/vnd.wolfram.cdf";
     private final static String CDF_TEXT_MIME_TYPE = "application/vnd.wolfram.cdf.text";
-    private final static String HTML_CDF_DOWNLOAD_LABEL = "Download CDF";
 
     private final static String HTML_DOWNLOAD_LABEL = "Download ";
 
@@ -1063,13 +1063,30 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
+    protected static String getDownloadLabel(final Element elem) {
+        final Element mediaElem = (Element)elem.getParent();
+        final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
+        final String alt = mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT);
+        final String originalSource = elem.getAttributeValue(ProcessorData.ORIGINAL_SOURCE_ATTR,
+                ProcessorData.NAMESPACE);
+        if (!alt.isEmpty()) {
+            return HTML_DOWNLOAD_LABEL + alt;
+        } else if (!Strings.isNullOrEmpty(originalSource)) {
+            return HTML_DOWNLOAD_LABEL + originalSource;
+        } else {
+            return HTML_DOWNLOAD_LABEL + source;
+        }
+    }
+
     protected void generateObject(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.OBJECT.getTag()))
                 .setAttribute(HtmlAttributes.OBJECT_SOURCE,
                         elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
                 .setAttribute(HtmlAttributes.OBJECT_TYPE,
-                        elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE));
+                        elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE))
+                .setText(getDownloadLabel(elem));
+
         final String width = elem.getAttributeValue(CnxmlAttributes.OBJECT_WIDTH);
         if (width != null) {
             htmlElem.setAttribute(HtmlAttributes.OBJECT_WIDTH, width);
@@ -1078,20 +1095,17 @@ import org.jdom.input.DOMBuilder;
         if (height != null) {
             htmlElem.setAttribute(HtmlAttributes.OBJECT_HEIGHT, height);
         }
-        htmlElem.setText(mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
         addHtmlContent(htmlElem);
     }
 
     protected void generateDownloadLink(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
-        final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.LINK.getTag()))
+        addHtmlContent(copyId(mediaElem, new Element(HtmlTag.LINK.getTag()))
                 .setAttribute(HtmlAttributes.LINK_URL,
                         elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
                 .setAttribute(HtmlAttributes.LINK_TYPE,
-                        elem.getAttributeValue(CnxmlAttributes.DOWNLOAD_TYPE));
-        htmlElem.setText(HTML_DOWNLOAD_LABEL
-                + mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
-        addHtmlContent(htmlElem);
+                        elem.getAttributeValue(CnxmlAttributes.DOWNLOAD_TYPE))
+                .setText(getDownloadLabel(elem)));
     }
 
     protected void generateMathematica(final Element elem) {
@@ -1125,7 +1139,7 @@ import org.jdom.input.DOMBuilder;
                         .setAttribute(HtmlAttributes.CLASS, HTML_CDF_DOWNLOAD_CLASS)
                         .addContent(new Element(HtmlTag.LINK.getTag())
                                 .setAttribute(HtmlAttributes.LINK_URL, source)
-                                .setText(HTML_CDF_DOWNLOAD_LABEL)));
+                                .setText(getDownloadLabel(elem))));
     }
 
     // TODO(light): allow multiple tgroups

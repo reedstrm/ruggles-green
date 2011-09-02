@@ -81,8 +81,10 @@ public class LinkProcessorTests {
     }
 
     private URI processMedia(final Element elem) throws Exception {
+        final String src = elem.getAttributeValue("src");
         processor.resolveMedia(elem);
         assertNotNull(elem.getAttributeValue("src"));
+        assertEquals(src, elem.getAttributeValue("original-src", ProcessorData.NAMESPACE));
         return new URI(elem.getAttributeValue("src"));
     }
 

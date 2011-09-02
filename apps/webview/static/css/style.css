@@ -182,6 +182,10 @@ table.cals {
     border-collapse: collapse;
 }
 
+table.cals > caption {
+    caption-side: bottom;
+}
+
 table.cals tr {
     border-top: thin solid black;
     border-bottom: thin solid black;

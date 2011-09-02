@@ -42,11 +42,11 @@ public class IdUtilTest {
         final OrmEntitySpec spec0 = new OrmEntitySpec("spec0", "");
         final OrmEntitySpec spec1 = new OrmEntitySpec("spec1", "X");
 
-        assertEquals("1", IdUtil.keyToId(spec0, KeyFactory.createKey("spec0", 1)));
+        assertEquals("0001", IdUtil.keyToId(spec0, KeyFactory.createKey("spec0", 1)));
         assertEquals("9223372036854775807",
                 IdUtil.keyToId(spec0, KeyFactory.createKey("spec0", 9223372036854775807L)));
 
-        assertEquals("X1", IdUtil.keyToId(spec1, KeyFactory.createKey("spec1", 1)));
+        assertEquals("X0001", IdUtil.keyToId(spec1, KeyFactory.createKey("spec1", 1)));
         assertEquals("X9223372036854775807",
                 IdUtil.keyToId(spec1, KeyFactory.createKey("spec1", 9223372036854775807L)));
     }

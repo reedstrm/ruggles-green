@@ -34,10 +34,11 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 public class IdUtil {
 
     /**
-     * Regex for the post prefix portion of the id. We reject values such as "0", "0x123", "0004" or
-     * "-98".
+     * Regex for the post prefix portion of the id. We match exactly strings that can
+     * be formatted by "%04d" with numeric value >= 0. We later filter out the invalid
+     * zero value.
      */
-    private static final Pattern SUB_ID_PATTERN = Pattern.compile("[1-9][0-9]{0,20}");
+    private static final Pattern SUB_ID_PATTERN = Pattern.compile("[0-9]{4}|[1-9][0-9]{4,20}");
 
     /**
      * Convert key to id.
@@ -50,7 +51,7 @@ public class IdUtil {
                 key);
         final long id = key.getId();
         checkArgument(id >= 1, "Invalid id: %s", key);
-        return entitySpec.getIdPrefix() + id;
+        return String.format("%s%04d", entitySpec.getIdPrefix(), id);
     }
 
     /**
@@ -78,6 +79,11 @@ public class IdUtil {
         try {
             numericId = Long.decode(subId);
         } catch (NumberFormatException e) {
+            return null;
+        }
+
+        // Appengine keys reject numeric id 0.w
+        if (numericId < 1) {
             return null;
         }
 

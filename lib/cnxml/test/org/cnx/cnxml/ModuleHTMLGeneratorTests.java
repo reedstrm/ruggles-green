@@ -726,6 +726,18 @@ public class ModuleHTMLGeneratorTests {
                         .addContent(new Element("item", ns).setText("Three"))));
     }
 
+    @Test public void bulletedListShouldAllowBulletStyleNone() throws Exception {
+        assertEquals("<ul id=\"bulletList\" class=\"bulletStyleNone\">"
+                + "<li>One</li><li>Two</li><li>Three</li></ul>",
+                generate(new Element("list", ns)
+                        .setAttribute("id", "bulletList")
+                        .setAttribute("list-type", "bulleted")
+                        .setAttribute("bullet-style", "none")
+                        .addContent(new Element("item", ns).setText("One"))
+                        .addContent(new Element("item", ns).setText("Two"))
+                        .addContent(new Element("item", ns).setText("Three"))));
+    }
+
     @Test public void enumeratedListShouldRenderAsOl() throws Exception {
         assertEquals("<ol id=\"enumList\"><li>One</li><li>Two</li><li>Three</li></ol>",
                 generate(new Element("list", ns)

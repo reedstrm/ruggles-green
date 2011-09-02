@@ -172,6 +172,10 @@ p.authors {
     background: #deca73;
 }
 
+.moduleContent .bulletStyleNone {
+    list-style: none;
+}
+
 table.cals {
     border-collapse: collapse;
 }

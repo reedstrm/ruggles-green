@@ -37,6 +37,7 @@ public class CnxmlAttributes {
     public final static String LIST_ITEM_SEP = "item-sep";
     public final static String LIST_TYPE = "list-type";
     public final static String LIST_NUMBER_STYLE = "number-style";
+    public final static String LIST_BULLET_STYLE = "bullet-style";
     public final static String LIST_START_VALUE = "start-value";
     public final static String NEWLINE_COUNT = "count";
     public final static String NEWLINE_EFFECT = "effect";
@@ -343,6 +344,36 @@ public class CnxmlAttributes {
         public static CalsFrame of(@Nullable final String value,
                 @Nullable final CalsFrame defaultValue) {
             return ValueEnums.findEnum(CalsFrame.class, value, defaultValue);
+        }
+    }
+
+    public static enum BulletStyle implements ValueEnum {
+        BULLET("bullet"),
+        OPEN_CIRCLE("open-circle"),
+        PILCROW("pilcrow"),
+        RPILCROW("rpilcrow"),
+        ASTERISK("asterisk"),
+        DASH("dash"),
+        SECTION("section"),
+        NONE("none");
+
+        private String value;
+
+        private BulletStyle(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static BulletStyle of(@Nullable final String value) {
+            return ValueEnums.findEnum(BulletStyle.class, value, null);
+        }
+
+        public static BulletStyle of(@Nullable final String value,
+                @Nullable final BulletStyle defaultValue) {
+            return ValueEnums.findEnum(BulletStyle.class, value, defaultValue);
         }
     }
 }

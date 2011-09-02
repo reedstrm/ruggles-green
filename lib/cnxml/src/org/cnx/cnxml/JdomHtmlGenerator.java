@@ -131,6 +131,8 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_CALS_FRAME_BOTTOM_CLASS = "calsFrameBottom";
     private final static String HTML_CALS_FRAME_TOPBOTTOM_CLASS = "calsFrameTopBottom";
 
+    private final static String HTML_BULLET_STYLE_NONE_CLASS = "bulletStyleNone";
+
     private final static String UNRECOGNIZED_CONTENT_INNER_TEXT = "...";
     private final static String UNRECOGNIZED_CONTENT_MESSAGE = "Unrecognized Content: ";
 
@@ -813,6 +815,21 @@ import org.jdom.input.DOMBuilder;
         switch (type) {
         case BULLETED:
             htmlElem = copyId(elem, new Element(HtmlTag.UNORDERED_LIST.getTag()));
+
+            final CnxmlAttributes.BulletStyle bulletStyle = CnxmlAttributes.BulletStyle.of(
+                    elem.getAttributeValue(CnxmlAttributes.LIST_BULLET_STYLE),
+                    CnxmlAttributes.BulletStyle.BULLET);
+            switch (bulletStyle) {
+            case NONE:
+                htmlElem.setAttribute(HtmlAttributes.CLASS, HTML_BULLET_STYLE_NONE_CLASS);
+                break;
+            case BULLET:
+                // Don't add a class for the normal case.
+                break;
+            default:
+                log.warning("unsupported bullet style: " + bulletStyle.getValue());
+                break;
+            }
             break;
         case ENUMERATED:
             htmlElem = copyId(elem, new Element(HtmlTag.ORDERED_LIST.getTag()));

@@ -176,6 +176,10 @@ p.authors {
     list-style: none;
 }
 
+.moduleContent figure {
+    text-align: center;
+}
+
 table.cals {
     margin-left: auto;
     margin-right: auto;
@@ -184,6 +188,7 @@ table.cals {
 
 table.cals > caption {
     caption-side: bottom;
+    text-align: center;
 }
 
 table.cals tr {

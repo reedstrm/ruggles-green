@@ -40,8 +40,6 @@
  *
  *  @param module Module object
  *  @param collection Collection object
- *  @param moduleIndex Index of the module in the collection
- *  @param moduleCount Number of modules in the collection
  *  @param? previousModule A partial Module object for the previous module, or null if there isn't
  *                         one.
  *  @param? nextModule A partial Module object for the previous module, or null if there isn't one.
@@ -55,15 +53,12 @@
         {/param}
         {param sandbarHtml}
             <nav id="sandbar">
+                <span class="collectionTitle">{$collection.title}</span>
                 <a href="{$collection.uri}">Table of Contents</a>
-                <span>{$moduleIndex + 1} of {$moduleCount}</span>
             </nav>
         {/param}
         {param contentHtml}
-            <hgroup>
-                <h1 class="collectionTitle"><a href="{$collection.uri}">{$collection.title}</a></h1>
-                <h1 class="moduleTitle">{$module.title}</h1>
-            </hgroup>
+            <h1 class="moduleTitle">{$module.title}</h1>
             <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
             {call .collectionNavBar data="all"/}

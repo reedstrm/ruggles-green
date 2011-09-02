@@ -55,19 +55,6 @@ p.authors {
     margin-top: 0.75ex;
 }
 
-hgroup > h1.collectionTitle {
-    margin-bottom: 0;
-    font-size: 100%;
-}
-
-hgroup > h1.collectionTitle > a {
-    color: gray;
-}
-
-hgroup > h1.moduleTitle {
-    margin-top: 0;
-}
-
 #sandbar {
     color: white;
     background: #555;
@@ -86,11 +73,10 @@ hgroup > h1.moduleTitle {
     display: table;
     table-layout: fixed;
     width: 100%;
-    margin-top: 1em;
+    margin-top: 3em;
+    margin-bottom: 1em;
     padding: 0.5ex 1ex;
-
-    background: #cedff0;
-    border: thin solid gray;
+    border-top: thin solid gray;
 }
 
 .collectionNavBar a {

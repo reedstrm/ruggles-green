@@ -135,8 +135,6 @@ public class RenderCollectionServlet {
     private static final String COLLECTION_PARAM = "collection";
     private static final String CONTENT_HTML_PARAM = "contentHtml";
     private static final String ID_PARAM = "id";
-    private static final String MODULE_COUNT_PARAM = "moduleCount";
-    private static final String MODULE_INDEX_PARAM = "moduleIndex";
     private static final String MODULE_LINKS_PARAM = "moduleLinks";
     private static final String MODULE_LINK_TYPE = "module";
     private static final String MODULE_PARAM = "module";
@@ -311,14 +309,13 @@ public class RenderCollectionServlet {
                 .create(collectionId, CommonHack.parseXmlString(saxParser, collXml));
 
         // Ensure module is part of the collection
-        final int moduleIndex = collection.getModuleIndex(moduleId);
-        if (moduleIndex == -1) {
+        final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
+        if (currentModuleLink == null) {
             logger.log(Level.INFO, "Collection " + collectionId + " does not contain module "
                 + moduleId);
             // TODO(arjuns): Fix this.
             return Response.serverError().build();
         }
-        final ModuleLink currentModuleLink = collection.getModuleLinks().get(moduleIndex);
 
         ClientEntry moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleId, moduleVersion);
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
@@ -391,8 +388,6 @@ public class RenderCollectionServlet {
                         AUTHORS_PARAM, Utils.convertActorListToSoyData(moduleAuthors),
                         CONTENT_HTML_PARAM, moduleContentHtml
                 ),
-                MODULE_INDEX_PARAM, moduleIndex,
-                MODULE_COUNT_PARAM, collection.getModuleLinks().size(),
                 PREVIOUS_MODULE_PARAM, prevLink,
                 NEXT_MODULE_PARAM, nextLink);
 

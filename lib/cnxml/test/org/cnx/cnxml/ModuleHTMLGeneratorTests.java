@@ -597,7 +597,8 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<div class=\"exercise\" id=\"texas-exercise\">"
                 + "<div class=\"title\">Exercise 1</div>"
                 + "<div class=\"problem\" id=\"texas-problem\">What is the capital of Texas?"
-                + "</div><div class=\"solution\" id=\"texas-solution\">Austin</div></div>",
+                + "</div><div class=\"solution\" id=\"texas-solution\">"
+                + "<div class=\"title\">Solution</div>Austin</div></div>",
                 generate(new Element("exercise", ns)
                         .setAttribute("id", "texas-exercise")
                         .addContent(new Element("problem", ns)

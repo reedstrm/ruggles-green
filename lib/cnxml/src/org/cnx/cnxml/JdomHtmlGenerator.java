@@ -63,6 +63,7 @@ import org.jdom.input.DOMBuilder;
     private final static String EXERCISE_LABEL = "Exercise";
     private final static String EQUATION_LABEL = "Equation";
     private final static String PROOF_LABEL = "Proof";
+    private final static String SOLUTION_LABEL = "Solution";
     private final static String DEFINITION_LABEL = "Definition";
     private final static String EXAMPLE_LABEL = "Example";
     private final static String FIGURE_LABEL = "Figure";
@@ -698,8 +699,12 @@ import org.jdom.input.DOMBuilder;
     }
 
     protected void generateSolution(final Element elem) {
+        final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                .setText(SOLUTION_LABEL);
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_SOLUTION_CLASS)));
+                .setAttribute(HtmlAttributes.CLASS, HTML_SOLUTION_CLASS))
+                .addContent(htmlTitleElem));
     }
 
     protected void generateEquation(final Element elem) {

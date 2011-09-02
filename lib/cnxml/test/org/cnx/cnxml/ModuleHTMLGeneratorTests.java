@@ -212,7 +212,8 @@ public class ModuleHTMLGeneratorTests {
     @Test public void emptyLinkShouldRecognizeFigure() throws Exception {
         final Element figure = new Element("figure", ns).setAttribute("id", "myRefId");
         final String figureOutput =
-                "<figure id=\"myRefId\"><figcaption>Figure 1</figcaption></figure>";
+                "<figure id=\"myRefId\"><figcaption><span class=\"title\">Figure 1</span>"
+                + "</figcaption></figure>";
         assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
                         .addContent(new Element("content", ns)
@@ -634,12 +635,14 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void figureShouldWrapContent() throws Exception {
-        assertEquals("<figure id=\"go\">Hello<figcaption>Figure 1</figcaption></figure>",
+        assertEquals("<figure id=\"go\">Hello"
+                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns).setAttribute("id", "go").setText("Hello")));
     }
 
     @Test public void figureShouldUseLabel() throws Exception {
-        assertEquals("<figure id=\"go\">Hello<figcaption>Fig 1</figcaption></figure>",
+        assertEquals("<figure id=\"go\">Hello"
+                + "<figcaption><span class=\"title\">Fig 1</span></figcaption></figure>",
                 generate(new Element("figure", ns).setAttribute("id", "go")
                         .addContent(new Element("label", ns).setText("Fig"))
                         .addContent(new Text("Hello"))));
@@ -647,7 +650,8 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureShouldUseTitle() throws Exception {
         assertEquals("<div class=\"title\">The Go Figure</div>"
-                + "<figure id=\"go\">Hello<figcaption>Figure 1</figcaption></figure>",
+                + "<figure id=\"go\">Hello"
+                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("title", ns).setText("The Go Figure"))
@@ -655,7 +659,9 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void figureShouldUseCaption() throws Exception {
-        assertEquals("<figure id=\"go\">Hello<figcaption>Figure 1: A caption</figcaption></figure>",
+        assertEquals("<figure id=\"go\">Hello"
+                + "<figcaption><span class=\"title\">Figure 1:</span>"
+                + " A caption</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("caption", ns).setText("A caption"))
@@ -664,7 +670,8 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureCaptionShouldAcceptLinks() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption>Figure 1: A <a href=\"http://www.example.com/\">caption</a>"
+                + "<figcaption><span class=\"title\">Figure 1:</span>"
+                + " A <a href=\"http://www.example.com/\">caption</a>"
                 + "</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
@@ -678,7 +685,9 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureShouldUseTitleLabelCaption() throws Exception {
         assertEquals("<div class=\"title\">The Go Figure</div>"
-                + "<figure id=\"go\">Hello<figcaption>Fig 1: A greeting</figcaption></figure>",
+                + "<figure id=\"go\">Hello"
+                + "<figcaption><span class=\"title\">Fig 1:</span>"
+                + " A greeting</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("title", ns).setText("The Go Figure"))
@@ -691,7 +700,7 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<figure id=\"go\" class=\"horizontal\">"
                 + "<div class=\"subfigure\">Hello</div>"
                 + "<div class=\"subfigure\">World</div>"
-                + "<figcaption>Figure 1</figcaption></figure>",
+                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("subfigure", ns).setText("Hello"))
@@ -702,7 +711,7 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<figure id=\"go\" class=\"horizontal\">"
                 + "<div class=\"subfigure\">Hello</div>"
                 + "<div class=\"subfigure\">World</div>"
-                + "<figcaption>Figure 1</figcaption></figure>",
+                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "horizontal")
@@ -714,7 +723,7 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<figure id=\"go\" class=\"vertical\">"
                 + "<div class=\"subfigure\">Hello</div>"
                 + "<div class=\"subfigure\">World</div>"
-                + "<figcaption>Figure 1</figcaption></figure>",
+                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "vertical")

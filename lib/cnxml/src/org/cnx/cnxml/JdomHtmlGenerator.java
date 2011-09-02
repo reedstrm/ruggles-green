@@ -740,16 +740,20 @@ import org.jdom.input.DOMBuilder;
 
         // Add caption to HTML figure element
         final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
+        final Element htmlCaptionTitleElem = new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
         final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         final Element captionElem =
                 elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
-        htmlCaptionElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
+        htmlCaptionTitleElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
+        htmlCaptionElem.addContent(htmlCaptionTitleElem);
         htmlElem.addContent(htmlCaptionElem);
 
         // Push CNXML caption element to stack if it is present
         if (captionElem != null) {
-            htmlCaptionElem.addContent(": ");
+            htmlCaptionTitleElem.addContent(":");
+            htmlCaptionElem.addContent(" ");
             stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
         }
 

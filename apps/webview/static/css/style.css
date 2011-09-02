@@ -155,7 +155,7 @@ p.authors {
     border-bottom: thin solid gray;
 }
 
-.moduleContent .title, .moduleContent figcaption {
+.moduleContent .title {
     font-weight: bold;
     margin-bottom: 1ex;
 }

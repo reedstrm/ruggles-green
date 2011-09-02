@@ -165,6 +165,34 @@ p.authors {
     margin-top: 1em;
 }
 
+.moduleContent .equation {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.moduleContent .equationContent {
+    display: table-cell;
+    width: 95%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.moduleContent .equationNumber {
+    display: table-cell;
+    width: 5%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.moduleContent .equationNumber:before {
+    content: "[";
+}
+
+.moduleContent .equationNumber:after {
+    content: "]";
+}
+
 .moduleContent .unhandled {
     width: 20em;
     padding: 0 1ex;

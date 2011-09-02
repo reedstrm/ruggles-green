@@ -91,6 +91,8 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_DEFINITION_CLASS = "definition";
     private final static String HTML_MEANING_CLASS = "meaning";
     private final static String HTML_EQUATION_CLASS = "equation";
+    private final static String HTML_EQUATION_CONTENT_CLASS = "equationContent";
+    private final static String HTML_EQUATION_NUMBER_CLASS = "equationNumber";
     private final static String HTML_RULE_CLASS = "rule";
     private final static String HTML_STATEMENT_CLASS = "statement";
     private final static String HTML_PROOF_CLASS = "proof";
@@ -708,7 +710,26 @@ import org.jdom.input.DOMBuilder;
     }
 
     protected void generateEquation(final Element elem) {
-        pushHtmlElement(elem, numberedContainer(elem, HTML_EQUATION_CLASS, EQUATION_LABEL));
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
+        if (title != null) {
+            addHtmlContent(new Element(HtmlTag.DIV.getTag())
+                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setText(title));
+        }
+
+        final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_CLASS));
+        addHtmlContent(htmlElem);
+
+        final int number = getNumber(elem);
+        htmlElem.addContent(new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_NUMBER_CLASS)
+                .setText(Integer.toString(number)));
+
+        final Element htmlContentDiv = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_CONTENT_CLASS);
+        htmlElem.addContent(0, htmlContentDiv);
+        stack.push(new GeneratorFrame(elem, htmlContentDiv));
     }
 
     protected void generateFigure(final Element elem) {

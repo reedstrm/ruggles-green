@@ -628,10 +628,22 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void equationShouldWrapContent() throws Exception {
         assertEquals("<div class=\"equation\" id=\"my-equation\">"
-                + "<div class=\"title\">Equation 1</div>2 + 2 = 4</div>",
+                + "<div class=\"equationContent\">2 + 2 = 4</div>"
+                + "<div class=\"equationNumber\">1</div></div>",
                 generate(new Element("equation", ns)
                         .setAttribute("id", "my-equation")
                         .setText("2 + 2 = 4")));
+    }
+
+    @Test public void equationShouldUseTitle() throws Exception {
+        assertEquals("<div class=\"title\">My Brilliant Hypothesis</div>"
+                + "<div class=\"equation\" id=\"my-equation\">"
+                + "<div class=\"equationContent\">2 + 2 = 4</div>"
+                + "<div class=\"equationNumber\">1</div></div>",
+                generate(new Element("equation", ns)
+                        .setAttribute("id", "my-equation")
+                        .addContent(new Element("title", ns).setText("My Brilliant Hypothesis"))
+                        .addContent("2 + 2 = 4")));
     }
 
     @Test public void figureShouldWrapContent() throws Exception {

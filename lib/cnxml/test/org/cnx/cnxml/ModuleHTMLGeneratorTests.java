@@ -662,6 +662,20 @@ public class ModuleHTMLGeneratorTests {
                         .addContent(new Text("Hello"))));
     }
 
+    @Test public void figureCaptionShouldAcceptLinks() throws Exception {
+        assertEquals("<figure id=\"go\">Hello"
+                + "<figcaption>Figure 1: A <a href=\"http://www.example.com/\">caption</a>"
+                + "</figcaption></figure>",
+                generate(new Element("figure", ns)
+                        .setAttribute("id", "go")
+                        .addContent(new Element("caption", ns)
+                                .addContent(new Text("A "))
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "http://www.example.com/")
+                                        .setText("caption")))
+                        .addContent(new Text("Hello"))));
+    }
+
     @Test public void figureShouldUseTitleLabelCaption() throws Exception {
         assertEquals("<div class=\"title\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello<figcaption>Fig 1: A greeting</figcaption></figure>",

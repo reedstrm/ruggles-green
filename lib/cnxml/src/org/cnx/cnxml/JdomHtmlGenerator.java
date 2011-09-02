@@ -734,18 +734,26 @@ import org.jdom.input.DOMBuilder;
             }
         }
 
+        // Add HTML figure element to parent
+        final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
+        addHtmlContent(htmlElem.addContent(tempSpan));
+
+        // Add caption to HTML figure element
         final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
         final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
-        final String caption = elem.getChildText(
-                CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
+        final Element captionElem =
+                elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
         htmlCaptionElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
-        if (caption != null) {
-            htmlCaptionElem.addContent(": " + caption);
+        htmlElem.addContent(htmlCaptionElem);
+
+        // Push CNXML caption element to stack if it is present
+        if (captionElem != null) {
+            htmlCaptionElem.addContent(": ");
+            stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
         }
 
-        final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
-        addHtmlContent(htmlElem.addContent(tempSpan).addContent(htmlCaptionElem));
+        // Push content to stack for iteration
         stack.push(new GeneratorFrame(elem, tempSpan, true));
     }
 

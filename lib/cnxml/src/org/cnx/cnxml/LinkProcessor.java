@@ -118,5 +118,16 @@ public class LinkProcessor implements Processor {
         if (target != null) {
             elem.setAttribute(CnxmlAttributes.MEDIA_CHILD_SOURCE, target.toString());
         }
+
+        if (CnxmlTag.IMAGE.getTag().equals(elem.getName())) {
+            final String thumbnail = elem.getAttributeValue(CnxmlAttributes.IMAGE_THUMBNAIL);
+            if (thumbnail != null) {
+                final URI thumbnailUri = resolver.resolveUri(
+                        Links.convertLinkAttributeToUri(thumbnail));
+                if (thumbnailUri != null) {
+                    elem.setAttribute(CnxmlAttributes.IMAGE_THUMBNAIL, thumbnailUri.toString());
+                }
+            }
+        }
     }
 }

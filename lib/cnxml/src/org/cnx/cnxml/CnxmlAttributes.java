@@ -43,6 +43,7 @@ public class CnxmlAttributes {
     public final static String NEWLINE_EFFECT = "effect";
     public final static String MEDIA_ALT = "alt";
     public final static String MEDIA_CHILD_SOURCE = "src";
+    public final static String IMAGE_THUMBNAIL = "thumbnail";
     public final static String IMAGE_WIDTH = "width";
     public final static String IMAGE_HEIGHT = "height";
     public final static String OBJECT_TYPE = "mime-type";

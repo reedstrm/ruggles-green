@@ -816,6 +816,21 @@ public class ModuleHTMLGeneratorTests {
                                 .setAttribute("width", "128"))));
     }
 
+    @Test public void mediaImageShouldUseThumbnail() throws Exception {
+        assertEquals("<a href=\"http://www.example.com/foo.png\">"
+                + "<img id=\"myImage\" alt=\"A great image\" "
+                + "src=\"thumbnail.png\" width=\"128\" height=\"42\"></a>",
+                generate(new Element("media", ns)
+                        .setAttribute("id", "myImage")
+                        .setAttribute("alt", "A great image")
+                        .addContent(new Element("image", ns)
+                                .setAttribute("src", "http://www.example.com/foo.png")
+                                .setAttribute("thumbnail", "thumbnail.png")
+                                .setAttribute("mime-type", "image/png")
+                                .setAttribute("height", "42")
+                                .setAttribute("width", "128"))));
+    }
+
     @Test public void mediaImageShouldRenderWithoutDimensions() throws Exception {
         assertEquals("<img id=\"myImage\" alt=\"A great image\" "
                 + "src=\"http://www.example.com/foo.png\">", 

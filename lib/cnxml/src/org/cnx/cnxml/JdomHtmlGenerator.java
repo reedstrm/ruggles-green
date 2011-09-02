@@ -1006,9 +1006,20 @@ import org.jdom.input.DOMBuilder;
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.IMAGE.getTag()))
                 .setAttribute(HtmlAttributes.IMAGE_ALT,
-                        mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT))
-                .setAttribute(HtmlAttributes.IMAGE_SOURCE,
-                        elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE));
+                        mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
+
+        final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
+        final String thumbnail = elem.getAttributeValue(CnxmlAttributes.IMAGE_THUMBNAIL);
+        if (thumbnail != null) {
+            htmlElem.setAttribute(HtmlAttributes.IMAGE_SOURCE, thumbnail);
+            addHtmlContent(new Element(HtmlTag.LINK.getTag())
+                    .setAttribute(HtmlAttributes.LINK_URL, source)
+                    .addContent(htmlElem));
+        } else {
+            htmlElem.setAttribute(HtmlAttributes.IMAGE_SOURCE, source);
+            addHtmlContent(htmlElem);
+        }
+
         final String width = elem.getAttributeValue(CnxmlAttributes.IMAGE_WIDTH);
         if (width != null) {
             htmlElem.setAttribute(HtmlAttributes.IMAGE_WIDTH, width);
@@ -1017,7 +1028,6 @@ import org.jdom.input.DOMBuilder;
         if (height != null) {
             htmlElem.setAttribute(HtmlAttributes.IMAGE_HEIGHT, height);
         }
-        addHtmlContent(htmlElem);
     }
 
     protected void generateObject(final Element elem) {

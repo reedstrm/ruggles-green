@@ -57,6 +57,9 @@ public class CnxmlAttributes {
     public final static String CALS_ROWSEP = "rowsep";
     public final static String CALS_FRAME = "frame";
 
+    // TODO(light): this is probably not the best place for this.
+    public final static String FRAGMENT = "#";
+
     public static enum EmphasisEffect implements ValueEnum {
         BOLD("bold"),
         ITALICS("italics"),

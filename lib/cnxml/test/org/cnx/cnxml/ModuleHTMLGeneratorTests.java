@@ -204,6 +204,30 @@ public class ModuleHTMLGeneratorTests {
                 .setAttribute("target-id", "myRefId").setText("Example")));
     }
 
+    @Test public void emptyLinkShouldDefaultToLink() throws Exception {
+        assertEquals("<a href=\"#myRefId\">link</a>", generate(new Element("link", ns)
+                .setAttribute("target-id", "myRefId")));
+    }
+
+    @Test public void emptyLinkShouldRecognizeFigure() throws Exception {
+        final Element figure = new Element("figure", ns).setAttribute("id", "myRefId");
+        final String figureOutput =
+                "<figure id=\"myRefId\"><figcaption>Figure 1</figcaption></figure>";
+        assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("target-id", "myRefId"))
+                                .addContent(figure)))));
+        figure.detach();
+        assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "#myRefId"))
+                                .addContent(figure)))));
+    }
+
     @Test public void foreignShouldRenderAsSpan() throws Exception {
         assertEquals("<span class=\"foreign\">&iexcl;Hola, mundo!</span>",
                 generate(new Element("foreign", ns).setText("\u00a1Hola, mundo!")));

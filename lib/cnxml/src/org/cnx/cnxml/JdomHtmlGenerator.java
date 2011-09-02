@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import org.cnx.util.RenderTime;
 import org.cnx.util.HtmlTag;
 import org.cnx.util.HtmlAttributes;
+import org.cnx.util.IdFilter;
 import org.cnx.util.JdomHtmlSerializer;
 
 import org.jdom.Attribute;
@@ -105,6 +106,9 @@ import org.jdom.input.DOMBuilder;
 
     private final static String HTML_DOWNLOAD_LABEL = "Download ";
 
+    private final static String HTML_DEFAULT_LINK_TEXT = "link";
+    private final static String HTML_DEFAULT_FIGURE_LINK_TEXT = "figure";
+
     private final static String HTML_CALS_TABLE_CLASS = "cals";
     private final static String HTML_CALS_ALIGN_LEFT_CLASS = "calsAlignLeft";
     private final static String HTML_CALS_ALIGN_RIGHT_CLASS = "calsAlignRight";
@@ -134,6 +138,7 @@ import org.jdom.input.DOMBuilder;
 
     private final ImmutableSet<Processor> processors;
     private final JdomHtmlSerializer jdomHtmlSerializer;
+    private Module module;
     private Stack<GeneratorFrame> stack;
     private Counter counter;
     private final MediaElementFilter mediaFilter;
@@ -210,10 +215,12 @@ import org.jdom.input.DOMBuilder;
         }
 
         // Generate HTML tree
+        this.module = module;
         counter = new Counter();
         StringBuilder sb = new StringBuilder();
         final List<Content> contentList = generateHtmlTree(contentElem);
         counter = null;
+        module = null;
 
         // Serialize HTML
         for (Content content : contentList) {
@@ -485,6 +492,26 @@ import org.jdom.input.DOMBuilder;
         }
 
         copyId(elem, htmlElem);
+
+        // Default text (if no text found)
+        if (elem.getContentSize() == 0) {
+            String text = HTML_DEFAULT_LINK_TEXT;
+            String ref = null;
+            if (url != null && url.startsWith(CnxmlAttributes.FRAGMENT)) {
+                ref = url.substring(CnxmlAttributes.FRAGMENT.length());
+            } else if (targetId != null) {
+                ref = targetId;
+            }
+            if (ref != null) {
+                final Element refElem = IdFilter.getElementById(module.getCnxml(), ref);
+                if (refElem != null && CnxmlTag.NAMESPACE_URI.equals(refElem.getNamespaceURI())
+                        && CnxmlTag.FIGURE.getTag().equals(refElem.getName())) {
+                    // TODO(light): Add numbers
+                    text = HTML_DEFAULT_FIGURE_LINK_TEXT;
+                }
+            }
+            htmlElem.setText(text);
+        }
 
         if (url != null) {
             htmlElem.setAttribute(HtmlAttributes.LINK_URL, url);

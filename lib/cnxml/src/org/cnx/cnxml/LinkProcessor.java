@@ -16,6 +16,8 @@
 
 package org.cnx.cnxml;
 
+import static org.cnx.cnxml.CnxmlAttributes.FRAGMENT;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
@@ -41,8 +43,6 @@ import org.jdom.filter.ElementFilter;
  */
 public class LinkProcessor implements Processor {
     private static final Logger logger = Logger.getLogger(LinkProcessor.class.getName());
-
-    private static final String FRAGMENT = "#";
 
     private static final ImmutableSet<CnxmlTag> LINK_TAGS = ImmutableSet.of(
             CnxmlTag.FOREIGN,

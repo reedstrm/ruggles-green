@@ -66,4 +66,8 @@ public class WebViewConfiguration {
     public static String getPropertyHtmlString(Object key, Object value) {
         return key + "=" + value + "<br/>";
     }
+
+    public String getFeedbackLink() {
+        return configProperties.getProperty("cnx.feedbackUrl");
+    }
 }

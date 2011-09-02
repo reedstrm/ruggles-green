@@ -63,10 +63,11 @@ public class WebViewModule extends AbstractModule {
     }
 
     @Provides @Singleton @WebViewTemplate
-            SoyTofu provideTofu(SoyFileSet.Builder builder) {
+            SoyTofu provideTofu(WebViewConfiguration config, SoyFileSet.Builder builder) {
         return builder
                 .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
                         .put("analyticsJs", "")
+                        .put("feedbackUrl", config.getFeedbackLink())
                         .build())
                 .add(new File("base.soy"))
                 .add(new File("collection.soy"))

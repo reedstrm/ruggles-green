@@ -72,24 +72,32 @@ public final class Links {
      */
     private static String convert(final String input, final CharMatcher safe) {
         final StringBuilder sb = new StringBuilder();
-        // XXX(light): Ideally, you should be able to wrap the input directly.  Sadly, the algorithm
-        // fails because of this bug:
+
+        // XXX(light): Ideally, you should be able to wrap the input directly.  Sadly, this fails
+        // because of this bug:
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4997655
         final CharBuffer cbuf = CharBuffer.wrap(input.toCharArray());
         boolean escaping = false;
 
         while (cbuf.hasRemaining()) {
+            // Find the boundaries of the current run (safe content or non-safe content)
             final int index = (escaping ? safe : safe.negate()).indexIn(cbuf);
             final CharBuffer slice = cbuf.slice();
             if (index != -1) {
                 slice.limit(index);
             }
+
+            // Escape if necessary, otherwise, copy the current run straight to the new string.
             if (escaping) {
                 encode(sb, slice);
             } else {
                 sb.append(slice);
             }
+
+            // Advance position
             cbuf.position(cbuf.position() + slice.limit());
+
+            // Alternate escaping and non-escaping
             escaping = !escaping;
         }
         return sb.toString();
@@ -104,9 +112,13 @@ public final class Links {
     private static void encode(final StringBuilder sb, final CharBuffer cbuf) {
         final ByteBuffer buf = Charsets.UTF_8.encode(cbuf);
         while (buf.hasRemaining()) {
+            // Get next character
             final byte b = buf.get();
+
             // XXX(light): Don't remove the mask. Remember that Java doesn't have unsigned values.
             final String hex = Integer.toHexString(((int)b) & 0x000000ff).toUpperCase();
+
+            // Build percent escape
             sb.append('%');
             if (hex.length() == 1) {
                 sb.append('0');

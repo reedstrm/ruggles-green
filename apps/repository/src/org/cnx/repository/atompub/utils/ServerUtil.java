@@ -16,12 +16,28 @@
 
 package org.cnx.repository.atompub.utils;
 
+import static org.cnx.repository.atompub.utils.PrettyXmlOutputter.prettyXmlOutputEntry;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.utils.SystemProperty;
+import com.google.common.base.Charsets;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
+
+import org.cnx.exceptions.CnxBadRequestException;
+import org.cnx.exceptions.CnxException;
+import org.jdom.JDOMException;
 
 /**
  * Server related utils.
@@ -56,5 +72,30 @@ public class ServerUtil {
 
         return serverUrl.toString();
     }
+    
+    /**
+     * Return Entry posted by Client from Request.
+     */
+    public static Entry getPostedEntry(Logger logger, HttpServletRequest req) throws CnxException {
+        Entry postedEntry = null;
+        try {
+            postedEntry =
+                Atom10Parser.parseEntry(
+                        new BufferedReader(new InputStreamReader(req.getInputStream(),
+                            Charsets.UTF_8.displayName())), null);
+        } catch (IllegalArgumentException e) {
+            throw new CnxBadRequestException("Parsing Error.", e);
+        } catch (UnsupportedEncodingException e) {
+            throw new CnxBadRequestException("Invalid Encoding.", e);
+        } catch (JDOMException e) {
+            throw new CnxBadRequestException("Jdom Exception.", e);
+        } catch (IOException e) {
+            throw new CnxBadRequestException("IOException.", e);
+        } catch (FeedException e) {
+            throw new CnxBadRequestException("FeedException.", e);
+        }
 
+        logger.fine("Received Entry : " + prettyXmlOutputEntry(postedEntry));
+        return postedEntry;
+    }
 }

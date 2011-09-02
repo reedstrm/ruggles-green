@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.jerseyservlets.migrators;
+package org.cnx.repository.scripts.migrators;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -59,7 +59,7 @@ public class ParallelResourceMigrator implements Runnable {
         for (int i = 0; i < 10; i++) {
             try {
                 logger.info("Trying to upload : " + resourceLocation);
-                this.resourceEntry =
+                resourceEntry =
                     cnxClient.uploadFileToBlobStore(getResourceNameForResourceMappingDoc(file
                         .getName()), file);
                 success = true;

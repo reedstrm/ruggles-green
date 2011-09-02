@@ -18,6 +18,8 @@ package org.cnx.repository.atompub.utils;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.cnx.exceptions.CnxException;
+import org.cnx.exceptions.CnxInternalServerErrorException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -47,18 +49,17 @@ public class PrettyXmlOutputter {
         return xmlOutputter.outputString(element);
     }
 
-    public static String prettyXmlOutputEntry(Entry entry) throws IllegalArgumentException,
-        FeedException, IOException {
+    public static String prettyXmlOutputEntry(Entry entry) throws CnxException {
         StringWriter writer = new StringWriter();
-        Atom10Generator.serializeEntry(entry, writer);
-        // CnxAtomPubConstants.serializeEntry(entry, writer);
+        try {
+            Atom10Generator.serializeEntry(entry, writer);
+        } catch (IllegalArgumentException e) {
+            throw new CnxInternalServerErrorException("Invalid XML", e);
+        } catch (FeedException e) {
+            throw new CnxInternalServerErrorException("FeedException", e);
+        } catch (IOException e) {
+            throw new CnxInternalServerErrorException("IoException", e);
+        }
         return writer.toString();
     }
-
-    // public static String prettyXmlOutputMyEntry(Entry entry) throws IllegalArgumentException,
-    // FeedException, IOException {
-    // StringWriter writer = new StringWriter();
-    // CnxAtomPubConstants.serializeEntry(entry, writer);
-    // return writer.toString();
-    // }
 }

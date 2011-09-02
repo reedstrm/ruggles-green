@@ -62,7 +62,7 @@ class ResponseUtil {
     private static Level statusLogLevel(RepositoryStatus status) {
         checkNotNull(status, "null status");
         switch (status) {
-            case SERVER_ERRROR:
+            case SERVER_ERROR:
                 return Level.SEVERE;
             case OK:
                 return Level.INFO;

@@ -1,7 +1,5 @@
-package org.cnx.atompubclient;
-
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,21 +13,31 @@ package org.cnx.atompubclient;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+package org.cnx.atompubclient;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Logger;
+import com.google.common.base.Preconditions;
 
-import javax.xml.bind.JAXBException;
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
+import com.sun.syndication.propono.atom.client.AtomClientFactory;
+import com.sun.syndication.propono.atom.client.ClientAtomService;
+import com.sun.syndication.propono.atom.client.ClientCollection;
+import com.sun.syndication.propono.atom.client.ClientEntry;
+import com.sun.syndication.propono.atom.client.ClientWorkspace;
+import com.sun.syndication.propono.atom.client.CustomHttpClient;
+import com.sun.syndication.propono.atom.client.NoAuthStrategy;
+import com.sun.syndication.propono.utils.ProponoException;
+import com.sun.syndication.propono.utils.Utilities;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
@@ -43,22 +51,22 @@ import org.cnx.resourcemapping.Resource;
 import org.cnx.resourcemapping.Resources;
 import org.jdom.JDOMException;
 
-import com.google.common.base.Preconditions;
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.propono.atom.client.AtomClientFactory;
-import com.sun.syndication.propono.atom.client.ClientAtomService;
-import com.sun.syndication.propono.atom.client.ClientCollection;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.atom.client.ClientWorkspace;
-import com.sun.syndication.propono.atom.client.CustomHttpClient;
-import com.sun.syndication.propono.atom.client.NoAuthStrategy;
-import com.sun.syndication.propono.utils.ProponoException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 /**
- * AtomPub client for CNX Repository.
- * This client is thread safe.
- *
+ * AtomPub client for CNX Repository. This client is thread safe.
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomPubClient {
@@ -98,7 +106,7 @@ public class CnxAtomPubClient {
 
     /**
      * Construct a AtomPub client for CNX Repository.
-     *
+     * 
      * @param atomPubServerUrl : URL for CNX Repository AtomPub Service.
      * @throws ProponoException
      * @throws MalformedURLException
@@ -124,7 +132,7 @@ public class CnxAtomPubClient {
         @SuppressWarnings("unchecked")
         List<ClientWorkspace> listOfWorkspaces = service.getWorkspaces();
         Preconditions.checkArgument(1 == listOfWorkspaces.size(),
-            "CNX ServiceDocument should have only one workspace.");
+                "CNX ServiceDocument should have only one workspace.");
         workspace = listOfWorkspaces.get(0);
     }
 
@@ -187,11 +195,11 @@ public class CnxAtomPubClient {
 
     /**
      * Upload file to blobstore.
-     *
+     * 
      * @param resourceName : Pretty name for the resource. This will be used to create the
      *            resourceMappingDoc.
      * @param file : File to be uploaded to CNX Repository.
-     *
+     * 
      *            TODO(arjuns) : Replace file with InputStream so that it can work on AppEngine.
      */
     public ClientEntry uploadFileToBlobStore(String resourceName, File file)
@@ -206,10 +214,10 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * CNX AtomPub API should return the resourceUrl with
-     * rel={@code CnxAtomPubConstants.REL_TAG_FOR_SELF_URL} and href=<resource URL>.
-     *
-     *
+     * CNX AtomPub API should return the resourceUrl with rel=
+     * {@code CnxAtomPubConstants.REL_TAG_FOR_SELF_URL} and href=<resource URL>.
+     * 
+     * 
      * @param entry AtomPub entry returned by server.
      * @return Link containing Resource URL.
      */
@@ -227,10 +235,10 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * CNX AtomPub API should return the BlobStoreUrl with
-     * rel={@code CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL} and href=<blobstore url>
-     * where clients are expected to post the blobs.
-     *
+     * CNX AtomPub API should return the BlobStoreUrl with rel=
+     * {@code CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL} and href=<blobstore url> where clients
+     * are expected to post the blobs.
+     * 
      * @param entry AtomPub entry returned by Server.
      * @return Link containing Blobstore URL.
      */
@@ -249,14 +257,13 @@ public class CnxAtomPubClient {
 
     /**
      * Upload file to Blobstore.
-     *
+     * 
      * @param blobstoreUrl where file needs to be uploaded.
      * @param file File to be uploaded to Blobstore.
      */
     void postFileToBlobstore(URL blobstoreUrl, File file) throws IOException {
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
-        Part[] parts = { new FilePart(file.getName(), file),
-            };
+        Part[] parts = { new FilePart(file.getName(), file), };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
         int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
@@ -274,13 +281,36 @@ public class CnxAtomPubClient {
     }
 
     /**
+     * Create New Module on CNX Repository for Migration.
+     * 
+     * @param cnxModuleId Original CNX Module id on cnx.org.
+     * @throws IOException
+     * @throws ProponoException
+     * @throws FeedException
+     * @throws JDOMException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    @SuppressWarnings("deprecation")
+    public ClientEntry createNewModuleForMigration(String cnxModuleId) throws IOException,
+            ProponoException, IllegalArgumentException, JDOMException, FeedException,
+            IllegalAccessException, InvocationTargetException {
+        // TODO(arjuns) : Create a function for URL appending.
+        // TODO(arjuns) : move this url to constants.
+        String migrateModule =
+            constants.getAtomPubRestUrl().toString() + "/module/migration/" + cnxModuleId;
+        return handlePostForMigration(migrateModule);
+    }
+
+    /**
      * Create New ModuleVersion on CNX Repository. Before first version can be created, a moduleId
      * must be obtained using {@link #createNewModule()}.
-     *
+     * 
      * @param moduleVersionEntry Entry returned as response for {@link #createNewModule}
      * @param cnxmlDoc CNXML Doc.
      * @param resourceMappingDoc XML for Resource Mapping.
-     *
+     * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
@@ -290,7 +320,7 @@ public class CnxAtomPubClient {
             IOException {
         // TODO(arjuns): rename AtomPubListOfContent to something better.
         moduleVersionEntry.setContents(constants.getAtomPubListOfContent(cnxmlDoc,
-            resourceMappingDoc));
+                resourceMappingDoc));
         moduleVersionEntry.update();
 
         String moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleVersionEntry.getId());
@@ -298,7 +328,7 @@ public class CnxAtomPubClient {
             CnxAtomPubConstants.getVersionFromAtomPubId(moduleVersionEntry.getId());
 
         moduleVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(moduleId,
-            currentVersion));
+                currentVersion));
 
         return moduleVersionEntry;
     }
@@ -306,7 +336,7 @@ public class CnxAtomPubClient {
     /**
      * Fetches Module Entry from CNX Repository for given ModuleId and Version. The AtomEntry will
      * have value which is representation for {@link ResourceEntryValue}
-     *
+     * 
      * @param moduleId
      * @param version
      * @throws ProponoException
@@ -320,7 +350,7 @@ public class CnxAtomPubClient {
 
     /**
      * Get CNXML from AtomEntry for a Module-Version.
-     *
+     * 
      * @param moduleVersionEntry Atom Entry returned by Server for a particular module-version.
      * @return Returns CNXML (response is already decoded).
      */
@@ -333,8 +363,7 @@ public class CnxAtomPubClient {
 
     /**
      * Get ResourceMapping XML from AtomEntry for a ModuleVersion.
-     *
-     *
+     * 
      */
     public String getModuleVersionResourceMappingXml(String moduleId, VersionWrapper version)
             throws HttpException, JDOMException, IOException, ProponoException {
@@ -359,10 +388,10 @@ public class CnxAtomPubClient {
     /**
      * Provide ResourceMapping XML for uploaded resources. Users of CnxAtomPubClient are expected to
      * maintain a list of entries returned by CnxAtomPubClient.
-     *
+     * 
      * TODO(arjuns) : May be make CnxAtomPubClient statefule so that users of clients are not
      * expected to maintain list.
-     *
+     * 
      * @param resourceEntries List of resourceEntries returned by Client.
      */
     public String getResourceMappingFromResourceEntries(List<ClientEntry> resourceEntries)
@@ -404,12 +433,66 @@ public class CnxAtomPubClient {
     }
 
     /**
+     * Create New Module on CNX Repository for Migration.
+     * 
+     * @param cnxModuleId Original CNX Module id on cnx.org.
+     * @throws IOException
+     * @throws ProponoException
+     * @throws FeedException
+     * @throws JDOMException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    @SuppressWarnings("deprecation")
+    public ClientEntry createNewCollectionForMigration(String cnxCollectionId) throws IOException,
+            ProponoException, IllegalArgumentException, JDOMException, FeedException,
+            IllegalAccessException, InvocationTargetException {
+        // TODO(arjuns) : Create a function for URL appending.
+        // TODO(arjuns) : move this url to constants.
+        String migrateModule =
+            constants.getAtomPubRestUrl().toString() + "/collection/migration/" + cnxCollectionId;
+        return handlePostForMigration(migrateModule);
+    }
+
+    /**
+     * @param migrateModule
+     * @return
+     * @throws IOException
+     * @throws ProponoException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private ClientEntry handlePostForMigration(String migrateModule) throws IOException,
+            ProponoException, JDOMException, FeedException, IllegalAccessException,
+            InvocationTargetException {
+        PostMethod postMethod = new PostMethod(migrateModule);
+        postMethod.setRequestEntity(new StringRequestEntity(""));
+        httpClient.executeMethod(postMethod);
+        int code = postMethod.getStatusCode();
+
+        // TODO(arjuns) : Refactor following method to customHttpClient
+        InputStream is = postMethod.getResponseBodyAsStream();
+        code = postMethod.getStatusCode();
+        if (code != 200 && code != 201) {
+            throw new ProponoException("ERROR HTTP status=" + code + " : "
+                + Utilities.streamToString(is));
+        }
+        Entry romeEntry = Atom10Parser.parseEntry(new InputStreamReader(is), null /* baseUri */);
+        BeanUtils.copyProperties(this, romeEntry);
+
+        return new ClientEntry(service, null, romeEntry, false);
+    }
+
+    /**
      * Create New CNX Collection version on CNX Repository. Before first version can be created, a
      * collectionId must be obtained using {@link #createNewCollection}.
-     *
+     * 
      * @param collXmlVersionEntry Entry returned as response for {@link #createNewCollection}
      * @param collXmlDoc Collection XML Doc.
-     *
+     * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
@@ -426,14 +509,14 @@ public class CnxAtomPubClient {
             CnxAtomPubConstants.getVersionFromAtomPubId(collXmlVersionEntry.getId());
 
         collXmlVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId,
-            currentVersion));
+                currentVersion));
 
         return collXmlVersionEntry;
     }
 
     /**
      * Fetches Collection Entry from CNX Repository for given CollectionId and Version.
-     *
+     * 
      * @param collectionId
      * @param version
      * @throws ProponoException

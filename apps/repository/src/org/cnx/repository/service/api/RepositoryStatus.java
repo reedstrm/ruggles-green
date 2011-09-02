@@ -20,20 +20,30 @@ package org.cnx.repository.service.api;
  * Status codes of the repository service operations.
  */
 public enum RepositoryStatus {
-    /** Operation done ok. */
-    OK,
+    /** Trying to create new data that already exists */
+    ALREADY_EXISTS,
+
+    /**
+     * Bad request format (e.g. bad format of an object id). This error is more about the request
+     * syntax than the request semantic (e.g. if an object is not found, this is not classified as
+     * BAD_REQUEST but as NOT_FOUND).
+     */
+    BAD_REQUEST,
 
     /** Requested object not found. */
     NOT_FOUND,
 
+    /** Operation done ok. */
+    OK,
+
     /** Some portion of the reuqest is out of valid range. */
     OUT_OF_RANGE,
 
-    /**
-     * Version specification in request does not match object's state. Caller need to resolved the
-     * version conflict.
-     */
-    VERSION_CONFLICT,
+    /** Some portion of the query is too large. */
+    OVERSIZE,
+
+    /** General error, typically internal to the server. */
+    SERVER_ERROR,
 
     /**
      * Cannot perform the operation on an object in this state. The actual details of the state
@@ -44,20 +54,11 @@ public enum RepositoryStatus {
     STATE_MISMATCH,
 
     /**
-     * Bad request format (e.g. bad format of an object id). This error is more about the request
-     * syntax than the request semantic (e.g. if an object is not found, this is not classified as
-     * BAD_REQUEST but as NOT_FOUND).
+     * Version specification in request does not match object's state. Caller need to resolved the
+     * version conflict.
      */
-    BAD_REQUEST,
+    VERSION_CONFLICT;
 
-    /** General error, typically internal to the server. */
-    SERVER_ERRROR,
-
-    /** Trying to create new data that already exists */
-    ALREADY_EXISTS,
-
-    /** Some portion of the query is too large. */
-    OVERSIZE;
 
     public boolean isOk() {
         return this == OK;

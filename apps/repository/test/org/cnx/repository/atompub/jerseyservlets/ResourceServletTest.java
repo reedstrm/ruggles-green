@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.jerseyservlets.migrators.ParallelResourceMigrator;
+import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -85,20 +85,5 @@ public class ResourceServletTest extends CnxAtomPubBasetest {
         // TODO(arjuns) : Add test for get once it works.
         // TODO(arjuns) : Add link in entry for get.
         // TODO(arjuns) : Add test for resourceName with white spaces.
-    }
-
-    // TODO(arjuns) : Move this to separate test.
-    @Test
-    public void testResourceMigrator() {
-        ParallelResourceMigrator resourceMigrator = new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
-
-        ClientEntry createResourceEntry = resourceMigrator.migrateResource();
-        createResourceEntry.getEditURI();
-        assertNotNull(createResourceEntry);
-        assertNotNull(createResourceEntry.getId());
-        String resourceId = createResourceEntry.getId();
-        String expectedResourceUrl = getConstants().getResourceAbsPath(resourceId).toString();
-        assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
-            .getHrefResolved());
     }
 }

@@ -17,6 +17,8 @@ package org.cnx.repository.atompub;
 
 import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_STRING;
 
+import org.cnx.exceptions.CnxInvalidUrlException;
+
 /**
  * This is to wrap version in a TypeSafe object.
  * Version has two possible values :
@@ -54,10 +56,10 @@ public class VersionWrapper {
     public Integer getVersionInt() {
         return versionInt;
     }
-
-    public VersionWrapper(String version) {
+    
+    public VersionWrapper(String version) throws CnxInvalidUrlException {
         if (!isValidVersion(version)) {
-            throw new RuntimeException("Invalid version : " + version);
+            throw new CnxInvalidUrlException("Invalid version : " + version, null);
         }
 
         if(version.equals(LATEST_VERSION_STRING)) {

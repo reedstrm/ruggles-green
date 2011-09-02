@@ -15,6 +15,21 @@
  */
 package org.cnx.repository.atompub;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+
+import org.apache.commons.codec.binary.Base64;
+import org.cnx.resourceentry.ObjectFactory;
+import org.cnx.resourceentry.ResourceEntryValue;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -29,22 +44,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.apache.commons.codec.binary.Base64;
-import org.cnx.resourceentry.ObjectFactory;
-import org.cnx.resourceentry.ResourceEntryValue;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
-
 /**
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomPubConstants {
@@ -54,9 +55,7 @@ public class CnxAtomPubConstants {
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
     /**
-     * URLs ending with XML will point to
-     * CNXML : for modules.
-     * CollXml : For collections.
+     * URLs ending with XML will point to CNXML : for modules. CollXml : For collections.
      */
     public static final String END_URL_XML = "/xml";
 
@@ -188,6 +187,10 @@ public class CnxAtomPubConstants {
     /** Default new Version for any module. */
     public static final VersionWrapper NEW_CNX_COLLECTION_DEFAULT_VERSION = new VersionWrapper("1");
 
+    /** Latest version for any Module/collection. */
+    public static final VersionWrapper LATEST_VERSION_WRAPPER = new VersionWrapper(
+        LATEST_VERSION_STRING);
+
     /** Get URI for AtomPub collection for CNX Modules. */
     public URL getCollectionModulesAbsPath() {
         try {
@@ -240,7 +243,8 @@ public class CnxAtomPubConstants {
     /** Get URL for ResourceMapping XML for a ModuleVersion. */
     public URL getModuleVersionResourceMappingAbsPath(String moduleId, VersionWrapper version) {
         try {
-            return new URL(getModuleVersionAbsPath(moduleId, version).toString() + END_URL_RESOURCES);
+            return new URL(getModuleVersionAbsPath(moduleId, version).toString()
+                + END_URL_RESOURCES);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -312,7 +316,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Get AtomPub List of Contents from CNXMl and ResourceMappingDoc.
-     *
+     * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
@@ -332,7 +336,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Get AtomPub List of Contents from CollXml.
-     *
+     * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
@@ -351,9 +355,9 @@ public class CnxAtomPubConstants {
 
     /**
      * Get CNXML-doc from ModuleEntry XML.
-     *
+     * 
      * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
-     *     moduleEntryXml is already decoded.
+     *            moduleEntryXml is already decoded.
      * @return CNXML (response is already decoded).
      */
     public String getCnxmlFromModuleEntryXml(String moduleEntryXml) throws JDOMException,
@@ -363,8 +367,9 @@ public class CnxAtomPubConstants {
 
     /**
      * Get ResourceMapping doc from decoded ModuleEntry XML.
+     * 
      * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
-     *     moduleEntryXml is already decoded.
+     *            moduleEntryXml is already decoded.
      * @return ResourceMapping XML (response is already decoded).
      */
     public String getResourceMappingDocFromModuleEntryXml(String moduleEntryXml)
@@ -415,7 +420,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Decode a 64 Bit encoded String.
-     *
+     * 
      * @param encodedString 64bit encoded string.
      * @return Decoded string.
      * @throws UnsupportedEncodingException
@@ -432,7 +437,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Encode a String to a Base64-encoded string.
-     *
+     * 
      * @param originalString : String to be encoded.
      * @return Base64-encoded String.
      * @throws UnsupportedEncodingException
@@ -440,27 +445,26 @@ public class CnxAtomPubConstants {
     public String encodeToBase64EncodedString(String originalString)
             throws UnsupportedEncodingException {
         return new String(Base64.encodeBase64(originalString.getBytes(Charsets.UTF_8)),
-                Charsets.UTF_8);
+            Charsets.UTF_8);
     }
 
     /**
      * Get XML for Module Entry. This consists of 64 bit encoded CNXML and 64 bit encoded
      * ResourceMapping Doc. This is used to create {@link ResourceEntryValue}
-     *
-     * @param encodedCnxml CNXML source
-     * @param encodedResourceMappingXml Resource mapping XML source
-     *
+     * 
+     * @param cnxml CNXML source
+     * @param resourceMappingXml Resource mapping XML source
+     * 
      * @return XML representation for {@link ResourceEntryValue}
      * @throws JAXBException
      */
-    public String getModuleEntryValue(String cnxml, String resourceMappingXml)
-            throws JAXBException {
+    public String getModuleEntryValue(String cnxml, String resourceMappingXml) throws JAXBException {
         ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<byte[]> encodedCnxmlDoc;
         JAXBElement<byte[]> encodedResourceMappingDoc;
         encodedCnxmlDoc = objectFactory.createCnxmlDoc(cnxml.getBytes(Charsets.UTF_8));
-        encodedResourceMappingDoc = objectFactory.createResourceMappingDoc(
-                resourceMappingXml.getBytes(Charsets.UTF_8));
+        encodedResourceMappingDoc =
+            objectFactory.createResourceMappingDoc(resourceMappingXml.getBytes(Charsets.UTF_8));
 
         ResourceEntryValue resourceEntryValue = objectFactory.createResourceEntryValue();
         resourceEntryValue.setCnxmlDoc(encodedCnxmlDoc.getValue());
@@ -475,10 +479,10 @@ public class CnxAtomPubConstants {
 
     /**
      * Convert a JAXB object to its XML Representation.
-     *
+     * 
      * @param jaxbObject JAXB object whose XML representation is required.
      * @param rootClass Class annotated with RootElement for JAXB objects.
-     *
+     * 
      * @return XML representation for JAXB Object.
      */
     @SuppressWarnings("rawtypes")

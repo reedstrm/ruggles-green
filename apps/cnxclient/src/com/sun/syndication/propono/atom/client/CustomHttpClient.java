@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -25,6 +25,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -45,7 +47,7 @@ import com.google.common.io.CharStreams;
 /**
  * Rome-propono uses commons-httpclient which does not work on AppEngine. So creating a custom HTTP
  * Client which wraps URL Fetch service offered by AppEngine.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CustomHttpClient extends HttpClient {
@@ -55,8 +57,8 @@ public class CustomHttpClient extends HttpClient {
     private final Class parent = HttpMethodBase.class;
 
     /**
-     * This is the Generic executeMethod which will replace all the http-methods and in
-     * turn depending on type of method will delegate to individual handlers.
+     * This is the Generic executeMethod which will replace all the http-methods and in turn
+     * depending on type of method will delegate to individual handlers.
      */
     @Override
     public int executeMethod(HttpMethod method) {
@@ -145,7 +147,7 @@ public class CustomHttpClient extends HttpClient {
     private String handlePostMethod(HttpMethod method) throws MalformedURLException, URIException,
             IOException, ProtocolException, NoSuchFieldException, HttpException,
             IllegalAccessException {
-        String response;
+        String response = "";
         URL url = new URL(method.getURI().toString());
         PostMethod postMethod = (PostMethod) method;
 
@@ -155,8 +157,6 @@ public class CustomHttpClient extends HttpClient {
         connection.setRequestMethod("POST");
 
         for (NameValuePair currParam : postMethod.getParameters()) {
-            System.out
-                .println("name : " + currParam.getName() + " value = " + currParam.getValue());
             connection.setRequestProperty(currParam.getName(), currParam.getValue());
         }
 
@@ -182,9 +182,14 @@ public class CustomHttpClient extends HttpClient {
                 + "] is not yet implemented.");
 
         }
-        updateStatusLineInResponseBody(method, connection.getResponseCode());
 
-        response = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
+        int responseCode = connection.getResponseCode();
+        updateStatusLineInResponseBody(method, responseCode);
+
+        if (responseCode == Status.OK.getStatusCode()
+            || responseCode == Status.CREATED.getStatusCode()) {
+            response = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
+        }
         return response;
     }
 
@@ -193,18 +198,21 @@ public class CustomHttpClient extends HttpClient {
      */
     private String handleGetMethod(HttpMethod method) throws IOException, URIException,
             NoSuchFieldException, IllegalAccessException {
-
         URL url = new URL(method.getURI().toString());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        GetMethod getMethod = (GetMethod) method;
-        InputStream inputStream = (InputStream)connection.getContent();
-        String response = CharStreams.toString(new InputStreamReader(inputStream));
 
-        Field responseBodyField = parent.getDeclaredField(FIELD_RESPONSE_BODY_NAME);
-        responseBodyField.setAccessible(true);
-        responseBodyField.set(method, response.getBytes());
-        updateStatusLineInResponseBody(method, connection.getResponseCode());
-
-        return response;
+        try {
+            InputStream inputStream = (InputStream) connection.getContent();
+            String response = CharStreams.toString(new InputStreamReader(inputStream));
+            Field responseBodyField = parent.getDeclaredField(FIELD_RESPONSE_BODY_NAME);
+            responseBodyField.setAccessible(true);
+            responseBodyField.set(method, response.getBytes());
+            updateStatusLineInResponseBody(method, connection.getResponseCode());
+            return response;
+        } catch (IOException e) {
+            // TODO(arjuns) : Look for code.
+            updateStatusLineInResponseBody(method, 404);
+            return "";
+        }
     }
 }

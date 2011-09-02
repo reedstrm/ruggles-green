@@ -27,7 +27,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.exceptions.CnxRuntimeException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -86,7 +85,7 @@ public class ClientAtomService extends AtomService {
                 return new ClientMediaEntry(this, null, romeEntry, false);
             }
         } catch (CnxInvalidUrlException e) {
-            throw new CnxRuntimeException(e.getJerseyStatus(), e.getMessage(), e.getCause());
+            throw e;
         } catch (Exception e) {
             throw new ProponoException("ERROR: getting or parsing entry/media", e);
         } finally {

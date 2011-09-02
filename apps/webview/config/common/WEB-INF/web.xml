@@ -66,7 +66,10 @@
     </servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>org.cnx.web.jerseyservlets;</param-value>
+      <param-value>
+        org.cnx.web.jerseyservlets;
+        org.cnx.web.jerseyservlets.exceptionhandlers;
+      </param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>

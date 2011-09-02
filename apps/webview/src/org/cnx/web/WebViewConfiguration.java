@@ -70,4 +70,8 @@ public class WebViewConfiguration {
     public String getFeedbackLink() {
         return configProperties.getProperty("cnx.feedbackUrl");
     }
+    
+    public boolean isStackEnabled() {
+        return Boolean.parseBoolean(configProperties.getProperty("stack.enable"));
+    }
 }

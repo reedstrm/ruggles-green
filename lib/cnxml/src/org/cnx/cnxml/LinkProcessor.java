@@ -44,7 +44,7 @@ import org.jdom.filter.ElementFilter;
 public class LinkProcessor implements Processor {
     private static final Logger logger = Logger.getLogger(LinkProcessor.class.getName());
 
-    private static final ImmutableSet<CnxmlTag> LINK_TAGS = ImmutableSet.of(
+    @VisibleForTesting static final ImmutableSet<CnxmlTag> LINK_TAGS = ImmutableSet.of(
             CnxmlTag.FOREIGN,
             CnxmlTag.LINK,
             CnxmlTag.TERM

@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// NOTE(light): This is originally from the GData Java Client.
-
 package org.cnx.util;
 
 import org.xml.sax.EntityResolver;
@@ -35,9 +33,8 @@ import javax.xml.validation.Schema;
 
 /**
  * Secures JDK-inbuilt Xerces parsers using the public APIs.
- *
- * 
- * 
+ * <p>
+ * This is originally from the GData Java Client.
  */
 public class SecureGenericXMLFactory {
 

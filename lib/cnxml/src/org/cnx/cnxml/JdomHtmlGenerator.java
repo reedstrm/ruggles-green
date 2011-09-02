@@ -1150,19 +1150,15 @@ import org.jdom.input.DOMBuilder;
 
         final Element htmlCaptionElem = new Element(HtmlTag.TABLE_CAPTION.getTag());
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
-        final String summary = elem.getAttributeValue(CnxmlAttributes.CALS_TABLE_SUMMARY);
         final int number = getNumber(elem);
 
-        final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
+        final Element htmlTitleElem = new Element(HtmlTag.SPAN.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
                 .addContent(CALS_TABLE_LABEL + " " + number);
-        if (title != null) {
-            htmlTitleElem.addContent(": " + title);
-        }
-        
         htmlCaptionElem.addContent(htmlTitleElem);
-        if (summary != null) {
-            htmlCaptionElem.addContent(summary);
+        if (title != null) {
+            htmlTitleElem.addContent(":");
+            htmlCaptionElem.addContent(" " + title);
         }
 
         htmlElem.addContent(htmlCaptionElem);

@@ -994,7 +994,7 @@ public class ModuleHTMLGeneratorTests {
                 + "</tr><tr>"
                 + "<td>pi</td><td>float</td><td>3.14</td>"
                 + "</tr></tbody>"
-                + "<caption><div class=\"title\">Table 1: Information</div>A data table</caption>"
+                + "<caption><span class=\"title\">Table 1:</span> Information</caption>"
                 + "</table>",
                 generate(new Element("table", ns)
                         .setAttribute("id", "1000")
@@ -1052,7 +1052,7 @@ public class ModuleHTMLGeneratorTests {
                                 .addContent(new Element("entry", ns).setText("2"))
                                 .addContent(new Element("entry", ns).setText("78%")));
         assertEquals("<table id=\"report_card\">"
-                + "<caption>Table 1: Report Card<details>Your grades</details></caption>"
+                + "<caption><span class=\"title\">Table 1:</span> Report Card</caption>"
                 + "<thead><tr><th>Course</th><th>Semester</th><th>Grade</th></tr></thead>"
                 + "<tbody>"
                 + "<tr><td rowspan=\"2\">Biology</td><td>1</td><td>86%</td></tr>"

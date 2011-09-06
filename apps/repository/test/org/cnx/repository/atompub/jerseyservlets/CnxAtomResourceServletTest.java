@@ -18,20 +18,19 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.List;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.propono.atom.client.ClientEntry;
+import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * Test for {@link CnxAtomResourceServlet}
@@ -82,9 +81,7 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(blobStoreLink.getHref());
 
         // Now upload blob to AppEngine.
-        cnxClient
-                .uploadFileToBlobStore(ParallelResourceMigrator
-                        .getResourceNameForResourceMappingDoc(file.getName()), file);
+        cnxClient.uploadFileToBlobStore(file.getName(), file);
 
         // TODO(arjuns) : Add test for get once it works.
         // TODO(arjuns) : Add link in entry for get.

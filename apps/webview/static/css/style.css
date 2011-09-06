@@ -157,6 +157,7 @@ p.authors {
 
 .moduleContent .title {
     font-weight: bold;
+    margin-top: 1.5em;
     margin-bottom: 1ex;
 }
 
@@ -231,9 +232,12 @@ p.authors {
     text-align: center;
 }
 
+.moduleContent caption, .moduleContent figcaption {
+    padding-top: 1ex;
+}
+
 table.cals {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 1em auto;
     border-collapse: collapse;
 }
 

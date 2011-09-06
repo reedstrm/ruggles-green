@@ -165,7 +165,7 @@ p.authors {
     font-weight: bold;
 }
 
-.moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement {
+.moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement, .moduleContent .definition {
     margin-bottom: 1em;
     margin-top: 1em;
 }
@@ -196,6 +196,10 @@ p.authors {
 
 .moduleContent .equationNumber:after {
     content: "]";
+}
+
+.moduleContent .definition > ol {
+    list-style: none;
 }
 
 .moduleContent .unhandled {

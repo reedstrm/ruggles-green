@@ -122,7 +122,8 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void paragraphShouldShowTitle() throws Exception {
-        assertEquals("<div class=\"title\">My Paragraph</div><p id=\"mypara\">Hello, World!</p>",
+        assertEquals("<div class=\"title paraTitle\">My Paragraph</div>"
+                + "<p id=\"mypara\">Hello, World!</p>",
                 generate(new Element("para", ns)
                         .setAttribute("id", "mypara")
                         .addContent(new Element("title", ns).setText("My Paragraph"))
@@ -639,7 +640,7 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void equationShouldUseTitle() throws Exception {
-        assertEquals("<div class=\"title\">My Brilliant Hypothesis</div>"
+        assertEquals("<div class=\"title equationTitle\">My Brilliant Hypothesis</div>"
                 + "<div class=\"equation\" id=\"my-equation\">"
                 + "<div class=\"equationContent\">2 + 2 = 4</div>"
                 + "<div class=\"equationNumber\">1</div></div>",
@@ -664,7 +665,7 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void figureShouldUseTitle() throws Exception {
-        assertEquals("<div class=\"title\">The Go Figure</div>"
+        assertEquals("<div class=\"title figureTitle\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello"
                 + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
@@ -699,7 +700,7 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void figureShouldUseTitleLabelCaption() throws Exception {
-        assertEquals("<div class=\"title\">The Go Figure</div>"
+        assertEquals("<div class=\"title figureTitle\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello"
                 + "<figcaption><span class=\"prefix\">Fig 1:</span>"
                 + " A greeting</figcaption></figure>",

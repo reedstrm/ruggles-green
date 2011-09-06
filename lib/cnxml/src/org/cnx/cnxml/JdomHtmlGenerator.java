@@ -83,7 +83,11 @@ import org.jdom.input.DOMBuilder;
     private final static String CSS_DISPLAY_NONE = "display:none;";
 
     private final static String HTML_TITLE_CLASS = "title";
+    private final static String HTML_PARAGRAPH_TITLE_CLASS = "title paraTitle";
+    private final static String HTML_EQUATION_TITLE_CLASS = "title equationTitle";
+    private final static String HTML_FIGURE_TITLE_CLASS = "title figureTitle";
     private final static String HTML_PREFIX_CLASS = "prefix";
+
     private final static String HTML_FOREIGN_CLASS = "foreign";
     private final static String HTML_TERM_CLASS = "term";
     private final static String HTML_SMALLCAPS_CLASS = "smallcaps";
@@ -482,7 +486,7 @@ import org.jdom.input.DOMBuilder;
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
-                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setAttribute(HtmlAttributes.CLASS, HTML_PARAGRAPH_TITLE_CLASS)
                     .setText(title));
         }
         pushHtmlElement(elem, htmlElem);
@@ -754,7 +758,7 @@ import org.jdom.input.DOMBuilder;
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
-                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_TITLE_CLASS)
                     .setText(title));
         }
 
@@ -778,7 +782,7 @@ import org.jdom.input.DOMBuilder;
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
-                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setAttribute(HtmlAttributes.CLASS, HTML_FIGURE_TITLE_CLASS)
                     .setText(title));
         }
 

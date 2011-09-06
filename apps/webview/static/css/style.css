@@ -161,6 +161,10 @@ p.authors {
     margin-bottom: 1ex;
 }
 
+.moduleContent .figureTitle {
+    text-align: center;
+}
+
 .moduleContent .prefix {
     font-weight: bold;
 }

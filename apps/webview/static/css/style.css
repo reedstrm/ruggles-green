@@ -229,6 +229,22 @@ p.authors {
     vertical-align: middle;
 }
 
+.moduleContent .note {
+    width: 90%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1ex 1em;
+
+    background: #ddd;
+}
+
+.moduleContent .note > .title:first-child {
+    margin-top: 0;
+}
+
 .moduleContent .download {
     width: 50%;
     margin: 1em auto;

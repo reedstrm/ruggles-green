@@ -18,6 +18,7 @@ package org.cnx.cnxml;
 
 import static com.google.common.base.Preconditions.*;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -117,9 +118,9 @@ import org.jdom.input.DOMBuilder;
             "subfigureContainer horizontal";
     private final static String HTML_LABELED_ITEM_LIST_CLASS = "labeled";
 
-    private final static int MAX_SUBFIGURES = 26;
     private final static String SUBFIGURE_COUNTER_PREFIX = "(";
-    private final static char SUBFIGURE_COUNTER_START = 'a';
+    private final static char SUBFIGURE_ALPHABET_START = 'a';
+    private final static char SUBFIGURE_ALPHABET_SIZE = 26;
     private final static String SUBFIGURE_COUNTER_SUFFIX = ")";
 
     private final static String CDF_MIME_TYPE = "application/vnd.wolfram.cdf";
@@ -836,12 +837,6 @@ import org.jdom.input.DOMBuilder;
             final ArrayList<GeneratorFrame> frames =
                     new ArrayList<GeneratorFrame>(subfigures.size());
             for (int i = 0; i < subfigures.size(); i++) {
-                // TODO(light): Remove this restriction
-                if (i >= MAX_SUBFIGURES) {
-                    log.severe("has more than " + MAX_SUBFIGURES + " subfigures!");
-                    break;
-                }
-
                 frames.add(generateSubfigure(i, subfigures.get(i), htmlContainerElem));
             }
             for (GeneratorFrame frame : Lists.reverse(frames)) {
@@ -853,15 +848,24 @@ import org.jdom.input.DOMBuilder;
     }
 
     /**
-     *  Builds a string for the subfigure.
+     *  Builds a prefix for the subfigure.
+     *  <p>
+     *  The sequence generated is:
+     *  a, b, c, ... z, aa, ab, ac, ...
      */
-    private static String getSubfigurePrefix(final int index) {
-        checkPositionIndex(index, MAX_SUBFIGURES);
-        return new StringBuilder()
-                .append(SUBFIGURE_COUNTER_PREFIX)
-                .append(Character.toString((char)('a' + index)))
-                .append(SUBFIGURE_COUNTER_SUFFIX)
-                .toString();
+    @VisibleForTesting static String getSubfigurePrefix(final int index) {
+        // Our argument is a 0-based index, but we work with a 1-based number.
+        checkArgument(index >= 0);
+        int n = index + 1;
+
+        final StringBuilder sb = new StringBuilder();
+        while (n > 0) {
+            final int mod = (n - 1) % SUBFIGURE_ALPHABET_SIZE;
+            sb.insert(0, (char)(SUBFIGURE_ALPHABET_START + mod));
+            n = (n - mod) / SUBFIGURE_ALPHABET_SIZE;
+        }
+        sb.insert(0, SUBFIGURE_COUNTER_PREFIX).append(SUBFIGURE_COUNTER_SUFFIX);
+        return sb.toString();
     }
 
     protected GeneratorFrame generateSubfigure(final int number, final Element elem,

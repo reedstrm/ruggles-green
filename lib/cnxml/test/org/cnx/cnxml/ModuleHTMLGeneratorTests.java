@@ -953,10 +953,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaDownloadShouldRenderAsLink() throws Exception {
-        assertEquals("<a id=\"thing\" "
-                + "href=\"http://www.example.com/my-widget\" "
+        assertEquals("<div class=\"download\" id=\"thing\">"
+                + "<a href=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">"
-                + "Download Epic widget</a>",
+                + "Download Epic widget</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "Epic widget")
@@ -966,10 +966,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaDownloadShouldShowUriForEmptyAlt() throws Exception {
-        assertEquals("<a id=\"thing\" "
-                + "href=\"http://www.example.com/my-widget\" "
+        assertEquals("<div class=\"download\" id=\"thing\">"
+                + "<a href=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">"
-                + "Download http://www.example.com/my-widget</a>",
+                + "Download http://www.example.com/my-widget</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "")
@@ -979,10 +979,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaLabviewShouldRenderAsLink() throws Exception {
-        assertEquals("<a id=\"lbv\" "
-                + "href=\"http://www.example.com/content.vi\" "
+        assertEquals("<div class=\"download\" id=\"lbv\">"
+                + "<a href=\"http://www.example.com/content.vi\" "
                 + "type=\"application/x-labview-vi\">"
-                + "Download A LabVIEW Thing</a>",
+                + "Download A LabVIEW Thing</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "lbv")
                         .setAttribute("alt", "A LabVIEW Thing")
@@ -992,10 +992,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaLabviewShouldShowUriForEmptyAlt() throws Exception {
-        assertEquals("<a id=\"lbv\" "
-                + "href=\"http://www.example.com/content.vi\" "
+        assertEquals("<div class=\"download\" id=\"lbv\">"
+                + "<a href=\"http://www.example.com/content.vi\" "
                 + "type=\"application/x-labview-vi\">"
-                + "Download http://www.example.com/content.vi</a>",
+                + "Download http://www.example.com/content.vi</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "lbv")
                         .setAttribute("alt", "")

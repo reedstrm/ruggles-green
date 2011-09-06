@@ -101,6 +101,7 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_STATEMENT_CLASS = "statement";
     private final static String HTML_PROOF_CLASS = "proof";
     private final static String HTML_EXAMPLE_CLASS = "example";
+    private final static String HTML_DOWNLOAD_CLASS = "download";
     private final static String HTML_CDF_DOWNLOAD_CLASS = "downloadLink";
     private final static String HTML_SUBFIGURE_CLASS = "subfigure";
     private final static String HTML_SUBFIGURE_CONTENT_CLASS = "subfigureContent";
@@ -1168,12 +1169,14 @@ import org.jdom.input.DOMBuilder;
 
     protected void generateDownloadLink(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
-        addHtmlContent(copyId(mediaElem, new Element(HtmlTag.LINK.getTag()))
-                .setAttribute(HtmlAttributes.LINK_URL,
-                        elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
-                .setAttribute(HtmlAttributes.LINK_TYPE,
-                        elem.getAttributeValue(CnxmlAttributes.DOWNLOAD_TYPE))
-                .setText(getDownloadLabel(elem)));
+        addHtmlContent(copyId(mediaElem, new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_DOWNLOAD_CLASS)
+                .addContent(new Element(HtmlTag.LINK.getTag())
+                        .setAttribute(HtmlAttributes.LINK_URL,
+                                elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
+                        .setAttribute(HtmlAttributes.LINK_TYPE,
+                                elem.getAttributeValue(CnxmlAttributes.DOWNLOAD_TYPE))
+                        .setText(getDownloadLabel(elem)))));
     }
 
     protected void generateMathematica(final Element elem) {

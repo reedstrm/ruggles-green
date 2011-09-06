@@ -26,6 +26,7 @@ import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.mdml.MdmlModule;
 import org.cnx.resourcemapping.ObjectFactory;
+import org.cnx.util.MathmlTag;
 import org.cnx.util.RenderScope;
 import org.cnx.util.UtilModule;
 
@@ -42,8 +43,10 @@ import org.jdom.Text;
 
 public class ModuleHTMLGeneratorTests {
     private static final String moduleId = "m123";
+    private static final Namespace ns = CnxmlTag.NAMESPACE;
+    private static final Namespace mathns = MathmlTag.NAMESPACE;
+
     private static Injector injector;
-    private Namespace ns = CnxmlTag.NAMESPACE;
 
     @BeforeClass public static void createInjector() {
         injector = Guice.createInjector(
@@ -1035,9 +1038,23 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mathShouldPassThrough() throws Exception {
-        final Namespace mathns = Namespace.getNamespace("http://www.w3.org/1998/Math/MathML");
-        assertEquals("<math><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>",
+        assertEquals("<math id=\"foo\">"
+                + "<mrow><mi>a</mi><mo id=\"bar\">+</mo><mi>b</mi></mrow>"
+                + "</math>",
                 generate(new Element("math", mathns)
+                        .setAttribute("id", "foo")
+                        .addContent(new Element("mrow", mathns)
+                                .addContent(new Element("mi", mathns).setText("a"))
+                                .addContent(new Element("mo", mathns)
+                                        .setAttribute("id", "bar")
+                                        .setText("+"))
+                                .addContent(new Element("mi", mathns).setText("b")))));
+    }
+
+    @Test public void mathRootShouldChangeModeToDisplay() throws Exception {
+        assertEquals("<math display=\"block\"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>",
+                generate(new Element("math", mathns)
+                        .setAttribute("mode", "display")
                         .addContent(new Element("mrow", mathns)
                                 .addContent(new Element("mi", mathns).setText("a"))
                                 .addContent(new Element("mo", mathns).setText("+"))

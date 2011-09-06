@@ -37,6 +37,8 @@ import org.cnx.util.HtmlTag;
 import org.cnx.util.HtmlAttributes;
 import org.cnx.util.IdFilter;
 import org.cnx.util.JdomHtmlSerializer;
+import org.cnx.util.MathmlAttributes;
+import org.cnx.util.MathmlTag;
 
 import org.jdom.Attribute;
 import org.jdom.Comment;
@@ -56,8 +58,6 @@ import org.jdom.input.DOMBuilder;
  *  It is iterative, but it is not thread-safe.
  */
 @RenderTime public class JdomHtmlGenerator implements ModuleHTMLGenerator {
-    private final static String MATHML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
-
     private final static String NOTE_LABEL_ASIDE = "Aside";
     private final static String NOTE_LABEL_WARNING = "Warning";
     private final static String NOTE_LABEL_TIP = "Tip";
@@ -393,11 +393,8 @@ import org.jdom.input.DOMBuilder;
                 unrecognized(elem);
                 break;
             }
-        } else if (MATHML_NAMESPACE.equals(elem.getNamespaceURI())) {
-            // Copy math without modification.  If we add it directly, it detaches from the original
-            // CNXML tree.
-            // TODO(light): Don't use clone, it's recursive.
-            addHtmlContent((Element)elem.clone());
+        } else if (MathmlTag.NAMESPACE_URI.equals(elem.getNamespaceURI())) {
+            duplicateMath(elem);
         }
     }
     
@@ -445,6 +442,39 @@ import org.jdom.input.DOMBuilder;
             htmlElem.setAttribute(HtmlAttributes.ID, id);
         }
         return htmlElem;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void duplicateMath(final Element elem) {
+        final Element htmlElem = new Element(elem.getName());
+        for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
+            htmlElem.getAttributes().add(new Attribute(attr.getName(), attr.getValue()));
+        }
+
+        switch (MathmlTag.of(elem.getName())) {
+        case MATH:
+            final String modeString = elem.getAttributeValue(MathmlAttributes.MODE);
+            if (modeString != null) {
+                htmlElem.removeAttribute(MathmlAttributes.MODE);
+                if (elem.getAttribute(MathmlAttributes.DISPLAY) == null) {
+                    final MathmlAttributes.Mode mode = MathmlAttributes.Mode.of(
+                            modeString, MathmlAttributes.Mode.INLINE);
+                    switch (mode) {
+                    case INLINE:
+                        htmlElem.setAttribute(MathmlAttributes.DISPLAY,
+                                MathmlAttributes.Display.INLINE.getValue());
+                        break;
+                    case BLOCK:
+                        htmlElem.setAttribute(MathmlAttributes.DISPLAY,
+                                MathmlAttributes.Display.BLOCK.getValue());
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+
+        pushHtmlElement(elem, htmlElem);
     }
 
     protected void generateParagraph(final Element elem) {

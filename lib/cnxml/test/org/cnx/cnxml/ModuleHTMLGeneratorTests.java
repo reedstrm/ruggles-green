@@ -212,7 +212,7 @@ public class ModuleHTMLGeneratorTests {
     @Test public void emptyLinkShouldRecognizeFigure() throws Exception {
         final Element figure = new Element("figure", ns).setAttribute("id", "myRefId");
         final String figureOutput =
-                "<figure id=\"myRefId\"><figcaption><span class=\"title\">Figure 1</span>"
+                "<figure id=\"myRefId\"><figcaption><span class=\"prefix\">Figure 1</span>"
                 + "</figcaption></figure>";
         assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
@@ -648,13 +648,13 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureShouldWrapContent() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns).setAttribute("id", "go").setText("Hello")));
     }
 
     @Test public void figureShouldUseLabel() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Fig 1</span></figcaption></figure>",
+                + "<figcaption><span class=\"prefix\">Fig 1</span></figcaption></figure>",
                 generate(new Element("figure", ns).setAttribute("id", "go")
                         .addContent(new Element("label", ns).setText("Fig"))
                         .addContent(new Text("Hello"))));
@@ -663,7 +663,7 @@ public class ModuleHTMLGeneratorTests {
     @Test public void figureShouldUseTitle() throws Exception {
         assertEquals("<div class=\"title\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("title", ns).setText("The Go Figure"))
@@ -672,7 +672,7 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureShouldUseCaption() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1:</span>"
+                + "<figcaption><span class=\"prefix\">Figure 1:</span>"
                 + " A caption</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
@@ -682,7 +682,7 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureCaptionShouldAcceptLinks() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1:</span>"
+                + "<figcaption><span class=\"prefix\">Figure 1:</span>"
                 + " A <a href=\"http://www.example.com/\">caption</a>"
                 + "</figcaption></figure>",
                 generate(new Element("figure", ns)
@@ -698,7 +698,7 @@ public class ModuleHTMLGeneratorTests {
     @Test public void figureShouldUseTitleLabelCaption() throws Exception {
         assertEquals("<div class=\"title\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Fig 1:</span>"
+                + "<figcaption><span class=\"prefix\">Fig 1:</span>"
                 + " A greeting</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
@@ -713,13 +713,13 @@ public class ModuleHTMLGeneratorTests {
                 + "<div class=\"subfigureContainer horizontal\">"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">Hello</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span></div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span></div>"
                 + "</div>"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">World</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span></div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span></div>"
                 + "</div>"
-                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("subfigure", ns).setText("Hello"))
@@ -731,13 +731,13 @@ public class ModuleHTMLGeneratorTests {
                 + "<div class=\"subfigureContainer horizontal\">"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">Hello</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span></div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span></div>"
                 + "</div>"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">World</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span></div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span></div>"
                 + "</div>"
-                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "horizontal")
@@ -750,13 +750,13 @@ public class ModuleHTMLGeneratorTests {
                 + "<div class=\"subfigureContainer vertical\">"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">Hello</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span></div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span></div>"
                 + "</div>"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">World</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span></div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span></div>"
                 + "</div>"
-                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "vertical")
@@ -769,13 +769,13 @@ public class ModuleHTMLGeneratorTests {
                 + "<div class=\"subfigureContainer horizontal\">"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">Hello</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span> First</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span> First</div>"
                 + "</div>"
                 + "<div class=\"subfigure\">"
                 + "<div class=\"subfigureContent\">World</div>"
-                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span> Second</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span> Second</div>"
                 + "</div>"
-                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("subfigure", ns)
@@ -1114,7 +1114,7 @@ public class ModuleHTMLGeneratorTests {
                 + "</tr><tr>"
                 + "<td>pi</td><td>float</td><td>3.14</td>"
                 + "</tr></tbody>"
-                + "<caption><span class=\"title\">Table 1:</span> Information</caption>"
+                + "<caption><span class=\"prefix\">Table 1:</span> Information</caption>"
                 + "</table>",
                 generate(new Element("table", ns)
                         .setAttribute("id", "1000")
@@ -1172,7 +1172,7 @@ public class ModuleHTMLGeneratorTests {
                                 .addContent(new Element("entry", ns).setText("2"))
                                 .addContent(new Element("entry", ns).setText("78%")));
         assertEquals("<table id=\"report_card\">"
-                + "<caption><span class=\"title\">Table 1:</span> Report Card</caption>"
+                + "<caption><span class=\"prefix\">Table 1:</span> Report Card</caption>"
                 + "<thead><tr><th>Course</th><th>Semester</th><th>Grade</th></tr></thead>"
                 + "<tbody>"
                 + "<tr><td rowspan=\"2\">Biology</td><td>1</td><td>86%</td></tr>"

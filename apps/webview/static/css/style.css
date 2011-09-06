@@ -160,6 +160,10 @@ p.authors {
     margin-bottom: 1ex;
 }
 
+.moduleContent .prefix {
+    font-weight: bold;
+}
+
 .moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement {
     margin-bottom: 1em;
     margin-top: 1em;

@@ -83,6 +83,7 @@ import org.jdom.input.DOMBuilder;
     private final static String CSS_DISPLAY_NONE = "display:none;";
 
     private final static String HTML_TITLE_CLASS = "title";
+    private final static String HTML_PREFIX_CLASS = "prefix";
     private final static String HTML_FOREIGN_CLASS = "foreign";
     private final static String HTML_TERM_CLASS = "term";
     private final static String HTML_SMALLCAPS_CLASS = "smallcaps";
@@ -756,18 +757,18 @@ import org.jdom.input.DOMBuilder;
 
         // Add caption to HTML figure element
         final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
-        final Element htmlCaptionTitleElem = new Element(HtmlTag.SPAN.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
+        final Element htmlCaptionPrefixElem = new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS);
         final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
-        htmlCaptionTitleElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
-        htmlCaptionElem.addContent(htmlCaptionTitleElem);
+        htmlCaptionPrefixElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
+        htmlCaptionElem.addContent(htmlCaptionPrefixElem);
 
         // Push CNXML caption element to stack if it is present
         final Element captionElem =
                 elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
         if (captionElem != null) {
-            htmlCaptionTitleElem.addContent(":");
+            htmlCaptionPrefixElem.addContent(":");
             htmlCaptionElem.addContent(" ");
             stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
         }
@@ -839,7 +840,7 @@ import org.jdom.input.DOMBuilder;
                 .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CAPTION_CLASS);
 
         htmlCaptionElem.addContent(new Element(HtmlTag.SPAN.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS)
                 .setText(getSubfigurePrefix(number)));
 
         // Push CNXML caption element to stack if it is present
@@ -1258,12 +1259,12 @@ import org.jdom.input.DOMBuilder;
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
 
-        final Element htmlTitleElem = new Element(HtmlTag.SPAN.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+        final Element htmlPrefixElem = new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS)
                 .addContent(CALS_TABLE_LABEL + " " + number);
-        htmlCaptionElem.addContent(htmlTitleElem);
+        htmlCaptionElem.addContent(htmlPrefixElem);
         if (title != null) {
-            htmlTitleElem.addContent(":");
+            htmlPrefixElem.addContent(":");
             htmlCaptionElem.addContent(" " + title);
         }
 

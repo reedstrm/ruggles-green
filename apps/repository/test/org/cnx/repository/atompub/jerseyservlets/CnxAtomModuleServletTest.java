@@ -30,7 +30,6 @@ import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
-import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.jdom.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,23 +65,22 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     public void testMigrateCompleteModule() throws HttpException, ProponoException, IOException,
             JAXBException, JDOMException {
         List<File> listOfResourcesToUpload =
-            ParallelModuleMigrator.getListOfResourcesToBeUploaded(MODULE_LOCATION);
+                ParallelModuleMigrator.getListOfResourcesToBeUploaded(MODULE_LOCATION);
 
         List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
         for (File currFile : listOfResourcesToUpload) {
             logger.info("Attempting to upload : " + currFile.getAbsolutePath());
             ClientEntry resourceEntry =
-                cnxClient.uploadFileToBlobStore(ParallelResourceMigrator
-                    .getResourceNameForResourceMappingDoc(currFile.getName()), currFile);
+                    cnxClient.uploadFileToBlobStore(currFile.getName(), currFile);
             listOfEntryForUploadedResources.add(resourceEntry);
             logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
-                + resourceEntry.getId() + "], and can be found here [" + resourceEntry.getEditURI()
-                + "].");
+                    + resourceEntry.getId() + "], and can be found here ["
+                    + resourceEntry.getEditURI() + "].");
             // TODO(arjuns) : Add validations here.
         }
 
         String resourceMappingDocXml =
-            cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
+                cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
 
         File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
@@ -91,14 +89,14 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         // TODO(arjuns): Add more validations here.
 
         ClientEntry moduleNewVersionEntry =
-            cnxClient.createNewModuleVersion(createModuleEntry, cnxmlAsString,
-                    resourceMappingDocXml);
+                cnxClient.createNewModuleVersion(createModuleEntry, cnxmlAsString,
+                        resourceMappingDocXml);
         // TODO(arjuns) : Add more validations here.
 
         // TODO(arjuns) : refactor this.
         IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleNewVersionEntry.getId());
         VersionWrapper version =
-            CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
+                CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
         ClientEntry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);
 
         String downloadedCnxmlDoc = cnxClient.getCnxml(getEntry);

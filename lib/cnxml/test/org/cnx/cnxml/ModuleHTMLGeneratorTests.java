@@ -709,10 +709,17 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void defaultSubfigureTest() throws Exception {
-        assertEquals("<figure id=\"go\" class=\"horizontal\">"
-                + "<div class=\"subfigure\">Hello</div>"
-                + "<div class=\"subfigure\">World</div>"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer horizontal\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span></div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span></div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("subfigure", ns).setText("Hello"))
@@ -720,10 +727,17 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void horizontalSubfigureTest() throws Exception {
-        assertEquals("<figure id=\"go\" class=\"horizontal\">"
-                + "<div class=\"subfigure\">Hello</div>"
-                + "<div class=\"subfigure\">World</div>"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer horizontal\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span></div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span></div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "horizontal")
@@ -732,15 +746,44 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void verticalSubfigureTest() throws Exception {
-        assertEquals("<figure id=\"go\" class=\"vertical\">"
-                + "<div class=\"subfigure\">Hello</div>"
-                + "<div class=\"subfigure\">World</div>"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer vertical\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span></div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span></div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "vertical")
                         .addContent(new Element("subfigure", ns).setText("Hello"))
                         .addContent(new Element("subfigure", ns).setText("World"))));
+    }
+
+    @Test public void subfiguresShouldUseCaptions() throws Exception {
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer horizontal\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(a)</span> First</div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"title\">(b)</span> Second</div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                generate(new Element("figure", ns)
+                        .setAttribute("id", "go")
+                        .addContent(new Element("subfigure", ns)
+                                .addContent("Hello")
+                                .addContent(new Element("caption", ns).setText("First")))
+                        .addContent(new Element("subfigure", ns)
+                                .addContent("World")
+                                .addContent(new Element("caption", ns).setText("Second")))));
     }
 
     @Test public void defaultListShouldRenderAsUl() throws Exception {

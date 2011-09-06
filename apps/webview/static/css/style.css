@@ -205,7 +205,19 @@ p.authors {
 }
 
 .moduleContent figure {
+    margin: 0;
     text-align: center;
+}
+
+.moduleContent .subfigureContainer.horizontal {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.moduleContent .subfigureContainer.horizontal > .subfigure {
+    display: table-cell;
+    vertical-align: middle;
 }
 
 table.cals {

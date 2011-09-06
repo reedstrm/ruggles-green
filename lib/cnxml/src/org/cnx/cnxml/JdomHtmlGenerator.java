@@ -17,10 +17,12 @@
 package org.cnx.cnxml;
 
 import static com.google.common.base.Preconditions.*;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
+import org.jdom.filter.ElementFilter;
 import org.jdom.filter.Filter;
 import org.jdom.input.DOMBuilder;
 
@@ -100,9 +103,18 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_EXAMPLE_CLASS = "example";
     private final static String HTML_CDF_DOWNLOAD_CLASS = "downloadLink";
     private final static String HTML_SUBFIGURE_CLASS = "subfigure";
-    private final static String HTML_FIGURE_VERTICAL_CLASS = "vertical";
-    private final static String HTML_FIGURE_HORIZONTAL_CLASS = "horizontal";
+    private final static String HTML_SUBFIGURE_CONTENT_CLASS = "subfigureContent";
+    private final static String HTML_SUBFIGURE_CAPTION_CLASS = "subfigureCaption";
+    private final static String HTML_SUBFIGURE_CONTAINER_VERTICAL_CLASS =
+            "subfigureContainer vertical";
+    private final static String HTML_SUBFIGURE_CONTAINER_HORIZONTAL_CLASS =
+            "subfigureContainer horizontal";
     private final static String HTML_LABELED_ITEM_LIST_CLASS = "labeled";
+
+    private final static int MAX_SUBFIGURES = 26;
+    private final static String SUBFIGURE_COUNTER_PREFIX = "(";
+    private final static char SUBFIGURE_COUNTER_START = 'a';
+    private final static String SUBFIGURE_COUNTER_SUFFIX = ")";
 
     private final static String CDF_MIME_TYPE = "application/vnd.wolfram.cdf";
     private final static String CDF_TEXT_MIME_TYPE = "application/vnd.wolfram.cdf.text";
@@ -359,9 +371,6 @@ import org.jdom.input.DOMBuilder;
                 break;
             case MEDIA:
                 generateMedia(elem);
-                break;
-            case SUBFIGURE:
-                generateSubfigure(elem);
                 break;
             case TABLE:
                 generateTable(elem);
@@ -732,6 +741,7 @@ import org.jdom.input.DOMBuilder;
         stack.push(new GeneratorFrame(elem, htmlContentDiv));
     }
 
+    @SuppressWarnings("unchecked")
     protected void generateFigure(final Element elem) {
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
@@ -741,50 +751,108 @@ import org.jdom.input.DOMBuilder;
         }
 
         final Element htmlElem = copyId(elem, new Element(HtmlTag.FIGURE.getTag()));
-        if (elem.getChild(CnxmlTag.SUBFIGURE.getTag(), CnxmlTag.NAMESPACE) != null) {
-            final CnxmlAttributes.FigureOrientation orient = CnxmlAttributes.FigureOrientation.of(
-                    elem.getAttributeValue(CnxmlAttributes.FIGURE_ORIENT),
-                    CnxmlAttributes.FigureOrientation.HORIZONTAL);
-            switch (orient) {
-            case VERTICAL:
-                htmlElem.setAttribute(HtmlAttributes.CLASS, HTML_FIGURE_VERTICAL_CLASS);
-                break;
-            case HORIZONTAL:
-                htmlElem.setAttribute(HtmlAttributes.CLASS, HTML_FIGURE_HORIZONTAL_CLASS);
-                break;
-            }
-        }
-
-        // Add HTML figure element to parent
-        final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
-        addHtmlContent(htmlElem.addContent(tempSpan));
+        addHtmlContent(htmlElem);
 
         // Add caption to HTML figure element
         final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
         final Element htmlCaptionTitleElem = new Element(HtmlTag.SPAN.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
         final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
-        final Element captionElem =
-                elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
         htmlCaptionTitleElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
         htmlCaptionElem.addContent(htmlCaptionTitleElem);
-        htmlElem.addContent(htmlCaptionElem);
 
         // Push CNXML caption element to stack if it is present
+        final Element captionElem =
+                elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
         if (captionElem != null) {
             htmlCaptionTitleElem.addContent(":");
             htmlCaptionElem.addContent(" ");
             stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
         }
 
-        // Push content to stack for iteration
-        stack.push(new GeneratorFrame(elem, tempSpan, true));
+        final List<Element> subfigures = (List<Element>)elem.getContent(
+                new ElementFilter(CnxmlTag.SUBFIGURE.getTag(), CnxmlTag.NAMESPACE));
+        if (subfigures.isEmpty()) {
+            final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
+            htmlElem.addContent(0, tempSpan);
+            stack.push(new GeneratorFrame(elem, tempSpan, true));
+        } else {
+            final Element htmlContainerElem = new Element(HtmlTag.DIV.getTag());
+            htmlElem.addContent(0, htmlContainerElem);
+
+            // Set class for orientation
+            final CnxmlAttributes.FigureOrientation orient = CnxmlAttributes.FigureOrientation.of(
+                    elem.getAttributeValue(CnxmlAttributes.FIGURE_ORIENT),
+                    CnxmlAttributes.FigureOrientation.HORIZONTAL);
+            switch (orient) {
+            case VERTICAL:
+                htmlContainerElem.setAttribute(HtmlAttributes.CLASS,
+                        HTML_SUBFIGURE_CONTAINER_VERTICAL_CLASS);
+                break;
+            case HORIZONTAL:
+                htmlContainerElem.setAttribute(HtmlAttributes.CLASS,
+                        HTML_SUBFIGURE_CONTAINER_HORIZONTAL_CLASS);
+                break;
+            }
+
+            // Add subfigures
+            final ArrayList<GeneratorFrame> frames =
+                    new ArrayList<GeneratorFrame>(subfigures.size());
+            for (int i = 0; i < subfigures.size(); i++) {
+                // TODO(light): Remove this restriction
+                if (i >= MAX_SUBFIGURES) {
+                    log.severe("has more than " + MAX_SUBFIGURES + " subfigures!");
+                    break;
+                }
+
+                frames.add(generateSubfigure(i, subfigures.get(i), htmlContainerElem));
+            }
+            for (GeneratorFrame frame : Lists.reverse(frames)) {
+                stack.push(frame);
+            }
+        }
+
+        htmlElem.addContent(htmlCaptionElem);
     }
 
-    protected void generateSubfigure(final Element elem) {
-        pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CLASS)));
+    /**
+     *  Builds a string for the subfigure.
+     */
+    private static String getSubfigurePrefix(final int index) {
+        checkPositionIndex(index, MAX_SUBFIGURES);
+        return new StringBuilder()
+                .append(SUBFIGURE_COUNTER_PREFIX)
+                .append(Character.toString((char)('a' + index)))
+                .append(SUBFIGURE_COUNTER_SUFFIX)
+                .toString();
+    }
+
+    protected GeneratorFrame generateSubfigure(final int number, final Element elem,
+            final Element htmlContainerElem) {
+        final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CLASS));
+        final Element htmlContentElem = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CONTENT_CLASS);
+        final Element htmlCaptionElem = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CAPTION_CLASS);
+
+        htmlCaptionElem.addContent(new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                .setText(getSubfigurePrefix(number)));
+
+        // Push CNXML caption element to stack if it is present
+        final Element captionElem =
+                elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
+        if (captionElem != null) {
+            htmlCaptionElem.addContent(" ");
+            stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
+        }
+
+        htmlContainerElem.addContent(htmlElem);
+        htmlElem.addContent(htmlContentElem).addContent(htmlCaptionElem);
+
+        return new GeneratorFrame(elem, htmlContentElem);
     }
 
     protected void generateRule(final Element elem) {

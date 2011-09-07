@@ -1141,6 +1141,40 @@ public class ModuleHTMLGeneratorTests {
                         .addContent(tgroup)));
     }
 
+    @Test public void tableShouldUseSummaryIfNoTitleIsGiven() throws Exception {
+        final Element tgroup = new Element("tgroup", ns)
+                .setAttribute("cols", "3")
+                .addContent(new Element("thead", ns)
+                        .addContent(new Element("row", ns)
+                                .addContent(new Element("entry", ns).setText("Name"))
+                                .addContent(new Element("entry", ns).setText("Type"))
+                                .addContent(new Element("entry", ns).setText("Value"))))
+                .addContent(new Element("tbody", ns)
+                        .addContent(new Element("row", ns)
+                                .addContent(new Element("entry", ns).setText("answer"))
+                                .addContent(new Element("entry", ns).setText("int"))
+                                .addContent(new Element("entry", ns).setText("42")))
+                        .addContent(new Element("row", ns)
+                                .addContent(new Element("entry", ns).setText("pi"))
+                                .addContent(new Element("entry", ns).setText("float"))
+                                .addContent(new Element("entry", ns).setText("3.14"))));
+        assertEquals("<table id=\"1000\" class=\"cals calsFrameAll\">"
+                + "<thead><tr>"
+                + "<th>Name</th><th>Type</th><th>Value</th>"
+                + "</tr></thead>"
+                + "<tbody><tr>"
+                + "<td>answer</td><td>int</td><td>42</td>"
+                + "</tr><tr>"
+                + "<td>pi</td><td>float</td><td>3.14</td>"
+                + "</tr></tbody>"
+                + "<caption><span class=\"prefix\">Table 1:</span> A data table</caption>"
+                + "</table>",
+                generate(new Element("table", ns)
+                        .setAttribute("id", "1000")
+                        .setAttribute("summary", "A data table")
+                        .addContent(tgroup)));
+    }
+
     /**
      *  trickyTableTest is the trial-by-fire test that a full CALS-table compliant generator should
      *  pass.

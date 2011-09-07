@@ -17,6 +17,7 @@
 package org.cnx.cnxml;
 
 import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -1294,16 +1295,24 @@ import org.jdom.input.DOMBuilder;
         pushTablePart(tgroup, CnxmlTag.TABLE_HEAD, htmlElem, HtmlTag.TABLE_HEAD);
 
         final Element htmlCaptionElem = new Element(HtmlTag.TABLE_CAPTION.getTag());
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
 
         final Element htmlPrefixElem = new Element(HtmlTag.SPAN.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS)
                 .addContent(CALS_TABLE_LABEL + " " + number);
         htmlCaptionElem.addContent(htmlPrefixElem);
-        if (title != null) {
+
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
+        final String summary = elem.getAttributeValue(CnxmlAttributes.CALS_TABLE_SUMMARY);
+        String captionText = null;
+        if (!isNullOrEmpty(title)) {
+            captionText = title;
+        } else if (!isNullOrEmpty(summary)) {
+            captionText = summary;
+        }
+        if (captionText != null) {
             htmlPrefixElem.addContent(":");
-            htmlCaptionElem.addContent(" " + title);
+            htmlCaptionElem.addContent(" " + captionText);
         }
 
         htmlElem.addContent(htmlCaptionElem);

@@ -32,7 +32,7 @@ import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
  * Cnx AtomPub Service.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomService extends AtomService {
@@ -59,16 +59,20 @@ public class CnxAtomService extends AtomService {
 
         /*
          * For Connexions repository, there is only one workspace. Each workspace will have three
-         * AtomPubcollections : 1. Resources 2. Modules 3. Collections.
+         * AtomPubcollections : 
+         *      1. Resources 
+         *      2. Modules 
+         *      3. Collections.
          */
-        workspace = new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, CnxMediaTypes.TEXT);
+        workspace =
+                new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, CnxMediaTypes.TEXT_XML_UTF8);
         getWorkspaces().add(workspace);
 
         workspace
-            .addCollection(getCollectionForCnxResource(constants.getCollectionResourceScheme()));
+                .addCollection(getCollectionForCnxResource(constants.getCollectionResourceScheme()));
         workspace.addCollection(getCollectionForCnxModule(constants.getCollectionModuleScheme()));
         workspace.addCollection(getCollectionForCnxCollection(constants
-            .getCollectionCnxCollectionScheme()));
+                .getCollectionCnxCollectionScheme()));
 
     }
 

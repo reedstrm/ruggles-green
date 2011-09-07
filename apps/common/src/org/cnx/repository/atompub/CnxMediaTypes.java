@@ -19,7 +19,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * AtomPub Media Types.
- * TODO(arjuns) : Move this to common.
+ * 
  * @author Arjun Satyapal
  */
 public class CnxMediaTypes extends MediaType {
@@ -33,7 +33,8 @@ public class CnxMediaTypes extends MediaType {
     public final static MediaType TEXT_HTML_UTF8_TYPE = new MediaType("text",
             "html");
 
-
-    /** MediaType : "text" */
-    public final static String TEXT = "text";
+    /** text/xml with charset = UTF-8 */
+    public final static String TEXT_XML_UTF8 = "text/xml; charset=utf-8";
+    public final static MediaType TEXT_XML_UTF8_TYPE = new MediaType("text",
+            "xml");
 }

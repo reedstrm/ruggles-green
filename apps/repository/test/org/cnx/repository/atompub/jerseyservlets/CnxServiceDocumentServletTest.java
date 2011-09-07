@@ -56,7 +56,7 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
         ClientWorkspace workspace = cnxClient.getWorkspace();
         assertEquals(3, workspace.getCollections().size());
         assertEquals(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, workspace.getTitle());
-        assertEquals(CnxMediaTypes.TEXT, workspace.getTitleType());
+        assertEquals(CnxMediaTypes.TEXT_XML_UTF8, workspace.getTitleType());
 
         // Now validate each collection individually.
         validateCollection(cnxClient.getCollectionResource(),

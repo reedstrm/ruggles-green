@@ -73,6 +73,7 @@ public class WebViewModule extends AbstractModule {
                 .add(new File("collection.soy"))
                 .add(new File("index.soy"))
                 .add(new File("module.soy"))
+                .add(new File("errors.soy"))
                 .build().compileToJavaObj();
     }
 

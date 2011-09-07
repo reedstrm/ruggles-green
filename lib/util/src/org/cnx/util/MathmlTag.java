@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.cnx.common.collxml;
+package org.cnx.util;
 
 import com.google.common.base.Objects;
 
@@ -23,22 +23,19 @@ import javax.annotation.Nullable;
 import org.jdom.Namespace;
 
 /**
- *  CollxmlTag holds constants for all CollXML elements.
+ *  MathmlTag holds constants for MathML elements.
  */
-public enum CollxmlTag {
+public enum MathmlTag {
     INVALID(null),
 
-    METADATA("metadata"),
-    CONTENT("content"),
-    MODULE("module"),
-    SUBCOLLECTION("subcollection");
+    MATH("math");
+
+    public static final String NAMESPACE_URI = "http://www.w3.org/1998/Math/MathML";
+    public static final Namespace NAMESPACE = Namespace.getNamespace(NAMESPACE_URI);
 
     private final String tag;
 
-    public static final String NAMESPACE_URI = "http://cnx.rice.edu/collxml";
-    public static final Namespace NAMESPACE = Namespace.getNamespace(NAMESPACE_URI);
-
-    private CollxmlTag(@Nullable String tag) {
+    private MathmlTag(@Nullable String tag) {
         this.tag = tag;
     }
 
@@ -46,12 +43,19 @@ public enum CollxmlTag {
         return tag;
     }
 
-    public static CollxmlTag of(@Nullable final String name) {
-        for (CollxmlTag tag : CollxmlTag.values()) {
+    public static MathmlTag of(@Nullable final String name) {
+        return MathmlTag.of(name, INVALID);
+    }
+
+    public static MathmlTag of(@Nullable final String name, @Nullable final MathmlTag defaultTag) {
+        if (name == null) {
+            return defaultTag;
+        }
+        for (MathmlTag tag : MathmlTag.values()) {
             if (Objects.equal(tag.tag, name)) {
                 return tag;
             }
         }
-        return INVALID;
+        return defaultTag;
     }
 }

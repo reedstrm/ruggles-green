@@ -1,17 +1,17 @@
 /*
- *  Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cnx.cnxml;
@@ -26,6 +26,7 @@ import org.cnx.cnxml.CnxmlModule;
 import org.cnx.cnxml.ModuleHTMLGenerator;
 import org.cnx.mdml.MdmlModule;
 import org.cnx.resourcemapping.ObjectFactory;
+import org.cnx.util.MathmlTag;
 import org.cnx.util.RenderScope;
 import org.cnx.util.UtilModule;
 
@@ -42,8 +43,10 @@ import org.jdom.Text;
 
 public class ModuleHTMLGeneratorTests {
     private static final String moduleId = "m123";
+    private static final Namespace ns = CnxmlTag.NAMESPACE;
+    private static final Namespace mathns = MathmlTag.NAMESPACE;
+
     private static Injector injector;
-    private Namespace ns = CnxmlTag.NAMESPACE;
 
     @BeforeClass public static void createInjector() {
         injector = Guice.createInjector(
@@ -119,7 +122,8 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void paragraphShouldShowTitle() throws Exception {
-        assertEquals("<div class=\"title\">My Paragraph</div><p id=\"mypara\">Hello, World!</p>",
+        assertEquals("<div class=\"title paraTitle\">My Paragraph</div>"
+                + "<p id=\"mypara\">Hello, World!</p>",
                 generate(new Element("para", ns)
                         .setAttribute("id", "mypara")
                         .addContent(new Element("title", ns).setText("My Paragraph"))
@@ -212,7 +216,7 @@ public class ModuleHTMLGeneratorTests {
     @Test public void emptyLinkShouldRecognizeFigure() throws Exception {
         final Element figure = new Element("figure", ns).setAttribute("id", "myRefId");
         final String figureOutput =
-                "<figure id=\"myRefId\"><figcaption><span class=\"title\">Figure 1</span>"
+                "<figure id=\"myRefId\"><figcaption><span class=\"prefix\">Figure 1</span>"
                 + "</figcaption></figure>";
         assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
@@ -636,7 +640,7 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void equationShouldUseTitle() throws Exception {
-        assertEquals("<div class=\"title\">My Brilliant Hypothesis</div>"
+        assertEquals("<div class=\"title equationTitle\">My Brilliant Hypothesis</div>"
                 + "<div class=\"equation\" id=\"my-equation\">"
                 + "<div class=\"equationContent\">2 + 2 = 4</div>"
                 + "<div class=\"equationNumber\">1</div></div>",
@@ -648,22 +652,22 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureShouldWrapContent() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns).setAttribute("id", "go").setText("Hello")));
     }
 
     @Test public void figureShouldUseLabel() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Fig 1</span></figcaption></figure>",
+                + "<figcaption><span class=\"prefix\">Fig 1</span></figcaption></figure>",
                 generate(new Element("figure", ns).setAttribute("id", "go")
                         .addContent(new Element("label", ns).setText("Fig"))
                         .addContent(new Text("Hello"))));
     }
 
     @Test public void figureShouldUseTitle() throws Exception {
-        assertEquals("<div class=\"title\">The Go Figure</div>"
+        assertEquals("<div class=\"title figureTitle\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+                + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("title", ns).setText("The Go Figure"))
@@ -672,7 +676,7 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureShouldUseCaption() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1:</span>"
+                + "<figcaption><span class=\"prefix\">Figure 1:</span>"
                 + " A caption</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
@@ -682,7 +686,7 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void figureCaptionShouldAcceptLinks() throws Exception {
         assertEquals("<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Figure 1:</span>"
+                + "<figcaption><span class=\"prefix\">Figure 1:</span>"
                 + " A <a href=\"http://www.example.com/\">caption</a>"
                 + "</figcaption></figure>",
                 generate(new Element("figure", ns)
@@ -696,9 +700,9 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void figureShouldUseTitleLabelCaption() throws Exception {
-        assertEquals("<div class=\"title\">The Go Figure</div>"
+        assertEquals("<div class=\"title figureTitle\">The Go Figure</div>"
                 + "<figure id=\"go\">Hello"
-                + "<figcaption><span class=\"title\">Fig 1:</span>"
+                + "<figcaption><span class=\"prefix\">Fig 1:</span>"
                 + " A greeting</figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
@@ -709,10 +713,17 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void defaultSubfigureTest() throws Exception {
-        assertEquals("<figure id=\"go\" class=\"horizontal\">"
-                + "<div class=\"subfigure\">Hello</div>"
-                + "<div class=\"subfigure\">World</div>"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer horizontal\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span></div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span></div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .addContent(new Element("subfigure", ns).setText("Hello"))
@@ -720,10 +731,17 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void horizontalSubfigureTest() throws Exception {
-        assertEquals("<figure id=\"go\" class=\"horizontal\">"
-                + "<div class=\"subfigure\">Hello</div>"
-                + "<div class=\"subfigure\">World</div>"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer horizontal\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span></div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span></div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "horizontal")
@@ -732,15 +750,44 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void verticalSubfigureTest() throws Exception {
-        assertEquals("<figure id=\"go\" class=\"vertical\">"
-                + "<div class=\"subfigure\">Hello</div>"
-                + "<div class=\"subfigure\">World</div>"
-                + "<figcaption><span class=\"title\">Figure 1</span></figcaption></figure>",
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer vertical\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span></div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span></div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
                 generate(new Element("figure", ns)
                         .setAttribute("id", "go")
                         .setAttribute("orient", "vertical")
                         .addContent(new Element("subfigure", ns).setText("Hello"))
                         .addContent(new Element("subfigure", ns).setText("World"))));
+    }
+
+    @Test public void subfiguresShouldUseCaptions() throws Exception {
+        assertEquals("<figure id=\"go\">"
+                + "<div class=\"subfigureContainer horizontal\">"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">Hello</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(a)</span> First</div>"
+                + "</div>"
+                + "<div class=\"subfigure\">"
+                + "<div class=\"subfigureContent\">World</div>"
+                + "<div class=\"subfigureCaption\"><span class=\"prefix\">(b)</span> Second</div>"
+                + "</div>"
+                + "</div><figcaption><span class=\"prefix\">Figure 1</span></figcaption></figure>",
+                generate(new Element("figure", ns)
+                        .setAttribute("id", "go")
+                        .addContent(new Element("subfigure", ns)
+                                .addContent("Hello")
+                                .addContent(new Element("caption", ns).setText("First")))
+                        .addContent(new Element("subfigure", ns)
+                                .addContent("World")
+                                .addContent(new Element("caption", ns).setText("Second")))));
     }
 
     @Test public void defaultListShouldRenderAsUl() throws Exception {
@@ -910,10 +957,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaDownloadShouldRenderAsLink() throws Exception {
-        assertEquals("<a id=\"thing\" "
-                + "href=\"http://www.example.com/my-widget\" "
+        assertEquals("<div class=\"download\" id=\"thing\">"
+                + "<a href=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">"
-                + "Download Epic widget</a>",
+                + "Download Epic widget</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "Epic widget")
@@ -923,10 +970,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaDownloadShouldShowUriForEmptyAlt() throws Exception {
-        assertEquals("<a id=\"thing\" "
-                + "href=\"http://www.example.com/my-widget\" "
+        assertEquals("<div class=\"download\" id=\"thing\">"
+                + "<a href=\"http://www.example.com/my-widget\" "
                 + "type=\"application/x-widget\">"
-                + "Download http://www.example.com/my-widget</a>",
+                + "Download http://www.example.com/my-widget</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "thing")
                         .setAttribute("alt", "")
@@ -936,10 +983,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaLabviewShouldRenderAsLink() throws Exception {
-        assertEquals("<a id=\"lbv\" "
-                + "href=\"http://www.example.com/content.vi\" "
+        assertEquals("<div class=\"download\" id=\"lbv\">"
+                + "<a href=\"http://www.example.com/content.vi\" "
                 + "type=\"application/x-labview-vi\">"
-                + "Download A LabVIEW Thing</a>",
+                + "Download A LabVIEW Thing</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "lbv")
                         .setAttribute("alt", "A LabVIEW Thing")
@@ -949,10 +996,10 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mediaLabviewShouldShowUriForEmptyAlt() throws Exception {
-        assertEquals("<a id=\"lbv\" "
-                + "href=\"http://www.example.com/content.vi\" "
+        assertEquals("<div class=\"download\" id=\"lbv\">"
+                + "<a href=\"http://www.example.com/content.vi\" "
                 + "type=\"application/x-labview-vi\">"
-                + "Download http://www.example.com/content.vi</a>",
+                + "Download http://www.example.com/content.vi</a></div>",
                 generate(new Element("media", ns)
                         .setAttribute("id", "lbv")
                         .setAttribute("alt", "")
@@ -992,9 +1039,23 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void mathShouldPassThrough() throws Exception {
-        final Namespace mathns = Namespace.getNamespace("http://www.w3.org/1998/Math/MathML");
-        assertEquals("<math><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>",
+        assertEquals("<math id=\"foo\">"
+                + "<mrow><mi>a</mi><mo id=\"bar\">+</mo><mi>b</mi></mrow>"
+                + "</math>",
                 generate(new Element("math", mathns)
+                        .setAttribute("id", "foo")
+                        .addContent(new Element("mrow", mathns)
+                                .addContent(new Element("mi", mathns).setText("a"))
+                                .addContent(new Element("mo", mathns)
+                                        .setAttribute("id", "bar")
+                                        .setText("+"))
+                                .addContent(new Element("mi", mathns).setText("b")))));
+    }
+
+    @Test public void mathRootShouldChangeModeToDisplay() throws Exception {
+        assertEquals("<math display=\"block\"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>",
+                generate(new Element("math", mathns)
+                        .setAttribute("mode", "display")
                         .addContent(new Element("mrow", mathns)
                                 .addContent(new Element("mi", mathns).setText("a"))
                                 .addContent(new Element("mo", mathns).setText("+"))
@@ -1071,12 +1132,46 @@ public class ModuleHTMLGeneratorTests {
                 + "</tr><tr>"
                 + "<td>pi</td><td>float</td><td>3.14</td>"
                 + "</tr></tbody>"
-                + "<caption><span class=\"title\">Table 1:</span> Information</caption>"
+                + "<caption><span class=\"prefix\">Table 1:</span> Information</caption>"
                 + "</table>",
                 generate(new Element("table", ns)
                         .setAttribute("id", "1000")
                         .setAttribute("summary", "A data table")
                         .addContent(new Element("title", ns).setText("Information"))
+                        .addContent(tgroup)));
+    }
+
+    @Test public void tableShouldUseSummaryIfNoTitleIsGiven() throws Exception {
+        final Element tgroup = new Element("tgroup", ns)
+                .setAttribute("cols", "3")
+                .addContent(new Element("thead", ns)
+                        .addContent(new Element("row", ns)
+                                .addContent(new Element("entry", ns).setText("Name"))
+                                .addContent(new Element("entry", ns).setText("Type"))
+                                .addContent(new Element("entry", ns).setText("Value"))))
+                .addContent(new Element("tbody", ns)
+                        .addContent(new Element("row", ns)
+                                .addContent(new Element("entry", ns).setText("answer"))
+                                .addContent(new Element("entry", ns).setText("int"))
+                                .addContent(new Element("entry", ns).setText("42")))
+                        .addContent(new Element("row", ns)
+                                .addContent(new Element("entry", ns).setText("pi"))
+                                .addContent(new Element("entry", ns).setText("float"))
+                                .addContent(new Element("entry", ns).setText("3.14"))));
+        assertEquals("<table id=\"1000\" class=\"cals calsFrameAll\">"
+                + "<thead><tr>"
+                + "<th>Name</th><th>Type</th><th>Value</th>"
+                + "</tr></thead>"
+                + "<tbody><tr>"
+                + "<td>answer</td><td>int</td><td>42</td>"
+                + "</tr><tr>"
+                + "<td>pi</td><td>float</td><td>3.14</td>"
+                + "</tr></tbody>"
+                + "<caption><span class=\"prefix\">Table 1:</span> A data table</caption>"
+                + "</table>",
+                generate(new Element("table", ns)
+                        .setAttribute("id", "1000")
+                        .setAttribute("summary", "A data table")
                         .addContent(tgroup)));
     }
 
@@ -1129,7 +1224,7 @@ public class ModuleHTMLGeneratorTests {
                                 .addContent(new Element("entry", ns).setText("2"))
                                 .addContent(new Element("entry", ns).setText("78%")));
         assertEquals("<table id=\"report_card\">"
-                + "<caption><span class=\"title\">Table 1:</span> Report Card</caption>"
+                + "<caption><span class=\"prefix\">Table 1:</span> Report Card</caption>"
                 + "<thead><tr><th>Course</th><th>Semester</th><th>Grade</th></tr></thead>"
                 + "<tbody>"
                 + "<tr><td rowspan=\"2\">Biology</td><td>1</td><td>86%</td></tr>"

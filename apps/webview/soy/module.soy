@@ -1,17 +1,17 @@
 /*
- *  Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 {namespace org.cnx.web}
@@ -51,32 +51,14 @@
             {call .mathjax/}
             <script type="text/javascript" src="/static/js/toc-dropdown.js"></script>
         {/param}
+        {param sandbarHtml}
+            <nav id="sandbar">
+                <span class="collectionTitle">{$collection.title}</span>
+                <a href="{$collection.uri}">Table of Contents</a>
+            </nav>
+        {/param}
         {param contentHtml}
-            <div id="tocDropdownBox">
-                <select id="tocDropdown">
-                    {foreach $item in $collection.items}
-                        {switch $item.type}
-                            {case 'subcollection'}
-                                <option class="subcollection" disabled>
-                                    {call .indent data="$item"/}
-                                    {$item.title}
-                                </option>
-                            {case 'module'}
-                                <option value="{$item.uri}"
-                                        {sp}class="module{if $item.id == $module.id} selected{/if}"
-                                        {if $item.id == $module.id}{sp}selected{/if}>
-                                    {call .indent data="$item"/}
-                                    {$item.title}
-                                </option>
-                        {/switch}
-                    {/foreach}
-                </select>
-                <button onclick="onSelectTocDropdown();">Go</button>
-            </div>
-            <hgroup>
-                <h1 class="collectionTitle"><a href="{$collection.uri}">{$collection.title}</a></h1>
-                <h1 class="moduleTitle">{$module.title}</h1>
-            </hgroup>
+            <h1 class="moduleTitle">{$module.title}</h1>
             <p class="authors">By {call .actorList}{param actors: $module.authors/}{/call}</p>
             {call .moduleContent data="all"/}
             {call .collectionNavBar data="all"/}

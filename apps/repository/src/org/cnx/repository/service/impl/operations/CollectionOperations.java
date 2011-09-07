@@ -77,7 +77,7 @@ public class CollectionOperations {
             Services.persistence.write(entity);
             collectionId = checkNotNull(entity.getId(), "Null collection id");
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to create a new collection", log, e);
         }
 
@@ -124,7 +124,7 @@ public class CollectionOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to create a new collection with forced id: " + forcedId,
                     log, e);
         } finally {
@@ -166,7 +166,7 @@ public class CollectionOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error fetching the info of collection " + collectionId, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s/%s", collectionId);
@@ -266,7 +266,7 @@ public class CollectionOperations {
             if (Services.persistence.hasObjectWithKey(versionEntity.getKey())) {
                 tx.rollback();
                 return ResponseUtil
-                    .loggedError(RepositoryStatus.SERVER_ERRROR,
+                    .loggedError(RepositoryStatus.SERVER_ERROR,
                             "Server collection data inconsistency. Key: " + versionEntity.getKey(),
                             log);
             }
@@ -276,7 +276,7 @@ public class CollectionOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while trying to add a version to collection " + collectionId, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", collectionId);
@@ -355,7 +355,7 @@ public class CollectionOperations {
                     versionToServe, versionEntity.getVersionNumber());
 
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while looking collection version " + collectionId + "/"
                         + collectionVersion, log, e);
         }
@@ -441,7 +441,7 @@ public class CollectionOperations {
         } catch (Throwable e) {
             tx.rollback();
             return ResponseUtil
-                .loggedError(RepositoryStatus.SERVER_ERRROR, "Collection version not found"
+                .loggedError(RepositoryStatus.SERVER_ERROR, "Collection version not found"
                     + collectionId + "/" + collectionVersion, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", collectionId);

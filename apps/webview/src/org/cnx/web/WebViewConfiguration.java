@@ -1,5 +1,5 @@
 /*
- * Copyright The CNX Authors.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -65,5 +65,13 @@ public class WebViewConfiguration {
 
     public static String getPropertyHtmlString(Object key, Object value) {
         return key + "=" + value + "<br/>";
+    }
+
+    public String getFeedbackLink() {
+        return configProperties.getProperty("cnx.feedbackUrl");
+    }
+    
+    public boolean isStackEnabled() {
+        return Boolean.parseBoolean(configProperties.getProperty("stack.enable"));
     }
 }

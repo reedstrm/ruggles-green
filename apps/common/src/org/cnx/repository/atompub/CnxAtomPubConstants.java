@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,6 +15,21 @@
  */
 package org.cnx.repository.atompub;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+
+import org.apache.commons.codec.binary.Base64;
+import org.cnx.resourceentry.ObjectFactory;
+import org.cnx.resourceentry.ResourceEntryValue;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -29,22 +44,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.apache.commons.codec.binary.Base64;
-import org.cnx.resourceentry.ObjectFactory;
-import org.cnx.resourceentry.ResourceEntryValue;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
-
 /**
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxAtomPubConstants {
@@ -54,9 +55,7 @@ public class CnxAtomPubConstants {
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
     /**
-     * URLs ending with XML will point to
-     * CNXML : for modules.
-     * CollXml : For collections.
+     * URLs ending with XML will point to CNXML : for modules. CollXml : For collections.
      */
     public static final String END_URL_XML = "/xml";
 
@@ -127,10 +126,11 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for Collection-Version to fetch via AtomPub. */
-    public URL getCollectionVersionAbsPath(String collectionId, VersionWrapper version) {
+    public URL getCollectionVersionAbsPath(IdWrapper collectionId, VersionWrapper version) {
         try {
-            return new URL(getCollectionCnxCollectionsAbsPath() + "/" + collectionId + "/"
-                + version);
+            return new URL(getCollectionCnxCollectionsAbsPath() + "/"
+                    + collectionId.getIdForUrls() + "/"
+                    + version);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
             // TODO(arjuns): Create a CNXAtomPubException to handle this.
@@ -139,7 +139,7 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for CollectionXml for a Collection-Version. */
-    public URL getCollectionVersionXmlAbsPath(String collectionId, VersionWrapper version) {
+    public URL getCollectionVersionXmlAbsPath(IdWrapper collectionId, VersionWrapper version) {
         try {
             URL url = getCollectionVersionAbsPath(collectionId, version);
             return new URL(url.toString() + END_URL_XML);
@@ -151,9 +151,9 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for Resource to fetch via AtomPub. */
-    public URL getResourceAbsPath(String resourceId) {
+    public URL getResourceAbsPath(IdWrapper resourceId) {
         try {
-            return new URL(getCollectionResourcesAbsPath() + "/" + resourceId);
+            return new URL(getCollectionResourcesAbsPath() + "/" + resourceId.getIdForUrls());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -188,6 +188,10 @@ public class CnxAtomPubConstants {
     /** Default new Version for any module. */
     public static final VersionWrapper NEW_CNX_COLLECTION_DEFAULT_VERSION = new VersionWrapper("1");
 
+    /** Latest version for any Module/collection. */
+    public static final VersionWrapper LATEST_VERSION_WRAPPER = new VersionWrapper(
+            LATEST_VERSION_STRING);
+
     /** Get URI for AtomPub collection for CNX Modules. */
     public URL getCollectionModulesAbsPath() {
         try {
@@ -201,9 +205,9 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for Module to fetch via AtomPub. */
-    public URL getModuleAbsPath(String moduleId) {
+    public URL getModuleAbsPath(IdWrapper moduleId) {
         try {
-            return new URL(getCollectionModulesAbsPath() + "/" + moduleId);
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId.getIdForUrls());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -213,10 +217,10 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for ModuleVersion to fetch via AtomPup. */
-    public URL getModuleVersionAbsPath(String moduleId, VersionWrapper version) {
+    public URL getModuleVersionAbsPath(IdWrapper moduleId, VersionWrapper version) {
         try {
-            return new URL(getCollectionModulesAbsPath() + "/" + moduleId + "/"
-                + version.toString());
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId.getIdForUrls() + "/"
+                    + version.toString());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -226,7 +230,7 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for CNXML for a ModuleVersion. */
-    public URL getModuleVersionXmlAbsPath(String moduleId, VersionWrapper version) {
+    public URL getModuleVersionXmlAbsPath(IdWrapper moduleId, VersionWrapper version) {
         try {
             return new URL(getModuleVersionAbsPath(moduleId, version).toString() + END_URL_XML);
         } catch (MalformedURLException e) {
@@ -238,9 +242,10 @@ public class CnxAtomPubConstants {
     }
 
     /** Get URL for ResourceMapping XML for a ModuleVersion. */
-    public URL getModuleVersionResourceMappingAbsPath(String moduleId, VersionWrapper version) {
+    public URL getModuleVersionResourceMappingAbsPath(IdWrapper moduleId, VersionWrapper version) {
         try {
-            return new URL(getModuleVersionAbsPath(moduleId, version).toString() + END_URL_RESOURCES);
+            return new URL(getModuleVersionAbsPath(moduleId, version).toString()
+                    + END_URL_RESOURCES);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -259,7 +264,7 @@ public class CnxAtomPubConstants {
      */
     /** Name for AtomPub collection for CnxCollections.. */
     public static final String COLLECTION_CNX_COLLECTION_TITLE =
-        "AtomPub Collection for Cnx Collections.";
+            "AtomPub Collection for Cnx Collections.";
 
     /** Path for CnxCollection AtomPub collection relative to {@link #atomPubRestUrl}. */
     public static final String COLLECTION_CNX_COLLECTION_REL_PATH = "/collection";
@@ -312,7 +317,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Get AtomPub List of Contents from CNXMl and ResourceMappingDoc.
-     *
+     * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
@@ -332,7 +337,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Get AtomPub List of Contents from CollXml.
-     *
+     * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
@@ -351,9 +356,9 @@ public class CnxAtomPubConstants {
 
     /**
      * Get CNXML-doc from ModuleEntry XML.
-     *
+     * 
      * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
-     *     moduleEntryXml is already decoded.
+     *            moduleEntryXml is already decoded.
      * @return CNXML (response is already decoded).
      */
     public String getCnxmlFromModuleEntryXml(String moduleEntryXml) throws JDOMException,
@@ -363,8 +368,9 @@ public class CnxAtomPubConstants {
 
     /**
      * Get ResourceMapping doc from decoded ModuleEntry XML.
+     * 
      * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
-     *     moduleEntryXml is already decoded.
+     *            moduleEntryXml is already decoded.
      * @return ResourceMapping XML (response is already decoded).
      */
     public String getResourceMappingDocFromModuleEntryXml(String moduleEntryXml)
@@ -387,10 +393,12 @@ public class CnxAtomPubConstants {
 
     /**
      * Get moduleId/collectionId from AtomId.
+     * 
+     * TODO(arjuns) : Write a wrapper for this.
      */
-    public static String getIdFromAtomPubId(String atomPubId) {
+    public static IdWrapper getIdFromAtomPubId(String atomPubId) {
         String[] args = atomPubId.split(":");
-        return args[0];
+        return IdWrapper.getIdWrapperFromUrlId(args[0]);
     }
 
     /**
@@ -404,18 +412,14 @@ public class CnxAtomPubConstants {
     /**
      * Get AtomPubId from moduleId/collectionId and version.
      */
-    public static String getAtomPubIdFromCnxIdAndVersion(String cnxId, VersionWrapper version) {
-        return cnxId + DELIMITER_ID_VERSION + version.toString();
+    public static String getAtomPubIdFromCnxIdAndVersion(IdWrapper cnxId, VersionWrapper version) {
+        return cnxId.getIdForUrls() + DELIMITER_ID_VERSION + version.toString();
 
-    }
-
-    static String getClassPath() {
-        return System.getProperties().getProperty("java.class.path", null);
     }
 
     /**
      * Decode a 64 Bit encoded String.
-     *
+     * 
      * @param encodedString 64bit encoded string.
      * @return Decoded string.
      * @throws UnsupportedEncodingException
@@ -432,7 +436,7 @@ public class CnxAtomPubConstants {
 
     /**
      * Encode a String to a Base64-encoded string.
-     *
+     * 
      * @param originalString : String to be encoded.
      * @return Base64-encoded String.
      * @throws UnsupportedEncodingException
@@ -446,21 +450,20 @@ public class CnxAtomPubConstants {
     /**
      * Get XML for Module Entry. This consists of 64 bit encoded CNXML and 64 bit encoded
      * ResourceMapping Doc. This is used to create {@link ResourceEntryValue}
-     *
-     * @param encodedCnxml CNXML source
-     * @param encodedResourceMappingXml Resource mapping XML source
-     *
+     * 
+     * @param cnxml CNXML source
+     * @param resourceMappingXml Resource mapping XML source
+     * 
      * @return XML representation for {@link ResourceEntryValue}
      * @throws JAXBException
      */
-    public String getModuleEntryValue(String cnxml, String resourceMappingXml)
-            throws JAXBException {
+    public String getModuleEntryValue(String cnxml, String resourceMappingXml) throws JAXBException {
         ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<byte[]> encodedCnxmlDoc;
         JAXBElement<byte[]> encodedResourceMappingDoc;
         encodedCnxmlDoc = objectFactory.createCnxmlDoc(cnxml.getBytes(Charsets.UTF_8));
-        encodedResourceMappingDoc = objectFactory.createResourceMappingDoc(
-                resourceMappingXml.getBytes(Charsets.UTF_8));
+        encodedResourceMappingDoc =
+                objectFactory.createResourceMappingDoc(resourceMappingXml.getBytes(Charsets.UTF_8));
 
         ResourceEntryValue resourceEntryValue = objectFactory.createResourceEntryValue();
         resourceEntryValue.setCnxmlDoc(encodedCnxmlDoc.getValue());
@@ -469,16 +472,16 @@ public class CnxAtomPubConstants {
         // TODO(arjuns) : Move this inside xmls folder.
 
         String moduleEntryValueXml =
-            jaxbObjectToString(ResourceEntryValue.class, resourceEntryValue);
+                jaxbObjectToString(ResourceEntryValue.class, resourceEntryValue);
         return moduleEntryValueXml;
     }
 
     /**
      * Convert a JAXB object to its XML Representation.
-     *
+     * 
      * @param jaxbObject JAXB object whose XML representation is required.
      * @param rootClass Class annotated with RootElement for JAXB objects.
-     *
+     * 
      * @return XML representation for JAXB Object.
      */
     @SuppressWarnings("rawtypes")

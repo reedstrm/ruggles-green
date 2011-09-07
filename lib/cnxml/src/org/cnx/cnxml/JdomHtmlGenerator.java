@@ -1,25 +1,30 @@
 /*
- *  Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cnx.cnxml;
 
 import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Strings.isNullOrEmpty;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 import java.util.ArrayList;
@@ -32,7 +37,10 @@ import java.util.logging.Logger;
 import org.cnx.util.RenderTime;
 import org.cnx.util.HtmlTag;
 import org.cnx.util.HtmlAttributes;
+import org.cnx.util.IdFilter;
 import org.cnx.util.JdomHtmlSerializer;
+import org.cnx.util.MathmlAttributes;
+import org.cnx.util.MathmlTag;
 
 import org.jdom.Attribute;
 import org.jdom.Comment;
@@ -41,6 +49,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
+import org.jdom.filter.ElementFilter;
 import org.jdom.filter.Filter;
 import org.jdom.input.DOMBuilder;
 
@@ -51,8 +60,6 @@ import org.jdom.input.DOMBuilder;
  *  It is iterative, but it is not thread-safe.
  */
 @RenderTime public class JdomHtmlGenerator implements ModuleHTMLGenerator {
-    private final static String MATHML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
-
     private final static String NOTE_LABEL_ASIDE = "Aside";
     private final static String NOTE_LABEL_WARNING = "Warning";
     private final static String NOTE_LABEL_TIP = "Tip";
@@ -62,6 +69,7 @@ import org.jdom.input.DOMBuilder;
     private final static String EXERCISE_LABEL = "Exercise";
     private final static String EQUATION_LABEL = "Equation";
     private final static String PROOF_LABEL = "Proof";
+    private final static String SOLUTION_LABEL = "Solution";
     private final static String DEFINITION_LABEL = "Definition";
     private final static String EXAMPLE_LABEL = "Example";
     private final static String FIGURE_LABEL = "Figure";
@@ -77,6 +85,11 @@ import org.jdom.input.DOMBuilder;
     private final static String CSS_DISPLAY_NONE = "display:none;";
 
     private final static String HTML_TITLE_CLASS = "title";
+    private final static String HTML_PARAGRAPH_TITLE_CLASS = "title paraTitle";
+    private final static String HTML_EQUATION_TITLE_CLASS = "title equationTitle";
+    private final static String HTML_FIGURE_TITLE_CLASS = "title figureTitle";
+    private final static String HTML_PREFIX_CLASS = "prefix";
+
     private final static String HTML_FOREIGN_CLASS = "foreign";
     private final static String HTML_TERM_CLASS = "term";
     private final static String HTML_SMALLCAPS_CLASS = "smallcaps";
@@ -89,18 +102,35 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_DEFINITION_CLASS = "definition";
     private final static String HTML_MEANING_CLASS = "meaning";
     private final static String HTML_EQUATION_CLASS = "equation";
+    private final static String HTML_EQUATION_CONTENT_CLASS = "equationContent";
+    private final static String HTML_EQUATION_NUMBER_CLASS = "equationNumber";
     private final static String HTML_RULE_CLASS = "rule";
     private final static String HTML_STATEMENT_CLASS = "statement";
     private final static String HTML_PROOF_CLASS = "proof";
     private final static String HTML_EXAMPLE_CLASS = "example";
+    private final static String HTML_DOWNLOAD_CLASS = "download";
     private final static String HTML_CDF_DOWNLOAD_CLASS = "downloadLink";
     private final static String HTML_SUBFIGURE_CLASS = "subfigure";
-    private final static String HTML_FIGURE_VERTICAL_CLASS = "vertical";
-    private final static String HTML_FIGURE_HORIZONTAL_CLASS = "horizontal";
+    private final static String HTML_SUBFIGURE_CONTENT_CLASS = "subfigureContent";
+    private final static String HTML_SUBFIGURE_CAPTION_CLASS = "subfigureCaption";
+    private final static String HTML_SUBFIGURE_CONTAINER_VERTICAL_CLASS =
+            "subfigureContainer vertical";
+    private final static String HTML_SUBFIGURE_CONTAINER_HORIZONTAL_CLASS =
+            "subfigureContainer horizontal";
+    private final static String HTML_LABELED_ITEM_LIST_CLASS = "labeled";
+
+    private final static String SUBFIGURE_COUNTER_PREFIX = "(";
+    private final static char SUBFIGURE_ALPHABET_START = 'a';
+    private final static char SUBFIGURE_ALPHABET_SIZE = 26;
+    private final static String SUBFIGURE_COUNTER_SUFFIX = ")";
 
     private final static String CDF_MIME_TYPE = "application/vnd.wolfram.cdf";
     private final static String CDF_TEXT_MIME_TYPE = "application/vnd.wolfram.cdf.text";
-    private final static String HTML_CDF_DOWNLOAD_LABEL = "Download CDF";
+
+    private final static String HTML_DOWNLOAD_LABEL = "Download ";
+
+    private final static String HTML_DEFAULT_LINK_TEXT = "link";
+    private final static String HTML_DEFAULT_FIGURE_LINK_TEXT = "figure";
 
     private final static String HTML_CALS_TABLE_CLASS = "cals";
     private final static String HTML_CALS_ALIGN_LEFT_CLASS = "calsAlignLeft";
@@ -124,6 +154,8 @@ import org.jdom.input.DOMBuilder;
     private final static String HTML_CALS_FRAME_BOTTOM_CLASS = "calsFrameBottom";
     private final static String HTML_CALS_FRAME_TOPBOTTOM_CLASS = "calsFrameTopBottom";
 
+    private final static String HTML_BULLET_STYLE_NONE_CLASS = "bulletStyleNone";
+
     private final static String UNRECOGNIZED_CONTENT_INNER_TEXT = "...";
     private final static String UNRECOGNIZED_CONTENT_MESSAGE = "Unrecognized Content: ";
 
@@ -131,7 +163,7 @@ import org.jdom.input.DOMBuilder;
 
     private final ImmutableSet<Processor> processors;
     private final JdomHtmlSerializer jdomHtmlSerializer;
-    private final Namespace cnxmlNamespace;
+    private Module module;
     private Stack<GeneratorFrame> stack;
     private Counter counter;
     private final MediaElementFilter mediaFilter;
@@ -168,16 +200,10 @@ import org.jdom.input.DOMBuilder;
      *  Examples of elements yielded are image, flash, and object.
      */
     private static class MediaElementFilter implements Filter {
-        private final Namespace cnxmlNamespace;
-
-        public MediaElementFilter(final Namespace cnxmlNamespace) {
-            this.cnxmlNamespace = checkNotNull(cnxmlNamespace);
-        }
-
         @Override public boolean matches(Object obj) {
             if (obj instanceof Element) {
                 final Element elem = (Element)obj;
-                return cnxmlNamespace.getURI().equals(elem.getNamespaceURI())
+                return CnxmlTag.NAMESPACE_URI.equals(elem.getNamespaceURI())
                         && CnxmlTag.MEDIA_CHILDREN.contains(CnxmlTag.of(elem.getName()));
             }
             return false;
@@ -185,11 +211,10 @@ import org.jdom.input.DOMBuilder;
     }
 
     @Inject public JdomHtmlGenerator(Set<Processor> processors,
-            JdomHtmlSerializer jdomHtmlSerializer, @CnxmlNamespace String cnxmlNamespace) {
+            JdomHtmlSerializer jdomHtmlSerializer) {
         this.processors = ImmutableSet.copyOf(processors);
         this.jdomHtmlSerializer = jdomHtmlSerializer;
-        this.cnxmlNamespace = Namespace.getNamespace(cnxmlNamespace);
-        this.mediaFilter = new MediaElementFilter(this.cnxmlNamespace);
+        this.mediaFilter = new MediaElementFilter();
     }
 
     @Override public String generate(Module module) throws Exception {
@@ -208,19 +233,19 @@ import org.jdom.input.DOMBuilder;
         startTime = System.currentTimeMillis();
 
         // Convert to JDOM
-        // TODO(light): don't use DOMBuilder: it uses recursion
-        final Document jdomDocument = new DOMBuilder().build(module.getCnxml());
-        final Element contentElem = jdomDocument.getRootElement()
-                .getChild(CnxmlTag.CONTENT.getTag(), cnxmlNamespace);
+        final Element contentElem = module.getCnxml().getRootElement()
+                .getChild(CnxmlTag.CONTENT.getTag(), CnxmlTag.NAMESPACE);
         if (contentElem == null) {
             return "";
         }
 
         // Generate HTML tree
+        this.module = module;
         counter = new Counter();
         StringBuilder sb = new StringBuilder();
         final List<Content> contentList = generateHtmlTree(contentElem);
         counter = null;
+        module = null;
 
         // Serialize HTML
         for (Content content : contentList) {
@@ -276,7 +301,7 @@ import org.jdom.input.DOMBuilder;
         final GeneratorFrame frame = stack.peek();
         final String name = elem.getName();
 
-        if (cnxmlNamespace.getURI().equals(elem.getNamespaceURI())) {
+        if (CnxmlTag.NAMESPACE.getURI().equals(elem.getNamespaceURI())) {
             switch (CnxmlTag.of(name)) {
             case PARAGRAPH:
                 generateParagraph(elem);
@@ -355,9 +380,6 @@ import org.jdom.input.DOMBuilder;
             case MEDIA:
                 generateMedia(elem);
                 break;
-            case SUBFIGURE:
-                generateSubfigure(elem);
-                break;
             case TABLE:
                 generateTable(elem);
                 break;
@@ -377,11 +399,8 @@ import org.jdom.input.DOMBuilder;
                 unrecognized(elem);
                 break;
             }
-        } else if (MATHML_NAMESPACE.equals(elem.getNamespaceURI())) {
-            // Copy math without modification.  If we add it directly, it detaches from the original
-            // CNXML tree.
-            // TODO(light): Don't use clone, it's recursive.
-            addHtmlContent((Element)elem.clone());
+        } else if (MathmlTag.NAMESPACE_URI.equals(elem.getNamespaceURI())) {
+            duplicateMath(elem);
         }
     }
     
@@ -404,7 +423,7 @@ import org.jdom.input.DOMBuilder;
         addHtmlContent(new Comment(simpleText));
         addHtmlContent(new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, "unhandled")
-                .setText(UNRECOGNIZED_CONTENT_MESSAGE + elem.getName()));
+                .setText(UNRECOGNIZED_CONTENT_MESSAGE + message));
     }
 
     /**
@@ -431,12 +450,45 @@ import org.jdom.input.DOMBuilder;
         return htmlElem;
     }
 
+    @SuppressWarnings("unchecked")
+    protected void duplicateMath(final Element elem) {
+        final Element htmlElem = new Element(elem.getName());
+        for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
+            htmlElem.getAttributes().add(new Attribute(attr.getName(), attr.getValue()));
+        }
+
+        switch (MathmlTag.of(elem.getName())) {
+        case MATH:
+            final String modeString = elem.getAttributeValue(MathmlAttributes.MODE);
+            if (modeString != null) {
+                htmlElem.removeAttribute(MathmlAttributes.MODE);
+                if (elem.getAttribute(MathmlAttributes.DISPLAY) == null) {
+                    final MathmlAttributes.Mode mode = MathmlAttributes.Mode.of(
+                            modeString, MathmlAttributes.Mode.INLINE);
+                    switch (mode) {
+                    case INLINE:
+                        htmlElem.setAttribute(MathmlAttributes.DISPLAY,
+                                MathmlAttributes.Display.INLINE.getValue());
+                        break;
+                    case BLOCK:
+                        htmlElem.setAttribute(MathmlAttributes.DISPLAY,
+                                MathmlAttributes.Display.BLOCK.getValue());
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+
+        pushHtmlElement(elem, htmlElem);
+    }
+
     protected void generateParagraph(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.PARAGRAPH.getTag()));
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
-                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setAttribute(HtmlAttributes.CLASS, HTML_PARAGRAPH_TITLE_CLASS)
                     .setText(title));
         }
         pushHtmlElement(elem, htmlElem);
@@ -444,7 +496,7 @@ import org.jdom.input.DOMBuilder;
 
     protected void generateSection(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.SECTION.getTag()));
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             htmlElem.addContent(new Element(HtmlTag.HEADING.getTag()).setText(title));
         }
@@ -492,6 +544,26 @@ import org.jdom.input.DOMBuilder;
         }
 
         copyId(elem, htmlElem);
+
+        // Default text (if no text found)
+        if (elem.getContentSize() == 0) {
+            String text = HTML_DEFAULT_LINK_TEXT;
+            String ref = null;
+            if (url != null && url.startsWith(CnxmlAttributes.FRAGMENT)) {
+                ref = url.substring(CnxmlAttributes.FRAGMENT.length());
+            } else if (targetId != null) {
+                ref = targetId;
+            }
+            if (ref != null) {
+                final Element refElem = IdFilter.getElementById(module.getCnxml(), ref);
+                if (refElem != null && CnxmlTag.NAMESPACE_URI.equals(refElem.getNamespaceURI())
+                        && CnxmlTag.FIGURE.getTag().equals(refElem.getName())) {
+                    // TODO(light): Add numbers
+                    text = HTML_DEFAULT_FIGURE_LINK_TEXT;
+                }
+            }
+            htmlElem.setText(text);
+        }
 
         if (url != null) {
             htmlElem.setAttribute(HtmlAttributes.LINK_URL, url);
@@ -553,7 +625,7 @@ import org.jdom.input.DOMBuilder;
                 .setAttribute(HtmlAttributes.CLASS, HTML_NOTE_CLASS);
         copyId(elem, htmlElem);
 
-        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
             final CnxmlAttributes.NoteType type = CnxmlAttributes.NoteType.of(
                     elem.getAttributeValue(CnxmlAttributes.TYPE),
@@ -579,7 +651,7 @@ import org.jdom.input.DOMBuilder;
 
         final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             htmlTitleElem.setText(label + ": " + title);
         } else {
@@ -600,14 +672,14 @@ import org.jdom.input.DOMBuilder;
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, className));
 
-        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
             label = defaultLabel;
         }
 
         final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
         if (title != null) {
             htmlTitleElem.setText(label + " " + number + ": " + title);
@@ -624,9 +696,9 @@ import org.jdom.input.DOMBuilder;
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_DEFINITION_CLASS));
 
-        final Element term = elem.getChild(CnxmlTag.TERM.getTag(), cnxmlNamespace);
+        final Element term = elem.getChild(CnxmlTag.TERM.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
-        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
+        String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
             label = DEFINITION_LABEL;
         }
@@ -646,7 +718,7 @@ import org.jdom.input.DOMBuilder;
             @Override public boolean matches(Object obj) {
                 if (obj instanceof Element) {
                     final Element elem = (Element)obj;
-                    return !(cnxmlNamespace.getURI().equals(elem.getNamespaceURI())
+                    return !(CnxmlTag.NAMESPACE.getURI().equals(elem.getNamespaceURI())
                             && CnxmlTag.TERM.getTag().equals(elem.getName()));
                 }
                 return true;
@@ -676,54 +748,152 @@ import org.jdom.input.DOMBuilder;
     }
 
     protected void generateSolution(final Element elem) {
+        final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                .setText(SOLUTION_LABEL);
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_SOLUTION_CLASS)));
+                .setAttribute(HtmlAttributes.CLASS, HTML_SOLUTION_CLASS))
+                .addContent(htmlTitleElem));
     }
 
     protected void generateEquation(final Element elem) {
-        pushHtmlElement(elem, numberedContainer(elem, HTML_EQUATION_CLASS, EQUATION_LABEL));
-    }
-
-    protected void generateFigure(final Element elem) {
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
-                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_TITLE_CLASS)
+                    .setText(title));
+        }
+
+        final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_CLASS));
+        addHtmlContent(htmlElem);
+
+        final int number = getNumber(elem);
+        htmlElem.addContent(new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_NUMBER_CLASS)
+                .setText(Integer.toString(number)));
+
+        final Element htmlContentDiv = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_EQUATION_CONTENT_CLASS);
+        htmlElem.addContent(0, htmlContentDiv);
+        stack.push(new GeneratorFrame(elem, htmlContentDiv));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void generateFigure(final Element elem) {
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
+        if (title != null) {
+            addHtmlContent(new Element(HtmlTag.DIV.getTag())
+                    .setAttribute(HtmlAttributes.CLASS, HTML_FIGURE_TITLE_CLASS)
                     .setText(title));
         }
 
         final Element htmlElem = copyId(elem, new Element(HtmlTag.FIGURE.getTag()));
-        if (elem.getChild(CnxmlTag.SUBFIGURE.getTag(), cnxmlNamespace) != null) {
+        addHtmlContent(htmlElem);
+
+        // Add caption to HTML figure element
+        final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
+        final Element htmlCaptionPrefixElem = new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS);
+        final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
+        final int number = getNumber(elem);
+        htmlCaptionPrefixElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
+        htmlCaptionElem.addContent(htmlCaptionPrefixElem);
+
+        // Push CNXML caption element to stack if it is present
+        final Element captionElem =
+                elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
+        if (captionElem != null) {
+            htmlCaptionPrefixElem.addContent(":");
+            htmlCaptionElem.addContent(" ");
+            stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
+        }
+
+        final List<Element> subfigures = (List<Element>)elem.getContent(
+                new ElementFilter(CnxmlTag.SUBFIGURE.getTag(), CnxmlTag.NAMESPACE));
+        if (subfigures.isEmpty()) {
+            final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
+            htmlElem.addContent(0, tempSpan);
+            stack.push(new GeneratorFrame(elem, tempSpan, true));
+        } else {
+            final Element htmlContainerElem = new Element(HtmlTag.DIV.getTag());
+            htmlElem.addContent(0, htmlContainerElem);
+
+            // Set class for orientation
             final CnxmlAttributes.FigureOrientation orient = CnxmlAttributes.FigureOrientation.of(
                     elem.getAttributeValue(CnxmlAttributes.FIGURE_ORIENT),
                     CnxmlAttributes.FigureOrientation.HORIZONTAL);
             switch (orient) {
             case VERTICAL:
-                htmlElem.setAttribute(HtmlAttributes.CLASS, HTML_FIGURE_VERTICAL_CLASS);
+                htmlContainerElem.setAttribute(HtmlAttributes.CLASS,
+                        HTML_SUBFIGURE_CONTAINER_VERTICAL_CLASS);
                 break;
             case HORIZONTAL:
-                htmlElem.setAttribute(HtmlAttributes.CLASS, HTML_FIGURE_HORIZONTAL_CLASS);
+                htmlContainerElem.setAttribute(HtmlAttributes.CLASS,
+                        HTML_SUBFIGURE_CONTAINER_HORIZONTAL_CLASS);
                 break;
+            }
+
+            // Add subfigures
+            final ArrayList<GeneratorFrame> frames =
+                    new ArrayList<GeneratorFrame>(subfigures.size());
+            for (int i = 0; i < subfigures.size(); i++) {
+                frames.add(generateSubfigure(i, subfigures.get(i), htmlContainerElem));
+            }
+            for (GeneratorFrame frame : Lists.reverse(frames)) {
+                stack.push(frame);
             }
         }
 
-        final Element htmlCaptionElem = new Element(HtmlTag.FIGURE_CAPTION.getTag());
-        final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), cnxmlNamespace);
-        final String caption = elem.getChildText(CnxmlTag.FIGURE_CAPTION.getTag(), cnxmlNamespace);
-        final int number = getNumber(elem);
-        htmlCaptionElem.addContent((label != null ? label : FIGURE_LABEL) + " " + number);
-        if (caption != null) {
-            htmlCaptionElem.addContent(": " + caption);
-        }
-
-        final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
-        addHtmlContent(htmlElem.addContent(tempSpan).addContent(htmlCaptionElem));
-        stack.push(new GeneratorFrame(elem, tempSpan, true));
+        htmlElem.addContent(htmlCaptionElem);
     }
 
-    protected void generateSubfigure(final Element elem) {
-        pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CLASS)));
+    /**
+     *  Builds a prefix for the subfigure.
+     *  <p>
+     *  The sequence generated is:
+     *  a, b, c, ... z, aa, ab, ac, ...
+     */
+    @VisibleForTesting static String getSubfigurePrefix(final int index) {
+        // Our argument is a 0-based index, but we work with a 1-based number.
+        checkArgument(index >= 0);
+        int n = index + 1;
+
+        final StringBuilder sb = new StringBuilder();
+        while (n > 0) {
+            final int mod = (n - 1) % SUBFIGURE_ALPHABET_SIZE;
+            sb.insert(0, (char)(SUBFIGURE_ALPHABET_START + mod));
+            n = (n - mod) / SUBFIGURE_ALPHABET_SIZE;
+        }
+        sb.insert(0, SUBFIGURE_COUNTER_PREFIX).append(SUBFIGURE_COUNTER_SUFFIX);
+        return sb.toString();
+    }
+
+    protected GeneratorFrame generateSubfigure(final int number, final Element elem,
+            final Element htmlContainerElem) {
+        final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CLASS));
+        final Element htmlContentElem = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CONTENT_CLASS);
+        final Element htmlCaptionElem = new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CAPTION_CLASS);
+
+        htmlCaptionElem.addContent(new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS)
+                .setText(getSubfigurePrefix(number)));
+
+        // Push CNXML caption element to stack if it is present
+        final Element captionElem =
+                elem.getChild(CnxmlTag.FIGURE_CAPTION.getTag(), CnxmlTag.NAMESPACE);
+        if (captionElem != null) {
+            htmlCaptionElem.addContent(" ");
+            stack.push(new GeneratorFrame(captionElem, htmlCaptionElem));
+        }
+
+        htmlContainerElem.addContent(htmlElem);
+        htmlElem.addContent(htmlContentElem).addContent(htmlCaptionElem);
+
+        return new GeneratorFrame(elem, htmlContentElem);
     }
 
     protected void generateRule(final Element elem) {
@@ -792,6 +962,21 @@ import org.jdom.input.DOMBuilder;
         switch (type) {
         case BULLETED:
             htmlElem = copyId(elem, new Element(HtmlTag.UNORDERED_LIST.getTag()));
+
+            final CnxmlAttributes.BulletStyle bulletStyle = CnxmlAttributes.BulletStyle.of(
+                    elem.getAttributeValue(CnxmlAttributes.LIST_BULLET_STYLE),
+                    CnxmlAttributes.BulletStyle.BULLET);
+            switch (bulletStyle) {
+            case NONE:
+                htmlElem.setAttribute(HtmlAttributes.CLASS, HTML_BULLET_STYLE_NONE_CLASS);
+                break;
+            case BULLET:
+                // Don't add a class for the normal case.
+                break;
+            default:
+                log.warning("unsupported bullet style: " + bulletStyle.getValue());
+                break;
+            }
             break;
         case ENUMERATED:
             htmlElem = copyId(elem, new Element(HtmlTag.ORDERED_LIST.getTag()));
@@ -803,6 +988,11 @@ import org.jdom.input.DOMBuilder;
             if (startValue != null) {
                 htmlElem.setAttribute(HtmlAttributes.LIST_START_VALUE, startValue);
             }
+            break;
+        case LABELED_ITEM:
+            htmlElem = new Element(HtmlTag.UNORDERED_LIST.getTag())
+                    .setAttribute(HtmlAttributes.CLASS, HTML_LABELED_ITEM_LIST_CLASS);
+            copyId(elem, htmlElem);
             break;
         default:
             // TODO(light): gracefully handle other list types
@@ -819,13 +1009,26 @@ import org.jdom.input.DOMBuilder;
     }
 
     protected void generateListItem(final Element elem) {
+        final Element listElem = (Element)elem.getParent();
         final Element htmlElem = copyId(elem, new Element(HtmlTag.LIST_ITEM.getTag()));
         final GeneratorFrame parentFrame = stack.peek();
 
+        // Labeled item lists must copy the label element.
+        final CnxmlAttributes.ListType type = CnxmlAttributes.ListType.of(
+                listElem.getAttributeValue(CnxmlAttributes.LIST_TYPE),
+                CnxmlAttributes.ListType.BULLETED);
+        if (type == CnxmlAttributes.ListType.LABELED_ITEM) {
+            final String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
+            if (label != null) {
+                htmlElem.addContent(new Element(HtmlTag.SPAN.getTag())
+                        .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                        .setText(label));
+            }
+        }
+
         // If the list has an item separator and this is not the last item, then add the separator.
         if (parentFrame.iterator.hasNext()) {
-            final String itemSep = ((Element)elem.getParent())
-                    .getAttributeValue(CnxmlAttributes.LIST_ITEM_SEP);
+            final String itemSep = listElem.getAttributeValue(CnxmlAttributes.LIST_ITEM_SEP);
             if (itemSep != null) {
                 final Element tempSpan = new Element(HtmlTag.SPAN.getTag());
                 parentFrame.htmlParent.addContent(htmlElem
@@ -931,6 +1134,10 @@ import org.jdom.input.DOMBuilder;
                 generateObject(child);
             }
             break;
+        case LABVIEW:
+        case DOWNLOAD:
+            generateDownloadLink(child);
+            break;
         default:
             unrecognized(child);
             break;
@@ -941,9 +1148,20 @@ import org.jdom.input.DOMBuilder;
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.IMAGE.getTag()))
                 .setAttribute(HtmlAttributes.IMAGE_ALT,
-                        mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT))
-                .setAttribute(HtmlAttributes.IMAGE_SOURCE,
-                        elem.getAttributeValue(CnxmlAttributes.IMAGE_SOURCE));
+                        mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
+
+        final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
+        final String thumbnail = elem.getAttributeValue(CnxmlAttributes.IMAGE_THUMBNAIL);
+        if (thumbnail != null) {
+            htmlElem.setAttribute(HtmlAttributes.IMAGE_SOURCE, thumbnail);
+            addHtmlContent(new Element(HtmlTag.LINK.getTag())
+                    .setAttribute(HtmlAttributes.LINK_URL, source)
+                    .addContent(htmlElem));
+        } else {
+            htmlElem.setAttribute(HtmlAttributes.IMAGE_SOURCE, source);
+            addHtmlContent(htmlElem);
+        }
+
         final String width = elem.getAttributeValue(CnxmlAttributes.IMAGE_WIDTH);
         if (width != null) {
             htmlElem.setAttribute(HtmlAttributes.IMAGE_WIDTH, width);
@@ -952,16 +1170,32 @@ import org.jdom.input.DOMBuilder;
         if (height != null) {
             htmlElem.setAttribute(HtmlAttributes.IMAGE_HEIGHT, height);
         }
-        addHtmlContent(htmlElem);
+    }
+
+    protected static String getDownloadLabel(final Element elem) {
+        final Element mediaElem = (Element)elem.getParent();
+        final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
+        final String alt = mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT);
+        final String originalSource = elem.getAttributeValue(ProcessorData.ORIGINAL_SOURCE_ATTR,
+                ProcessorData.NAMESPACE);
+        if (!alt.isEmpty()) {
+            return HTML_DOWNLOAD_LABEL + alt;
+        } else if (!Strings.isNullOrEmpty(originalSource)) {
+            return HTML_DOWNLOAD_LABEL + originalSource;
+        } else {
+            return HTML_DOWNLOAD_LABEL + source;
+        }
     }
 
     protected void generateObject(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.OBJECT.getTag()))
                 .setAttribute(HtmlAttributes.OBJECT_SOURCE,
-                        elem.getAttributeValue(CnxmlAttributes.OBJECT_SOURCE))
+                        elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
                 .setAttribute(HtmlAttributes.OBJECT_TYPE,
-                        elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE));
+                        elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE))
+                .setText(getDownloadLabel(elem));
+
         final String width = elem.getAttributeValue(CnxmlAttributes.OBJECT_WIDTH);
         if (width != null) {
             htmlElem.setAttribute(HtmlAttributes.OBJECT_WIDTH, width);
@@ -970,14 +1204,25 @@ import org.jdom.input.DOMBuilder;
         if (height != null) {
             htmlElem.setAttribute(HtmlAttributes.OBJECT_HEIGHT, height);
         }
-        htmlElem.setText(mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT));
         addHtmlContent(htmlElem);
+    }
+
+    protected void generateDownloadLink(final Element elem) {
+        final Element mediaElem = (Element)elem.getParent();
+        addHtmlContent(copyId(mediaElem, new Element(HtmlTag.DIV.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_DOWNLOAD_CLASS)
+                .addContent(new Element(HtmlTag.LINK.getTag())
+                        .setAttribute(HtmlAttributes.LINK_URL,
+                                elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE))
+                        .setAttribute(HtmlAttributes.LINK_TYPE,
+                                elem.getAttributeValue(CnxmlAttributes.DOWNLOAD_TYPE))
+                        .setText(getDownloadLabel(elem)))));
     }
 
     protected void generateMathematica(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final String type = elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE);
-        final String source = elem.getAttributeValue(CnxmlAttributes.OBJECT_SOURCE);
+        final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
         final String width = elem.getAttributeValue(CnxmlAttributes.OBJECT_WIDTH);
         final String height = elem.getAttributeValue(CnxmlAttributes.OBJECT_HEIGHT);
 
@@ -1005,12 +1250,12 @@ import org.jdom.input.DOMBuilder;
                         .setAttribute(HtmlAttributes.CLASS, HTML_CDF_DOWNLOAD_CLASS)
                         .addContent(new Element(HtmlTag.LINK.getTag())
                                 .setAttribute(HtmlAttributes.LINK_URL, source)
-                                .setText(HTML_CDF_DOWNLOAD_LABEL)));
+                                .setText(getDownloadLabel(elem))));
     }
 
     // TODO(light): allow multiple tgroups
     protected void generateTable(final Element elem) {
-        final Element tgroup = elem.getChild(CnxmlTag.TABLE_GROUP.getTag(), cnxmlNamespace);
+        final Element tgroup = elem.getChild(CnxmlTag.TABLE_GROUP.getTag(), CnxmlTag.NAMESPACE);
         final Element htmlElem = copyId(elem, new Element(HtmlTag.TABLE.getTag()));
 
         final List<String> classList = computeTableClasses(tgroup);
@@ -1050,20 +1295,24 @@ import org.jdom.input.DOMBuilder;
         pushTablePart(tgroup, CnxmlTag.TABLE_HEAD, htmlElem, HtmlTag.TABLE_HEAD);
 
         final Element htmlCaptionElem = new Element(HtmlTag.TABLE_CAPTION.getTag());
-        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), cnxmlNamespace);
-        final String summary = elem.getAttributeValue(CnxmlAttributes.CALS_TABLE_SUMMARY);
         final int number = getNumber(elem);
 
-        final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
-                .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+        final Element htmlPrefixElem = new Element(HtmlTag.SPAN.getTag())
+                .setAttribute(HtmlAttributes.CLASS, HTML_PREFIX_CLASS)
                 .addContent(CALS_TABLE_LABEL + " " + number);
-        if (title != null) {
-            htmlTitleElem.addContent(": " + title);
+        htmlCaptionElem.addContent(htmlPrefixElem);
+
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
+        final String summary = elem.getAttributeValue(CnxmlAttributes.CALS_TABLE_SUMMARY);
+        String captionText = null;
+        if (!isNullOrEmpty(title)) {
+            captionText = title;
+        } else if (!isNullOrEmpty(summary)) {
+            captionText = summary;
         }
-        
-        htmlCaptionElem.addContent(htmlTitleElem);
-        if (summary != null) {
-            htmlCaptionElem.addContent(summary);
+        if (captionText != null) {
+            htmlPrefixElem.addContent(":");
+            htmlCaptionElem.addContent(" " + captionText);
         }
 
         htmlElem.addContent(htmlCaptionElem);
@@ -1071,7 +1320,7 @@ import org.jdom.input.DOMBuilder;
 
     protected void pushTablePart(final Element tableGroupElem, final CnxmlTag cnxmlTag,
             final Element htmlTableElem, final HtmlTag htmlTag) {
-        final Element elem = tableGroupElem.getChild(cnxmlTag.getTag(), cnxmlNamespace);
+        final Element elem = tableGroupElem.getChild(cnxmlTag.getTag(), CnxmlTag.NAMESPACE);
         if (elem == null) {
             return;
         }

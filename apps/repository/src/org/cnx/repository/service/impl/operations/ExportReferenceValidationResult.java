@@ -201,7 +201,7 @@ public class ExportReferenceValidationResult {
                 }
                 break;
             default:
-                return new ExportReferenceValidationResult(RepositoryStatus.SERVER_ERRROR,
+                return new ExportReferenceValidationResult(RepositoryStatus.SERVER_ERROR,
                     "Unknown export reference scope type: " + exportReference.getScopeType());
         }
 

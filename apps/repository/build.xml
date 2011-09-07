@@ -34,7 +34,7 @@
         <mkdir dir="${war.dir}/WEB-INF/lib" />
 
         <copy todir="${war.dir}/WEB-INF">
-            <fileset dir="${web.inf.common}" includes="*.*" />
+            <fileset dir="${web.inf.common}" includes="*" />
         </copy>
 
         <copy todir="${war.dir}/WEB-INF/lib">
@@ -164,29 +164,32 @@
 
 
         <property name="test_lib_dir" value="${basedir}/${test.lib}" />
-
-        <ant antfile="junit/build.xml"
+        <ant antfile="appengine/build.xml"
              inheritAll="true"
-             target="default"
+             target="test"
              dir="${third_party}" />
 
+      <ant antfile="args4j/build.xml"
+           inheritAll="true"
+           target="test"
+           dir="${third_party}" />
+        	
         <ant antfile="jersey/build.xml"
              inheritAll="true"
              target="test"
              dir="${third_party}" />
 
-        <ant antfile="appengine/build.xml"
+        <ant antfile="junit/build.xml"
              inheritAll="true"
-             target="testing"
+             target="test"
              dir="${third_party}" />
     </target>
 
     <target name="test-compile"
             description="Compile Unit Tests."
-            depends="compile">
+            depends="compile, scripts-compile">
 
         <!-- TODO(arjuns) : Optimize classpaths. -->
-        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
         <javac srcdir="${test.src}"
                destdir="${test.classes}"
                includeantruntime="false"
@@ -302,7 +305,29 @@
         </appcfg>
     </target>
 
+    <target name="scripts-compile" depends="compile">
+        <mkdir dir="${scripts.classes}" />
+        <mkdir dir="${test.lib}" />
+
+        <javac srcdir="${scripts.src}"
+               destdir="${scripts.classes}"
+               includeantruntime="false"
+               debug="on"
+               failonerror="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+            </classpath>
+        </javac>
+
+        <jar destfile="${test.lib}/scripts.jar">
+            <fileset dir="${scripts.classes}" />
+            <fileset dir="${scripts.src}" />
+        </jar>
+    </target>
+
     <target name="all"
             description="Refers to all the targets in this file other then test."
-            depends="compile, test-compile, war_qa" />
+            depends="compile, test-compile, war_qa, scripts-compile" />
 </project>

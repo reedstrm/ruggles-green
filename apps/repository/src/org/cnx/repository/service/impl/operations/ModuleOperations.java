@@ -75,7 +75,7 @@ public class ModuleOperations {
             Services.persistence.write(moduleEntity);
             moduleId = checkNotNull(moduleEntity.getId(), "Null module id");
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to create a new module", log, e);
         }
 
@@ -119,7 +119,7 @@ public class ModuleOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to create a new module with forced id: " + forcedId, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active");
@@ -161,7 +161,7 @@ public class ModuleOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while fetching info of module " + moduleId, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", moduleId);
@@ -269,7 +269,7 @@ public class ModuleOperations {
             // triggered if the persisted data is consistent.
             if (Services.persistence.hasObjectWithKey(versionEntity.getKey())) {
                 tx.rollback();
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                         "Server module data inconsistency. Key: " + versionEntity.getKey(), log);
             }
             // Update the persistence
@@ -277,7 +277,7 @@ public class ModuleOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while trying to add a version to module " + moduleId, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", moduleId);
@@ -345,7 +345,7 @@ public class ModuleOperations {
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while looking module version " + moduleId + "/" + moduleVersion, log, e);
         }
 
@@ -419,7 +419,7 @@ public class ModuleOperations {
 
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while looking module version " + moduleId + "/" + moduleVersion, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s/%s", moduleId, moduleVersion);

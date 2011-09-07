@@ -1,17 +1,17 @@
 /*
- *  Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cnx.common.collxml;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import javax.annotation.Nullable;
 import org.cnx.mdml.Metadata;
-import org.w3c.dom.Document;
+import org.jdom.Document;
 
 /**
  *  A Collection is a POJO container for CollXML collections.
@@ -105,16 +105,29 @@ public class Collection {
     /**
      *  This method finds the module link inside the collection.
      *
+     *  @return The index of module associated with the ID in the moduleLinks list, or -1 if not
+     *          found.
+     */
+    public int getModuleIndex(String moduleId) {
+        checkNotNull(moduleId);
+        int index = 0;
+        for (ModuleLink link : moduleLinks) {
+            if (moduleId.equals(link.getModuleId())) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    /**
+     *  This method finds the module link inside the collection.
+     *
      *  @return The module link associated with the ID, or null if not found.
      */
     public ModuleLink getModuleLink(String moduleId) {
-        checkNotNull(moduleId);
-        for (ModuleLink link : moduleLinks) {
-            if (moduleId.equals(link.getModuleId())) {
-                return link;
-            }
-        }
-        return null;
+        final int index = getModuleIndex(checkNotNull(moduleId));
+        return index >= 0 ? moduleLinks.get(index) : null;
     }
 
     /**

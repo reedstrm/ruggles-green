@@ -23,7 +23,7 @@
              dir="junit/junit-4.8.2"
              includes="*.jar" />
 
-    <target name="default">
+    <target name="test">
         <fail message="Target path for jars is not set.">
             <condition>
                 <not>

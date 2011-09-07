@@ -1,17 +1,17 @@
 <!--
-    Copyright 2011 Google Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
+    Copyright (C) 2011 The CNX Authors
+    
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not
+    use this file except in compliance with the License. You may obtain a copy of
+    the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
     Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
 -->
 
 <!-- Ant build file for the CNX utilities library. -->
@@ -65,6 +65,57 @@
             </classpath>
         </javac>
     </target>
+
+    <target name="test-compile" description="compile tests." depends="jar">
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
+
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="test"
+             dir="${third_party}" />
+
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+
+        <javac srcdir="${test.src}"
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.util.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" description="Run unit tests" depends="test-compile">
+        <junit fork="yes" printsummary="yes" failureproperty="test.failed">
+            <jvmarg value="-enableassertions" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="build/lib/org.cnx.util.jar" />
+                <pathelement location="${test.dir}" />
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed" />
+            </condition>
+        </fail>
+    </target>
+
 
     <target name="clean"
             description="Remove built files">

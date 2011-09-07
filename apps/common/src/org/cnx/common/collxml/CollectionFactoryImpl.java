@@ -1,91 +1,88 @@
 /*
- *  Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cnx.common.collxml;
 
 import com.google.inject.Inject;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.cnx.mdml.Metadata;
 import org.cnx.mdml.MdmlMetadata;
-import org.cnx.util.DOMUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.filter.ElementFilter;
 
 public class CollectionFactoryImpl implements CollectionFactory {
     private static final String METADATA_TAG_NAME = "metadata";
     private static final String CONTENT_TAG_NAME = "content";
     private static final String MODULE_TAG_NAME = "module";
     private static final String SUBCOLLECTION_TAG_NAME = "subcollection";
-    private static final String DOCUMENT_ATTR_NAME = "document";
-    private static final String VERSION_ATTR_NAME = "version";
 
     private final MdmlMetadata.Factory metadataFactory;
-    private final String collxmlNamespace;
 
-    @Inject public CollectionFactoryImpl(MdmlMetadata.Factory metadataFactory,
-            @CollxmlNamespace String collxmlNamespace) {
+    @Inject public CollectionFactoryImpl(MdmlMetadata.Factory metadataFactory) {
         this.metadataFactory = metadataFactory;
-        this.collxmlNamespace = collxmlNamespace;
     }
 
-    @Override public Collection create(String id, Document collxml) {
+    @Override public Collection create(final String id, final Document collxml) {
         return new Collection(id, collxml, parseMetadata(collxml), parseTopNodes(collxml));
     }
 
-    private Metadata parseMetadata(Document collxml) {
-        Element elem = DOMUtils.findFirstChild(collxml.getDocumentElement(),
-                collxmlNamespace, METADATA_TAG_NAME);
-        if (elem == null) {
-            return null;
-        }
-        return metadataFactory.create(elem);
+    private Metadata parseMetadata(final Document collxml) {
+        final Element elem = collxml.getRootElement().getChild(
+                CollxmlTag.METADATA.getTag(), CollxmlTag.NAMESPACE);
+        return elem != null ? metadataFactory.create(elem) : null;
     }
 
-    private ArrayList<CollectionItem> parseTopNodes(Document collxml) {
-        ArrayList<CollectionItem> nodes = new ArrayList<CollectionItem>();
-        Element elem = DOMUtils.findFirstChild(collxml.getDocumentElement(),
-                collxmlNamespace, CONTENT_TAG_NAME);
+    private List<CollectionItem> parseTopNodes(final Document collxml) {
+        final Element elem = collxml.getRootElement().getChild(
+                CollxmlTag.CONTENT.getTag(), CollxmlTag.NAMESPACE);
         if (elem == null) {
-            return nodes;
+            return Collections.<CollectionItem>emptyList();
         }
         return parseNodes(0, elem);
     }
 
-    private ArrayList<CollectionItem> parseNodes(int depth, Element parent) {
+    @SuppressWarnings("unchecked")
+    private ArrayList<CollectionItem> parseNodes(final int depth, final Element parent) {
         final ArrayList<CollectionItem> nodes = new ArrayList<CollectionItem>();
+        final List<Element> children = (List<Element>)parent.getContent(
+                new ElementFilter(CollxmlTag.NAMESPACE));
         int index = 0;
-        for (Element elem : DOMUtils.iterElements(parent)) {
-            final String localName = elem.getLocalName();
-            if (MODULE_TAG_NAME.equals(localName)) {
+        for (Element elem : children) {
+            switch (CollxmlTag.of(elem.getName())) {
+            case MODULE:
                 nodes.add(new ModuleLink(
-                        depth,
-                        index,
-                        elem.getAttribute(DOCUMENT_ATTR_NAME),
-                        elem.getAttribute(VERSION_ATTR_NAME),
+                        depth, index,
+                        elem.getAttributeValue(CollxmlAttributes.MODULE_DOCUMENT),
+                        elem.getAttributeValue(CollxmlAttributes.MODULE_VERSION),
                         metadataFactory.create(elem)));
-            } else if (SUBCOLLECTION_TAG_NAME.equals(localName)) {
-                final Element content = DOMUtils.findFirstChild(elem, collxmlNamespace,
-                        CONTENT_TAG_NAME);
+                break;
+            case SUBCOLLECTION:
+                final Element content = elem.getChild(
+                        CollxmlTag.CONTENT.getTag(), CollxmlTag.NAMESPACE);
                 if (content != null) {
                     final ArrayList<CollectionItem> subnodes = parseNodes(depth + 1, content);
                     nodes.add(new Subcollection(depth, index, subnodes,
                             metadataFactory.create(elem)));
                 }
-            } else {
-                continue;
             }
             index++;
         }

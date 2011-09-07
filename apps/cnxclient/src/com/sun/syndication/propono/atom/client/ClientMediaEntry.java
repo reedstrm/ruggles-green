@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2011 The CNX Authors.
  * Copyright 2007 Sun Microsystems, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,6 +48,7 @@ import org.jdom.JDOMException;
  * Client implementation of Atom media-link entry, an Atom entry that provides
  * meta-data for a media file (e.g. uploaded image or audio file).
  */
+@SuppressWarnings({ "rawtypes", "rawtypes", "unchecked", "deprecation", "unused" })
 public class ClientMediaEntry extends ClientEntry {
     private static final Log  logger = LogFactory.getLog(ClientMediaEntry.class);
 
@@ -66,7 +68,6 @@ public class ClientMediaEntry extends ClientEntry {
         super(service, collection, entry, partial);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ClientMediaEntry(ClientAtomService service, ClientCollection collection,
             String title, String slug, String contentType, InputStream is) {
         this(service, collection);
@@ -80,7 +81,6 @@ public class ClientMediaEntry extends ClientEntry {
         setContents(contents);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public ClientMediaEntry(ClientAtomService service, ClientCollection collection,
             String title, String slug, String contentType, byte[] bytes) {
         this(service, collection);
@@ -187,7 +187,6 @@ public class ClientMediaEntry extends ClientEntry {
     /**
      * Update entry on server.
      */
-    @SuppressWarnings("deprecation")
     @Override
     public void update() throws ProponoException {
         if (partial) {
@@ -239,7 +238,6 @@ public class ClientMediaEntry extends ClientEntry {
     }
 
     /** Package access, to be called by DefaultClientCollection */
-    @SuppressWarnings({ "rawtypes", "rawtypes", "unchecked" })
     @Override
     void addToCollection(ClientCollection col) throws ProponoException {
         setCollection(col);
@@ -307,28 +305,3 @@ public class ClientMediaEntry extends ClientEntry {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -81,7 +81,7 @@ public class ResourceOperations {
             // it was assigned a key.
             resourceId = entity.getId();
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Failed to create a new resource", log, e);
         }
 
@@ -115,7 +115,7 @@ public class ResourceOperations {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
                 + resourceId + "]", log, e);
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to retrieve resource: [" + resourceId + "]", log, e);
         }
 
@@ -138,7 +138,7 @@ public class ResourceOperations {
                             contentInfo);
                 break;
             default:
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                         "Unknown resource entity state:" + entity.getState(), log);
         }
 
@@ -170,7 +170,7 @@ public class ResourceOperations {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
                 + resourceId + "]", log, e);
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to retrieve resource: " + resourceId, log, e);
         }
 
@@ -178,7 +178,7 @@ public class ResourceOperations {
         try {
             Services.blobstore.serve(blobKey, httpResponse);
         } catch (IOException e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error serving the resource content: " + resourceId, log, e);
         }
 

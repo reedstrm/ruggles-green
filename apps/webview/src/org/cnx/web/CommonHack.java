@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright (C) 2011 The CNX Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -28,10 +28,13 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.SAXParser;
 
 import org.cnx.resourcemapping.Resources;
-import org.w3c.dom.Document;
+
+import org.jdom.Document;
+import org.jdom.input.SAXHandler;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -56,9 +59,11 @@ public class CommonHack {
     public static final String COLLECTION_ID_PATH_PARAM = "collectionId";
     public static final String COLLECTION_VERSION_PATH_PARAM = "collectionVersion";
 
-    public static Document parseXmlString(final DocumentBuilder builder, final String source)
+    public static Document parseXmlString(final SAXParser parser, final String source)
             throws SAXException, IOException {
-        return builder.parse(new ByteArrayInputStream(source.getBytes(Charsets.UTF_8)));
+        final SAXHandler handler = new SAXHandler();
+        parser.parse(new ByteArrayInputStream(source.getBytes(Charsets.UTF_8)), handler);
+        return handler.getDocument();
     }
 
     public static Resources getResourcesFromResourceMappingDoc(String resourceMappingXml) {

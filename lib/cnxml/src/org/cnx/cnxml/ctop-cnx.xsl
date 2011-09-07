@@ -2378,7 +2378,7 @@
 
 
 <!-- Any other elements should be copied as-is -->
-<xsl:template match="node()|processing-instruction()">
+<xsl:template match="@*|node()|processing-instruction()">
     <xsl:copy>
         <xsl:apply-templates select="@*|node()|processing-instruction()"/>
     </xsl:copy>

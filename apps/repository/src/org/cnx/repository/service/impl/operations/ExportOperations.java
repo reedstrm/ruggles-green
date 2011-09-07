@@ -78,7 +78,7 @@ public class ExportOperations {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
                     "Export parent object not found: " + exportReference, log, e);
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when looking up parent entity of export: " + exportReference, log, e);
         }
 
@@ -120,7 +120,7 @@ public class ExportOperations {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
                 + exportReference, log, e);
         } catch (Throwable e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when looking up export: " + exportReference, log, e);
         }
 
@@ -128,7 +128,7 @@ public class ExportOperations {
         try {
             Services.blobstore.serve(blobKey, httpResponse);
         } catch (IOException e) {
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error serving the resource content: " + exportReference, log, e);
         }
 
@@ -174,7 +174,7 @@ public class ExportOperations {
             tx.commit();
         } catch (Throwable e) {
             tx.rollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERRROR,
+            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when deleting export" + exportReference, log, e);
         } finally {
             checkArgument(!tx.isActive(), "Transaction left active: %s", exportReference);

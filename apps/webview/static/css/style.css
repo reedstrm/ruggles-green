@@ -1,18 +1,18 @@
 /*
-    Copyright 2011 Google Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+ * Copyright (C) 2011 The CNX Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
 
@@ -55,28 +55,28 @@ p.authors {
     margin-top: 0.75ex;
 }
 
-hgroup > h1.collectionTitle {
-    margin-bottom: 0;
-    font-size: 100%;
+#sandbar {
+    color: white;
+    background: #555;
+    padding: 0.5ex 1em;
 }
 
-hgroup > h1.collectionTitle > a {
-    color: gray;
+#sandbar a {
+    color: inherit;
 }
 
-hgroup > h1.moduleTitle {
-    margin-top: 0;
+#sandbar > * {
+    margin-right: 1em;
 }
 
 .collectionNavBar {
     display: table;
     table-layout: fixed;
     width: 100%;
-    margin-top: 1em;
+    margin-top: 3em;
+    margin-bottom: 1em;
     padding: 0.5ex 1ex;
-
-    background: #cedff0;
-    border: thin solid gray;
+    border-top: thin solid gray;
 }
 
 .collectionNavBar a {
@@ -143,6 +143,10 @@ hgroup > h1.moduleTitle {
     text-align: justify;
 }
 
+.moduleContent ul.labeled {
+    list-style: none;
+}
+
 .moduleContent h1 {
     margin-top: 1.5em;
 }
@@ -151,14 +155,55 @@ hgroup > h1.moduleTitle {
     border-bottom: thin solid gray;
 }
 
-.moduleContent .title, .moduleContent figcaption {
+.moduleContent .title {
     font-weight: bold;
+    margin-top: 1.5em;
     margin-bottom: 1ex;
 }
 
-.moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement {
+.moduleContent .figureTitle {
+    text-align: center;
+}
+
+.moduleContent .prefix {
+    font-weight: bold;
+}
+
+.moduleContent .note, .moduleContent .rule, .moduleContent .example, .moduleContent .exercise, .moduleContent .commentary, .moduleContent .problem, .moduleContent .solution, .moduleContent .equation, .moduleContent .statement, .moduleContent .definition {
     margin-bottom: 1em;
     margin-top: 1em;
+}
+
+.moduleContent .equation {
+    display: table;
+    width: 100%;
+}
+
+.moduleContent .equationContent {
+    display: table-cell;
+    width: 90%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.moduleContent .equationNumber {
+    display: table-cell;
+    width: 5%;
+    padding-left: 5%;
+    text-align: right;
+    vertical-align: middle;
+}
+
+.moduleContent .equationNumber:before {
+    content: "[";
+}
+
+.moduleContent .equationNumber:after {
+    content: "]";
+}
+
+.moduleContent .definition > ol {
+    list-style: none;
 }
 
 .moduleContent .unhandled {
@@ -168,8 +213,61 @@ hgroup > h1.moduleTitle {
     background: #deca73;
 }
 
+.moduleContent .bulletStyleNone {
+    list-style: none;
+}
+
+.moduleContent figure {
+    margin: 0;
+    text-align: center;
+}
+
+.moduleContent .subfigureContainer.horizontal {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.moduleContent .subfigureContainer.horizontal > .subfigure {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.moduleContent .note {
+    width: 90%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1ex 1em;
+
+    background: #ddd;
+}
+
+.moduleContent .note > .title:first-child {
+    margin-top: 0;
+}
+
+.moduleContent .download {
+    width: 50%;
+    margin: 1em auto;
+    font-weight: bold;
+    text-align: center;
+}
+
+.moduleContent caption, .moduleContent figcaption {
+    padding-top: 1ex;
+}
+
 table.cals {
+    margin: 1em auto;
     border-collapse: collapse;
+}
+
+table.cals > caption {
+    caption-side: bottom;
+    text-align: center;
 }
 
 table.cals tr {

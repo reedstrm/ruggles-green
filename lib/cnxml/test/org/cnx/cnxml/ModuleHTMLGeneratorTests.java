@@ -527,36 +527,76 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void definitionShouldRenderAsDiv() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1</div><ol></ol></div>",
+                + "<div class=\"title\">Definition 1</div></div>",
                 generate(new Element("definition", ns).setAttribute("id", "myDef")));
     }
 
     @Test public void definitionShouldUseTermAsTitle() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1: snarf</div><ol></ol></div>",
+                + "<div class=\"title\">Definition 1: snarf</div></div>",
                 generate(new Element("definition", ns)
                         .setAttribute("id", "myDef")
                         .addContent(new Element("term", ns).setText("snarf"))));
     }
 
-    @Test public void definitionShouldRenderMeaningsInList() throws Exception {
+    @Test public void definitionShouldAllowElementsInTerm() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1</div><ol>"
-                + "<li class=\"meaning\">A noun</li><li class=\"meaning\">A verb</li></ol></div>",
+                + "<div class=\"title\">Definition 1: "
+                + "<a href=\"http://www.example.com/\">snarf</a> text</div></div>",
+                generate(new Element("definition", ns)
+                        .setAttribute("id", "myDef")
+                        .addContent(new Element("term", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "http://www.example.com/")
+                                        .setText("snarf"))
+                                .addContent(" text"))));
+    }
+
+    @Test public void definitionShouldRenderMeanings() throws Exception {
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1</div>"
+                + "<div class=\"meaning\">A noun</div><div class=\"meaning\">A verb</div></div>",
                 generate(new Element("definition", ns)
                         .setAttribute("id", "myDef")
                         .addContent(new Element("meaning", ns).setText("A noun"))
                         .addContent(new Element("meaning", ns).setText("A verb"))));
     }
 
-    @Test public void fullDefinitionTest() throws Exception {
+    @Test public void definitionShouldRenderExamples() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1: snarf</div><ol>"
-                + "<li class=\"meaning\">A noun</li><li class=\"meaning\">A verb</li></ol></div>",
+                + "<div class=\"title\">Definition 1</div>"
+                + "<div class=\"meaning\">A noun</div>"
+                + "<div class=\"example\" id=\"four\">"
+                + "<div class=\"title\">Example 1</div>Four examples!</div>"
+                + "<div class=\"meaning\">A verb</div></div>",
                 generate(new Element("definition", ns)
                         .setAttribute("id", "myDef")
-                        .addContent(new Element("term", ns).setText("snarf"))
                         .addContent(new Element("meaning", ns).setText("A noun"))
+                        .addContent(new Element("example", ns)
+                                .setAttribute("id", "four")
+                                .setText("Four examples!"))
+                        .addContent(new Element("meaning", ns).setText("A verb"))));
+    }
+
+    @Test public void fullDefinitionTest() throws Exception {
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1: "
+                + "<a href=\"http://www.example.com/\">snarf</a> text</div>"
+                + "<div class=\"meaning\">A noun</div>"
+                + "<div class=\"example\" id=\"four\">"
+                + "<div class=\"title\">Example 1</div>Four examples!</div>"
+                + "<div class=\"meaning\">A verb</div></div>",
+                generate(new Element("definition", ns)
+                        .setAttribute("id", "myDef")
+                        .addContent(new Element("term", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "http://www.example.com/")
+                                        .setText("snarf"))
+                                .addContent(" text"))
+                        .addContent(new Element("meaning", ns).setText("A noun"))
+                        .addContent(new Element("example", ns)
+                                .setAttribute("id", "four")
+                                .setText("Four examples!"))
                         .addContent(new Element("meaning", ns).setText("A verb"))));
     }
 

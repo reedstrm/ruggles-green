@@ -696,7 +696,6 @@ import org.jdom.input.DOMBuilder;
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_DEFINITION_CLASS));
 
-        final Element term = elem.getChild(CnxmlTag.TERM.getTag(), CnxmlTag.NAMESPACE);
         final int number = getNumber(elem);
         String label = elem.getChildText(CnxmlTag.LABEL.getTag(), CnxmlTag.NAMESPACE);
         if (label == null) {
@@ -705,31 +704,22 @@ import org.jdom.input.DOMBuilder;
         final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS);
         htmlTitleElem.addContent(label + " " + number);
-        // TODO(light): This doesn't handle links.
-        if (term != null) {
-            htmlTitleElem.addContent(": " + term.getText());
-        }
-
-        // TODO(light): Allow interspersed examples with meanings
-        final Element htmlMeaningList = new Element(HtmlTag.ORDERED_LIST.getTag());
+        htmlElem.addContent(htmlTitleElem);
 
         addHtmlContent(htmlElem);
-        final List<Content> children = (List<Content>)elem.getContent(new Filter() {
-            @Override public boolean matches(Object obj) {
-                if (obj instanceof Element) {
-                    final Element elem = (Element)obj;
-                    return !(CnxmlTag.NAMESPACE.getURI().equals(elem.getNamespaceURI())
-                            && CnxmlTag.TERM.getTag().equals(elem.getName()));
-                }
-                return true;
-            }
-        });
-        stack.push(new GeneratorFrame(children.iterator(), htmlMeaningList, false));
-        htmlElem.addContent(htmlTitleElem).addContent(htmlMeaningList);
+        final List<Content> children = (List<Content>)elem.getContent(
+                new ElementFilter(CnxmlTag.TERM.getTag(), CnxmlTag.NAMESPACE).negate());
+        stack.push(new GeneratorFrame(children.iterator(), htmlElem, false));
+
+        final Element term = elem.getChild(CnxmlTag.TERM.getTag(), CnxmlTag.NAMESPACE);
+        if (term != null) {
+            htmlTitleElem.addContent(": ");
+            stack.push(new GeneratorFrame(term, htmlTitleElem));
+        }
     }
 
     protected void generateMeaning(final Element elem) {
-        pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.LIST_ITEM.getTag())
+        pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_MEANING_CLASS)));
     }
 

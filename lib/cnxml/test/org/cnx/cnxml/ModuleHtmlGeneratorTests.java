@@ -210,7 +210,7 @@ public class ModuleHtmlGeneratorTests {
     }
 
     @Test public void emptyLinkShouldDefaultToLink() throws Exception {
-        assertEquals("<a href=\"#myRefId\">link</a>", generate(new Element("link", ns)
+        assertEquals("<a href=\"#myRefId\">Link</a>", generate(new Element("link", ns)
                 .setAttribute("target-id", "myRefId")));
     }
 
@@ -219,19 +219,39 @@ public class ModuleHtmlGeneratorTests {
         final String figureOutput =
                 "<figure id=\"myRefId\"><figcaption><span class=\"prefix\">Figure 1</span>"
                 + "</figcaption></figure>";
-        assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
+        assertEquals("<a href=\"#myRefId\">Figure 1</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
                         .addContent(new Element("content", ns)
                                 .addContent(new Element("link", ns)
                                         .setAttribute("target-id", "myRefId"))
                                 .addContent(figure)))));
         figure.detach();
-        assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
+        assertEquals("<a href=\"#myRefId\">Figure 1</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
                         .addContent(new Element("content", ns)
                                 .addContent(new Element("link", ns)
                                         .setAttribute("url", "#myRefId"))
                                 .addContent(figure)))));
+    }
+
+    @Test public void emptyLinkShouldRecognizeEquation() throws Exception {
+        final Element equation = new Element("equation", ns).setAttribute("id", "myRefId");
+        final String equationOutput = "<div class=\"equation\" id=\"myRefId\">"
+                + "<div class=\"equationContent\"></div>"
+                + "<div class=\"equationNumber\">1</div></div>";
+        assertEquals("<a href=\"#myRefId\">Equation 1</a>" + equationOutput,
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("target-id", "myRefId"))
+                                .addContent(equation)))));
+        equation.detach();
+        assertEquals("<a href=\"#myRefId\">Equation 1</a>" + equationOutput,
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "#myRefId"))
+                                .addContent(equation)))));
     }
 
     @Test public void foreignShouldRenderAsSpan() throws Exception {

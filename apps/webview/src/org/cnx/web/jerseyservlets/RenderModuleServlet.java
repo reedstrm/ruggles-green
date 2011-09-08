@@ -176,7 +176,7 @@ public class RenderModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_XML_URL_PATTERN)
     public Response getModuleVersionXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
@@ -190,9 +190,9 @@ public class RenderModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_RESOURCES_URL_PATTERN)
-    public Response getModuleVersionResources(@Context HttpServletRequest req,
+    public Response getModuleVersionResourcesXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
         final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);

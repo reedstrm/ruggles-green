@@ -259,7 +259,7 @@ public class RenderCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_XML_URL_PATTERN)
     public Response getCollectionVersionXml(
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -396,7 +396,7 @@ public class RenderCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_MODULE_XML_URL_PATTERN)
     public Response getModuleVersionXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
@@ -409,9 +409,9 @@ public class RenderCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_MODULE_RESOURCES_URL_PATTERN)
-    public Response getModuleVersionResourcesUnderCollectionVersion(
+    public Response getModuleVersionResourcesXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
         IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);

@@ -53,7 +53,7 @@ import org.jdom.transform.JDOMSource;
     public Module process(Module module) throws Exception {
         final JDOMResult result = new JDOMResult();
         transformer.transform(new JDOMSource(module.getCnxml()), result);
-        return new Module(module.getId(), result.getDocument(), module.getResources(),
-                module.getMetadata());
+        return new Module(module.getId(), module.getVersion(),
+                result.getDocument(), module.getResources(), module.getMetadata());
     }
 }

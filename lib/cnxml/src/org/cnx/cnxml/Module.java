@@ -17,7 +17,9 @@
 package org.cnx.cnxml;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.annotation.Nullable;
+
 import org.cnx.mdml.Metadata;
 import org.cnx.resourcemapping.Resources;
 import org.jdom.Document;
@@ -30,19 +32,26 @@ import org.jdom.Element;
  */
 public class Module {
     private final String id;
+    private final String version;
     private final Document cnxml;
     private final Resources resources;
     private final Metadata metadata;
 
-    public Module(String id, Document cnxml, Resources resources, @Nullable Metadata metadata) {
+    public Module(String id, @Nullable String version, Document cnxml, Resources resources,
+            @Nullable Metadata metadata) {
         this.id = checkNotNull(id);
-        this.cnxml= checkNotNull(cnxml);
+        this.version = version;
+        this.cnxml = checkNotNull(cnxml);
         this.resources = checkNotNull(resources);
         this.metadata = metadata;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public Document getCnxml() {

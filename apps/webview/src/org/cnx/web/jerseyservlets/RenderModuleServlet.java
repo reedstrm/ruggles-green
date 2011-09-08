@@ -132,10 +132,9 @@ public class RenderModuleServlet {
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);
             String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-            final Module module =
-                    injector.getInstance(ModuleFactory.class).create(moduleId,
-                            CommonHack.parseXmlString(saxParser, cnxml),
-                            CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+            final Module module = injector.getInstance(ModuleFactory.class).create(
+                    moduleId, moduleVersionString, CommonHack.parseXmlString(saxParser, cnxml),
+                    CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
             RenderScope renderScope = injector.getInstance(RenderScope.class);
 

@@ -43,6 +43,7 @@ import org.jdom.Text;
 
 public class ModuleHTMLGeneratorTests {
     private static final String moduleId = "m123";
+    private static final String moduleVersion = "42";
     private static final Namespace ns = CnxmlTag.NAMESPACE;
     private static final Namespace mathns = MathmlTag.NAMESPACE;
 
@@ -71,7 +72,7 @@ public class ModuleHTMLGeneratorTests {
         try {
             ObjectFactory dummyFactory = new ObjectFactory();
             return injector.getInstance(ModuleHTMLGenerator.class).generate(
-                    new Module(moduleId, d, dummyFactory.createResources(), null));
+                    new Module(moduleId, moduleVersion, d, dummyFactory.createResources(), null));
         } finally {
             scope.exit();
         }

@@ -16,8 +16,10 @@
 
 package org.cnx.common.collxml;
 
+import javax.annotation.Nullable;
+
 import org.jdom.Document;
 
 public interface CollectionFactory {
-    public Collection create(String id, Document collxml);
+    public Collection create(String id, @Nullable String version, Document collxml);
 }

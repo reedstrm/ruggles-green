@@ -76,15 +76,12 @@ public class WebViewLinkResolver implements LinkResolver {
 
         StringBuilder uriBuilder = new StringBuilder(CommonHack.CONTENT_NAME_SPACE);
         if (collection != null && collection.hasModule(moduleId)) {
-            // TODO(arjuns): TODO(light) collection version
-            final String collectionVersion = CnxAtomPubConstants.LATEST_VERSION_STRING;
-
             uriBuilder
                     .append(CommonHack.COLLECTION)
                     .append("/")
                     .append(collection.getId())
                     .append("/")
-                    .append(collectionVersion);
+                    .append(collection.getVersion());
         }
 
         uriBuilder

@@ -187,9 +187,9 @@ public class RenderCollectionServlet {
                 cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
                         collectionVersionEntry);
 
-        final Collection collection =
-                injector.getInstance(CollectionFactory.class).create(collectionId,
-                        CommonHack.parseXmlString(saxParser, collXml));
+        final Collection collection = injector.getInstance(CollectionFactory.class).create(
+                collectionId, collectionVersionString,
+                CommonHack.parseXmlString(saxParser, collXml));
         // Get metadata
         String title = "", abstractText = null;
         List<Actor> authors = null;
@@ -300,9 +300,9 @@ public class RenderCollectionServlet {
                 cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
                         collectionVersionEntry);
 
-        final Collection collection =
-                injector.getInstance(CollectionFactory.class).create(collectionId,
-                        CommonHack.parseXmlString(saxParser, collXml));
+        final Collection collection = injector.getInstance(CollectionFactory.class).create(
+                collectionId, collectionVersionString,
+                CommonHack.parseXmlString(saxParser, collXml));
 
         // Ensure module is part of the collection
         final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
@@ -318,10 +318,9 @@ public class RenderCollectionServlet {
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
         String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-        final Module module =
-                injector.getInstance(ModuleFactory.class).create(moduleId,
-                        CommonHack.parseXmlString(saxParser, cnxml),
-                        CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+        final Module module = injector.getInstance(ModuleFactory.class).create(
+                moduleId, moduleVersionString, CommonHack.parseXmlString(saxParser, cnxml),
+                CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
         final ModuleLink[] links = collection.getPreviousNext(moduleId);
         SoyData prevLink, nextLink;

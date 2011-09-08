@@ -16,9 +16,11 @@
 
 package org.cnx.cnxml;
 
+import javax.annotation.Nullable;
+
 import org.cnx.resourcemapping.Resources;
 import org.jdom.Document;
 
 public interface ModuleFactory {
-    public Module create(String id, Document cnxml, Resources resources);
+    public Module create(String id, @Nullable String version, Document cnxml, Resources resources);
 }

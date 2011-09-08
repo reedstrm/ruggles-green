@@ -979,6 +979,13 @@ import org.jdom.input.DOMBuilder;
             return;
         }
 
+        final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
+        if (title != null) {
+            addHtmlContent(new Element(HtmlTag.DIV.getTag())
+                    .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                    .setText(title));
+        }
+
         switch (type) {
         case BULLETED:
             htmlElem = copyId(elem, new Element(HtmlTag.UNORDERED_LIST.getTag()));

@@ -870,6 +870,17 @@ public class ModuleHtmlGeneratorTests {
                         .addContent(new Element("item", ns).setText("Three"))));
     }
 
+    @Test public void listShouldAllowTitle() throws Exception {
+        assertEquals("<div class=\"title\">Some things</div>"
+                + "<ul id=\"basicList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                generate(new Element("list", ns)
+                        .setAttribute("id", "basicList")
+                        .addContent(new Element("title", ns).setText("Some things"))
+                        .addContent(new Element("item", ns).setText("One"))
+                        .addContent(new Element("item", ns).setText("Two"))
+                        .addContent(new Element("item", ns).setText("Three"))));
+    }
+
     @Test public void bulletedListShouldRenderAsUl() throws Exception {
         assertEquals("<ul id=\"bulletList\"><li>One</li><li>Two</li><li>Three</li></ul>",
                 generate(new Element("list", ns)

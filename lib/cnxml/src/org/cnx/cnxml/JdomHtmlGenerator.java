@@ -549,8 +549,8 @@ import org.jdom.input.DOMBuilder;
         if (elem.getContentSize() == 0) {
             String text = HTML_DEFAULT_LINK_TEXT;
             String ref = null;
-            if (url != null && url.startsWith(CnxmlAttributes.FRAGMENT)) {
-                ref = url.substring(CnxmlAttributes.FRAGMENT.length());
+            if (url != null && url.startsWith(Links.FRAGMENT)) {
+                ref = url.substring(Links.FRAGMENT.length());
             } else if (targetId != null) {
                 ref = targetId;
             }

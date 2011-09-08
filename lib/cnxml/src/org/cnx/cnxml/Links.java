@@ -35,6 +35,8 @@ import java.nio.CharBuffer;
  *  TODO(light): This may not work with supplementary Unicode characters.
  */
 public final class Links {
+    public final static String FRAGMENT = "#";
+
     // These constants are defined in RFC3986.
     // http://tools.ietf.org/html/rfc3986
     private static final CharMatcher URI_RESERVED = CharMatcher.anyOf(":/?#[]@!$&'()*+,;=");

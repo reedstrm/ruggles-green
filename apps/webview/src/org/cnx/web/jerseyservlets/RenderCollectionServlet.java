@@ -41,10 +41,10 @@ import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.common.collxml.Collection;
 import org.cnx.common.collxml.CollectionFactory;
-import org.cnx.common.collxml.CollectionHTMLGenerator;
+import org.cnx.common.collxml.CollectionHtmlGenerator;
 import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
@@ -211,7 +211,7 @@ public class RenderCollectionServlet {
         renderScope.enter();
         try {
             renderScope.seed(Collection.class, collection);
-            CollectionHTMLGenerator generator = injector.getInstance(CollectionHTMLGenerator.class);
+            CollectionHtmlGenerator generator = injector.getInstance(CollectionHtmlGenerator.class);
             contentHtml = generator.generate(collection);
         } catch (Exception e) {
             e.printStackTrace();
@@ -335,7 +335,7 @@ public class RenderCollectionServlet {
             renderScope.seed(Collection.class, collection);
             renderScope.seed(Module.class, module);
 
-            final ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
+            final ModuleHtmlGenerator generator = injector.getInstance(ModuleHtmlGenerator.class);
             moduleContentHtml = generator.generate(module);
 
             // Get collection title

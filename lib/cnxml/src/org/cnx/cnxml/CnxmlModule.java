@@ -40,7 +40,7 @@ public class CnxmlModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ModuleFactory.class).to(ModuleFactoryImpl.class);
-        bind(ModuleHTMLGenerator.class).to(JdomHtmlGenerator.class).in(RenderTime.class);
+        bind(ModuleHtmlGenerator.class).to(JdomHtmlGenerator.class).in(RenderTime.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
@@ -48,7 +48,7 @@ public class CnxmlModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @ContentMathMLProcessor.ContentToPresentation
+    @ContentMathmlProcessor.ContentToPresentation
     Transformer provideContentToPresentationTransformer(TransformerFactory factory) {
         try {
             final Source cnxSource = getXsltSource(CTOP_CNX_NAME);

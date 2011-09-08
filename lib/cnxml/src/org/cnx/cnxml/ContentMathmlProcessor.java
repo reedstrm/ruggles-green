@@ -35,9 +35,9 @@ import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 
 /**
- *  ContentMathMLProcessor transforms content MathML into presentation MathML.
+ *  ContentMathmlProcessor transforms content MathML into presentation MathML.
  */
-@Singleton public class ContentMathMLProcessor implements Processor {
+@Singleton public class ContentMathmlProcessor implements Processor {
     private final Transformer transformer;
 
     @BindingAnnotation
@@ -46,7 +46,7 @@ import org.jdom.transform.JDOMSource;
     public static @interface ContentToPresentation {
     }
 
-    @Inject public ContentMathMLProcessor(@ContentToPresentation Transformer transformer) {
+    @Inject public ContentMathmlProcessor(@ContentToPresentation Transformer transformer) {
         this.transformer = transformer;
     }
 

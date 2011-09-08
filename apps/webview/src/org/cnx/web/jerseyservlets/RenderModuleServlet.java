@@ -31,7 +31,7 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.mdml.Actor;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
@@ -150,7 +150,7 @@ public class RenderModuleServlet {
                 } else {
                     authors = Collections.<Actor> emptyList();
                 }
-                ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
+                ModuleHtmlGenerator generator = injector.getInstance(ModuleHtmlGenerator.class);
                 contentHtml = generator.generate(module);
             } catch (Exception e) {
                 // TODO(arjuns) : Handle Exception.

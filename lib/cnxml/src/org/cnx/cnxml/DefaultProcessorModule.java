@@ -26,6 +26,6 @@ public class DefaultProcessorModule extends AbstractModule {
     @Override protected void configure() {
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
-        processorBinder.addBinding().to(ContentMathMLProcessor.class);
+        processorBinder.addBinding().to(ContentMathmlProcessor.class);
     }
 }

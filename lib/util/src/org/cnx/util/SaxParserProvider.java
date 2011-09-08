@@ -23,11 +23,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
- *  SAXParserProvider allows Guice to inject SAXParser instances.
+ *  SaxParserProvider allows Guice to inject SAXParser instances.
  *  <p>
  *  Parsers from this provider are automatically secured with {@link SecureGenericXMLFactory}.
  */
-public class SAXParserProvider implements Provider<SAXParser> {
+public class SaxParserProvider implements Provider<SAXParser> {
     private static final String FACTORY_SETTING = "javax.xml.parsers.SAXParserFactory";
 
     private String factoryClass;

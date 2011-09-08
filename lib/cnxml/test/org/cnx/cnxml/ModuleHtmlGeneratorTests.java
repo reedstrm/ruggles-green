@@ -23,7 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 
 import org.cnx.cnxml.CnxmlModule;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.mdml.MdmlModule;
 import org.cnx.resourcemapping.ObjectFactory;
 import org.cnx.util.MathmlTag;
@@ -41,7 +41,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
 
-public class ModuleHTMLGeneratorTests {
+public class ModuleHtmlGeneratorTests {
     private static final String moduleId = "m123";
     private static final String moduleVersion = "42";
     private static final Namespace ns = CnxmlTag.NAMESPACE;
@@ -71,7 +71,7 @@ public class ModuleHTMLGeneratorTests {
         scope.enter();
         try {
             ObjectFactory dummyFactory = new ObjectFactory();
-            return injector.getInstance(ModuleHTMLGenerator.class).generate(
+            return injector.getInstance(ModuleHtmlGenerator.class).generate(
                     new Module(moduleId, moduleVersion, d, dummyFactory.createResources(), null));
         } finally {
             scope.exit();

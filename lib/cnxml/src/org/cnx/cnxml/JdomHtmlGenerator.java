@@ -54,12 +54,12 @@ import org.jdom.filter.Filter;
 import org.jdom.input.DOMBuilder;
 
 /**
- *  JdomHtmlGenerator is an implementation of ModuleHTMLGenerator that generates HTML from a DOM
+ *  JdomHtmlGenerator is an implementation of ModuleHtmlGenerator that generates HTML from a DOM
  *  structure.
  *
  *  It is iterative, but it is not thread-safe.
  */
-@RenderTime public class JdomHtmlGenerator implements ModuleHTMLGenerator {
+@RenderTime public class JdomHtmlGenerator implements ModuleHtmlGenerator {
     private final static String NOTE_LABEL_ASIDE = "Aside";
     private final static String NOTE_LABEL_WARNING = "Warning";
     private final static String NOTE_LABEL_TIP = "Tip";

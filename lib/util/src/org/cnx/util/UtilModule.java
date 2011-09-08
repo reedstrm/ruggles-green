@@ -26,9 +26,7 @@ import javax.xml.transform.TransformerFactory;
  */
 public class UtilModule extends AbstractModule {
     @Override protected void configure() {
-        bind(TransformerFactory.class)
-                .toProvider(TransformerFactoryProvider.class)
-                .asEagerSingleton();
+        bind(TransformerFactory.class).toProvider(TransformerFactoryProvider.class);
         bind(SAXParser.class).toProvider(SAXParserProvider.class);
 
         RenderScope scope = new RenderScope();

@@ -630,6 +630,13 @@ import org.jdom.input.DOMBuilder;
             pushHtmlElement(elem, htmlElem.setAttribute(HtmlAttributes.STYLE, CSS_DISPLAY_NONE));
             break;
         case BLOCK:
+            final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
+            if (title != null) {
+                addHtmlContent(new Element(HtmlTag.DIV.getTag())
+                        .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
+                        .setText(title));
+            }
+
             addHtmlContent(
                     new Element(HtmlTag.PREFORMAT.getTag()).addContent(htmlElem));
             stack.push(new GeneratorFrame(elem, htmlElem));

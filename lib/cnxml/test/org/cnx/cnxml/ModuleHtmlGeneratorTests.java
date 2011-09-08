@@ -351,6 +351,16 @@ public class ModuleHtmlGeneratorTests {
                         .setText("print \"Hello\"")));
     }
 
+    @Test public void blockCodeShouldAllowTitle() throws Exception {
+        assertEquals("<div class=\"title\">Hello Python</div>"
+                + "<pre><code id=\"py\">print &quot;Hello&quot;</code></pre>",
+                generate(new Element("code", ns)
+                        .setAttribute("display", "block")
+                        .setAttribute("id", "py")
+                        .addContent(new Element("title", ns).setText("Hello Python"))
+                        .addContent("print \"Hello\"")));
+    }
+
     @Test public void defaultNoteShouldRenderAsDiv() throws Exception {
         assertEquals("<div class=\"note\" id=\"cake\">"
                 + "<div class=\"title\">Note:</div>Huge success</div>",

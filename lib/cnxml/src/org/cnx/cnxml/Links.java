@@ -31,8 +31,6 @@ import java.nio.CharBuffer;
  *  Links provides methods for working with link attributes encountered in CNXML.
  *  <p>
  *  A link is not the same as a URI.  A link may contain spaces and Unicode characters.
- *  <p>
- *  TODO(light): This may not work with supplementary Unicode characters.
  */
 public final class Links {
     public final static String FRAGMENT = "#";

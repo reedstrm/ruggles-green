@@ -70,7 +70,7 @@
                 <include name="*.xml" />
             </fileset>
         </copy>
-        <copy todir="${war.dir}/WEB-INF/classes">
+        <copy todir="${war.classdir}">
             <fileset dir="${properties.prod}" includes="*.properties" />
         </copy>
     </target>
@@ -83,7 +83,7 @@
                 <include name="*.xml" />
             </fileset>
         </copy>
-        <copy todir="${war.dir}/WEB-INF/classes">
+        <copy todir="${war.classdir}">
             <fileset dir="${properties.qa}" includes="*.properties" />
         </copy>
     </target>
@@ -187,6 +187,56 @@
                 <resources refid="depend_lib" />
             </classpath>
         </javac>
+    </target>
+
+    <target name="test-compile" description="Compile unit tests" depends="war_qa">
+        <mkdir dir="${test.dir}" />
+        <mkdir dir="${test.outdir}" />
+
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="test"
+             dir="${third_party}" />
+
+        <fileset id="depend_test_lib" dir="${test_lib_dir}" includes="*.jar" />
+
+        <javac srcdir="${test.src}"
+               destdir="${test.dir}"
+               includeantruntime="false"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="${war.classdir}" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" description="Run unit tests" depends="test-compile">
+        <junit fork="yes" dir="${war.dir}" printsummary="yes" failureproperty="test.failed">
+            <jvmarg value="-enableassertions" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="${war.classdir}" />
+                <pathelement location="${test.dir}" />
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*Tests.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed" />
+            </condition>
+        </fail>
     </target>
 
     <target name="clean" description="Force a clean slate to rebuild">

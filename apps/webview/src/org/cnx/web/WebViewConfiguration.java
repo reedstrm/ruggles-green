@@ -78,4 +78,8 @@ public class WebViewConfiguration {
     public String getAnalyticsCode() {
         return configProperties.getProperty("cnx.analyticsJs", "");
     }
+
+    public String getSiteMessage() {
+        return configProperties.getProperty("cnx.siteMessage", "");
+    }
 }

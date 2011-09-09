@@ -67,6 +67,7 @@ public class WebViewModule extends AbstractModule {
         return builder
                 .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
                         .put("analyticsJs", config.getAnalyticsCode())
+                        .put("siteMessage", config.getSiteMessage())
                         .put("feedbackUrl", config.getFeedbackLink())
                         .build())
                 .add(new File("base.soy"))

@@ -38,6 +38,9 @@
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
+    {if siteMessage}
+    <div id="siteMessage">{siteMessage}</div>
+    {/if}
     <header>
         {if not $headerHtml}
             <h1>Connexions</h1>

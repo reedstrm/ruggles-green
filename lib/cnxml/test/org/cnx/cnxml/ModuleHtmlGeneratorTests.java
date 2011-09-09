@@ -254,6 +254,39 @@ public class ModuleHtmlGeneratorTests {
                                 .addContent(equation)))));
     }
 
+    @Test public void emptyLinkTest() throws Exception {
+        final Element equation1 = new Element("equation", ns).setAttribute("id", "eip-245");
+        final Element equation2 = new Element("equation", ns).setAttribute("id", "id62170");
+        final Element figure1 = new Element("figure", ns).setAttribute("id", "figFin");
+        final Element figure2 = new Element("figure", ns).setAttribute("id", "id62155");
+        final Element figure3 = new Element("figure", ns).setAttribute("id", "id11698544");
+        assertEquals("<a href=\"#id62155\">Figure 2</a>"
+                + "<figure id=\"figFin\">"
+                + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption>"
+                + "</figure>"
+                + "<div class=\"equation\" id=\"eip-245\">"
+                + "<div class=\"equationContent\"></div>"
+                + "<div class=\"equationNumber\">1</div></div>"
+                + "<div class=\"equation\" id=\"id62170\">"
+                + "<div class=\"equationContent\"></div>"
+                + "<div class=\"equationNumber\">2</div></div>"
+                + "<figure id=\"id62155\">"
+                + "<figcaption><span class=\"prefix\">Figure 2</span></figcaption>"
+                + "</figure>"
+                + "<figure id=\"id11698544\">"
+                + "<figcaption><span class=\"prefix\">Figure 3</span></figcaption>"
+                + "</figure>",
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("target-id", "id62155"))
+                                .addContent(figure1)
+                                .addContent(equation1)
+                                .addContent(equation2)
+                                .addContent(figure2)
+                                .addContent(figure3)))));
+    }
+
     @Test public void foreignShouldRenderAsSpan() throws Exception {
         assertEquals("<span class=\"foreign\">&iexcl;Hola, mundo!</span>",
                 generate(new Element("foreign", ns).setText("\u00a1Hola, mundo!")));

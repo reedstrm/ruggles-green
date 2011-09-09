@@ -16,7 +16,8 @@
 package org.cnx.repository;
 
 /**
- *
+ * Constants used by Repository.
+ * 
  * @author Arjun Satyapal
  */
 public class RepositoryConstants {

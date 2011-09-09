@@ -130,7 +130,6 @@ public class RenderModuleServlet {
         if (finalHtml == null) {
             // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
             
-            
             ClientEntry moduleVersionEntry = null;
             try {
                 moduleVersionEntry = cnxClient.getModuleVersionEntry(idWrapper, versionWrapper); 

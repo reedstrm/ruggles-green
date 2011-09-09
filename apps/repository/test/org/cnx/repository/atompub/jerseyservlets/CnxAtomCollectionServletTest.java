@@ -41,7 +41,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     Logger logger = Logger.getLogger(CnxAtomCollectionServletTest.class.getName());
     private CnxAtomPubClient cnxClient;
 
-    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.12_complete/";
+    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/";
     private final String ORIGINAL_COLLECTION_XML_LOCATION = COLLECTION_LOCATION + "collection.xml";
 
     public CnxAtomCollectionServletTest() throws Exception {

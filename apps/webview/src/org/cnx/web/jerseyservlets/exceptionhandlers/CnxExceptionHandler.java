@@ -39,7 +39,6 @@ public class CnxExceptionHandler implements ExceptionMapper<CnxException> {
         
     }
 
-    
     /**
      * Handles {@link CnxException}.
      */

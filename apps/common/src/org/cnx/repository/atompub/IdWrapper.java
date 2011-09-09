@@ -50,7 +50,7 @@ public class IdWrapper {
             return new IdWrapper(idString, Type.RESOURCE);
         }
 
-        throw new CnxInvalidUrlException("Invalid Id : " + idString, null);
+        throw new CnxInvalidUrlException("Invalid Id : " + idString, null /*throwable*/);
     }
 
     private static String getIdWithPadding(int id) {
@@ -102,7 +102,10 @@ public class IdWrapper {
         this.idUrl = idString;
 
         String integerPart = idString.substring(1);
-        checkArgument(integerPart.length() >= 4);
+        
+        if (integerPart.length() < 4) {
+            throw new CnxInvalidUrlException("Invalid Id[" + idString + "]", null /*throwable*/);
+        }
 
         try {
             idInt = Integer.parseInt(integerPart);

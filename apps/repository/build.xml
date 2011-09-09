@@ -28,7 +28,7 @@
     <target name="war_common"
             depends="compile"
             description="Assemble the application directory">
-        <delete dir="${war.dir}" />
+        <!--delete dir="${war.dir}" /-->
         <mkdir dir="${war.dir}/WEB-INF" />
         <mkdir dir="${war.dir}/WEB-INF/classes" />
         <mkdir dir="${war.dir}/WEB-INF/lib" />

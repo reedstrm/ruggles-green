@@ -69,7 +69,7 @@ public class ExceptionLogger {
                     // TODO(arjuns) : Move this to constant
                     String redirectUrl =
                             "http://cnx.org/content/" + exception.getId().getIdForCnxOrg()
-                                    + CnxAtomPubConstants.LATEST_VERSION_STRING;
+                                    + "/" + CnxAtomPubConstants.LATEST_VERSION_STRING;
                     builder.append(errorPages.render404OldSite(redirectUrl));
                     break;
                 }

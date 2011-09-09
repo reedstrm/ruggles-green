@@ -46,10 +46,10 @@ public class CreateModuleServlet extends HttpServlet {
         String forcedId = req.getParameter("id");
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        // TODO(tal): why the Eclipse auto formatter require here extra parenthesis?
+        // TODO(tal): why does the Eclipse auto formatter require here extra parenthesis?
         final RepositoryResponse<CreateModuleResult> repositoryResponse =
-            ((forcedId == null) ? repository.createModule(context) : repository
-                .migrationCreateModuleWithId(context, forcedId));
+                ((forcedId == null) ? repository.createModule(context) : repository
+                    .migrationCreateModuleWithId(context, forcedId));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

@@ -71,6 +71,12 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
+    public RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
+            RepositoryRequestContext context, String forcedId) {
+        return ResourceOperations.migrationCreateResourceWithId(context, forcedId);
+    }
+
+    @Override
     public RepositoryResponse<GetResourceInfoResult> getResourceInfo(
             RepositoryRequestContext context, String resourceId) {
         return ResourceOperations.getResourceInfo(context, resourceId);

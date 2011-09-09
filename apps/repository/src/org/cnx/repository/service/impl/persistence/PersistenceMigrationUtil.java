@@ -71,6 +71,15 @@ public class PersistenceMigrationUtil {
     }
 
     /**
+     * Test if given resource key is in the protected range.
+     */
+    public static boolean isResourceKeyProtected(Key resourceKey) {
+        checkArgument(OrmResourceEntity.getSpec().getKeyKind().equals(resourceKey.getKind()),
+                "Not a resource key: %s", resourceKey);
+        return (resourceKey.getId() < MIN_NON_RESERVED_KEY_ID);
+    }
+
+    /**
      * Test if given module key is in the protected range.
      */
     public static boolean isModuleKeyProtected(Key moduleKey) {

@@ -19,6 +19,7 @@ package org.cnx.repository.tempservlets.resources;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,8 +42,14 @@ public class CreateResourceServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        RepositoryResponse<CreateResourceResult> repositoryResponse =
-            repository.createResource(new RepositoryRequestContext(null));
+        @Nullable
+        String forcedId = req.getParameter("id");
+
+        // Query the repository service
+        final RepositoryRequestContext context = new RepositoryRequestContext(null);
+        final RepositoryResponse<CreateResourceResult> repositoryResponse =
+                ((forcedId == null) ? repository.createResource(context) : repository
+                    .migrationCreateResourceWithId(context, forcedId));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

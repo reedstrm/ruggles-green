@@ -82,7 +82,8 @@ public class IdUtil {
             return null;
         }
 
-        // Appengine keys reject numeric id 0.w
+        // NOTE(tal): app engine keys reject numeric id 0. This is not captured by the 
+        // regex to keep the regex simple.
         if (numericId < 1) {
             return null;
         }

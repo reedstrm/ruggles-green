@@ -265,7 +265,7 @@ import org.jdom.input.DOMBuilder;
      *  Get numbers for elements.
      */
     @SuppressWarnings("unchecked")
-    protected static Map<Element, Integer> enumerateElements(final Parent contentRoot) {
+    private static Map<Element, Integer> enumerateElements(final Parent contentRoot) {
         final Map<Element, Integer> map = new HashMap<Element, Integer>();
         final Iterator<Element> iter = contentRoot.getDescendants(numberedElementFilter);
         final Counter counter = new Counter();
@@ -284,7 +284,7 @@ import org.jdom.input.DOMBuilder;
      *  @param contentRoot The content element from the CNXML
      */
     @SuppressWarnings("unchecked")
-    protected List<Content> generateHtmlTree(Element contentRoot) {
+    private List<Content> generateHtmlTree(Element contentRoot) {
         checkNotNull(contentRoot);
         stack = new Stack<GeneratorFrame>();
 
@@ -317,7 +317,7 @@ import org.jdom.input.DOMBuilder;
         return (List<Content>)dummy.removeContent();
     }
 
-    protected void generateElement(final Element elem) {
+    private void generateElement(final Element elem) {
         final GeneratorFrame frame = stack.peek();
         final String name = elem.getName();
 
@@ -424,13 +424,13 @@ import org.jdom.input.DOMBuilder;
         }
     }
     
-    protected void unrecognized(final Element elem) {
+    private void unrecognized(final Element elem) {
         unrecognized(elem, elem.getName());
     }
 
     /** Display a placeholder for an unrecognized element. */
     @SuppressWarnings("unchecked")
-    protected void unrecognized(final Element elem, final String message) {
+    private void unrecognized(final Element elem, final String message) {
         // Create a simpler version of the element for serialization
         final Element simpleElem = new Element(elem.getName())
                 .setText(UNRECOGNIZED_CONTENT_INNER_TEXT);
@@ -449,7 +449,7 @@ import org.jdom.input.DOMBuilder;
     /**
      *  This method adds the HTML content to the top parent in the stack.
      */
-    protected void addHtmlContent(final Content content) {
+    private void addHtmlContent(final Content content) {
         stack.peek().htmlParent.addContent(content);
     }
 
@@ -457,12 +457,12 @@ import org.jdom.input.DOMBuilder;
      *  This method adds the HTML element to the top parent then pushes the HTML element onto the
      *  stack, using the given element for children.
      */
-    protected void pushHtmlElement(final Element elem, final Element htmlElem) {
+    private void pushHtmlElement(final Element elem, final Element htmlElem) {
         addHtmlContent(htmlElem);
         stack.push(new GeneratorFrame(elem, htmlElem));
     }
 
-    protected static Element copyId(final Element elem, final Element htmlElem) {
+    private static Element copyId(final Element elem, final Element htmlElem) {
         final String id = elem.getAttributeValue(CnxmlAttributes.ID);
         if (id != null) {
             htmlElem.setAttribute(HtmlAttributes.ID, id);
@@ -471,7 +471,7 @@ import org.jdom.input.DOMBuilder;
     }
 
     @SuppressWarnings("unchecked")
-    protected void duplicateMath(final Element elem) {
+    private void duplicateMath(final Element elem) {
         final Element htmlElem = new Element(elem.getName());
         for (Attribute attr : (List<Attribute>)elem.getAttributes()) {
             htmlElem.getAttributes().add(new Attribute(attr.getName(), attr.getValue()));
@@ -503,7 +503,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateParagraph(final Element elem) {
+    private void generateParagraph(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.PARAGRAPH.getTag()));
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
@@ -514,7 +514,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateSection(final Element elem) {
+    private void generateSection(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.SECTION.getTag()));
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
@@ -523,7 +523,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateEmphasis(final Element elem) {
+    private void generateEmphasis(final Element elem) {
         final Element htmlElem = new Element(HtmlTag.SPAN.getTag());
         final CnxmlAttributes.EmphasisEffect effect = CnxmlAttributes.EmphasisEffect.of(
                 elem.getAttributeValue(CnxmlAttributes.EFFECT),
@@ -551,7 +551,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateLink(final Element elem) {
+    private void generateLink(final Element elem) {
         final Element htmlElem = new Element(HtmlTag.LINK.getTag());
         final CnxmlTag tag = CnxmlTag.of(elem.getName());
         final String url = elem.getAttributeValue(CnxmlAttributes.LINK_URL);
@@ -607,19 +607,19 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
-    protected void generateSup(final Element elem) {
+    private void generateSup(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.SUP.getTag())));
     }
 
-    protected void generateSub(final Element elem) {
+    private void generateSub(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.SUB.getTag())));
     }
 
-    protected void generatePreformat(final Element elem) {
+    private void generatePreformat(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.PREFORMAT.getTag())));
     }
 
-    protected void generateCode(final Element elem) {
+    private void generateCode(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.CODE.getTag()));
         final CnxmlAttributes.Display display = CnxmlAttributes.Display.of(
                 elem.getAttributeValue(CnxmlAttributes.DISPLAY),
@@ -646,7 +646,7 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
-    protected void generateNote(final Element elem) {
+    private void generateNote(final Element elem) {
         final CnxmlAttributes.Display display = CnxmlAttributes.Display.of(
                 elem.getAttributeValue(CnxmlAttributes.DISPLAY),
                 CnxmlAttributes.Display.BLOCK);
@@ -697,7 +697,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected Element numberedContainer(final Element elem,
+    private Element numberedContainer(final Element elem,
             final String className, final String defaultLabel) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, className));
@@ -722,7 +722,7 @@ import org.jdom.input.DOMBuilder;
     }
 
     @SuppressWarnings("unchecked")
-    protected void generateDefinition(final Element elem) {
+    private void generateDefinition(final Element elem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_DEFINITION_CLASS));
 
@@ -748,26 +748,26 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
-    protected void generateMeaning(final Element elem) {
+    private void generateMeaning(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_MEANING_CLASS)));
     }
 
-    protected void generateExercise(final Element elem) {
+    private void generateExercise(final Element elem) {
         pushHtmlElement(elem, numberedContainer(elem, HTML_EXERCISE_CLASS, EXERCISE_LABEL));
     }
 
-    protected void generateCommentary(final Element elem) {
+    private void generateCommentary(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_COMMENTARY_CLASS)));
     }
 
-    protected void generateProblem(final Element elem) {
+    private void generateProblem(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_PROBLEM_CLASS)));
     }
 
-    protected void generateSolution(final Element elem) {
+    private void generateSolution(final Element elem) {
         final Element htmlTitleElem = new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_TITLE_CLASS)
                 .setText(SOLUTION_LABEL);
@@ -776,7 +776,7 @@ import org.jdom.input.DOMBuilder;
                 .addContent(htmlTitleElem));
     }
 
-    protected void generateEquation(final Element elem) {
+    private void generateEquation(final Element elem) {
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
@@ -800,7 +800,7 @@ import org.jdom.input.DOMBuilder;
     }
 
     @SuppressWarnings("unchecked")
-    protected void generateFigure(final Element elem) {
+    private void generateFigure(final Element elem) {
         final String title = elem.getChildText(CnxmlTag.TITLE.getTag(), CnxmlTag.NAMESPACE);
         if (title != null) {
             addHtmlContent(new Element(HtmlTag.DIV.getTag())
@@ -889,7 +889,7 @@ import org.jdom.input.DOMBuilder;
         return sb.toString();
     }
 
-    protected GeneratorFrame generateSubfigure(final int number, final Element elem,
+    private GeneratorFrame generateSubfigure(final int number, final Element elem,
             final Element htmlContainerElem) {
         final Element htmlElem = copyId(elem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_SUBFIGURE_CLASS));
@@ -916,7 +916,7 @@ import org.jdom.input.DOMBuilder;
         return new GeneratorFrame(elem, htmlContentElem);
     }
 
-    protected void generateRule(final Element elem) {
+    private void generateRule(final Element elem) {
         final CnxmlAttributes.RuleType type = CnxmlAttributes.RuleType.of(
                 elem.getAttributeValue(CnxmlAttributes.TYPE),
                 CnxmlAttributes.RuleType.RULE);
@@ -945,12 +945,12 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, numberedContainer(elem, HTML_RULE_CLASS, defaultLabel));
     }
 
-    protected void generateStatement(final Element elem) {
+    private void generateStatement(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
                     .setAttribute(HtmlAttributes.CLASS, HTML_STATEMENT_CLASS)));
     }
 
-    protected void generateProof(final Element elem) {
+    private void generateProof(final Element elem) {
         pushHtmlElement(elem, copyId(elem, new Element(HtmlTag.DIV.getTag())
                     .setAttribute(HtmlAttributes.CLASS, HTML_PROOF_CLASS)
                     .addContent(new Element(HtmlTag.DIV.getTag())
@@ -958,11 +958,11 @@ import org.jdom.input.DOMBuilder;
                             .setText(PROOF_LABEL))));
     }
 
-    protected void generateExample(final Element elem) {
+    private void generateExample(final Element elem) {
         pushHtmlElement(elem, numberedContainer(elem, HTML_EXAMPLE_CLASS, EXAMPLE_LABEL));
     }
 
-    protected void generateList(final Element elem) {
+    private void generateList(final Element elem) {
         final CnxmlAttributes.Display display = CnxmlAttributes.Display.of(
                 elem.getAttributeValue(CnxmlAttributes.DISPLAY),
                 CnxmlAttributes.Display.BLOCK);
@@ -1035,7 +1035,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateListItem(final Element elem) {
+    private void generateListItem(final Element elem) {
         final Element listElem = (Element)elem.getParent();
         final Element htmlElem = copyId(elem, new Element(HtmlTag.LIST_ITEM.getTag()));
         final GeneratorFrame parentFrame = stack.peek();
@@ -1070,7 +1070,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateNewline(final Element elem) {
+    private void generateNewline(final Element elem) {
         Element parent = stack.peek().htmlParent;
         final String id = elem.getAttributeValue(CnxmlAttributes.ID);
         if (id != null) {
@@ -1108,7 +1108,7 @@ import org.jdom.input.DOMBuilder;
     }
 
     @SuppressWarnings("unchecked")
-    protected void generateMedia(final Element elem) {
+    private void generateMedia(final Element elem) {
         Element child = null;
 
         // Select child
@@ -1171,7 +1171,7 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
-    protected void generateImage(final Element elem) {
+    private void generateImage(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.IMAGE.getTag()))
                 .setAttribute(HtmlAttributes.IMAGE_ALT,
@@ -1199,7 +1199,7 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
-    protected static String getDownloadLabel(final Element elem) {
+    private static String getDownloadLabel(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
         final String alt = mediaElem.getAttributeValue(CnxmlAttributes.MEDIA_ALT);
@@ -1214,7 +1214,7 @@ import org.jdom.input.DOMBuilder;
         }
     }
 
-    protected void generateObject(final Element elem) {
+    private void generateObject(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final Element htmlElem = copyId(mediaElem, new Element(HtmlTag.OBJECT.getTag()))
                 .setAttribute(HtmlAttributes.OBJECT_SOURCE,
@@ -1234,7 +1234,7 @@ import org.jdom.input.DOMBuilder;
         addHtmlContent(htmlElem);
     }
 
-    protected void generateDownloadLink(final Element elem) {
+    private void generateDownloadLink(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         addHtmlContent(copyId(mediaElem, new Element(HtmlTag.DIV.getTag())
                 .setAttribute(HtmlAttributes.CLASS, HTML_DOWNLOAD_CLASS)
@@ -1246,7 +1246,7 @@ import org.jdom.input.DOMBuilder;
                         .setText(getDownloadLabel(elem)))));
     }
 
-    protected void generateMathematica(final Element elem) {
+    private void generateMathematica(final Element elem) {
         final Element mediaElem = (Element)elem.getParent();
         final String type = elem.getAttributeValue(CnxmlAttributes.OBJECT_TYPE);
         final String source = elem.getAttributeValue(CnxmlAttributes.MEDIA_CHILD_SOURCE);
@@ -1281,7 +1281,7 @@ import org.jdom.input.DOMBuilder;
     }
 
     // TODO(light): allow multiple tgroups
-    protected void generateTable(final Element elem) {
+    private void generateTable(final Element elem) {
         final Element tgroup = elem.getChild(CnxmlTag.TABLE_GROUP.getTag(), CnxmlTag.NAMESPACE);
         final Element htmlElem = copyId(elem, new Element(HtmlTag.TABLE.getTag()));
 
@@ -1345,7 +1345,7 @@ import org.jdom.input.DOMBuilder;
         htmlElem.addContent(htmlCaptionElem);
     }
 
-    protected void pushTablePart(final Element tableGroupElem, final CnxmlTag cnxmlTag,
+    private void pushTablePart(final Element tableGroupElem, final CnxmlTag cnxmlTag,
             final Element htmlTableElem, final HtmlTag htmlTag) {
         final Element elem = tableGroupElem.getChild(cnxmlTag.getTag(), CnxmlTag.NAMESPACE);
         if (elem == null) {
@@ -1361,7 +1361,7 @@ import org.jdom.input.DOMBuilder;
         stack.push(new GeneratorFrame(elem, htmlElem));
     }
 
-    protected void generateTableRow(final Element elem) {
+    private void generateTableRow(final Element elem) {
         final Element htmlElem = new Element(HtmlTag.TABLE_ROW.getTag());
         final List<String> classList = computeTableClasses(elem);
         if (!classList.isEmpty()) {
@@ -1370,7 +1370,7 @@ import org.jdom.input.DOMBuilder;
         pushHtmlElement(elem, htmlElem);
     }
 
-    protected void generateTableCell(final Element elem) {
+    private void generateTableCell(final Element elem) {
         final String grandparentName = ((Element)elem.getParent().getParent()).getName();
         final String htmlName = CnxmlTag.TABLE_HEAD.getTag().equals(grandparentName)
                 ? HtmlTag.TABLE_HEAD_CELL.getTag() : HtmlTag.TABLE_CELL.getTag();
@@ -1386,7 +1386,7 @@ import org.jdom.input.DOMBuilder;
     /**
      *  Determine the HTML classes to be applied for a CALS table element.
      */
-    protected List<String> computeTableClasses(final Element elem) {
+    private List<String> computeTableClasses(final Element elem) {
         final ArrayList<String> classList = new ArrayList<String>(4);
         final CnxmlAttributes.CalsAlign align = CnxmlAttributes.CalsAlign.of(
                 elem.getAttributeValue(CnxmlAttributes.CALS_ALIGN));

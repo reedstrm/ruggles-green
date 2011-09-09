@@ -15,8 +15,12 @@
  */
 package org.cnx.web.jerseyservlets.exceptionhandlers;
 
+import com.google.inject.Injector;
+
 import org.cnx.exceptions.CnxException;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -28,15 +32,20 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 public class CnxExceptionHandler implements ExceptionMapper<CnxException> {
-    private ExceptionLogger exceptionLogger = new ExceptionLogger(
-            CnxExceptionHandler.class.getName());
+    private final Injector injector;
+    
+    public CnxExceptionHandler(@Context ServletContext context) {
+        injector = (Injector) context.getAttribute(Injector.class.getName());
+        
+    }
 
+    
     /**
      * Handles {@link CnxException}.
      */
     @Override
     public Response toResponse(CnxException exception) {
-        exceptionLogger.logException(exception);
-        return exceptionLogger.getResponseForException(exception);
+        ExceptionLogger exceptionLogger = new ExceptionLogger(injector, exception);
+        return exceptionLogger.getResponseForException();
     }
 }

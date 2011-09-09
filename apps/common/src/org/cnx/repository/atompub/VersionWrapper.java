@@ -15,6 +15,7 @@
  */
 package org.cnx.repository.atompub;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_STRING;
 
 import org.cnx.exceptions.CnxInvalidUrlException;
@@ -59,18 +60,24 @@ public class VersionWrapper {
     
     public VersionWrapper(String version) throws CnxInvalidUrlException {
         if (!isValidVersion(version)) {
-            throw new CnxInvalidUrlException("Invalid version : " + version, null);
+            throw new CnxInvalidUrlException("Invalid version : " + version, null /*throwable*/);
         }
 
         if(version.equals(LATEST_VERSION_STRING)) {
             this.versionInt = null;
         } else {
-            this.versionInt = Integer.parseInt(version);
+            try {
+                this.versionInt = Integer.parseInt(version);
+            } catch (NumberFormatException e) {
+                throw new CnxInvalidUrlException("Invalid version : " + version, 
+                        null /*throwable*/);
+            }
         }
     }
 
     // TODO(arjuns) : Add checks for negative version.
     public VersionWrapper(int version) {
+        checkArgument(version > 0, "Invalid Version[" + version + "]. Version should be > 0.");
         this.versionInt = version;
     }
 

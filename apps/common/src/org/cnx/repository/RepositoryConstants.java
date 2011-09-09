@@ -13,16 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
-
-import javax.ws.rs.core.Response.Status;
+package org.cnx.repository;
 
 /**
- * CNX Exception to represent NOT_FOUND (404).
+ *
  * @author Arjun Satyapal
  */
-public class CnxInvalidUrlException extends CnxRuntimeException {
-    public CnxInvalidUrlException(String message, Throwable throwable) {
-        super(Status.NOT_FOUND, message, throwable);
-    }
+public class RepositoryConstants {
+    /**
+     * Collections, modules and resource auto ids are allocated starting from this value.
+     */
+    public static final long MIN_NON_RESERVED_KEY_ID = 100000;
 }

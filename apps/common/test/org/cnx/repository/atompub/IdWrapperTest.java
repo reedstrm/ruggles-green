@@ -98,4 +98,34 @@ public class IdWrapperTest {
         assertEquals("r0001", idWrapper.getIdForUrls());
         assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
     }
+    
+    @Test
+    public void testIdCnxOrgForModules() {
+        String restrictedRepoId = "m1";
+        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("m0001", idWrapper.getIdForCnxOrg());
+        
+        restrictedRepoId = "m01";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("m0001", idWrapper.getIdForCnxOrg());
+        
+        restrictedRepoId = "m10085";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("m10085", idWrapper.getIdForCnxOrg());
+    }
+    
+    @Test
+    public void testIdCnxOrgForCollections() {
+        String restrictedRepoId = "c1";
+        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("col0001", idWrapper.getIdForCnxOrg());
+        
+        restrictedRepoId = "c01";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("col0001", idWrapper.getIdForCnxOrg());
+        
+        restrictedRepoId = "c10064";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("col10064", idWrapper.getIdForCnxOrg());
+    }
 }

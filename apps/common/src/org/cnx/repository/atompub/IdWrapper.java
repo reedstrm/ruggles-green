@@ -15,14 +15,13 @@
  */
 package org.cnx.repository.atompub;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import org.cnx.exceptions.CnxRuntimeException;
-
-import javax.ws.rs.core.Response.Status;
+import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.repository.RepositoryConstants;
 
 /**
- * This will wrap Ids for Collections/Modules/Resources.
+ * This will wrap Ids for Collections/Modules/Resources. TODO(arjuns) : move this to upper package.
  * 
  * @author Arjun Satyapal
  */
@@ -32,14 +31,11 @@ public class IdWrapper {
     private final static String COLLECTION_ID_PREFIX = "c";
     private final static String MODULE_ID_PREFIX = "m";
     private final static String RESOURCE_ID_PREFIX = "r";
-    private final static String PADDING = "0";
-    private final static int MIN_ID_LEN = 4;
 
+    private Type type;
+    private final Integer idInt;
     private final String idUrl;
-    private final int idInt;
-    private IdType idType;
 
-    
     /**
      * Here Id string can be prefixed with 0.
      * 
@@ -47,37 +43,35 @@ public class IdWrapper {
      */
     public static IdWrapper getIdWrapperFromUrlId(String idString) {
         if (idString.startsWith(COLLECTION_ID_PREFIX)) {
-            return new IdWrapper(idString, IdType.COLLECTION);
+            return new IdWrapper(idString, Type.COLLECTION);
         } else if (idString.startsWith(MODULE_ID_PREFIX)) {
-            return new IdWrapper(idString, IdType.MODULE);
+            return new IdWrapper(idString, Type.MODULE);
         } else if (idString.startsWith(RESOURCE_ID_PREFIX)) {
-            return new IdWrapper(idString, IdType.RESOURCE);
+            return new IdWrapper(idString, Type.RESOURCE);
         }
-        
-        throw new RuntimeException("Invalid Id : " + idString);
+
+        throw new CnxInvalidUrlException("Invalid Id : " + idString, null);
     }
-    
+
+    private static String getIdWithPadding(int id) {
+        return String.format("%04d", id);
+    }
+
     /**
      * Here values are not prefixed with 0.
-     *
-     * @param repoIdString Ids returned by CNX repository. These will be converted to 
-     *      URL friendly Ids with {@link #PADDING} prefix if required to meet {@link #MIN_ID_LEN}
+     * 
+     * @param repoIdString Ids returned by CNX repository. These will be converted to URL friendly
+     *            Ids with 0 padded to have min length of 4.
      */
     public static IdWrapper getIdWrapperFromRepositoryId(String repoIdString) {
-        IdType idType = IdType.getIdTypeFromPrefix(repoIdString.substring(0, PREFIX_LENGTH));
+        Type idType = Type.getTypeFromPrefix(repoIdString.substring(0, PREFIX_LENGTH));
         String intPart = repoIdString.substring(PREFIX_LENGTH);
-        int requiredNumberOfPaddings = MIN_ID_LEN - intPart.length();
         StringBuilder builder = new StringBuilder(idType.getPrefix());
-        
-        for (int i = 0; i < requiredNumberOfPaddings; i++) {
-            builder.append(PADDING);
-        }
-        builder.append(intPart);
-        
-        
+        builder.append(getIdWithPadding(Integer.parseInt(intPart)));
+
         return new IdWrapper(builder.toString(), idType);
     }
-    
+
     /**
      * Constructor for IdWrapper.
      * 
@@ -86,57 +80,58 @@ public class IdWrapper {
      * @param idString String format for module/collection Ids.
      * @param idType Type of Id.
      */
-    public IdWrapper(String idString, IdType idType) {
+    public IdWrapper(String idString, Type idType) {
         switch (idType) {
             case MODULE:
-                Preconditions.checkArgument(idString.startsWith(MODULE_ID_PREFIX));
+                checkArgument(idString.startsWith(MODULE_ID_PREFIX));
                 break;
 
             case COLLECTION:
-                Preconditions.checkArgument(idString.startsWith(COLLECTION_ID_PREFIX));
+                checkArgument(idString.startsWith(COLLECTION_ID_PREFIX));
                 break;
-                
+
             case RESOURCE:
-                Preconditions.checkArgument(idString.startsWith(RESOURCE_ID_PREFIX));
+                checkArgument(idString.startsWith(RESOURCE_ID_PREFIX));
                 break;
 
             default:
-                throw new CnxRuntimeException(Status.BAD_REQUEST,
-                        "Illegal IdType[" + idType + "].", null /* throwable */);
-        }
-        
-        this.idType = idType;
-        this.idUrl = idString;
-        
-        String integerPart = idString.substring(1);
-        if (integerPart.startsWith(PADDING)) {
-            Preconditions.checkArgument(integerPart.length() == 4);
+                throw new CnxInvalidUrlException("Illegal IdType[" + idType + "].", null /* throwable */);
         }
 
-        
-        idInt = Integer.parseInt(integerPart);
+        this.type = idType;
+        this.idUrl = idString;
+
+        String integerPart = idString.substring(1);
+        checkArgument(integerPart.length() >= 4);
+
+        try {
+            idInt = Integer.parseInt(integerPart);
+        } catch (NumberFormatException e) {
+            throw new CnxInvalidUrlException("Invalid Id : " + idString, e);
+        }
     }
 
     /**
-     * Get ID that is understood by CNX repository service. 
-     * Here ids dont have padding.
+     * Get ID that is understood by CNX repository service. Here Ids don't have padding.
      * 
      * @return Id understood by CNX Repository service.
      */
     public String getIdForRepository() {
-        switch (idType) {
-            case COLLECTION : return COLLECTION_ID_PREFIX + idInt;
-            case MODULE: return MODULE_ID_PREFIX + idInt;
-            case RESOURCE: return RESOURCE_ID_PREFIX + idInt;
-            
+        switch (type) {
+            case COLLECTION:
+                return COLLECTION_ID_PREFIX + idInt;
+            case MODULE:
+                return MODULE_ID_PREFIX + idInt;
+            case RESOURCE:
+                return RESOURCE_ID_PREFIX + idInt;
+
         }
-        throw new CnxRuntimeException(Status.BAD_REQUEST,
-                "Illegal IdType[" + idType + "].", null /* throwable */);
+
+        throw new CnxInvalidUrlException("Invalid IdType[" + type + "].", null /* throwable */);
     }
-    
+
     /**
-     * Here Ids are returned that are used in URLs. Here if int part of id is < 1000, then 
-     * padding is done.
+     * Here Ids are returned that are used in URLs.
      * 
      * @return Ids used over URLs.
      */
@@ -145,47 +140,73 @@ public class IdWrapper {
     }
     
     /**
+     * Returns possible Id in cnx.org format.
+     */
+    public String getIdForCnxOrg() {
+        switch (type) {
+            case MODULE:
+                return idUrl;
+                
+            case COLLECTION:
+                return "col" + getIdWithPadding(idInt);
+        }
+        
+        throw new RuntimeException("Code should not reach here.");
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    /**
      * This should not be called as toString is ambiguous for this class.
      */
     @Override
     public String toString() {
         throw new RuntimeException("This should not be called.");
     }
-    
+
     /**
      * Currently this is not supported deliberately. In future if required, this can be supported.
      */
     @Override
     public boolean equals(Object that) {
-      throw new RuntimeException("This should not be called.");
+        throw new RuntimeException("This should not be called.");
     }
-    
+
+    /**
+     * Checks if Id belongs to ForcedId range.
+     */
+    public boolean isIdUnderForcedRange() {
+        return idInt > 0 && idInt < RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
+    }
+
     /**
      * Types of Ids supported.
      */
-    public static enum IdType {
+    public static enum Type {
         COLLECTION(COLLECTION_ID_PREFIX),
         MODULE(MODULE_ID_PREFIX),
         RESOURCE(RESOURCE_ID_PREFIX);
-        
+
         private String prefix;
-        private IdType(String prefix) {
+
+        private Type(String prefix) {
             this.prefix = prefix;
         }
-        
+
         public String getPrefix() {
             return prefix;
         }
-        
-        public static IdType getIdTypeFromPrefix(String prefix) {
-            for (IdType currIdType : IdType.values()) {
-                if (currIdType.getPrefix().equals(prefix)) {
-                    return currIdType;
+
+        public static Type getTypeFromPrefix(String prefix) {
+            for (Type currType : Type.values()) {
+                if (currType.getPrefix().equals(prefix)) {
+                    return currType;
                 }
             }
-            
-            throw new RuntimeException("Invalid prefix : " + prefix);
-            
+
+            throw new CnxInvalidUrlException("Invalid prefix : " + prefix, null /* throwable */);
         }
     }
 }

@@ -17,12 +17,13 @@
 package org.cnx.repository.service.impl.persistence;
 
 import static com.google.common.base.Preconditions.checkArgument;
-
-import java.util.logging.Logger;
+import static org.cnx.repository.RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyRange;
+
+import java.util.logging.Logger;
 
 /**
  * Utilities related to the data migration from old CNX repository.
@@ -34,11 +35,6 @@ import com.google.appengine.api.datastore.KeyRange;
 public class PersistenceMigrationUtil {
 
     private static final Logger log = Logger.getLogger(PersistenceMigrationUtil.class.getName());
-
-    /**
-     * Collections, modules and resource auto ids are allocated starting from this value.
-     */
-    public static final long MIN_NON_RESERVED_KEY_ID = 100000;
 
     /**
      * Protect all key ranges reserved for migration.

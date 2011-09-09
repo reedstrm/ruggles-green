@@ -15,6 +15,10 @@
  */
 package org.cnx.web.jerseyservlets.exceptionhandlers;
 
+import com.google.inject.Injector;
+
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -26,15 +30,18 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 public class CatchAllThrowableHandler implements ExceptionMapper<Throwable> {
-    private ExceptionLogger exceptionLogger = new ExceptionLogger(
-            CatchAllThrowableHandler.class.getName());
-
+    private final Injector injector;
+    
+    public CatchAllThrowableHandler(@Context ServletContext context) {
+        injector = (Injector) context.getAttribute(Injector.class.getName());
+    }
+    
     /**
      * Handles {@link Throwable}.
      */
     @Override
     public Response toResponse(Throwable exception) {
-        Response response = exceptionLogger.getResponseForException(exception); 
-        return response;
+        ExceptionLogger exceptionLogger = new ExceptionLogger(injector, exception);
+        return exceptionLogger.getResponseForException(); 
     }
 }

@@ -337,7 +337,7 @@ public class CnxAtomModuleServlet {
     }
 
     /**
-     * In order to fetch ResourceMapping XML for a given Module, clien should do HTTP Get on this
+     * In order to fetch ResourceMapping XML for a given Module, client should do HTTP Get on this
      * URL.
      * 
      * @param moduleId Id of desired Module.

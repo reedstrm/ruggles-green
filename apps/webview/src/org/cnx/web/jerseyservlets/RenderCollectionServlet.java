@@ -23,6 +23,7 @@ import static org.cnx.web.CommonHack.MODULE;
 import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
+import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_RESOURCES_URL_PATTERN;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_URL_PATTERN;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_XML_URL_PATTERN;
@@ -48,6 +49,7 @@ import org.cnx.common.collxml.CollectionHtmlGenerator;
 import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
+import org.cnx.exceptions.CnxInvalidUrlException;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.repository.atompub.CnxMediaTypes;
@@ -181,8 +183,14 @@ public class RenderCollectionServlet {
         StringBuilder builder = new StringBuilder();
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-        Entry collectionVersionEntry =
-                cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
+        Entry collectionVersionEntry = null;
+        
+        try {
+            collectionVersionEntry = cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
+        } catch (CnxInvalidUrlException e) {
+            handleCnxInvalidUrlException(idWrapper, versionWrapper, e);
+        }
+                
         String collXml =
                 cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
                         collectionVersionEntry);
@@ -294,8 +302,13 @@ public class RenderCollectionServlet {
         final VersionWrapper moduleVersion = new VersionWrapper(moduleVersionString);
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-        Entry collectionVersionEntry =
-                cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
+        Entry collectionVersionEntry = null;
+        try {
+            collectionVersionEntry = cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
+        } catch (CnxInvalidUrlException e) { 
+            handleCnxInvalidUrlException(collectionIdWrapper, collectionVersion, e);
+        }
+        
         String collXml =
                 cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
                         collectionVersionEntry);
@@ -313,8 +326,13 @@ public class RenderCollectionServlet {
             return Response.serverError().build();
         }
 
-        ClientEntry moduleVersionEntry =
-                cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
+        ClientEntry moduleVersionEntry = null;
+        try {
+            moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
+        } catch (CnxInvalidUrlException e) {
+            handleCnxInvalidUrlException(moduleIdWrapper, moduleVersion, e);
+        }
+        
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
         String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 

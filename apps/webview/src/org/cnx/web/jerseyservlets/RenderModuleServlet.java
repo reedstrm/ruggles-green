@@ -20,6 +20,7 @@ import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;
 import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
+import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -32,6 +33,7 @@ import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
 import org.cnx.cnxml.ModuleHtmlGenerator;
+import org.cnx.exceptions.CnxInvalidUrlException;
 import org.cnx.mdml.Actor;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
@@ -74,7 +76,7 @@ public class RenderModuleServlet {
     static final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/{"
             + MODULE_VERSION_PATH_PARAM + "}";
 
-    private Injector injector;
+    private final Injector injector;
 
     /**
      * This will fetch CNXML for a given module-version.
@@ -127,8 +129,15 @@ public class RenderModuleServlet {
 
         if (finalHtml == null) {
             // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-            ClientEntry moduleVersionEntry =
-                    cnxClient.getModuleVersionEntry(idWrapper, versionWrapper);
+            
+            
+            ClientEntry moduleVersionEntry = null;
+            try {
+                moduleVersionEntry = cnxClient.getModuleVersionEntry(idWrapper, versionWrapper); 
+            } catch (CnxInvalidUrlException e) {
+               handleCnxInvalidUrlException(idWrapper, versionWrapper, e);
+            }
+
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);
             String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 

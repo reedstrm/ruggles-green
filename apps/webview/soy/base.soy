@@ -55,7 +55,9 @@
     {if $javascriptHtml}{$javascriptHtml|noAutoescape}{/if}
     {if analyticsJs}
     <script type="text/javascript">
-        {analyticsJs}
+        var _gaq = _gaq || [];
+
+        {analyticsJs|noAutoescape}
 
         (function() {lb}
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;

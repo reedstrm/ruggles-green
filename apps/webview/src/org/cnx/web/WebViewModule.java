@@ -66,7 +66,7 @@ public class WebViewModule extends AbstractModule {
             SoyTofu provideTofu(WebViewConfiguration config, SoyFileSet.Builder builder) {
         return builder
                 .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
-                        .put("analyticsJs", "")
+                        .put("analyticsJs", config.getAnalyticsCode())
                         .put("feedbackUrl", config.getFeedbackLink())
                         .build())
                 .add(new File("base.soy"))

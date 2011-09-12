@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
-import org.apache.jsp.ah.entityDetailsBody_jsp;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateModuleResult;

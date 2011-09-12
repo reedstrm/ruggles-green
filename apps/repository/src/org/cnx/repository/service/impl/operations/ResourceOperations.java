@@ -37,7 +37,6 @@ import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.api.UploadedResourceContentInfo;
 import org.cnx.repository.service.impl.persistence.IdUtil;
 import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
-import org.cnx.repository.service.impl.persistence.OrmModuleEntity;
 import org.cnx.repository.service.impl.persistence.OrmResourceEntity;
 import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
 

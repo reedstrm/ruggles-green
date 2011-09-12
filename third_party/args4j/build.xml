@@ -23,6 +23,22 @@
              dir="args4j/args4j-2.0.12"
              includes="*.jar" />
 
+    <target name="default">
+        <fail message="Target path for jars is not set.">
+            <condition>
+                <not>
+                    <and>
+                        <isset property="target_dir" />
+                    </and>
+                </not>
+            </condition>
+        </fail>
+
+        <copy todir="${target_dir}">
+            <fileset refid="args4j-2.0.12" />
+        </copy>
+    </target>
+
     <target name="test">
         <fail message="Target path for jars is not set.">
             <condition>

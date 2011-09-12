@@ -1,0 +1,104 @@
+<!--
+     Copyright (C) 2011 The CNX Authors.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<project name="migrator" default="all">
+    <description>
+        Build file for CNX Data Migrator.
+    </description>
+    <property file="build.properties" />
+
+    <property name="target_dir" value="${basedir}/${output.jars}" />
+    <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
+
+    <target name="compile"
+            description="Compile the migrator source code">
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${output.jars}" />
+
+        <ant antfile="guava/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="jdom/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="args4j/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="rome/build.xml"
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="rome-propono/build.xml"
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="xerces/build.xml"
+             inheritall="true"
+             target="default"
+             dir="${third_party}" />
+
+        <!-- Non third-party dependencies. -->
+        <!-- TODO(arjuns) : Common is bringing in libcnxml and libutil. -->
+
+        <ant antfile="build.xml"
+             inheritAll="true"
+             target="copyjar"
+             dir="${basedir}/${commondir}" />
+
+         <ant antfile="build.xml"
+             inheritall="true"
+             target="copyjar"
+             dir="${basedir}/${cnxclientdir}" />
+
+        <ant antfile="build.xml"
+             inheritall="true"
+             target="copyjar"
+             dir="${basedir}/${xmls.dir}" />
+
+        <javac srcdir="src"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="on"
+               failonerror="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="clean" description="Force a clean slate to rebuild">
+        <delete dir="${buildir}" />
+        <delete dir="${war.dir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${xmls.dir}" />
+        <ant antfile="build.xml"
+             target="clean"
+             dir="${basedir}/${cnxclientdir}" />
+    </target>
+
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="compile" />
+</project>

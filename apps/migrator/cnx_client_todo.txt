@@ -1,0 +1,10 @@
+Require extensions of the CNX Client
+
+* Add support for getting resource for info given a resource id.
+* Allow in the cnx client to force the file name and content type
+  of an uploaded resource (name posted to the repository does not have
+  to be identical to the name of the local file).
+* Rename uploadFileToBlobStore to uploadNewResource().  
+* Add support for forcing resource id, filename and content type.
+* Remove warning "added entry, but no location header returned"
+

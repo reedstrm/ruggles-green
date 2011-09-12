@@ -38,3 +38,17 @@ body > header {
     margin: 0 auto;
     padding: 0 1em 1em;
 }
+
+#siteMessage {
+    position: absolute;
+    top: 0;
+    left: 50%;
+
+    /* margin-left must be width/2 */
+    width: 40em;
+    margin-left: -20em;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}

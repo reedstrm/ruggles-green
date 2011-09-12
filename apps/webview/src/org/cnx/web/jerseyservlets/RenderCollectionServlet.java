@@ -23,6 +23,7 @@ import static org.cnx.web.CommonHack.MODULE;
 import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
+import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_RESOURCES_URL_PATTERN;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_URL_PATTERN;
 import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_XML_URL_PATTERN;
@@ -41,13 +42,14 @@ import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.common.collxml.Collection;
 import org.cnx.common.collxml.CollectionFactory;
-import org.cnx.common.collxml.CollectionHTMLGenerator;
+import org.cnx.common.collxml.CollectionHtmlGenerator;
 import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
+import org.cnx.exceptions.CnxInvalidUrlException;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.repository.atompub.CnxMediaTypes;
@@ -181,15 +183,21 @@ public class RenderCollectionServlet {
         StringBuilder builder = new StringBuilder();
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-        Entry collectionVersionEntry =
-                cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
+        Entry collectionVersionEntry = null;
+
+        try {
+            collectionVersionEntry = cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
+        } catch (CnxInvalidUrlException e) {
+            handleCnxInvalidUrlException(idWrapper, versionWrapper, e);
+        }
+
         String collXml =
                 cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
                         collectionVersionEntry);
 
         final Collection collection =
                 injector.getInstance(CollectionFactory.class).create(collectionId,
-                        CommonHack.parseXmlString(saxParser, collXml));
+                        collectionVersionString, CommonHack.parseXmlString(saxParser, collXml));
         // Get metadata
         String title = "", abstractText = null;
         List<Actor> authors = null;
@@ -211,7 +219,7 @@ public class RenderCollectionServlet {
         renderScope.enter();
         try {
             renderScope.seed(Collection.class, collection);
-            CollectionHTMLGenerator generator = injector.getInstance(CollectionHTMLGenerator.class);
+            CollectionHtmlGenerator generator = injector.getInstance(CollectionHtmlGenerator.class);
             contentHtml = generator.generate(collection);
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,7 +267,7 @@ public class RenderCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_XML_URL_PATTERN)
     public Response getCollectionVersionXml(
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -294,15 +302,21 @@ public class RenderCollectionServlet {
         final VersionWrapper moduleVersion = new VersionWrapper(moduleVersionString);
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-        Entry collectionVersionEntry =
-                cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
+        Entry collectionVersionEntry = null;
+        try {
+            collectionVersionEntry =
+                    cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
+        } catch (CnxInvalidUrlException e) {
+            handleCnxInvalidUrlException(collectionIdWrapper, collectionVersion, e);
+        }
+
         String collXml =
                 cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
                         collectionVersionEntry);
 
         final Collection collection =
                 injector.getInstance(CollectionFactory.class).create(collectionId,
-                        CommonHack.parseXmlString(saxParser, collXml));
+                        collectionVersionString, CommonHack.parseXmlString(saxParser, collXml));
 
         // Ensure module is part of the collection
         final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
@@ -313,13 +327,18 @@ public class RenderCollectionServlet {
             return Response.serverError().build();
         }
 
-        ClientEntry moduleVersionEntry =
-                cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
+        ClientEntry moduleVersionEntry = null;
+        try {
+            moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
+        } catch (CnxInvalidUrlException e) {
+            handleCnxInvalidUrlException(moduleIdWrapper, moduleVersion, e);
+        }
+
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);
         String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
         final Module module =
-                injector.getInstance(ModuleFactory.class).create(moduleId,
+                injector.getInstance(ModuleFactory.class).create(moduleId, moduleVersionString,
                         CommonHack.parseXmlString(saxParser, cnxml),
                         CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
@@ -336,7 +355,7 @@ public class RenderCollectionServlet {
             renderScope.seed(Collection.class, collection);
             renderScope.seed(Module.class, module);
 
-            final ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
+            final ModuleHtmlGenerator generator = injector.getInstance(ModuleHtmlGenerator.class);
             moduleContentHtml = generator.generate(module);
 
             // Get collection title
@@ -397,7 +416,7 @@ public class RenderCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_MODULE_XML_URL_PATTERN)
     public Response getModuleVersionXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
@@ -410,9 +429,9 @@ public class RenderCollectionServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_MODULE_RESOURCES_URL_PATTERN)
-    public Response getModuleVersionResourcesUnderCollectionVersion(
+    public Response getModuleVersionResourcesXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
         IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);

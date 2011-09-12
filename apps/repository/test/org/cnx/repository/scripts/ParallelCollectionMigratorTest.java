@@ -45,7 +45,7 @@ public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
     private CnxAtomPubClient cnxClient;
 
     private final String COLLECTION_LOCATION =
-            "/home/arjuns/cnxmodules/col10064_1.12_complete.bak/";
+            "/home/arjuns/cnxmodules/col10064_1.13_complete/";
 
     public ParallelCollectionMigratorTest() throws Exception {
         super();

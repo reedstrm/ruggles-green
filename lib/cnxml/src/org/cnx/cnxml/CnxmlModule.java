@@ -29,7 +29,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Named;
 
 /**
  *  CnxmlModule is the default configuration for the HTML generator.
@@ -38,21 +37,23 @@ public class CnxmlModule extends AbstractModule {
     private static final String CTOP_CNX_NAME = "ctop-cnx.xsl";
     private static final String CTOP_W3C_NAME = "ctop-w3c.xsl";
 
-    @Override protected void configure() {
+    @Override
+    protected void configure() {
         bind(ModuleFactory.class).to(ModuleFactoryImpl.class);
-        bind(ModuleHTMLGenerator.class).to(JdomHtmlGenerator.class).in(RenderTime.class);
+        bind(ModuleHtmlGenerator.class).to(JdomHtmlGenerator.class).in(RenderTime.class);
 
         Multibinder<Processor> processorBinder =
                 Multibinder.newSetBinder(binder(), Processor.class);
     }
 
-    @Provides @Singleton @Named("ContentMathMLProcessor.transformer")
-            Transformer provideContentMathMLTransformer(TransformerFactory factory) {
+    @Provides
+    @Singleton
+    @ContentMathmlProcessor.ContentToPresentation
+    Transformer provideContentToPresentationTransformer(TransformerFactory factory) {
         try {
             final Source cnxSource = getXsltSource(CTOP_CNX_NAME);
             final Source w3cSource = getXsltSource(CTOP_W3C_NAME);
 
-            // TODO(light): This is not thread-safe.
             factory.setURIResolver(new URIResolver() {
                 @Override public Source resolve(String href, String base) {
                     if (cnxSource.getSystemId().equals(href)) {

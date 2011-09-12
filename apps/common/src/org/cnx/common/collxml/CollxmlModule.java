@@ -23,7 +23,7 @@ import com.google.inject.AbstractModule;
  */
 public class CollxmlModule extends AbstractModule {
     @Override protected void configure() {
-        bind(CollectionHTMLGenerator.class).to(HtmlGeneratorImpl.class);
+        bind(CollectionHtmlGenerator.class).to(HtmlGeneratorImpl.class);
         bind(CollectionFactory.class).to(CollectionFactoryImpl.class);
     }
 }

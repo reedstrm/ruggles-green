@@ -20,6 +20,7 @@ import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;
 import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
 import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
+import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -31,7 +32,8 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.cnxml.ModuleHtmlGenerator;
+import org.cnx.exceptions.CnxInvalidUrlException;
 import org.cnx.mdml.Actor;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
@@ -74,7 +76,7 @@ public class RenderModuleServlet {
     static final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/{"
             + MODULE_VERSION_PATH_PARAM + "}";
 
-    private Injector injector;
+    private final Injector injector;
 
     /**
      * This will fetch CNXML for a given module-version.
@@ -127,15 +129,20 @@ public class RenderModuleServlet {
 
         if (finalHtml == null) {
             // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-            ClientEntry moduleVersionEntry =
-                    cnxClient.getModuleVersionEntry(idWrapper, versionWrapper);
+            
+            ClientEntry moduleVersionEntry = null;
+            try {
+                moduleVersionEntry = cnxClient.getModuleVersionEntry(idWrapper, versionWrapper); 
+            } catch (CnxInvalidUrlException e) {
+               handleCnxInvalidUrlException(idWrapper, versionWrapper, e);
+            }
+
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);
             String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
 
-            final Module module =
-                    injector.getInstance(ModuleFactory.class).create(moduleId,
-                            CommonHack.parseXmlString(saxParser, cnxml),
-                            CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+            final Module module = injector.getInstance(ModuleFactory.class).create(
+                    moduleId, moduleVersionString, CommonHack.parseXmlString(saxParser, cnxml),
+                    CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
 
             RenderScope renderScope = injector.getInstance(RenderScope.class);
 
@@ -151,7 +158,7 @@ public class RenderModuleServlet {
                 } else {
                     authors = Collections.<Actor> emptyList();
                 }
-                ModuleHTMLGenerator generator = injector.getInstance(ModuleHTMLGenerator.class);
+                ModuleHtmlGenerator generator = injector.getInstance(ModuleHtmlGenerator.class);
                 contentHtml = generator.generate(module);
             } catch (Exception e) {
                 // TODO(arjuns) : Handle Exception.
@@ -177,7 +184,7 @@ public class RenderModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_XML_URL_PATTERN)
     public Response getModuleVersionXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
@@ -191,9 +198,9 @@ public class RenderModuleServlet {
     }
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_RESOURCES_URL_PATTERN)
-    public Response getModuleVersionResources(@Context HttpServletRequest req,
+    public Response getModuleVersionResourcesXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
         final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);

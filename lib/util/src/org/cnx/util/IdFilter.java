@@ -18,20 +18,28 @@ package org.cnx.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.jdom.Element;
 import org.jdom.Parent;
 import org.jdom.filter.AbstractFilter;
 
 /**
- *  Only returns elements that have the given ID.
+ *  Match elements based on their ID attribute.
  */
 public class IdFilter extends AbstractFilter {
     public static final String ATTRIBUTE = "id";
 
     private final String id;
 
+    /** Construct a filter that matches any element with an ID. */
+    public IdFilter() {
+        this.id = null;
+    }
+
+    /** Construct a filter that matches any element with the given ID. */
     public IdFilter(final String id) {
         this.id = checkNotNull(id);
     }
@@ -40,7 +48,11 @@ public class IdFilter extends AbstractFilter {
     public boolean matches(Object obj) {
         if (obj instanceof Element) {
             final Element elem = (Element)obj;
-            return id.equals(elem.getAttributeValue(ATTRIBUTE));
+            if (id == null) {
+                return elem.getAttribute(ATTRIBUTE) != null;
+            } else {
+                return id.equals(elem.getAttributeValue(ATTRIBUTE));
+            }
         }
         return false;
     }
@@ -56,5 +68,25 @@ public class IdFilter extends AbstractFilter {
             return null;
         }
         return iter.next();
+    }
+
+    /**
+     *  Returns a mapping from IDs to elements.
+     *  <p>
+     *  If there are multiple elements with the same ID, the first element is used.
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Element> getIdMap(final Parent parent) {
+        final Iterator<Element> iter = (Iterator<Element>)checkNotNull(parent).getDescendants(
+                new IdFilter());
+        final Map<String, Element> m = new HashMap<String, Element>();
+        while (iter.hasNext()) {
+            final Element elem = iter.next();
+            final String id = elem.getAttributeValue(ATTRIBUTE);
+            if (!m.containsKey(id)) {
+                m.put(id, elem);
+            }
+        }
+        return m;
     }
 }

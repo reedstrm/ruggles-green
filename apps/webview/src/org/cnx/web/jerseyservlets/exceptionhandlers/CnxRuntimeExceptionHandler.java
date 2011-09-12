@@ -15,9 +15,13 @@
  */
 package org.cnx.web.jerseyservlets.exceptionhandlers;
 
+import com.google.inject.Injector;
+
 import org.cnx.exceptions.CnxInvalidUrlException;
 import org.cnx.exceptions.CnxRuntimeException;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -29,15 +33,18 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 public class CnxRuntimeExceptionHandler implements ExceptionMapper<CnxRuntimeException> {
-    private ExceptionLogger exceptionLogger = new ExceptionLogger(
-            CnxRuntimeExceptionHandler.class.getName());
-
+    private final Injector injector;
+    
+    public CnxRuntimeExceptionHandler(@Context ServletContext context) {
+        injector = (Injector) context.getAttribute(Injector.class.getName());
+    }
+    
     /**
      * Handles {@link CnxInvalidUrlException}.
      */
     @Override
     public Response toResponse(CnxRuntimeException exception) {
-        exceptionLogger.logException(exception);
-        return exceptionLogger.getResponseForException(exception);
+        ExceptionLogger exceptionLogger = new ExceptionLogger(injector, exception);
+        return exceptionLogger.getResponseForException();
     }
 }

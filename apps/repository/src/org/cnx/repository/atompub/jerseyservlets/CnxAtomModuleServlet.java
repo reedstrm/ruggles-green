@@ -318,7 +318,7 @@ public class CnxAtomModuleServlet {
      * @return CNXML of desired Module.
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_CNXML_URL)
     public Response getModuleVersionXml(@PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) {
@@ -337,7 +337,7 @@ public class CnxAtomModuleServlet {
     }
 
     /**
-     * In order to fetch ResourceMapping XML for a given Module, clien should do HTTP Get on this
+     * In order to fetch ResourceMapping XML for a given Module, client should do HTTP Get on this
      * URL.
      * 
      * @param moduleId Id of desired Module.
@@ -345,9 +345,9 @@ public class CnxAtomModuleServlet {
      * @return ResourceMapping XML.
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_RESOURCE_MAPPING_URL)
-    public Response getModuleVersionResourceMapping(
+    public Response getModuleVersionResourcesXml(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) {
         final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);

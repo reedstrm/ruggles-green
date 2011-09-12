@@ -26,7 +26,7 @@
  *  @param? headerHtml Header content (defaults to small logo)
  *  @param? javascriptHtml JavaScript imports
  */
-{template .page private="true"}
+{template .page}
 <!DOCTYPE html>
 <html>
 <head>
@@ -38,6 +38,9 @@
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
+    {if siteMessage}
+    <div id="siteMessage">{siteMessage}</div>
+    {/if}
     <header>
         {if not $headerHtml}
             <h1>Connexions</h1>
@@ -55,7 +58,9 @@
     {if $javascriptHtml}{$javascriptHtml|noAutoescape}{/if}
     {if analyticsJs}
     <script type="text/javascript">
-        {analyticsJs}
+        var _gaq = _gaq || [];
+
+        {analyticsJs|noAutoescape}
 
         (function() {lb}
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;

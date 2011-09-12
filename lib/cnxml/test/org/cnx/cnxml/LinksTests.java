@@ -49,6 +49,12 @@ public class LinksTests {
     }
 
     @Test
+    public void linkShouldEscapeUnicodeSurrogates() throws Exception {
+        assertEquals(new URI("http://www.example.com/%F0%9D%84%9Emusic"),
+                Links.convertLinkAttributeToUri("http://www.example.com/\ud834\udd1emusic"));
+    }
+
+    @Test
     public void linkShouldAllowRelativeURIs() throws Exception {
         assertEquals(new URI("a/b/c"),
                 Links.convertLinkAttributeToUri("a/b/c"));
@@ -78,5 +84,11 @@ public class LinksTests {
                 Links.convertLinkAttributeToUri("\u00e1bc"));
         assertEquals(new URI("%E4%B8%96%E7%95%8C"),
                 Links.convertLinkAttributeToUri("\u4e16\u754c"));
+    }
+
+    @Test
+    public void fileNameShouldEscapeUnicodeSurrogates() throws Exception {
+        assertEquals(new URI("music%F0%9D%84%9E.dat"),
+                Links.convertLinkAttributeToUri("music\ud834\udd1e.dat"));
     }
 }

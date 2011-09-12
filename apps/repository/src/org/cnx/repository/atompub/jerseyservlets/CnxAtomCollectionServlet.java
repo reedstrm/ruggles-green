@@ -303,7 +303,7 @@ public class CnxAtomCollectionServlet {
      * @return Collection XML.
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_XML_URL)
     public Response getCnxCollectionVersionXml(
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,

@@ -29,6 +29,7 @@
         <ant antfile="build.xml" inheritall="false" target="test" dir="${libcnxmldir}" />
         <ant antfile="build.xml" inheritall="false" target="test" dir="${appscommondir}" />
         <ant antfile="build.xml" inheritall="false" target="test" dir="${repositorydir}" />
+        <ant antfile="build.xml" inheritall="false" target="test" dir="${webviewdir}" />
     </target>
 
     <target name="clean" description="Remove built files">

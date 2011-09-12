@@ -17,7 +17,12 @@ package org.cnx.repository.atompub;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.Lists;
+
+import org.cnx.exceptions.CnxInvalidUrlException;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * Test for {@link IdWrapper}
@@ -30,72 +35,113 @@ public class IdWrapperTest {
     public void testIdUrlForUnrestrictedIds() {
         String unRestrictedId = "m100000";
         IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(unRestrictedId);
-        
-        
+
         unRestrictedId = "c100000";
         idWrapper = IdWrapper.getIdWrapperFromUrlId(unRestrictedId);
         validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-        
+
         unRestrictedId = "r100000";
         idWrapper = IdWrapper.getIdWrapperFromUrlId(unRestrictedId);
         validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
     }
-    
+
     private void validateEqualityForUnrestrictedIds(String unRestrictedId, IdWrapper idWrapper) {
         assertEquals(unRestrictedId, idWrapper.getIdForRepository());
         assertEquals(unRestrictedId, idWrapper.getIdForUrls());
     }
-    
-    
+
     @Test
     public void testIdUrlForRestrictedIds() {
         String restrictedIdIntPart = "m0001";
         IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(restrictedIdIntPart);
         assertEquals(restrictedIdIntPart, idWrapper.getIdForUrls());
         assertEquals("m1", idWrapper.getIdForRepository());
-        
+
         restrictedIdIntPart = "c0001";
         idWrapper = IdWrapper.getIdWrapperFromUrlId(restrictedIdIntPart);
         assertEquals(restrictedIdIntPart, idWrapper.getIdForUrls());
         assertEquals("c1", idWrapper.getIdForRepository());
-        
+
         // TODO(arjuns) : Validate for smaller resource ids.
         restrictedIdIntPart = "r0001";
         idWrapper = IdWrapper.getIdWrapperFromUrlId(restrictedIdIntPart);
         assertEquals(restrictedIdIntPart, idWrapper.getIdForUrls());
         assertEquals("r1", idWrapper.getIdForRepository());
     }
-    
+
     @Test
     public void testIdRepositoryForUnrestrictedIds() {
         String unRestrictedId = "m100000";
         IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(unRestrictedId);
         validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-        
+
         unRestrictedId = "c1000000";
         idWrapper = IdWrapper.getIdWrapperFromRepositoryId(unRestrictedId);
         validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-        
+
         unRestrictedId = "r100000";
         idWrapper = IdWrapper.getIdWrapperFromRepositoryId(unRestrictedId);
         validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
     }
-    
+
     @Test
     public void testIdRepositoryForRestrictedIds() {
         String restrictedRepoId = "m1";
         IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
         assertEquals("m0001", idWrapper.getIdForUrls());
         assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
-        
+
         restrictedRepoId = "c1";
         idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
         assertEquals("c0001", idWrapper.getIdForUrls());
         assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
-        
+
         restrictedRepoId = "r1";
         idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
         assertEquals("r0001", idWrapper.getIdForUrls());
         assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
+    }
+
+    @Test
+    public void testIdCnxOrgForModules() {
+        String restrictedRepoId = "m1";
+        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("m0001", idWrapper.getIdForCnxOrg());
+
+        restrictedRepoId = "m01";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("m0001", idWrapper.getIdForCnxOrg());
+
+        restrictedRepoId = "m10085";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("m10085", idWrapper.getIdForCnxOrg());
+    }
+
+    @Test
+    public void testIdCnxOrgForCollections() {
+        String restrictedRepoId = "c1";
+        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("col0001", idWrapper.getIdForCnxOrg());
+
+        restrictedRepoId = "c01";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("col0001", idWrapper.getIdForCnxOrg());
+
+        restrictedRepoId = "c10064";
+        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
+        assertEquals("col10064", idWrapper.getIdForCnxOrg());
+    }
+
+    @Test
+    public void testCnxInvalidUrlExceptionIsThrown() {
+        List<String> listOfInvalidIds = Lists.newArrayList("abc", "m1a1", "c1a1", "r1a1");
+
+        for (String currId : listOfInvalidIds) {
+            try {
+                IdWrapper.getIdWrapperFromUrlId(currId);
+            } catch (CnxInvalidUrlException e) {
+                // expected
+            }
+        }
     }
 }

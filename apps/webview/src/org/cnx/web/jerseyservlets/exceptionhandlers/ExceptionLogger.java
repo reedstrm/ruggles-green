@@ -16,11 +16,14 @@
 package org.cnx.web.jerseyservlets.exceptionhandlers;
 
 import com.google.common.base.Throwables;
+import com.google.inject.Injector;
 
 import org.cnx.exceptions.CnxException;
+import org.cnx.exceptions.CnxPossibleValidIdException;
 import org.cnx.exceptions.CnxRuntimeException;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.web.WebViewConfiguration;
+import org.cnx.web.ErrorPages;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,13 +39,16 @@ import javax.ws.rs.core.Response.Status;
  */
 public class ExceptionLogger {
     private final Logger logger;
+    private final Throwable throwable;
     private final long errorTrackingCode;
-    private final WebViewConfiguration config;
+    private final ErrorPages errorPages;
 
-    public ExceptionLogger(String className) {
-        logger = Logger.getLogger(className);
+    public ExceptionLogger(Injector injector, Throwable throwable) {
+        this.throwable = throwable;
+
+        this.logger = Logger.getLogger(throwable.getClass().getName());
         this.errorTrackingCode = System.currentTimeMillis();
-        config = new WebViewConfiguration();
+        this.errorPages = injector.getInstance(ErrorPages.class);
     }
 
     private void updateTrackingCode(StringBuilder builder) {
@@ -52,21 +58,36 @@ public class ExceptionLogger {
     // TODO(arjuns) : Add chrome around these exceptions.
     private String getErrorMessageToDisplay(Status jerseyStatus, Throwable throwable) {
         StringBuilder builder = new StringBuilder();
-        builder.append("<h1> HTTP ERROR : ").append(jerseyStatus.getStatusCode())
-                .append("</h1><br/>");
-        updateTrackingCode(builder);
+        switch (jerseyStatus) {
+            case NOT_FOUND:
+                builder.append(errorPages.render404());
+                break;
 
-        if (config.isStackEnabled()) {
-            builder.append("<br/><pre>").append(Throwables.getStackTraceAsString(throwable))
-                    .append("</pre>");
-        } else {
-            builder.append("<br/>").append(throwable.getMessage());
+            case SEE_OTHER:
+                if (throwable instanceof CnxPossibleValidIdException) {
+                    CnxPossibleValidIdException exception = (CnxPossibleValidIdException) throwable;
+                    // TODO(arjuns) : Move this to constant
+                    String redirectUrl =
+                            "http://cnx.org/content/" + exception.getId().getIdForCnxOrg()
+                                    + "/" + CnxAtomPubConstants.LATEST_VERSION_STRING;
+                    builder.append(errorPages.render404OldSite(redirectUrl));
+                    break;
+                }
+
+                logger.severe("ExceptionType[" + throwable.getClass().getName()
+                        + " is having StatusCode = " + jerseyStatus);
+
+                //$FALL-THROUGH$
+            default:
+                logException();
+                builder.append(errorPages.renderError(jerseyStatus.getStatusCode(),
+                        Long.toString(errorTrackingCode), throwable.getMessage(), throwable));
         }
 
         return builder.toString();
     }
 
-    public Response getResponseForException(Throwable throwable) {
+    public Response getResponseForException() {
         // Defaulting to internal server error.
         Status jerseyStatus = Status.INTERNAL_SERVER_ERROR;
         if (throwable instanceof CnxException) {
@@ -85,11 +106,11 @@ public class ExceptionLogger {
         return responseBuilder.build();
     }
 
-    public void logException(Throwable throwable) {
-        logExceptionMessage(Level.SEVERE, throwable);
+    private void logException() {
+        logExceptionMessage(Level.SEVERE);
     }
 
-    public void logExceptionMessage(Level logLevel, Throwable throwable) {
+    private void logExceptionMessage(Level logLevel) {
         StringBuilder builder = new StringBuilder();
         updateTrackingCode(builder);
         builder.append(Throwables.getStackTraceAsString(throwable));

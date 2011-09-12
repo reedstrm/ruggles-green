@@ -41,6 +41,13 @@ body > header > h1 {
     text-align: left;
 }
 
+#siteMessage {
+    padding: 0 1ex 0.5ex;
+    background: #deca73;
+    text-align: center;
+    font-size: 90%;
+}
+
 .feedback {
     position: absolute;
     top: 1ex;
@@ -177,19 +184,30 @@ p.authors {
 .moduleContent .equation {
     display: table;
     width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .moduleContent .equationContent {
     display: table-cell;
     width: 90%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
     text-align: center;
     vertical-align: middle;
 }
 
 .moduleContent .equationNumber {
     display: table-cell;
-    width: 5%;
+    width: 10%;
     padding-left: 5%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
     text-align: right;
     vertical-align: middle;
 }

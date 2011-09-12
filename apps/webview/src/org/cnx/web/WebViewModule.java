@@ -66,13 +66,15 @@ public class WebViewModule extends AbstractModule {
             SoyTofu provideTofu(WebViewConfiguration config, SoyFileSet.Builder builder) {
         return builder
                 .setCompileTimeGlobals(new ImmutableMap.Builder<String, Object>()
-                        .put("analyticsJs", "")
+                        .put("analyticsJs", config.getAnalyticsCode())
+                        .put("siteMessage", config.getSiteMessage())
                         .put("feedbackUrl", config.getFeedbackLink())
                         .build())
                 .add(new File("base.soy"))
                 .add(new File("collection.soy"))
                 .add(new File("index.soy"))
                 .add(new File("module.soy"))
+                .add(new File("errors.soy"))
                 .build().compileToJavaObj();
     }
 

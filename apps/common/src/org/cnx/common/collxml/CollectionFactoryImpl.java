@@ -16,11 +16,13 @@
 
 package org.cnx.common.collxml;
 
-import com.google.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
+
+import com.google.inject.Inject;
 
 import org.cnx.mdml.Metadata;
 import org.cnx.mdml.MdmlMetadata;
@@ -41,8 +43,9 @@ public class CollectionFactoryImpl implements CollectionFactory {
         this.metadataFactory = metadataFactory;
     }
 
-    @Override public Collection create(final String id, final Document collxml) {
-        return new Collection(id, collxml, parseMetadata(collxml), parseTopNodes(collxml));
+    @Override public Collection create(final String id, @Nullable final String version,
+            final Document collxml) {
+        return new Collection(id, version, collxml, parseMetadata(collxml), parseTopNodes(collxml));
     }
 
     private Metadata parseMetadata(final Document collxml) {

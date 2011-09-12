@@ -49,7 +49,7 @@ import javax.xml.bind.Marshaller;
  * @author Arjun Satyapal
  */
 public class CnxAtomPubConstants {
-    Logger logger = Logger.getLogger(CnxAtomPubConstants.class.getName());
+    private final Logger logger = Logger.getLogger(CnxAtomPubConstants.class.getName());
 
     /** Sub-domain for AtomPub relative to host. */
     public static final String ATOMPUB_URL_PREFIX = "atompub";

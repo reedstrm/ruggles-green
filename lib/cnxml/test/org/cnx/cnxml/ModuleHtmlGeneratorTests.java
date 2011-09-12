@@ -23,7 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 
 import org.cnx.cnxml.CnxmlModule;
-import org.cnx.cnxml.ModuleHTMLGenerator;
+import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.mdml.MdmlModule;
 import org.cnx.resourcemapping.ObjectFactory;
 import org.cnx.util.MathmlTag;
@@ -41,8 +41,9 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
 
-public class ModuleHTMLGeneratorTests {
+public class ModuleHtmlGeneratorTests {
     private static final String moduleId = "m123";
+    private static final String moduleVersion = "42";
     private static final Namespace ns = CnxmlTag.NAMESPACE;
     private static final Namespace mathns = MathmlTag.NAMESPACE;
 
@@ -70,8 +71,8 @@ public class ModuleHTMLGeneratorTests {
         scope.enter();
         try {
             ObjectFactory dummyFactory = new ObjectFactory();
-            return injector.getInstance(ModuleHTMLGenerator.class).generate(
-                    new Module(moduleId, d, dummyFactory.createResources(), null));
+            return injector.getInstance(ModuleHtmlGenerator.class).generate(
+                    new Module(moduleId, moduleVersion, d, dummyFactory.createResources(), null));
         } finally {
             scope.exit();
         }
@@ -209,7 +210,7 @@ public class ModuleHTMLGeneratorTests {
     }
 
     @Test public void emptyLinkShouldDefaultToLink() throws Exception {
-        assertEquals("<a href=\"#myRefId\">link</a>", generate(new Element("link", ns)
+        assertEquals("<a href=\"#myRefId\">Link</a>", generate(new Element("link", ns)
                 .setAttribute("target-id", "myRefId")));
     }
 
@@ -218,19 +219,72 @@ public class ModuleHTMLGeneratorTests {
         final String figureOutput =
                 "<figure id=\"myRefId\"><figcaption><span class=\"prefix\">Figure 1</span>"
                 + "</figcaption></figure>";
-        assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
+        assertEquals("<a href=\"#myRefId\">Figure 1</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
                         .addContent(new Element("content", ns)
                                 .addContent(new Element("link", ns)
                                         .setAttribute("target-id", "myRefId"))
                                 .addContent(figure)))));
         figure.detach();
-        assertEquals("<a href=\"#myRefId\">figure</a>" + figureOutput,
+        assertEquals("<a href=\"#myRefId\">Figure 1</a>" + figureOutput,
                 generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
                         .addContent(new Element("content", ns)
                                 .addContent(new Element("link", ns)
                                         .setAttribute("url", "#myRefId"))
                                 .addContent(figure)))));
+    }
+
+    @Test public void emptyLinkShouldRecognizeEquation() throws Exception {
+        final Element equation = new Element("equation", ns).setAttribute("id", "myRefId");
+        final String equationOutput = "<div class=\"equation\" id=\"myRefId\">"
+                + "<div class=\"equationContent\"></div>"
+                + "<div class=\"equationNumber\">1</div></div>";
+        assertEquals("<a href=\"#myRefId\">Equation 1</a>" + equationOutput,
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("target-id", "myRefId"))
+                                .addContent(equation)))));
+        equation.detach();
+        assertEquals("<a href=\"#myRefId\">Equation 1</a>" + equationOutput,
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "#myRefId"))
+                                .addContent(equation)))));
+    }
+
+    @Test public void emptyLinkTest() throws Exception {
+        final Element equation1 = new Element("equation", ns).setAttribute("id", "eip-245");
+        final Element equation2 = new Element("equation", ns).setAttribute("id", "id62170");
+        final Element figure1 = new Element("figure", ns).setAttribute("id", "figFin");
+        final Element figure2 = new Element("figure", ns).setAttribute("id", "id62155");
+        final Element figure3 = new Element("figure", ns).setAttribute("id", "id11698544");
+        assertEquals("<a href=\"#id62155\">Figure 2</a>"
+                + "<figure id=\"figFin\">"
+                + "<figcaption><span class=\"prefix\">Figure 1</span></figcaption>"
+                + "</figure>"
+                + "<div class=\"equation\" id=\"eip-245\">"
+                + "<div class=\"equationContent\"></div>"
+                + "<div class=\"equationNumber\">1</div></div>"
+                + "<div class=\"equation\" id=\"id62170\">"
+                + "<div class=\"equationContent\"></div>"
+                + "<div class=\"equationNumber\">2</div></div>"
+                + "<figure id=\"id62155\">"
+                + "<figcaption><span class=\"prefix\">Figure 2</span></figcaption>"
+                + "</figure>"
+                + "<figure id=\"id11698544\">"
+                + "<figcaption><span class=\"prefix\">Figure 3</span></figcaption>"
+                + "</figure>",
+                generate(new Document(new Element("document", ns).setAttribute("id", moduleId)
+                        .addContent(new Element("content", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("target-id", "id62155"))
+                                .addContent(figure1)
+                                .addContent(equation1)
+                                .addContent(equation2)
+                                .addContent(figure2)
+                                .addContent(figure3)))));
     }
 
     @Test public void foreignShouldRenderAsSpan() throws Exception {
@@ -328,6 +382,16 @@ public class ModuleHTMLGeneratorTests {
                         .setAttribute("display", "block")
                         .setAttribute("id", "py")
                         .setText("print \"Hello\"")));
+    }
+
+    @Test public void blockCodeShouldAllowTitle() throws Exception {
+        assertEquals("<div class=\"title\">Hello Python</div>"
+                + "<pre><code id=\"py\">print &quot;Hello&quot;</code></pre>",
+                generate(new Element("code", ns)
+                        .setAttribute("display", "block")
+                        .setAttribute("id", "py")
+                        .addContent(new Element("title", ns).setText("Hello Python"))
+                        .addContent("print \"Hello\"")));
     }
 
     @Test public void defaultNoteShouldRenderAsDiv() throws Exception {
@@ -526,36 +590,76 @@ public class ModuleHTMLGeneratorTests {
 
     @Test public void definitionShouldRenderAsDiv() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1</div><ol></ol></div>",
+                + "<div class=\"title\">Definition 1</div></div>",
                 generate(new Element("definition", ns).setAttribute("id", "myDef")));
     }
 
     @Test public void definitionShouldUseTermAsTitle() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1: snarf</div><ol></ol></div>",
+                + "<div class=\"title\">Definition 1: snarf</div></div>",
                 generate(new Element("definition", ns)
                         .setAttribute("id", "myDef")
                         .addContent(new Element("term", ns).setText("snarf"))));
     }
 
-    @Test public void definitionShouldRenderMeaningsInList() throws Exception {
+    @Test public void definitionShouldAllowElementsInTerm() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1</div><ol>"
-                + "<li class=\"meaning\">A noun</li><li class=\"meaning\">A verb</li></ol></div>",
+                + "<div class=\"title\">Definition 1: "
+                + "<a href=\"http://www.example.com/\">snarf</a> text</div></div>",
+                generate(new Element("definition", ns)
+                        .setAttribute("id", "myDef")
+                        .addContent(new Element("term", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "http://www.example.com/")
+                                        .setText("snarf"))
+                                .addContent(" text"))));
+    }
+
+    @Test public void definitionShouldRenderMeanings() throws Exception {
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1</div>"
+                + "<div class=\"meaning\">A noun</div><div class=\"meaning\">A verb</div></div>",
                 generate(new Element("definition", ns)
                         .setAttribute("id", "myDef")
                         .addContent(new Element("meaning", ns).setText("A noun"))
                         .addContent(new Element("meaning", ns).setText("A verb"))));
     }
 
-    @Test public void fullDefinitionTest() throws Exception {
+    @Test public void definitionShouldRenderExamples() throws Exception {
         assertEquals("<div class=\"definition\" id=\"myDef\">"
-                + "<div class=\"title\">Definition 1: snarf</div><ol>"
-                + "<li class=\"meaning\">A noun</li><li class=\"meaning\">A verb</li></ol></div>",
+                + "<div class=\"title\">Definition 1</div>"
+                + "<div class=\"meaning\">A noun</div>"
+                + "<div class=\"example\" id=\"four\">"
+                + "<div class=\"title\">Example 1</div>Four examples!</div>"
+                + "<div class=\"meaning\">A verb</div></div>",
                 generate(new Element("definition", ns)
                         .setAttribute("id", "myDef")
-                        .addContent(new Element("term", ns).setText("snarf"))
                         .addContent(new Element("meaning", ns).setText("A noun"))
+                        .addContent(new Element("example", ns)
+                                .setAttribute("id", "four")
+                                .setText("Four examples!"))
+                        .addContent(new Element("meaning", ns).setText("A verb"))));
+    }
+
+    @Test public void fullDefinitionTest() throws Exception {
+        assertEquals("<div class=\"definition\" id=\"myDef\">"
+                + "<div class=\"title\">Definition 1: "
+                + "<a href=\"http://www.example.com/\">snarf</a> text</div>"
+                + "<div class=\"meaning\">A noun</div>"
+                + "<div class=\"example\" id=\"four\">"
+                + "<div class=\"title\">Example 1</div>Four examples!</div>"
+                + "<div class=\"meaning\">A verb</div></div>",
+                generate(new Element("definition", ns)
+                        .setAttribute("id", "myDef")
+                        .addContent(new Element("term", ns)
+                                .addContent(new Element("link", ns)
+                                        .setAttribute("url", "http://www.example.com/")
+                                        .setText("snarf"))
+                                .addContent(" text"))
+                        .addContent(new Element("meaning", ns).setText("A noun"))
+                        .addContent(new Element("example", ns)
+                                .setAttribute("id", "four")
+                                .setText("Four examples!"))
                         .addContent(new Element("meaning", ns).setText("A verb"))));
     }
 
@@ -794,6 +898,17 @@ public class ModuleHTMLGeneratorTests {
         assertEquals("<ul id=\"basicList\"><li>One</li><li>Two</li><li>Three</li></ul>",
                 generate(new Element("list", ns)
                         .setAttribute("id", "basicList")
+                        .addContent(new Element("item", ns).setText("One"))
+                        .addContent(new Element("item", ns).setText("Two"))
+                        .addContent(new Element("item", ns).setText("Three"))));
+    }
+
+    @Test public void listShouldAllowTitle() throws Exception {
+        assertEquals("<div class=\"title\">Some things</div>"
+                + "<ul id=\"basicList\"><li>One</li><li>Two</li><li>Three</li></ul>",
+                generate(new Element("list", ns)
+                        .setAttribute("id", "basicList")
+                        .addContent(new Element("title", ns).setText("Some things"))
                         .addContent(new Element("item", ns).setText("One"))
                         .addContent(new Element("item", ns).setText("Two"))
                         .addContent(new Element("item", ns).setText("Three"))));

@@ -30,6 +30,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.SAXParser;
 
+import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.exceptions.CnxPossibleValidIdException;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.resourcemapping.Resources;
 
 import org.jdom.Document;
@@ -39,7 +43,7 @@ import org.xml.sax.SAXException;
 
 /**
  * TODO(arjuns) : Figure out what to do with this class.
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CommonHack {
@@ -47,7 +51,6 @@ public class CommonHack {
     public static final String MODULE_TEMPLATE_NAME = "org.cnx.web.module";
     public static final String COLLECTION_TEMPLATE_NAME = "org.cnx.web.collection";
     public static final String COLLECTION_MODULE_TEMPLATE_NAME = "org.cnx.web.collectionModule";
-
 
     public static final String CONTENT_NAME_SPACE = "/content";
     public static final String COLLECTION = "/collection";
@@ -72,7 +75,7 @@ public class CommonHack {
             jaxbContext = JAXBContext.newInstance(Resources.class);
             Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
             Resources resources =
-                (Resources) unMarshaller.unmarshal(new StringReader(resourceMappingXml));
+                    (Resources) unMarshaller.unmarshal(new StringReader(resourceMappingXml));
             return resources;
         } catch (JAXBException e) {
             // TODO(arjuns): Auto-generated catch block
@@ -84,5 +87,15 @@ public class CommonHack {
         String cnxml = CharStreams.toString(new InputStreamReader(url.openStream()));
 
         return Response.ok(cnxml).build();
+    }
+
+    public static void handleCnxInvalidUrlException(IdWrapper id, VersionWrapper version,
+            CnxInvalidUrlException cnxInvalidUrlException) throws CnxInvalidUrlException {
+        if (id.isIdUnderForcedRange()) {
+            throw new CnxPossibleValidIdException(id, cnxInvalidUrlException.getMessage(),
+                    cnxInvalidUrlException.getCause());
+        }
+        
+        throw cnxInvalidUrlException;
     }
 }

@@ -17,11 +17,15 @@
 package org.cnx.common.collxml;
 
 import static com.google.common.base.Preconditions.*;
-import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+
 import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableList;
+
 import org.cnx.mdml.Metadata;
 import org.jdom.Document;
 
@@ -30,6 +34,7 @@ import org.jdom.Document;
  */
 public class Collection {
     private final String id;
+    private final String version;
     private final Document collxml;
     private final Metadata metadata;
     private final ImmutableList<CollectionItem> topItems;
@@ -37,9 +42,10 @@ public class Collection {
     private final ImmutableList<ModuleLink> moduleLinks;
 
     /** Create a collection. This is package-private; others should use CollectionFactory. */
-    Collection(String id, Document collxml, @Nullable Metadata metadata,
+    Collection(String id, @Nullable String version, Document collxml, @Nullable Metadata metadata,
             List<CollectionItem> topItems) {
         this.id = checkNotNull(id);
+        this.version = version;
         this.collxml = checkNotNull(collxml);
         this.metadata = metadata;
         this.topItems = ImmutableList.copyOf(checkNotNull(topItems));
@@ -65,6 +71,10 @@ public class Collection {
 
     public String getId() {
         return id;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public Document getCollxml() {

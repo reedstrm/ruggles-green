@@ -74,4 +74,12 @@ public class WebViewConfiguration {
     public boolean isStackEnabled() {
         return Boolean.parseBoolean(configProperties.getProperty("stack.enable"));
     }
+
+    public String getAnalyticsCode() {
+        return configProperties.getProperty("cnx.analyticsJs", "");
+    }
+
+    public String getSiteMessage() {
+        return configProperties.getProperty("cnx.siteMessage", "");
+    }
 }

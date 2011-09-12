@@ -16,31 +16,44 @@
 
 package org.cnx.cnxml;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import javax.xml.transform.Transformer;
+
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.jdom.Document;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 
 /**
- *  ContentMathMLProcessor transforms content MathML into presentation MathML.
+ *  ContentMathmlProcessor transforms content MathML into presentation MathML.
  */
-@Singleton public class ContentMathMLProcessor implements Processor {
+@Singleton public class ContentMathmlProcessor implements Processor {
     private final Transformer transformer;
 
-    @Inject public ContentMathMLProcessor(
-            @Named("ContentMathMLProcessor.transformer") Transformer transformer) {
+    @BindingAnnotation
+    @Target({FIELD, PARAMETER, METHOD})
+    @Retention(RUNTIME)
+    public static @interface ContentToPresentation {
+    }
+
+    @Inject public ContentMathmlProcessor(@ContentToPresentation Transformer transformer) {
         this.transformer = transformer;
     }
 
     public Module process(Module module) throws Exception {
         final JDOMResult result = new JDOMResult();
         transformer.transform(new JDOMSource(module.getCnxml()), result);
-        return new Module(module.getId(), result.getDocument(), module.getResources(),
-                module.getMetadata());
+        return new Module(module.getId(), module.getVersion(),
+                result.getDocument(), module.getResources(), module.getMetadata());
     }
 }

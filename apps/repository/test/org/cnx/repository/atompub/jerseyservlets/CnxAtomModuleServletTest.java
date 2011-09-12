@@ -50,7 +50,7 @@ import javax.xml.bind.JAXBException;
 public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     private Logger logger = Logger.getLogger(CnxAtomModuleServletTest.class.getName());
     private CnxAtomPubClient cnxClient;
-    private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.12_complete/m10085";
+    private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/m10085";
 
     public CnxAtomModuleServletTest() throws Exception {
         super();

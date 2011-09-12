@@ -32,7 +32,7 @@ import org.jdom.Element;
 /**
  *  HtmlGeneratorImpl renders CollXML as an ordered list using JDOM.
  */
-public class HtmlGeneratorImpl implements CollectionHTMLGenerator {
+public class HtmlGeneratorImpl implements CollectionHtmlGenerator {
     private static final String HTML_MODULE_CLASS = "module";
     private static final String HTML_COLLECTION_CLASS = "collection";
     private static final String HTML_SUBCOLLECTION_CLASS = "subcollection";

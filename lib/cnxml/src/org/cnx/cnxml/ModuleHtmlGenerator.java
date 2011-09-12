@@ -14,18 +14,17 @@
  * the License.
  */
 
-package org.cnx.common.collxml;
-
+package org.cnx.cnxml;
 
 /**
- *  Implementors of the CollectionHTMLGenerator interface can convert a collection to HTML.
+ *  Implementors of the ModuleHtmlGenerator interface can convert modules to HTML.
  */
-public interface CollectionHTMLGenerator {
+public interface ModuleHtmlGenerator {
     /**
-     *  The generate method outputs HTML that corresponds to the given collection into a string.
+     *  The generate method outputs HTML that corresponds to the given module to a string.
      *
-     *  @param coll The collection to render
+     *  @param module The module to render
      *  @return The rendered HTML string
      */
-    public String generate(Collection coll) throws Exception;
+    public String generate(Module module) throws Exception;
 }

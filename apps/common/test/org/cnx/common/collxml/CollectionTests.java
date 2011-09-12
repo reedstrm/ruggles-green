@@ -33,7 +33,7 @@ public class CollectionTests {
     }
 
     @Test public void hasModuleShouldNotFindMissingModule() {
-        final Collection coll = new Collection("col123", collxml, null,
+        final Collection coll = new Collection("col123", "42", collxml, null,
                 ImmutableList.<CollectionItem>of(
                     new ModuleLink(0, 0, "m567", "latest", null)
                 ));
@@ -41,7 +41,7 @@ public class CollectionTests {
     }
 
     @Test public void hasModuleShouldFindModule() {
-        final Collection coll = new Collection("col123", collxml, null,
+        final Collection coll = new Collection("col123", "42", collxml, null,
                 ImmutableList.<CollectionItem>of(
                         new ModuleLink(0, 0, "m567", "latest", null)
                 ));
@@ -49,7 +49,7 @@ public class CollectionTests {
     }
 
     @Test public void hasModuleShouldFindSubmodule() {
-        final Collection coll = new Collection("col123", collxml, null,
+        final Collection coll = new Collection("col123", "42", collxml, null,
                 ImmutableList.<CollectionItem>of(
                         new Subcollection(0, 0, ImmutableList.<CollectionItem>of(
                                 new ModuleLink(1, 0, "m567", "latest", null)
@@ -59,7 +59,7 @@ public class CollectionTests {
     }
 
     @Test public void getPreviousNextShouldReturnNullsWhenNotFound() {
-        final Collection coll = new Collection("col123", collxml, null,
+        final Collection coll = new Collection("col123", "42", collxml, null,
                 ImmutableList.<CollectionItem>of());
         final ModuleLink[] result = coll.getPreviousNext("m0001");
         assertEquals(2, result.length);
@@ -68,7 +68,7 @@ public class CollectionTests {
     }
 
     @Test public void getPreviousNextShouldReturnNullsForSingleItem() {
-        final Collection coll = new Collection("col123", collxml, null,
+        final Collection coll = new Collection("col123", "42", collxml, null,
                 ImmutableList.<CollectionItem>of(
                         new ModuleLink(0, 0, "m0001", "latest", null)
                 ));
@@ -84,7 +84,7 @@ public class CollectionTests {
                 new ModuleLink(0, 1, "m02", "latest", null),
                 new ModuleLink(0, 2, "m03", "latest", null)
         );
-        final Collection coll = new Collection("col123", collxml, null, links);
+        final Collection coll = new Collection("col123", "42", collxml, null, links);
         final ModuleLink[] result = coll.getPreviousNext("m02");
         assertEquals(2, result.length);
         assertEquals(links.get(0), result[0]);
@@ -97,7 +97,7 @@ public class CollectionTests {
                 new ModuleLink(0, 1, "m02", "latest", null),
                 new ModuleLink(0, 2, "m03", "latest", null)
         );
-        final Collection coll = new Collection("col123", collxml, null, links);
+        final Collection coll = new Collection("col123", "42", collxml, null, links);
         final ModuleLink[] result = coll.getPreviousNext("m01");
         assertEquals(2, result.length);
         assertNull(result[0]);
@@ -110,7 +110,7 @@ public class CollectionTests {
                 new ModuleLink(0, 1, "m02", "latest", null),
                 new ModuleLink(0, 2, "m03", "latest", null)
         );
-        final Collection coll = new Collection("col123", collxml, null, links);
+        final Collection coll = new Collection("col123", "42", collxml, null, links);
         final ModuleLink[] result = coll.getPreviousNext("m03");
         assertEquals(2, result.length);
         assertEquals(links.get(1), result[0]);

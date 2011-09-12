@@ -16,6 +16,8 @@
 
 package org.cnx.cnxml;
 
+import javax.annotation.Nullable;
+
 import com.google.inject.Inject;
 
 import org.cnx.mdml.Metadata;
@@ -33,13 +35,13 @@ public class ModuleFactoryImpl implements ModuleFactory {
     }
 
     @Override
-    public Module create(String id, Document cnxml, Resources resources) {
+    public Module create(String id, @Nullable String version, Document cnxml, Resources resources) {
         Metadata metadata = null;
         final Element elem = cnxml.getRootElement()
                 .getChild(CnxmlTag.METADATA.getTag(), CnxmlTag.NAMESPACE);
         if (elem != null) {
             metadata = metadataFactory.create(elem);
         }
-        return new Module(id, cnxml, resources, metadata);
+        return new Module(id, version, cnxml, resources, metadata);
     }
 }

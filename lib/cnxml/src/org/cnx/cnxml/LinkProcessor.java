@@ -16,8 +16,6 @@
 
 package org.cnx.cnxml;
 
-import static org.cnx.cnxml.CnxmlAttributes.FRAGMENT;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
@@ -99,7 +97,8 @@ public class LinkProcessor implements Processor {
             }
         } else if (targetId != null) {
             // ID reference
-            target = resolver.resolveUri(Links.convertLinkAttributeToUri(FRAGMENT + targetId));
+            target = resolver.resolveUri(
+                    Links.convertLinkAttributeToUri(Links.FRAGMENT + targetId));
         }
 
         if (target != null) {

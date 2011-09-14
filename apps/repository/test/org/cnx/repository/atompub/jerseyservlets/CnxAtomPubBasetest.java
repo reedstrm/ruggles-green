@@ -33,7 +33,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 public abstract class CnxAtomPubBasetest extends JerseyTest {
     // TODO(arjuns) : Move this to parent folder.
 
-    private final static String PACKAGE = "org.cnx.repository.atompub.servlets";
+    private final static String PACKAGE = "org.cnx.repository.atompub.jerseyservlets";
 
     private CnxAtomPubConstants constants;
     private URL cnxServerAtomPubUrl;

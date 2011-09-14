@@ -30,7 +30,7 @@ import com.google.appengine.api.datastore.Key;
  */
 public class OrmCollectionEntity extends OrmEntity {
 
-    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Collection", "c");
+    private static final OrmEntitySpec ENTITY_SPEC = new OrmEntitySpec("Collection", "col");
 
     private static final String VERSION_COUNT_PROPERTY = "versions";
 

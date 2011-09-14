@@ -122,7 +122,7 @@ public class RenderModuleServlet {
         // TODO(arjuns) : Handle exception.
         StringBuilder builder = new StringBuilder();
 
-        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
         final VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
 
         String finalHtml = null;
@@ -190,7 +190,7 @@ public class RenderModuleServlet {
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
         // TODO(arjuns) : Handle exceptions.
-        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
         final VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
         URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(idWrapper, versionWrapper);
 
@@ -203,7 +203,7 @@ public class RenderModuleServlet {
     public Response getModuleVersionResourcesXml(@Context HttpServletRequest req,
             @Context HttpServletResponse res, @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
         final VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
         URL url =
                 cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(idWrapper,

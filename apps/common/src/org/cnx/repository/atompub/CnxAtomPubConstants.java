@@ -129,7 +129,7 @@ public class CnxAtomPubConstants {
     public URL getCollectionVersionAbsPath(IdWrapper collectionId, VersionWrapper version) {
         try {
             return new URL(getCollectionCnxCollectionsAbsPath() + "/"
-                    + collectionId.getIdForUrls() + "/"
+                    + collectionId.getId() + "/"
                     + version);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
@@ -153,7 +153,7 @@ public class CnxAtomPubConstants {
     /** Get URL for Resource to fetch via AtomPub. */
     public URL getResourceAbsPath(IdWrapper resourceId) {
         try {
-            return new URL(getCollectionResourcesAbsPath() + "/" + resourceId.getIdForUrls());
+            return new URL(getCollectionResourcesAbsPath() + "/" + resourceId.getId());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -207,7 +207,7 @@ public class CnxAtomPubConstants {
     /** Get URL for Module to fetch via AtomPub. */
     public URL getModuleAbsPath(IdWrapper moduleId) {
         try {
-            return new URL(getCollectionModulesAbsPath() + "/" + moduleId.getIdForUrls());
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId.getId());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -219,7 +219,7 @@ public class CnxAtomPubConstants {
     /** Get URL for ModuleVersion to fetch via AtomPup. */
     public URL getModuleVersionAbsPath(IdWrapper moduleId, VersionWrapper version) {
         try {
-            return new URL(getCollectionModulesAbsPath() + "/" + moduleId.getIdForUrls() + "/"
+            return new URL(getCollectionModulesAbsPath() + "/" + moduleId.getId() + "/"
                     + version.toString());
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
@@ -398,7 +398,7 @@ public class CnxAtomPubConstants {
      */
     public static IdWrapper getIdFromAtomPubId(String atomPubId) {
         String[] args = atomPubId.split(":");
-        return IdWrapper.getIdWrapperFromUrlId(args[0]);
+        return IdWrapper.getIdWrapper(args[0]);
     }
 
     /**
@@ -413,7 +413,7 @@ public class CnxAtomPubConstants {
      * Get AtomPubId from moduleId/collectionId and version.
      */
     public static String getAtomPubIdFromCnxIdAndVersion(IdWrapper cnxId, VersionWrapper version) {
-        return cnxId.getIdForUrls() + DELIMITER_ID_VERSION + version.toString();
+        return cnxId.getId() + DELIMITER_ID_VERSION + version.toString();
 
     }
 

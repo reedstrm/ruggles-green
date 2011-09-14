@@ -68,7 +68,7 @@ public class ExceptionLogger {
                     CnxPossibleValidIdException exception = (CnxPossibleValidIdException) throwable;
                     // TODO(arjuns) : Move this to constant
                     String redirectUrl =
-                            "http://cnx.org/content/" + exception.getId().getIdForCnxOrg()
+                            "http://cnx.org/content/" + exception.getId().getId()
                                     + "/" + CnxAtomPubConstants.LATEST_VERSION_STRING;
                     builder.append(errorPages.render404OldSite(redirectUrl));
                     break;

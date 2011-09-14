@@ -118,12 +118,12 @@ public class ParallelCollectionMigrator implements Runnable {
 
                 if (cnxCollectionId != null && preserveModuleIds) {
                     // Publish version in restricted range.
-                    requiredCnxModuleId = IdWrapper.getIdWrapperFromUrlId(cnxModuleId);
+                    requiredCnxModuleId = IdWrapper.getIdWrapper(cnxModuleId);
                     requiredVersion = CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
                 }
 
                 if (aerCollectionId != null && preserveModuleIds) {
-                    requiredAerModuleId = IdWrapper.getIdWrapperFromUrlId(cnxModuleId);
+                    requiredAerModuleId = IdWrapper.getIdWrapper(cnxModuleId);
                 }
 
                 ParallelModuleMigrator moduleMigrator =
@@ -167,10 +167,10 @@ public class ParallelCollectionMigrator implements Runnable {
                 IdWrapper aerModuleId =
                         CnxAtomPubConstants.getIdFromAtomPubId(newModuleEntry.getId());
                 String oldString = "\"" + cnxModuleId + "\"";
-                String newString = "\"" + aerModuleId.getIdForUrls() + "\"";
+                String newString = "\"" + aerModuleId.getId() + "\"";
                 collXmlAsString = collXmlAsString.replaceAll(oldString, newString);
                 logger.info("Old ModuleId = " + cnxModuleId + " New ModuleId = "
-                        + aerModuleId.getIdForUrls());
+                        + aerModuleId.getId());
             }
 
             ClientEntry entryToUpdate = null;

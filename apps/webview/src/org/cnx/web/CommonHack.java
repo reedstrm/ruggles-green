@@ -18,6 +18,14 @@ package org.cnx.web;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
+import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.resourcemapping.Resources;
+import org.jdom.Document;
+import org.jdom.input.SAXHandler;
+import org.xml.sax.SAXException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,17 +37,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.SAXParser;
-
-import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.exceptions.CnxPossibleValidIdException;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.resourcemapping.Resources;
-
-import org.jdom.Document;
-import org.jdom.input.SAXHandler;
-
-import org.xml.sax.SAXException;
 
 /**
  * TODO(arjuns) : Figure out what to do with this class.
@@ -91,10 +88,11 @@ public class CommonHack {
 
     public static void handleCnxInvalidUrlException(IdWrapper id, VersionWrapper version,
             CnxInvalidUrlException cnxInvalidUrlException) throws CnxInvalidUrlException {
-        if (id.isIdUnderForcedRange()) {
-            throw new CnxPossibleValidIdException(id, cnxInvalidUrlException.getMessage(),
-                    cnxInvalidUrlException.getCause());
-        }
+        // TODO(arjuns) : Fix this.
+//        if (id.isIdUnderForcedRange()) {
+//            throw new CnxPossibleValidIdException(id, cnxInvalidUrlException.getMessage(),
+//                    cnxInvalidUrlException.getCause());
+//        }
         
         throw cnxInvalidUrlException;
     }

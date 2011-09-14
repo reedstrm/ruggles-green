@@ -302,7 +302,7 @@ public class CnxAtomPubClient {
         // TODO(arjuns) : move this url to constants.
         String migrateModule =
                 constants.getAtomPubRestUrl().toString() + "/module/migration/"
-                        + cnxModuleId.getIdForUrls();
+                        + cnxModuleId.getId();
         return handlePostForMigration(migrateModule);
     }
 
@@ -456,7 +456,7 @@ public class CnxAtomPubClient {
         // TODO(arjuns): Handle exceptions.
         String migrateModule =
                 constants.getAtomPubRestUrl().toString() + "/collection/migration/"
-                        + cnxCollectionId.getIdForUrls();
+                        + cnxCollectionId.getId();
         return handlePostForMigration(migrateModule);
     }
 

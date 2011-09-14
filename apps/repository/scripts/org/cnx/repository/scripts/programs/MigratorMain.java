@@ -123,10 +123,10 @@ public class MigratorMain {
         IdWrapper aerCollectionIdWrapper = null;
         if (aerCollectionId != null) {
             Preconditions.checkArgument(cnxCollectionId == null);
-            aerCollectionIdWrapper = IdWrapper.getIdWrapperFromUrlId(aerCollectionId);
+            aerCollectionIdWrapper = IdWrapper.getIdWrapper(aerCollectionId);
         } else if (cnxCollectionId != null) {
             Preconditions.checkArgument(aerCollectionId == null);
-            cnxCollectionIdWrapper = IdWrapper.getIdWrapperFromUrlId(cnxCollectionId);
+            cnxCollectionIdWrapper = IdWrapper.getIdWrapper(cnxCollectionId);
         }
 
         ParallelCollectionMigrator migrator =
@@ -150,10 +150,10 @@ public class MigratorMain {
         IdWrapper cnxModuleIdWrapper = null;
         if (aerModuleId != null) {
             Preconditions.checkArgument(cnxModuleId == null);
-            aerModuleIdWrapper = IdWrapper.getIdWrapperFromUrlId(aerModuleId);
+            aerModuleIdWrapper = IdWrapper.getIdWrapper(aerModuleId);
         } else if (cnxModuleId != null) {
             Preconditions.checkArgument(aerModuleId == null);
-            cnxModuleIdWrapper = IdWrapper.getIdWrapperFromUrlId(cnxModuleId);
+            cnxModuleIdWrapper = IdWrapper.getIdWrapper(cnxModuleId);
         }
 
         ParallelModuleMigrator migrator =

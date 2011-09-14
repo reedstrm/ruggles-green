@@ -64,7 +64,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         // TODO(arjuns) : Add a regex test here.
         String expectedCollectionUrl =
                 cnxClient.getConstants().getAtomPubRestUrl() + "/collection/"
-                        + collectionId.getIdForUrls() + "/1";
+                        + collectionId.getId() + "/1";
         assertEquals(expectedCollectionUrl, createCollectionEntry.getEditURI().toString());
 
         ClientEntry cnxCollectionNewVersionEntry =

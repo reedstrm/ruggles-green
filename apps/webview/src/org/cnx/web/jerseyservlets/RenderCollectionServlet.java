@@ -177,7 +177,7 @@ public class RenderCollectionServlet {
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
             throws Exception {
         // TODO(arjuns) : Handle exception.
-        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(collectionId);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapper(collectionId);
         final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
 
         StringBuilder builder = new StringBuilder();
@@ -274,7 +274,7 @@ public class RenderCollectionServlet {
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
             throws Exception {
         // TODO(arjuns) : Handle exception.
-        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(collectionId);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapper(collectionId);
         final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
 
         URL url =
@@ -295,10 +295,10 @@ public class RenderCollectionServlet {
             @PathParam(CommonHack.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
             throws Exception {
         // TODO(arjuns) : handle exceptions.
-        final IdWrapper collectionIdWrapper = IdWrapper.getIdWrapperFromUrlId(collectionId);
+        final IdWrapper collectionIdWrapper = IdWrapper.getIdWrapper(collectionId);
         final VersionWrapper collectionVersion = new VersionWrapper(collectionVersionString);
 
-        final IdWrapper moduleIdWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        final IdWrapper moduleIdWrapper = IdWrapper.getIdWrapper(moduleId);
         final VersionWrapper moduleVersion = new VersionWrapper(moduleVersionString);
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
@@ -421,7 +421,7 @@ public class RenderCollectionServlet {
     public Response getModuleVersionXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
         VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
         URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(idWrapper, versionWrapper);
 
@@ -434,7 +434,7 @@ public class RenderCollectionServlet {
     public Response getModuleVersionResourcesXmlUnderCollectionVersion(
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(moduleId);
+        IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
         VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
         URL url =
                 cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(idWrapper,

@@ -102,7 +102,7 @@ public class CnxAtomResourceServlet {
             // URL to fetch the Module published now.
 
             IdWrapper repoIdWrapper =
-                    IdWrapper.getIdWrapperFromRepositoryId(repoResult.getResourceId());
+                    IdWrapper.getIdWrapper(repoResult.getResourceId());
 
             URL selfUrl = atomPubService.getConstants().getResourceAbsPath(repoIdWrapper);
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
@@ -135,12 +135,12 @@ public class CnxAtomResourceServlet {
     @Path(RESOURCE_GET_URL_PATTERN)
     public Response getResource(@Context HttpServletResponse res,
             @PathParam(RESOURCE_GET_PATH_PARAM) String resourceId) {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapperFromUrlId(resourceId);
+        final IdWrapper idWrapper = IdWrapper.getIdWrapper(resourceId);
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
                 repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getIdForRepository(), res);
+                        idWrapper.getId(), res);
 
         if (serveResourceResult.isOk()) {
 
@@ -153,7 +153,7 @@ public class CnxAtomResourceServlet {
 
             RepositoryResponse<GetResourceInfoResult> repositoryInfo =
                     repositoryService.getResourceInfo(repositoryContext,
-                            idWrapper.getIdForRepository());
+                            idWrapper.getId());
 
             // TODO(arjuns) : Repository should return this.
             if (repositoryInfo.isOk()) {

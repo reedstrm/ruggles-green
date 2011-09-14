@@ -17,8 +17,9 @@ package org.cnx.repository.atompub;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.Preconditions;
+
 import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.repository.RepositoryConstants;
 
 /**
  * This will wrap Ids for Collections/Modules/Resources. TODO(arjuns) : move this to upper package.
@@ -27,21 +28,20 @@ import org.cnx.repository.RepositoryConstants;
  */
 public class IdWrapper {
     // TODO(arjuns) : Share this with Repository.
-    private final static int PREFIX_LENGTH = 1;
-    private final static String COLLECTION_ID_PREFIX = "c";
+    private final static String COLLECTION_ID_PREFIX = "col";
     private final static String MODULE_ID_PREFIX = "m";
     private final static String RESOURCE_ID_PREFIX = "r";
 
     private Type type;
-    private final Integer idInt;
-    private final String idUrl;
+//    private final Integer idInt;
+    private final String id;
 
     /**
      * Here Id string can be prefixed with 0.
      * 
      * @param idString ids used in URLs. e.g. m0001 etc.
      */
-    public static IdWrapper getIdWrapperFromUrlId(String idString) {
+    public static IdWrapper getIdWrapper(String idString) {
         if (idString.startsWith(COLLECTION_ID_PREFIX)) {
             return new IdWrapper(idString, Type.COLLECTION);
         } else if (idString.startsWith(MODULE_ID_PREFIX)) {
@@ -51,25 +51,6 @@ public class IdWrapper {
         }
 
         throw new CnxInvalidUrlException("Invalid Id : " + idString, null /*throwable*/);
-    }
-
-    private static String getIdWithPadding(int id) {
-        return String.format("%04d", id);
-    }
-
-    /**
-     * Here values are not prefixed with 0.
-     * 
-     * @param repoIdString Ids returned by CNX repository. These will be converted to URL friendly
-     *            Ids with 0 padded to have min length of 4.
-     */
-    public static IdWrapper getIdWrapperFromRepositoryId(String repoIdString) {
-        Type idType = Type.getTypeFromPrefix(repoIdString.substring(0, PREFIX_LENGTH));
-        String intPart = repoIdString.substring(PREFIX_LENGTH);
-        StringBuilder builder = new StringBuilder(idType.getPrefix());
-        builder.append(getIdWithPadding(Integer.parseInt(intPart)));
-
-        return new IdWrapper(builder.toString(), idType);
     }
 
     /**
@@ -99,38 +80,7 @@ public class IdWrapper {
         }
 
         this.type = idType;
-        this.idUrl = idString;
-
-        String integerPart = idString.substring(1);
-        
-        if (integerPart.length() < 4) {
-            throw new CnxInvalidUrlException("Invalid Id[" + idString + "]", null /*throwable*/);
-        }
-
-        try {
-            idInt = Integer.parseInt(integerPart);
-        } catch (NumberFormatException e) {
-            throw new CnxInvalidUrlException("Invalid Id : " + idString, e);
-        }
-    }
-
-    /**
-     * Get ID that is understood by CNX repository service. Here Ids don't have padding.
-     * 
-     * @return Id understood by CNX Repository service.
-     */
-    public String getIdForRepository() {
-        switch (type) {
-            case COLLECTION:
-                return COLLECTION_ID_PREFIX + idInt;
-            case MODULE:
-                return MODULE_ID_PREFIX + idInt;
-            case RESOURCE:
-                return RESOURCE_ID_PREFIX + idInt;
-
-        }
-
-        throw new CnxInvalidUrlException("Invalid IdType[" + type + "].", null /* throwable */);
+        this.id = idString;
     }
 
     /**
@@ -138,25 +88,10 @@ public class IdWrapper {
      * 
      * @return Ids used over URLs.
      */
-    public String getIdForUrls() {
-        return idUrl;
+    public String getId() {
+        return id;
     }
     
-    /**
-     * Returns possible Id in cnx.org format.
-     */
-    public String getIdForCnxOrg() {
-        switch (type) {
-            case MODULE:
-                return idUrl;
-                
-            case COLLECTION:
-                return "col" + getIdWithPadding(idInt);
-        }
-        
-        throw new RuntimeException("Code should not reach here.");
-    }
-
     public Type getType() {
         return type;
     }
@@ -175,13 +110,6 @@ public class IdWrapper {
     @Override
     public boolean equals(Object that) {
         throw new RuntimeException("This should not be called.");
-    }
-
-    /**
-     * Checks if Id belongs to ForcedId range.
-     */
-    public boolean isIdUnderForcedRange() {
-        return idInt > 0 && idInt < RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
     }
 
     /**

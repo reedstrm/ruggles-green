@@ -59,7 +59,7 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
         String expectedResourceUrl =
-                getConstants().getResourceAbsPath(IdWrapper.getIdWrapperFromUrlId(resourceId))
+                getConstants().getResourceAbsPath(IdWrapper.getIdWrapper(resourceId))
                         .toString();
         assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
                 .getHrefResolved());

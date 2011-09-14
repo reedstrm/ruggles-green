@@ -15,82 +15,103 @@
  */
 package org.cnx.repository.atompub;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_STRING;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import org.cnx.exceptions.CnxInvalidUrlException;
 
 /**
- * This is to wrap version in a TypeSafe object.
- * Version has two possible values :
- *     * latest
- *     * integer whose value should be non-negative (i.e. >= 0).
+ * This is to wrap version in a TypeSafe object. Version has two possible values : * latest *
+ * integer whose value should be non-negative (i.e. >= 0).
+ * 
  * @author Arjun Satyapal
  */
 public class VersionWrapper {
-    private final Integer versionInt;
+    private final Integer version;
 
     @Override
     public String toString() {
-        if (versionInt == null) {
+        if (version == null) {
             return LATEST_VERSION_STRING;
         }
 
-        return versionInt.toString();
+        return version.toString();
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof VersionWrapper) {
             VersionWrapper other = (VersionWrapper) object;
-            return versionInt.equals(other.versionInt);
+            return version.equals(other.version);
         }
 
         return false;
     }
 
     public VersionWrapper getNextVersion() {
-        return new VersionWrapper(versionInt + 1);
+        if (version == null) {
+            throw new IllegalStateException("getNext operation is not valid for version="
+                    + CnxAtomPubConstants.LATEST_VERSION_STRING);
+        }
+        return new VersionWrapper(version + 1);
     }
 
     // TODO(arjuns) : Add test to ensure version and versionInt semantically mean same.
     public Integer getVersionInt() {
-        return versionInt;
+        return version;
     }
-    
-    public VersionWrapper(String version) throws CnxInvalidUrlException {
-        if (!isValidVersion(version)) {
-            throw new CnxInvalidUrlException("Invalid version : " + version, null /*throwable*/);
+
+    public VersionWrapper(String versionString) throws CnxInvalidUrlException {
+        if (!isValidVersion(versionString)) {
+            throw new CnxInvalidUrlException("Invalid version : " + versionString, null /* throwable */);
         }
 
-        if(version.equals(LATEST_VERSION_STRING)) {
-            this.versionInt = null;
+        if (versionString.equals(LATEST_VERSION_STRING)) {
+            this.version = null;
         } else {
             try {
-                this.versionInt = Integer.parseInt(version);
+                this.version = Integer.parseInt(versionString);
             } catch (NumberFormatException e) {
-                throw new CnxInvalidUrlException("Invalid version : " + version, 
-                        null /*throwable*/);
+                throw new CnxInvalidUrlException("Invalid version : " + versionString, null /* throwable */);
             }
         }
     }
 
-    // TODO(arjuns) : Add checks for negative version.
     public VersionWrapper(int version) {
-        checkArgument(version > 0, "Invalid Version[" + version + "]. Version should be > 0.");
-        this.versionInt = version;
+        if (version < 0) {
+            throwInvalidVersionExecption(Long.toString(version), null /* throwable */);
+        }
+
+        this.version = version;
     }
 
-    public static boolean isValidVersion(String version) {
+    @VisibleForTesting
+    static boolean isValidVersion(String version) {
         if (version.equals(CnxAtomPubConstants.LATEST_VERSION_STRING)) {
             return true;
         }
 
+        if (version.startsWith("0")) {
+            return false;
+        }
+
         try {
-            Integer.parseInt(version);
-            return true;
+
+            long versionLong = Long.parseLong(version);
+
+            if (versionLong > 0) {
+                return true;
+            }
+
+            return false;
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private static void throwInvalidVersionExecption(String version, Throwable throwable)
+            throws CnxInvalidUrlException {
+        throw new CnxInvalidUrlException("Illegal Version[" + version + "]", throwable);
     }
 }

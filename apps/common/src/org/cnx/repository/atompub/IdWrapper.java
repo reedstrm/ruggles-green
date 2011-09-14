@@ -17,8 +17,8 @@ package org.cnx.repository.atompub;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Preconditions;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.cnx.exceptions.CnxInvalidUrlException;
 
 /**
@@ -33,24 +33,25 @@ public class IdWrapper {
     private final static String RESOURCE_ID_PREFIX = "r";
 
     private Type type;
-//    private final Integer idInt;
     private final String id;
 
     /**
      * Here Id string can be prefixed with 0.
      * 
-     * @param idString ids used in URLs. e.g. m0001 etc.
+     * @param id ids used in URLs. e.g. m0001 etc.
      */
-    public static IdWrapper getIdWrapper(String idString) {
-        if (idString.startsWith(COLLECTION_ID_PREFIX)) {
-            return new IdWrapper(idString, Type.COLLECTION);
-        } else if (idString.startsWith(MODULE_ID_PREFIX)) {
-            return new IdWrapper(idString, Type.MODULE);
-        } else if (idString.startsWith(RESOURCE_ID_PREFIX)) {
-            return new IdWrapper(idString, Type.RESOURCE);
+    public static IdWrapper getIdWrapper(String id) {
+        if (id.startsWith(COLLECTION_ID_PREFIX)) {
+            return new IdWrapper(id, Type.COLLECTION);
+        } else if (id.startsWith(MODULE_ID_PREFIX)) {
+            return new IdWrapper(id, Type.MODULE);
+        } else if (id.startsWith(RESOURCE_ID_PREFIX)) {
+            return new IdWrapper(id, Type.RESOURCE);
         }
 
-        throw new CnxInvalidUrlException("Invalid Id : " + idString, null /*throwable*/);
+        throwInvalidIdExecption(id, null /* type */, null/* throwable */);
+
+        return null;
     }
 
     /**
@@ -58,29 +59,72 @@ public class IdWrapper {
      * 
      * TODO(arjuns) : Add regex checks.
      * 
-     * @param idString String format for module/collection Ids.
+     * @param id String format for module/collection Ids.
      * @param idType Type of Id.
      */
-    public IdWrapper(String idString, Type idType) {
-        switch (idType) {
-            case MODULE:
-                checkArgument(idString.startsWith(MODULE_ID_PREFIX));
-                break;
+    public IdWrapper(String id, Type idType) {
+        try {
+            switch (idType) {
+                case MODULE:
+                    checkArgument(id.startsWith(MODULE_ID_PREFIX));
+                    validateId(id.substring(MODULE_ID_PREFIX.length()), Type.MODULE);
+                    break;
 
-            case COLLECTION:
-                checkArgument(idString.startsWith(COLLECTION_ID_PREFIX));
-                break;
+                case COLLECTION:
+                    checkArgument(id.startsWith(COLLECTION_ID_PREFIX));
+                    validateId(id.substring(COLLECTION_ID_PREFIX.length()), Type.COLLECTION);
+                    break;
 
-            case RESOURCE:
-                checkArgument(idString.startsWith(RESOURCE_ID_PREFIX));
-                break;
+                case RESOURCE:
+                    checkArgument(id.startsWith(RESOURCE_ID_PREFIX));
+                    validateId(id.substring(RESOURCE_ID_PREFIX.length()), Type.RESOURCE);
+                    break;
 
-            default:
-                throw new CnxInvalidUrlException("Illegal IdType[" + idType + "].", null /* throwable */);
+                default:
+                    throw new CnxInvalidUrlException("Illegal IdType[" + idType + "].", null /* throwable */);
+            }
+        } catch (Exception e) {
+            throwInvalidIdExecption(id, idType, e);
         }
 
         this.type = idType;
-        this.id = idString;
+        this.id = id;
+    }
+
+    /**
+     * Validate id for a module.
+     * 
+     * @param idWithoutPrefix ModuleId to be validated.
+     */
+    static void validateId(String idWithoutPrefix, Type type) {
+        checkArgument(idWithoutPrefix.length() >= 4);
+
+        try {
+            long longId = Long.parseLong(idWithoutPrefix);
+            checkArgument(longId > 0);
+        } catch (NumberFormatException e) {
+            throwInvalidIdExecption(idWithoutPrefix, type, null /* throwable */);
+        }
+
+        Pattern pattern;
+        Matcher matcher;
+        if (idWithoutPrefix.startsWith("0")) {
+            pattern = Pattern.compile("0{1,3}[1-9]+\\d?");
+            matcher = pattern.matcher(idWithoutPrefix);
+        } else {
+            pattern = Pattern.compile("\\d{4,}+");
+            matcher = pattern.matcher(idWithoutPrefix);
+        }
+
+        if (!matcher.matches()) {
+            throwInvalidIdExecption(idWithoutPrefix, type, null /* throwable */);
+        }
+    }
+
+    private static void throwInvalidIdExecption(String id, Type type, Throwable throwable)
+            throws CnxInvalidUrlException {
+        throw new CnxInvalidUrlException("Illegal Id[" + id + "],  idType[" + type + "].",
+                throwable);
     }
 
     /**
@@ -91,7 +135,7 @@ public class IdWrapper {
     public String getId() {
         return id;
     }
-    
+
     public Type getType() {
         return type;
     }

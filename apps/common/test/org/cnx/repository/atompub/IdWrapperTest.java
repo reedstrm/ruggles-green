@@ -16,7 +16,11 @@
 package org.cnx.repository.atompub;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import com.google.common.collect.Lists;
+import java.util.List;
+import org.cnx.exceptions.CnxInvalidUrlException;
 import org.junit.Test;
 
 /**
@@ -27,7 +31,7 @@ import org.junit.Test;
 public class IdWrapperTest {
 
     @Test
-    public void testIdUrlForUnrestrictedIds() {
+    public void testIdsForUnrestrictedIds() {
         String unRestrictedId = "m100000";
         IdWrapper idWrapper = new IdWrapper(unRestrictedId, IdWrapper.Type.MODULE);
 
@@ -45,99 +49,51 @@ public class IdWrapperTest {
     }
 
     @Test
-    public void testIdUrlForRestrictedIds() {
+    public void testIdsForRestrictedIds() {
         String restrictedIdIntPart = "m0001";
         IdWrapper idWrapper = new IdWrapper(restrictedIdIntPart, IdWrapper.Type.MODULE);
         assertEquals(restrictedIdIntPart, idWrapper.getId());
-//        assertEquals("m1", idWrapper.getIdForRepository());
-        // TODO(arjuns) : Add regex checks.
 
         restrictedIdIntPart = "col0001";
         idWrapper = new IdWrapper(restrictedIdIntPart, IdWrapper.Type.COLLECTION);
         assertEquals(restrictedIdIntPart, idWrapper.getId());
-//        assertEquals("c1", idWrapper.getIdForRepository());
 
-        // TODO(arjuns) : Validate for smaller resource ids.
         restrictedIdIntPart = "r0001";
         idWrapper = new IdWrapper(restrictedIdIntPart, IdWrapper.Type.RESOURCE);
         assertEquals(restrictedIdIntPart, idWrapper.getId());
-//        assertEquals("r1", idWrapper.getIdForRepository());
     }
 
-//    @Test
-//    public void testIdRepositoryForUnrestrictedIds() {
-//        String unRestrictedId = "m100000";
-//        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(unRestrictedId);
-//        validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-//
-//        unRestrictedId = "c1000000";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(unRestrictedId);
-//        validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-//
-//        unRestrictedId = "r100000";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(unRestrictedId);
-//        validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-//    }
+    @Test
+    public void testCnxInvalidUrlExceptionIsThrown() {
+        List<String> listOfInvalidIds =
+                Lists.newArrayList("abc", "module1234", "collection1234", "resource1234");
+        confirmInvalidityOfIds(listOfInvalidIds);
 
-//    @Test
-//    public void testIdRepositoryForRestrictedIds() {
-//        String restrictedRepoId = "m1";
-//        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("m0001", idWrapper.getId());
-//        assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
-//
-//        restrictedRepoId = "c1";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("c0001", idWrapper.getId());
-//        assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
-//
-//        restrictedRepoId = "r1";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("r0001", idWrapper.getId());
-//        assertEquals(restrictedRepoId, idWrapper.getIdForRepository());
-//    }
+        // Now testing for invalid moduleIds.
+        listOfInvalidIds =
+                Lists.newArrayList("m1a1", "m1", "m01", "m001", "m0000", "m0", "m0123a", "m00001");
+        confirmInvalidityOfIds(listOfInvalidIds);
 
-//    @Test
-//    public void testIdCnxOrgForModules() {
-//        String restrictedRepoId = "m1";
-//        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("m0001", idWrapper.getIdForCnxOrg());
-//
-//        restrictedRepoId = "m01";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("m0001", idWrapper.getIdForCnxOrg());
-//
-//        restrictedRepoId = "m10085";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("m10085", idWrapper.getIdForCnxOrg());
-//    }
+        // Now testing for invalid collections.
+        listOfInvalidIds =
+                Lists.newArrayList("col1a1", "col1", "col01", "col001", "col0000", "col0",
+                        "col0123a", "col00001");
+        confirmInvalidityOfIds(listOfInvalidIds);
 
-//    @Test
-//    public void testIdCnxOrgForCollections() {
-//        String restrictedRepoId = "c1";
-//        IdWrapper idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("col0001", idWrapper.getIdForCnxOrg());
-//
-//        restrictedRepoId = "c01";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("col0001", idWrapper.getIdForCnxOrg());
-//
-//        restrictedRepoId = "c10064";
-//        idWrapper = IdWrapper.getIdWrapperFromRepositoryId(restrictedRepoId);
-//        assertEquals("col10064", idWrapper.getIdForCnxOrg());
-//    }
-    
-    // TODO(arjuns) : Fix this test.
-//    @Test
-//    public void testCnxInvalidUrlExceptionIsThrown() {
-//        List<String> listOfInvalidIds = Lists.newArrayList("abc", "m1a1", "c1a1", "r1a1");
-//
-//        for (String currId : listOfInvalidIds) {
-//            try {
-//                IdWrapper.getIdWrapperFromUrlId(currId);
-//            } catch (CnxInvalidUrlException e) {
-//                // expected
-//            }
-//        }
-//    }
+        // Now testing for invalid ResourceIds.
+        listOfInvalidIds =
+                Lists.newArrayList("r1a1", "r1", "r01", "r001", "r0000", "r0", "r0123a", "r00001");
+        confirmInvalidityOfIds(listOfInvalidIds);
+    }
+
+    private void confirmInvalidityOfIds(List<String> listOfIds) {
+        for (String currId : listOfIds) {
+            try {
+                IdWrapper.getIdWrapper(currId);
+                fail("Should have failed for id : [" + currId + "].");
+            } catch (CnxInvalidUrlException e) {
+                // expected
+            }
+        }
+    }
 }

@@ -167,8 +167,13 @@ public class IdWrapper {
      * Currently this is not supported deliberately. In future if required, this can be supported.
      */
     @Override
-    public boolean equals(Object that) {
-        throw new RuntimeException("This should not be called.");
+    public boolean equals(Object object) {
+        if (object instanceof IdWrapper) {
+            IdWrapper that = (IdWrapper) object;
+            return (id.equals(that.id) && type == that.type);
+        }
+        
+        return false;
     }
 
     /**

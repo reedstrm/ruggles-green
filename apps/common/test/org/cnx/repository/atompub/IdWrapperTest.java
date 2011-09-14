@@ -110,4 +110,11 @@ public class IdWrapperTest {
         }
         
     }
+    
+    public void test_equals() {
+        IdWrapper one = IdWrapper.getIdWrapper("m1");
+        IdWrapper another = new IdWrapper("m1", IdWrapper.Type.MODULE);
+        
+        assertEquals(one, another);
+    }
 }

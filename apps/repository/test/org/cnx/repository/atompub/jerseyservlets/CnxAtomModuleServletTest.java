@@ -16,6 +16,11 @@
 package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import com.google.common.base.Throwables;
+
+import org.cnx.exceptions.CnxInvalidUrlException;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -107,7 +112,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     @Test
     public void testCreateModuleMultipleVersion() throws Exception {
         List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
-        String resourceMappingDocXml =
+        String resourceMappingXml =
                 cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
 
         File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
@@ -115,14 +120,82 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         ClientEntry moduleEntry = cnxClient.createNewModule();
 
-        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingDocXml);
+        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingXml);
 
-        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingDocXml);
+        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingXml);
 
         IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
-        ClientEntry latestEntry = cnxClient.getModuleVersionEntry(moduleId, new VersionWrapper(
-                CnxAtomPubConstants.LATEST_VERSION_STRING));
+        ClientEntry latestEntry =
+                cnxClient.getModuleVersionEntry(moduleId, new VersionWrapper(
+                        CnxAtomPubConstants.LATEST_VERSION_STRING));
         assertEquals(new VersionWrapper(2),
                 CnxAtomPubConstants.getVersionFromAtomPubId(latestEntry.getId()));
+
+        String downloadedCnxml = cnxClient.getCnxml(latestEntry);
+        assertEquals(cnxmlAsString, downloadedCnxml);
+
+        String downloadedResourceMappingXml = cnxClient.getResourceMappingXml(latestEntry);
+        assertEquals(resourceMappingXml, downloadedResourceMappingXml);
+    }
+
+    /*
+     * Purpose of this test is to test the state after creating a moduleId but not publishing any
+     * version.
+     */
+    @Test
+    public void testGetModuleVersion_withoutPublishingAnyVersion() throws Exception {
+        ClientEntry moduleEntry = cnxClient.createNewModule();
+
+        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+
+        List<VersionWrapper> listOfInvalidVersions =
+                Lists.newArrayList(new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING),
+                        new VersionWrapper(0), new VersionWrapper(1));
+
+        for (VersionWrapper currentVersion : listOfInvalidVersions) {
+            try {
+                cnxClient.getModuleVersionEntry(moduleId, currentVersion);
+                fail("should have failed.");
+            } catch (CnxInvalidUrlException e) {
+                // expected.
+            }
+        }
+    }
+
+    @Test
+    public void testGetModuleVersion_0() throws Exception {
+        List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
+        String resourceMappingXml =
+                cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
+
+        File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
+        String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
+
+        ClientEntry moduleEntry = cnxClient.createNewModule();
+
+        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingXml);
+
+        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        VersionWrapper version = new VersionWrapper(0);
+
+        try {
+            cnxClient.getModuleVersionEntry(moduleId, version);
+            fail("should have failed.");
+        } catch (CnxInvalidUrlException e) {
+            // expected.
+        }
+
+        version = new VersionWrapper(1);
+        try {
+            ClientEntry entry = cnxClient.getModuleVersionEntry(moduleId, version);
+            IdWrapper downloadedId = CnxAtomPubConstants.getIdFromAtomPubId(entry.getId());
+            VersionWrapper downloadedVersion =
+                    CnxAtomPubConstants.getVersionFromAtomPubId(entry.getId());
+            
+            assertEquals(moduleId, downloadedId);
+            assertEquals(version, downloadedVersion);
+        } catch (Exception e) {
+            fail("should not have failed." + Throwables.getStackTraceAsString(e));
+        }
     }
 }

@@ -34,16 +34,12 @@ public class IdWrapperTest {
 
     @Test
     public void testIdsForUnrestrictedIds() {
-        String unRestrictedId = "m100000";
-        IdWrapper idWrapper = new IdWrapper(unRestrictedId, IdWrapper.Type.MODULE);
-
-        unRestrictedId = "col100000";
-        idWrapper = new IdWrapper(unRestrictedId, IdWrapper.Type.COLLECTION);
-        validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
-
-        unRestrictedId = "r100000";
-        idWrapper = new IdWrapper(unRestrictedId, IdWrapper.Type.RESOURCE);
-        validateEqualityForUnrestrictedIds(unRestrictedId, idWrapper);
+        List<String> listOfValidIds = Lists.newArrayList("m100000","col100000", "r100000");
+        
+        for (String currString : listOfValidIds) {
+            IdWrapper idWrapper = IdWrapper.getIdWrapper(currString);    
+            validateEqualityForUnrestrictedIds(currString, idWrapper);
+        }
     }
 
     private void validateEqualityForUnrestrictedIds(String unRestrictedId, IdWrapper idWrapper) {
@@ -52,17 +48,12 @@ public class IdWrapperTest {
 
     @Test
     public void testIdsForRestrictedIds() {
-        String restrictedIdIntPart = "m0001";
-        IdWrapper idWrapper = new IdWrapper(restrictedIdIntPart, IdWrapper.Type.MODULE);
-        assertEquals(restrictedIdIntPart, idWrapper.getId());
-
-        restrictedIdIntPart = "col0001";
-        idWrapper = new IdWrapper(restrictedIdIntPart, IdWrapper.Type.COLLECTION);
-        assertEquals(restrictedIdIntPart, idWrapper.getId());
-
-        restrictedIdIntPart = "r0001";
-        idWrapper = new IdWrapper(restrictedIdIntPart, IdWrapper.Type.RESOURCE);
-        assertEquals(restrictedIdIntPart, idWrapper.getId());
+        List<String> listOfValidIds = Lists.newArrayList("m0001", "m0405", "col0001", "r0001");
+        
+        for (String currString : listOfValidIds) {
+            IdWrapper idWrapper = IdWrapper.getIdWrapper(currString);    
+            validateEqualityForUnrestrictedIds(currString, idWrapper);
+        }
     }
 
     @Test

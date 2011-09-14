@@ -111,7 +111,7 @@ public class IdWrapper {
         Pattern pattern;
         Matcher matcher;
         if (idWithoutPrefix.startsWith("0")) {
-            pattern = Pattern.compile("0{1,3}[1-9]+\\d?");
+            pattern = Pattern.compile("[0-9]{3}[1-9][\\d]*");
             matcher = pattern.matcher(idWithoutPrefix);
         } else {
             pattern = Pattern.compile("\\d{4,}+");

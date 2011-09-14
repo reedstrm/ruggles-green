@@ -288,6 +288,8 @@ public class CnxAtomPubConstants {
 
     /**
      * Get Collection XML from AtomPub Entry.
+     * 
+     * TODO(arjuns) : Make it static and move it to utils.
      */
     public String getCollXmlDocFromAtomPubCollectionEntry(Entry apCollectionEntry)
             throws UnsupportedEncodingException {

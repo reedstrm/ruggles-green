@@ -97,7 +97,13 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
         cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
 
+        IdWrapper collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
+        ClientEntry latestEntry =
+                cnxClient.getCollectionVersionEntry(collectionId, new VersionWrapper(
+                        CnxAtomPubConstants.LATEST_VERSION_STRING));
         assertEquals(new VersionWrapper(2),
-                CnxAtomPubConstants.getVersionFromAtomPubId(collectionEntry.getId()));
+                CnxAtomPubConstants.getVersionFromAtomPubId(latestEntry.getId()));
     }
+    
+    // TODO(arjuns) : Add test for collectionMigration for forced ids.
 }

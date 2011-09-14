@@ -119,7 +119,10 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingDocXml);
 
+        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        ClientEntry latestEntry = cnxClient.getModuleVersionEntry(moduleId, new VersionWrapper(
+                CnxAtomPubConstants.LATEST_VERSION_STRING));
         assertEquals(new VersionWrapper(2),
-                CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId()));
+                CnxAtomPubConstants.getVersionFromAtomPubId(latestEntry.getId()));
     }
 }

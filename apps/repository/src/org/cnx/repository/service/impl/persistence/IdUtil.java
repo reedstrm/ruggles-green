@@ -77,7 +77,7 @@ public class IdUtil {
 
         final long numericId;
         try {
-            numericId = Long.decode(subId);
+            numericId = Long.valueOf(subId);
         } catch (NumberFormatException e) {
             return null;
         }

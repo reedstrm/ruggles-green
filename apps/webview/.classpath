@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxclient.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxml.latest.jar"/>
@@ -27,5 +28,7 @@
 	<classpathentry kind="lib" path="build/jars/xercesImpl.jar" sourcepath="/home/arjuns/Downloads/xerces-2_11_0"/>
 	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

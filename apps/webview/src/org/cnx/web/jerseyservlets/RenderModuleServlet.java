@@ -134,7 +134,7 @@ public class RenderModuleServlet {
             try {
                 moduleVersionEntry = cnxClient.getModuleVersionEntry(idWrapper, versionWrapper); 
             } catch (CnxInvalidUrlException e) {
-               handleCnxInvalidUrlException(idWrapper, versionWrapper, e);
+               handleCnxInvalidUrlException(idWrapper, e);
             }
 
             String cnxml = cnxClient.getCnxml(moduleVersionEntry);

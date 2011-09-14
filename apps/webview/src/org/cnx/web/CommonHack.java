@@ -17,26 +17,25 @@ package org.cnx.web;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-
-import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.resourcemapping.Resources;
-import org.jdom.Document;
-import org.jdom.input.SAXHandler;
-import org.xml.sax.SAXException;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
-
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.SAXParser;
+import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.exceptions.CnxPossibleValidIdException;
+import org.cnx.repository.RepositoryConstants;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.resourcemapping.Resources;
+import org.cnx.web.jerseyservlets.exceptionhandlers.CnxRuntimeExceptionHandler;
+import org.jdom.Document;
+import org.jdom.input.SAXHandler;
+import org.xml.sax.SAXException;
 
 /**
  * TODO(arjuns) : Figure out what to do with this class.
@@ -86,14 +85,28 @@ public class CommonHack {
         return Response.ok(cnxml).build();
     }
 
-    public static void handleCnxInvalidUrlException(IdWrapper id, VersionWrapper version,
-            CnxInvalidUrlException cnxInvalidUrlException) throws CnxInvalidUrlException {
-        // TODO(arjuns) : Fix this.
-//        if (id.isIdUnderForcedRange()) {
-//            throw new CnxPossibleValidIdException(id, cnxInvalidUrlException.getMessage(),
-//                    cnxInvalidUrlException.getCause());
-//        }
-        
+    /**
+     * In case Ids are in restricted range, then {@link CnxInvalidUrlException} is converted into
+     * {@link CnxPossibleValidIdException} so that WebView exception handlers can display a special
+     * 404 page which will contain a redirect link to original CNX website. This exception is 
+     * handled in {@link CnxRuntimeExceptionHandler}.
+     * 
+     * @param id Module/Collection id.
+     * @param cnxInvalidUrlException Original CnxInvalidUrlException. If Id is beyond
+     *            {@link RepositoryConstants#MIN_NON_RESERVED_KEY_ID}, then original exception is
+     *            re-thrown.
+     *            
+     * @throws CnxInvalidUrlException
+     * @throws CnxPossibleValidIdException
+     */
+    public static void handleCnxInvalidUrlException(IdWrapper id,
+            CnxInvalidUrlException cnxInvalidUrlException) throws CnxInvalidUrlException,
+            CnxPossibleValidIdException {
+        if (id.isIdUnderForcedRange()) {
+            throw new CnxPossibleValidIdException(id, cnxInvalidUrlException.getMessage(),
+                    cnxInvalidUrlException.getCause());
+        }
+
         throw cnxInvalidUrlException;
     }
 }

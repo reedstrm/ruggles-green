@@ -326,5 +326,5 @@
 
     <target name="all"
             description="Refers to all the targets in this file other then test."
-            depends="compile, war_qa" />
+            depends="compile, test-compile, war_qa" />
 </project>

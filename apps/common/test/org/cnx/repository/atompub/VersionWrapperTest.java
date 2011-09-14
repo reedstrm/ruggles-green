@@ -52,7 +52,7 @@ public class VersionWrapperTest {
         assertEquals("100", versionWrapper.toString());
 
         versionWrapper = new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING);
-        assertNull(versionWrapper.getVersionLong());
+        assertNull(versionWrapper.getVersionInt());
 
         // Now testing for invalid values.
         List<String> listOfInvalidIds = Lists.newArrayList("-100", "-1.1", "0.1", "100.1");

@@ -188,7 +188,7 @@ public class RenderCollectionServlet {
         try {
             collectionVersionEntry = cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
         } catch (CnxInvalidUrlException e) {
-            handleCnxInvalidUrlException(idWrapper, versionWrapper, e);
+            handleCnxInvalidUrlException(idWrapper, e);
         }
 
         String collXml =
@@ -307,7 +307,7 @@ public class RenderCollectionServlet {
             collectionVersionEntry =
                     cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
         } catch (CnxInvalidUrlException e) {
-            handleCnxInvalidUrlException(collectionIdWrapper, collectionVersion, e);
+            handleCnxInvalidUrlException(collectionIdWrapper, e);
         }
 
         String collXml =
@@ -331,7 +331,7 @@ public class RenderCollectionServlet {
         try {
             moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
         } catch (CnxInvalidUrlException e) {
-            handleCnxInvalidUrlException(moduleIdWrapper, moduleVersion, e);
+            handleCnxInvalidUrlException(moduleIdWrapper, e);
         }
 
         String cnxml = cnxClient.getCnxml(moduleVersionEntry);

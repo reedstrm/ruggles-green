@@ -16,6 +16,8 @@
 package org.cnx.repository.atompub;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.Lists;
@@ -95,5 +97,26 @@ public class IdWrapperTest {
                 // expected
             }
         }
+    }
+
+    public void test_isIdUnderForcedRange() {
+        List<String> listOfForcedIds =
+                Lists.newArrayList("m0001", "m99999", "col0001", "col99999", "r0001", "r99999");
+        
+        for (String currId : listOfForcedIds) {
+            IdWrapper idWrapper = IdWrapper.getIdWrapper(currId);
+            assertTrue(idWrapper.isIdUnderForcedRange());
+        }
+        
+        String maxLong = Long.toString(Long.MAX_VALUE);
+        
+        List<String> listOfIds =
+                Lists.newArrayList("m100000", "m" + maxLong, "col100000", "col" + maxLong,
+                        "r100000", "r" + maxLong);
+        for (String currId : listOfIds) {
+            IdWrapper idWrapper = IdWrapper.getIdWrapper(currId);
+            assertFalse(idWrapper.isIdUnderForcedRange());
+        }
+        
     }
 }

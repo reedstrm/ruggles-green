@@ -17,6 +17,8 @@ package org.cnx.repository.atompub;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.cnx.repository.RepositoryConstants;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.cnx.exceptions.CnxInvalidUrlException;
@@ -28,9 +30,9 @@ import org.cnx.exceptions.CnxInvalidUrlException;
  */
 public class IdWrapper {
     // TODO(arjuns) : Share this with Repository.
-    private final static String COLLECTION_ID_PREFIX = "col";
-    private final static String MODULE_ID_PREFIX = "m";
-    private final static String RESOURCE_ID_PREFIX = "r";
+    final static String COLLECTION_ID_PREFIX = "col";
+    final static String MODULE_ID_PREFIX = "m";
+    final static String RESOURCE_ID_PREFIX = "r";
 
     private Type type;
     private final String id;
@@ -138,6 +140,19 @@ public class IdWrapper {
 
     public Type getType() {
         return type;
+    }
+    
+    /**
+     * Returns true  if Id is under forced range.
+     */
+    public boolean isIdUnderForcedRange() {
+        Long idLong = Long.parseLong(id.substring(type.getPrefix().length()));
+        
+        if (idLong < RepositoryConstants.MIN_NON_RESERVED_KEY_ID) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**

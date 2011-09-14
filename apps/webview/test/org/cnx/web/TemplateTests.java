@@ -16,14 +16,11 @@
 
 package org.cnx.web;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.SoyModule;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
-
 import org.junit.Test;
 
 public class TemplateTests {

@@ -162,6 +162,8 @@ public class CnxAtomResourceServlet {
                 if (fileName.endsWith(".cdf")) {
                     responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf.text");
                 }
+                
+                responseBuilder.header("Content-Disposition", ("attachment; filename=" + fileName));
             }
 
             return responseBuilder.build();

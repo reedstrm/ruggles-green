@@ -145,7 +145,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         VersionWrapper version = new VersionWrapper(0);
 
         try {
-            cnxClient.getModuleVersionEntry(collectionId, version);
+            cnxClient.getCollectionVersionEntry(collectionId, version);
             fail("should have failed.");
         } catch (CnxInvalidUrlException e) {
             // expected.
@@ -153,7 +153,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         
         version = new VersionWrapper(1);
         try {
-            ClientEntry entry = cnxClient.getModuleVersionEntry(collectionId, version);
+            ClientEntry entry = cnxClient.getCollectionVersionEntry(collectionId, version);
             IdWrapper downloadedId = CnxAtomPubConstants.getIdFromAtomPubId(entry.getId());
             VersionWrapper downloadedVersion =
                     CnxAtomPubConstants.getVersionFromAtomPubId(entry.getId());

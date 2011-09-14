@@ -58,7 +58,7 @@ public class ParallelModuleMigrator implements Runnable {
     private final IdWrapper cnxModuleId;
     private final IdWrapper aerModuleId;
     private final VersionWrapper currentVersion;
-    
+
     private boolean success = false;
     private ClientEntry moduleVersionEntry;
 
@@ -136,7 +136,7 @@ public class ParallelModuleMigrator implements Runnable {
                 // TODO(arjuns) : Need to handle only specific exception. Else test will never die.
 
                 ParallelResourceMigrator resourceMigrator =
-                    new ParallelResourceMigrator(cnxClient, currFile.getAbsolutePath());
+                        new ParallelResourceMigrator(cnxClient, currFile.getAbsolutePath());
                 listOfResourceMigrators.add(resourceMigrator);
 
                 Thread thread = new Thread(resourceMigrator);
@@ -153,7 +153,7 @@ public class ParallelModuleMigrator implements Runnable {
                     listOfEntryForUploadedResources.add(currMigrator.getResourceEntry());
                 } else {
                     throw new RuntimeException("Failed to upload resource : "
-                        + currMigrator.getResourceLocation());
+                            + currMigrator.getResourceLocation());
                 }
             }
 
@@ -167,15 +167,13 @@ public class ParallelModuleMigrator implements Runnable {
         for (int i = 0; i < 10; i++) {
             try {
                 String resourceMappingXml =
-                    cnxClient
-                            .getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
+                        cnxClient
+                                .getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
 
                 /*
                  * Modules will have two types of CNXML : * index.cnxml *
-                 * index_auto_generated.cnxml.
-                 * 
-                 * index.cnxml is the one that is published on cnx. whereas
-                 * index_auto_generated.cnxml is one which is upgraded to 0.7 version.
+                 * index_auto_generated.cnxml. index.cnxml is the one that is published on cnx.
+                 * whereas index_auto_generated.cnxml is one which is upgraded to 0.7 version.
                  */
                 File cnxml = new File(moduleLocation + "/index_auto_generated.cnxml");
                 String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
@@ -192,7 +190,8 @@ public class ParallelModuleMigrator implements Runnable {
 
                     try {
                         existingEntry =
-                            cnxClient.getModuleVersionEntry(cnxModuleId, LATEST_VERSION_WRAPPER);
+                                cnxClient
+                                        .getModuleVersionEntry(cnxModuleId, LATEST_VERSION_WRAPPER);
                     } catch (CnxRuntimeException e) {
                         if (e.getJerseyStatus() == Status.NOT_FOUND) {
                             // Expected.
@@ -212,16 +211,16 @@ public class ParallelModuleMigrator implements Runnable {
                 } else {
                     Preconditions.checkNotNull(currentVersion);
                     URL currentModuleUrl =
-                        cnxClient.getConstants().getModuleVersionAbsPath(aerModuleId,
-                                currentVersion);
+                            cnxClient.getConstants().getModuleVersionAbsPath(aerModuleId,
+                                    currentVersion);
                     entryToUpdate = cnxClient.getService().getEntry(currentModuleUrl.toString());
                 }
                 moduleVersionEntry =
-                    publishNewVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
+                        publishNewVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
                 success = true;
 
                 logger.info("Successfully uploaded : " + moduleLocation + " to : "
-                    + moduleVersionEntry.getEditURI());
+                        + moduleVersionEntry.getEditURI());
                 return moduleVersionEntry;
             } catch (Exception e) {
                 logger.severe(Throwables.getStackTraceAsString(e));
@@ -244,10 +243,9 @@ public class ParallelModuleMigrator implements Runnable {
     private ClientEntry publishNewVersion(ClientEntry entryToUpdate, String cnxmlAsString,
             String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
             IOException {
-        ClientEntry createModuleVersionEntry =
-            cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
+        cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
 
-        return createModuleVersionEntry;
+        return entryToUpdate;
     }
 
     @Override

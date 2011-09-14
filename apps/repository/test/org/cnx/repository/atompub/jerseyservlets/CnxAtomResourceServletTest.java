@@ -23,6 +23,7 @@ import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient.CnxClientUtils;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
 import org.junit.Before;
@@ -59,9 +60,8 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
         String expectedResourceUrl =
-                getConstants().getResourceAbsPath(IdWrapper.getIdWrapper(resourceId))
-                        .toString();
-        assertEquals(expectedResourceUrl, cnxClient.getLinkForResource(createResourceEntry)
+                getConstants().getResourceAbsPath(IdWrapper.getIdWrapper(resourceId)).toString();
+        assertEquals(expectedResourceUrl, CnxClientUtils.getSelfUri(createResourceEntry)
                 .getHrefResolved());
 
         /*

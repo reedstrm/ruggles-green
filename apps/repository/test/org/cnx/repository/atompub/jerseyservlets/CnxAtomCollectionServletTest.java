@@ -22,13 +22,17 @@ import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient.CnxClientUtils;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+
+import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 
@@ -57,20 +61,19 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     public void testCreateCollection() throws Exception {
         File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
         String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
-        ClientEntry createCollectionEntry = cnxClient.createNewCollection();
-        IdWrapper collectionId =
-                CnxAtomPubConstants.getIdFromAtomPubId(createCollectionEntry.getId());
+        ClientEntry collectionEntry = cnxClient.createNewCollection();
+        IdWrapper collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
 
         // TODO(arjuns) : Add a regex test here.
         String expectedCollectionUrl =
                 cnxClient.getConstants().getAtomPubRestUrl() + "/collection/"
                         + collectionId.getId() + "/1";
-        assertEquals(expectedCollectionUrl, createCollectionEntry.getEditURI().toString());
+        assertEquals(expectedCollectionUrl, collectionEntry.getEditURI().toString());
 
-        ClientEntry cnxCollectionNewVersionEntry =
-                cnxClient.createNewCollectionVersion(createCollectionEntry, collXmlAsString);
+        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
 
-        assertEquals(expectedCollectionUrl, cnxCollectionNewVersionEntry.getEditURI());
+        Link selfLink = CnxClientUtils.getSelfUri(collectionEntry);
+        assertEquals(expectedCollectionUrl, selfLink.getHrefResolved());
 
         logger.info("New location for collection = \n" + expectedCollectionUrl);
 
@@ -83,5 +86,18 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         // cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(getEntry);
         // TODO(arjuns) : Uncomment this once we start using the original ids.
         // assertEquals(collXmlAsString, downloadedCollXml);
+    }
+
+    @Test
+    public void testCreateCollectionMultipleVersion() throws Exception {
+        File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
+        String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
+        ClientEntry collectionEntry = cnxClient.createNewCollection();
+
+        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
+        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
+
+        assertEquals(new VersionWrapper(2),
+                CnxAtomPubConstants.getVersionFromAtomPubId(collectionEntry.getId()));
     }
 }

@@ -16,7 +16,6 @@
 package org.cnx.atompubclient;
 
 import com.google.common.base.Preconditions;
-
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
@@ -31,7 +30,17 @@ import com.sun.syndication.propono.atom.client.CustomHttpClient;
 import com.sun.syndication.propono.atom.client.NoAuthStrategy;
 import com.sun.syndication.propono.utils.ProponoException;
 import com.sun.syndication.propono.utils.Utilities;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
@@ -51,19 +60,6 @@ import org.cnx.resourcemapping.Repository;
 import org.cnx.resourcemapping.Resource;
 import org.cnx.resourcemapping.Resources;
 import org.jdom.JDOMException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 /**
  * AtomPub client for CNX Repository. This client is thread safe.
@@ -208,53 +204,11 @@ public class CnxAtomPubClient {
             throws ProponoException, HttpException, IOException {
         ClientEntry resourceEntry = createUploadUrl(resourceName);
 
-        Link blobstoreUrl = getLinkForBlobStore(resourceEntry);
+        Link blobstoreUrl = CnxClientUtils.getBlobstoreUri(resourceEntry);
 
         URL postUrl = new URL(blobstoreUrl.getHrefResolved());
         postFileToBlobstore(postUrl, file);
         return resourceEntry;
-    }
-
-    /**
-     * CNX AtomPub API should return the resourceUrl with rel=
-     * {@code CnxAtomPubConstants.REL_TAG_FOR_SELF_URL} and href=<resource URL>.
-     * 
-     * 
-     * @param entry AtomPub entry returned by server.
-     * @return Link containing Resource URL.
-     */
-    public Link getLinkForResource(ClientEntry entry) {
-        @SuppressWarnings("unchecked")
-        List<Link> otherLinks = entry.getOtherLinks();
-
-        for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubConstants.REL_TAG_FOR_SELF_URL)) {
-                return currLink;
-            }
-        }
-
-        throw new IllegalStateException("Resource url not found in entry.");
-    }
-
-    /**
-     * CNX AtomPub API should return the BlobStoreUrl with rel=
-     * {@code CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL} and href=<blobstore url> where clients
-     * are expected to post the blobs.
-     * 
-     * @param entry AtomPub entry returned by Server.
-     * @return Link containing Blobstore URL.
-     */
-    public Link getLinkForBlobStore(ClientEntry entry) {
-        @SuppressWarnings("unchecked")
-        List<Link> otherLinks = entry.getOtherLinks();
-
-        for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL)) {
-                return currLink;
-            }
-        }
-
-        throw new IllegalStateException("Blobstore url not found in entry.");
     }
 
     /**
@@ -307,33 +261,26 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * Create New ModuleVersion on CNX Repository. Before first version can be created, a moduleId
-     * must be obtained using {@link #createNewModule()}.
+     * Create New ModuleVersion on CNX Repository.
      * 
-     * @param moduleVersionEntry Entry returned as response for {@link #createNewModule}
+     * NOTE : Before first version can be created, a moduleId must be obtained using
+     * {@link #createNewModule()}.
+     * 
+     * @param moduleVersionEntry Module Version entry to be updated. On success, moduleVersionEntry
+     *      will be updated with response returned from Repository.
      * @param cnxmlDoc CNXML Doc.
-     * @param resourceMappingDoc XML for Resource Mapping.
+     * @param resourceMappingXml XML for Resource Mapping.
      * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
      */
-    public ClientEntry createNewModuleVersion(ClientEntry moduleVersionEntry, String cnxmlDoc,
-            String resourceMappingDoc) throws ProponoException, JAXBException, JDOMException,
-            IOException {
-        // TODO(arjuns): rename AtomPubListOfContent to something better.
+    public void createNewModuleVersion(ClientEntry moduleVersionEntry,
+            final String cnxmlDoc, final String resourceMappingXml) throws ProponoException,
+            JAXBException, JDOMException, IOException {
         moduleVersionEntry.setContents(constants.getAtomPubListOfContent(cnxmlDoc,
-                resourceMappingDoc));
+                resourceMappingXml));
         moduleVersionEntry.update();
-
-        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleVersionEntry.getId());
-        VersionWrapper currentVersion =
-                CnxAtomPubConstants.getVersionFromAtomPubId(moduleVersionEntry.getId());
-
-        moduleVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(moduleId,
-                currentVersion));
-
-        return moduleVersionEntry;
     }
 
     /**
@@ -353,7 +300,8 @@ public class CnxAtomPubClient {
 
     /**
      * Get CNXML from AtomEntry for a Module-Version.
-     * 
+     *  TODO(arjuns) : Move this to utility class.
+     *  
      * @param moduleVersionEntry Atom Entry returned by Server for a particular module-version.
      * @return Returns CNXML (response is already decoded).
      */
@@ -483,32 +431,25 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * Create New CNX Collection version on CNX Repository. Before first version can be created, a
-     * collectionId must be obtained using {@link #createNewCollection}.
+     * Create New CNX Collection version on CNX Repository.
      * 
-     * @param collXmlVersionEntry Entry returned as response for {@link #createNewCollection}
-     * @param collXmlDoc Collection XML Doc.
+     * NOTE : If it is first version, then a collectionId must be obtained using
+     * {@link #createNewCollection}.
+     * 
+     * @param collectionVersionEntry Collection Entry that needs to be published. On success, 
+     *      collectionVersionEntry will be updated with response returned from Repository.
+     * @param collXml Collection XML Doc.
      * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
      */
-    public ClientEntry
-            createNewCollectionVersion(ClientEntry collXmlVersionEntry, String collXmlDoc)
-                    throws ProponoException, JAXBException, JDOMException, IOException {
-        collXmlVersionEntry.setContents(constants
-                .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
-        collXmlVersionEntry.update();
-
-        IdWrapper collectionId =
-                CnxAtomPubConstants.getIdFromAtomPubId(collXmlVersionEntry.getId());
-        VersionWrapper currentVersion =
-                CnxAtomPubConstants.getVersionFromAtomPubId(collXmlVersionEntry.getId());
-
-        collXmlVersionEntry.setId(CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(collectionId,
-                currentVersion));
-
-        return collXmlVersionEntry;
+    public void createNewCollectionVersion(ClientEntry collectionVersionEntry,
+            final String collXml) throws ProponoException, JAXBException, JDOMException,
+            IOException {
+        collectionVersionEntry.setContents(constants
+                .getAtomPubListOfContentForCollectionEntry(collXml));
+        collectionVersionEntry.update();
     }
 
     /**

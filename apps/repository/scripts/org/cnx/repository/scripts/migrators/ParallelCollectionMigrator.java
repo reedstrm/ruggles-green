@@ -60,7 +60,7 @@ public class ParallelCollectionMigrator implements Runnable {
     private final String collectionLocation;
     private final VersionWrapper currentVersion;
     private final boolean preserveModuleIds;
-    
+
     private boolean success = false;
     private ClientEntry collectionVersionEntry;
 
@@ -223,10 +223,9 @@ public class ParallelCollectionMigrator implements Runnable {
 
     private ClientEntry publishNewVersion(ClientEntry entryToUpdate, String collXmlAsString)
             throws ProponoException, JAXBException, JDOMException, IOException {
-        ClientEntry createCollectionVersionEntry =
-                cnxClient.createNewCollectionVersion(entryToUpdate, collXmlAsString);
+        cnxClient.createNewCollectionVersion(entryToUpdate, collXmlAsString);
 
-        return createCollectionVersionEntry;
+        return entryToUpdate;
     }
 
     // From a given collection, extract list of modules that need to be uploaded to Repository.

@@ -16,30 +16,32 @@
  */
 package com.sun.syndication.propono.atom.client;
 
+import com.google.common.base.Charsets;
 import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.impl.Atom10Generator;
 import com.sun.syndication.io.impl.Atom10Parser;
 import com.sun.syndication.propono.utils.ProponoException;
+import com.sun.syndication.propono.utils.Utilities;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import com.sun.syndication.propono.utils.Utilities;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Client implementation of Atom entry, extends ROME Entry to add methods for
@@ -52,7 +54,7 @@ public class ClientEntry extends Entry {
 
     private ClientAtomService service = null;
     private ClientCollection collection = null;
-
+    
     public ClientEntry(ClientAtomService service, ClientCollection collection) {
         super();
         this.service = service;
@@ -154,6 +156,10 @@ public class ClientEntry extends Entry {
             if (method.getStatusCode() != 200 && method.getStatusCode() != 201) {
                 throw new ProponoException(
                     "ERROR HTTP status=" + method.getStatusCode() + " : " + Utilities.streamToString(is));
+            } else {
+                Entry romeEntry = Atom10Parser.parseEntry(new BufferedReader(new InputStreamReader(is,
+                                Charsets.UTF_8.displayName())), null);
+                BeanUtils.copyProperties(this, romeEntry);
             }
 
         } catch (Exception e) {

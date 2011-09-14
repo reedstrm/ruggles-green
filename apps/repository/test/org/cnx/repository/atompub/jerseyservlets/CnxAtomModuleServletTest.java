@@ -85,18 +85,15 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
         String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
 
-        ClientEntry createModuleEntry = cnxClient.createNewModule();
+        ClientEntry moduleEntry = cnxClient.createNewModule();
         // TODO(arjuns): Add more validations here.
 
-        ClientEntry moduleNewVersionEntry =
-                cnxClient.createNewModuleVersion(createModuleEntry, cnxmlAsString,
-                        resourceMappingDocXml);
+        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingDocXml);
         // TODO(arjuns) : Add more validations here.
 
         // TODO(arjuns) : refactor this.
-        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleNewVersionEntry.getId());
-        VersionWrapper version =
-                CnxAtomPubConstants.getVersionFromAtomPubId(moduleNewVersionEntry.getId());
+        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        VersionWrapper version = CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId());
         ClientEntry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);
 
         String downloadedCnxmlDoc = cnxClient.getCnxml(getEntry);
@@ -105,5 +102,24 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         String downloadedResourceMappingDoc = cnxClient.getResourceMappingXml(getEntry);
         assertEquals(resourceMappingDocXml, downloadedResourceMappingDoc);
         // TODO(arjuns) : Add test for links.
+    }
+
+    @Test
+    public void testCreateModuleMultipleVersion() throws Exception {
+        List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
+        String resourceMappingDocXml =
+                cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
+
+        File cnxml = new File(MODULE_LOCATION + "/index_auto_generated.cnxml");
+        String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
+
+        ClientEntry moduleEntry = cnxClient.createNewModule();
+
+        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingDocXml);
+
+        cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingDocXml);
+
+        assertEquals(new VersionWrapper(2),
+                CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId()));
     }
 }

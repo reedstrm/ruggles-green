@@ -20,6 +20,7 @@ import com.google.common.base.Throwables;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient.CnxClientUtils;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -62,7 +63,7 @@ public class ParallelResourceMigrator implements Runnable {
                 logger.info("Trying to upload : " + resourceLocation);
                 resourceEntry = cnxClient.uploadFileToBlobStore(file.getName(), file);
                 success = true;
-                String resourceUrl = cnxClient.getLinkForResource(resourceEntry).getHrefResolved();
+                String resourceUrl = CnxClientUtils.getSelfUri(resourceEntry).getHrefResolved();
                 logger.info("Successfully uploaded : " + resourceLocation + " to : " + resourceUrl);
                 return resourceEntry;
             } catch (Exception e) {

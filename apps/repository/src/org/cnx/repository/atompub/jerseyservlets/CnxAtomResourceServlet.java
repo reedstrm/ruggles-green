@@ -101,8 +101,7 @@ public class CnxAtomResourceServlet {
             // TODO(arjuns) : Create a function for this.
             // URL to fetch the Module published now.
 
-            IdWrapper repoIdWrapper =
-                    IdWrapper.getIdWrapper(repoResult.getResourceId());
+            IdWrapper repoIdWrapper = IdWrapper.getIdWrapper(repoResult.getResourceId());
 
             URL selfUrl = atomPubService.getConstants().getResourceAbsPath(repoIdWrapper);
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
@@ -152,8 +151,7 @@ public class CnxAtomResourceServlet {
             }
 
             RepositoryResponse<GetResourceInfoResult> repositoryInfo =
-                    repositoryService.getResourceInfo(repositoryContext,
-                            idWrapper.getId());
+                    repositoryService.getResourceInfo(repositoryContext, idWrapper.getId());
 
             // TODO(arjuns) : Repository should return this.
             if (repositoryInfo.isOk()) {
@@ -162,8 +160,9 @@ public class CnxAtomResourceServlet {
                 if (fileName.endsWith(".cdf")) {
                     responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf.text");
                 }
-                
-                responseBuilder.header("Content-Disposition", ("attachment; filename=" + fileName));
+
+                responseBuilder.header("Content-Disposition",
+                        ("attachment; filename=\"" + fileName + "\""));
             }
 
             return responseBuilder.build();

@@ -48,8 +48,9 @@ public class IdWrapperTest {
 
     @Test
     public void testIdsForRestrictedIds() {
-        List<String> listOfValidIds = Lists.newArrayList("m0001", "m0405", "col0001", "r0001");
-        
+        List<String> listOfValidIds = Lists.newArrayList("m0001", "m0010", "m0100",
+                "col0001", "r0001", "m0405");
+
         for (String currString : listOfValidIds) {
             IdWrapper idWrapper = IdWrapper.getIdWrapper(currString);    
             validateEqualityForUnrestrictedIds(currString, idWrapper);

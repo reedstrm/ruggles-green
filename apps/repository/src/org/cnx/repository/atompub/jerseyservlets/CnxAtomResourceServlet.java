@@ -164,7 +164,7 @@ public class CnxAtomResourceServlet {
                 responseBuilder.header("Content-Type", contentType.getContentType());
 
                 responseBuilder.header("Content-Disposition",
-                        ("attachment; filename=\"" + fileName + "\""));
+                        ("filename=\"" + fileName + "\""));
             }
 
             return responseBuilder.build();

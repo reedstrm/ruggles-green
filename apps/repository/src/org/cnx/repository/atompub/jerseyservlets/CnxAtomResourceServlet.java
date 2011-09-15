@@ -20,6 +20,8 @@ import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromReposito
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
 import static org.cnx.repository.atompub.utils.ServerUtil.getPostedEntry;
 
+import org.cnx.repository.FileContentTypeEnum;
+
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 
@@ -157,9 +159,9 @@ public class CnxAtomResourceServlet {
             if (repositoryInfo.isOk()) {
                 String fileName =
                         repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
-                if (fileName.endsWith(".cdf")) {
-                    responseBuilder.header("Content-Type", "application/vnd.wolfram.cdf.text");
-                }
+                FileContentTypeEnum contentType =
+                        FileContentTypeEnum.getFileContentTypeEnumFromFileName(fileName);
+                responseBuilder.header("Content-Type", contentType.getContentType());
 
                 responseBuilder.header("Content-Disposition",
                         ("attachment; filename=\"" + fileName + "\""));

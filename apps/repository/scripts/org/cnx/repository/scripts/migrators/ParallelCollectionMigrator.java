@@ -118,12 +118,12 @@ public class ParallelCollectionMigrator implements Runnable {
 
                 if (cnxCollectionId != null && preserveModuleIds) {
                     // Publish version in restricted range.
-                    requiredCnxModuleId = IdWrapper.getIdWrapper(cnxModuleId);
+                    requiredCnxModuleId = new IdWrapper(cnxModuleId, IdWrapper.Type.MODULE);
                     requiredVersion = CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
                 }
 
                 if (aerCollectionId != null && preserveModuleIds) {
-                    requiredAerModuleId = IdWrapper.getIdWrapper(cnxModuleId);
+                    requiredAerModuleId = new IdWrapper(cnxModuleId, IdWrapper.Type.MODULE);
                 }
 
                 ParallelModuleMigrator moduleMigrator =

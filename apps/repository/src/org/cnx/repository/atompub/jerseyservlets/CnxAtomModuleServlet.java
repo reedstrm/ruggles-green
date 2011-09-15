@@ -18,6 +18,7 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.cnx.repository.atompub.CommonUtils.getURI;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
+import static org.cnx.repository.atompub.IdWrapper.Type.MODULE;
 
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
@@ -67,7 +68,7 @@ import javax.xml.bind.JAXBException;
  */
 @Path(CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH)
 public class CnxAtomModuleServlet {
-    Logger logger = Logger.getLogger(CnxAtomModuleServlet.class.getName());
+    private final Logger logger = Logger.getLogger(CnxAtomModuleServlet.class.getName());
     private final String MODULE_ID_PATH_PARAM = "moduleId";
     private final String MODULE_VERSION_PATH_PARAM = "moduleVersion";
 
@@ -111,7 +112,7 @@ public class CnxAtomModuleServlet {
     @Path(MODULE_MIGRATION_POST)
     public Response createNewModuleForMigration(@Context HttpServletRequest req,
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId) throws CnxException {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
+        final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
@@ -127,7 +128,8 @@ public class CnxAtomModuleServlet {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */
-            IdWrapper repoIdWrapper = IdWrapper.getIdWrapper(repoResult.getModuleId());
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(repoResult.getModuleId(), MODULE);
             VersionWrapper firstVersion = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
 
             Entry entry = new Entry();
@@ -167,7 +169,7 @@ public class CnxAtomModuleServlet {
     public Response createNewModuleVersion(@Context HttpServletRequest req,
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String version) throws CnxException {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
+        final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(version);
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
         Entry postedEntry = ServerUtil.getPostedEntry(logger, req);
@@ -212,11 +214,11 @@ public class CnxAtomModuleServlet {
             AddModuleVersionResult repoResult = createdModule.getResult();
             Entry entry = new Entry();
 
-            IdWrapper repoIdWrapper = IdWrapper.getIdWrapper(repoResult.getModuleId());
+            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), MODULE);
 
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getNewVersionNumber());
             VersionWrapper nextVersion = repoVersion.getNextVersion();
-            
+
             String atomPubId =
                     CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
             entry.setId(atomPubId);
@@ -255,7 +257,7 @@ public class CnxAtomModuleServlet {
     public Response getModuleVersion(@Context HttpServletRequest req,
             @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) throws CnxException {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
+        final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
@@ -268,7 +270,7 @@ public class CnxAtomModuleServlet {
             String cnxmlDoc = repoResult.getCnxmlDoc();
             String resourceMappingDoc = repoResult.getResourceMapDoc();
 
-            IdWrapper repoIdWrapper = IdWrapper.getIdWrapper(repoResult.getModuleId());
+            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), MODULE);
 
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
             Entry entry = new Entry();
@@ -319,7 +321,7 @@ public class CnxAtomModuleServlet {
     @Path(MODULE_VERSION_CNXML_URL)
     public Response getModuleVersionXml(@PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
+        final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
@@ -344,10 +346,9 @@ public class CnxAtomModuleServlet {
     @GET
     @Produces(CnxMediaTypes.TEXT_XML_UTF8)
     @Path(MODULE_VERSION_RESOURCE_MAPPING_URL)
-    public Response getModuleVersionResourcesXml(
-            @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
+    public Response getModuleVersionResourcesXml(@PathParam(MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(MODULE_VERSION_PATH_PARAM) String versionString) {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(moduleId);
+        final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
                 repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),

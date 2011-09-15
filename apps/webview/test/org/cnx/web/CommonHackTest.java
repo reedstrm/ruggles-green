@@ -32,7 +32,7 @@ public class CommonHackTest {
     public void test_handleCnxInvalidUrlException() {
         // First testing for Ids in restricted range. Here CnxPossibleValidIdException should
         // be thrown.
-        IdWrapper idWrapper = IdWrapper.getIdWrapper("m01234");
+        IdWrapper idWrapper = new IdWrapper("m01234", IdWrapper.Type.MODULE);
 
         try {
             CommonHack.handleCnxInvalidUrlException(idWrapper, new CnxInvalidUrlException("test",
@@ -44,7 +44,7 @@ public class CommonHackTest {
 
         // Now testing for Ids beyond restricted range. Here CnxInvalidUrlException should be
         // thrown.
-        idWrapper = IdWrapper.getIdWrapper("m100000");
+        idWrapper = new IdWrapper("m100000", IdWrapper.Type.MODULE);
 
         try {
             CommonHack.handleCnxInvalidUrlException(idWrapper, new CnxInvalidUrlException("test",

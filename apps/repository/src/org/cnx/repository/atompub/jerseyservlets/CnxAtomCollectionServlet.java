@@ -19,6 +19,7 @@ import static org.cnx.repository.atompub.CnxAtomPubConstants.COLLECTION_CNX_COLL
 import static org.cnx.repository.atompub.CommonUtils.getURI;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
+import static org.cnx.repository.atompub.IdWrapper.Type.COLLECTION;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
@@ -111,7 +112,7 @@ public class CnxAtomCollectionServlet {
     @Path(COLLECTION_MIGRATION_POST)
     public Response createNewCnxCollectionForMigration(@Context HttpServletRequest req,
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId) throws CnxException {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(collectionId);
+        final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateCollectionResult> createdCollection =
@@ -133,8 +134,7 @@ public class CnxAtomCollectionServlet {
 
             VersionWrapper firstVersion = CnxAtomPubConstants.NEW_CNX_COLLECTION_DEFAULT_VERSION;
 
-            IdWrapper repoIdWrapper =
-                    IdWrapper.getIdWrapper(result.getCollectionId());
+            IdWrapper repoIdWrapper = new IdWrapper(result.getCollectionId(), COLLECTION);
 
             String atomPubId =
                     CnxAtomPubConstants
@@ -170,7 +170,7 @@ public class CnxAtomCollectionServlet {
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String versionString) throws IOException,
             CnxException {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(collectionId);
+        final IdWrapper idWrapper = new IdWrapper(collectionId, COLLECTION);
         final VersionWrapper newVersion = new VersionWrapper(versionString);
 
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
@@ -196,7 +196,7 @@ public class CnxAtomCollectionServlet {
             entry.setId(repoResult.getCollectionId());
 
             // TODO(arjuns) : Move this to repository.
-            IdWrapper repoIdWrapper = IdWrapper.getIdWrapper(repoResult.getCollectionId());
+            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getCollectionId(), COLLECTION);
             VersionWrapper createdVersion = new VersionWrapper(repoResult.getNewVersionNumber());
          
             String atomPubId =
@@ -242,7 +242,7 @@ public class CnxAtomCollectionServlet {
     public Response getCnxCollectionVersion(@Context HttpServletRequest req,
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String versionString) throws CnxException {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(collectionId);
+        final IdWrapper idWrapper = new IdWrapper(collectionId, COLLECTION);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
@@ -254,7 +254,7 @@ public class CnxAtomCollectionServlet {
             GetCollectionVersionResult repoResult = collectionVersionResult.getResult();
             String collXmlDoc = repoResult.getColxmlDoc();
 
-            IdWrapper repoIdWrapper = IdWrapper.getIdWrapper(repoResult.getCollectionId());
+            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getCollectionId(), COLLECTION);
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
             
             Entry entry = new Entry();
@@ -306,7 +306,7 @@ public class CnxAtomCollectionServlet {
     public Response getCnxCollectionVersionXml(
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String versionString) {
-        final IdWrapper idWrapper = IdWrapper.getIdWrapper(collectionId);
+        final IdWrapper idWrapper = new IdWrapper(collectionId, COLLECTION);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
 
         RepositoryResponse<GetCollectionVersionResult> collectionVersionResult =

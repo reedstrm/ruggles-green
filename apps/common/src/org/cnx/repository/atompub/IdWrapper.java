@@ -17,6 +17,8 @@ package org.cnx.repository.atompub;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import org.cnx.repository.RepositoryConstants;
 
 import java.util.regex.Matcher;
@@ -39,10 +41,13 @@ public class IdWrapper {
 
     /**
      * Here Id string can be prefixed with 0.
+     *
+     * This method is only for CnxAtomPubClient to obtain IdWrapper from generic Id.
+     * All other should use Constructor and pass expected type.
      * 
      * @param id ids used in URLs. e.g. m0001 etc.
      */
-    public static IdWrapper getIdWrapper(String id) {
+    static IdWrapper getIdWrapper(String id) {
         if (id.startsWith(COLLECTION_ID_PREFIX)) {
             return new IdWrapper(id, Type.COLLECTION);
         } else if (id.startsWith(MODULE_ID_PREFIX)) {

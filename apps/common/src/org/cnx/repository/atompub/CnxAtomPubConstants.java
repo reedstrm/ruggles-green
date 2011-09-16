@@ -158,7 +158,7 @@ public class CnxAtomPubConstants {
     /** Get URL for CNXML for a ModuleVersion. */
     public URL getModuleVersionXmlAbsPath(IdWrapper moduleId, VersionWrapper version) {
         try {
-            return new URL(getModuleVersionAbsPath(moduleId, version).toString()
+            return new URL(getModuleVersionAbsPath(moduleId, version).toString() + "/"
                     + ServletUris.XML_DOC);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
@@ -168,10 +168,11 @@ public class CnxAtomPubConstants {
         }
     }
     
+    // TODO(arjuns) : Add tests for this.
     /** Get URL for ResourceMapping XML for a ModuleVersion. */
     public URL getModuleVersionResourceMappingAbsPath(IdWrapper moduleId, VersionWrapper version) {
         try {
-            return new URL(getModuleVersionAbsPath(moduleId, version).toString()
+            return new URL(getModuleVersionAbsPath(moduleId, version).toString() + "/"
                     + ServletUris.RESOURCE_MAPPING_DOC);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));

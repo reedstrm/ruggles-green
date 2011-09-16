@@ -196,11 +196,12 @@ public class CnxAtomPubConstants {
         }
     }
 
+    // TODO(arjuns) : Add test for this.
     /** Get URL for CollectionXml for a Collection-Version. */
     public URL getCollectionVersionXmlAbsPath(IdWrapper collectionId, VersionWrapper version) {
         try {
             URL url = getCollectionVersionAbsPath(collectionId, version);
-            return new URL(url.toString() + ServletUris.XML_DOC);
+            return new URL(url.toString() + "/" + ServletUris.XML_DOC);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
             // TODO(arjuns): Create a CNXAtomPubException to handle this.

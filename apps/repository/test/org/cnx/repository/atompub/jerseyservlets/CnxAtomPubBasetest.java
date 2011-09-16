@@ -15,15 +15,14 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 
 /**
  * BaseTest for all tests for CNX AtomPub API.
@@ -57,7 +56,7 @@ public abstract class CnxAtomPubBasetest extends JerseyTest {
      */
     public CnxAtomPubBasetest() throws MalformedURLException {
         super(new WebAppDescriptor.Builder(PACKAGE).contextPath(
-            CnxAtomPubConstants.ATOMPUB_URL_PREFIX).build());
+                CnxAtomPubUtils.ATOMPUB_URL_PREFIX).build());
 
         // TODO(arjuns) : Temp override as junit is not working with datastore.
 

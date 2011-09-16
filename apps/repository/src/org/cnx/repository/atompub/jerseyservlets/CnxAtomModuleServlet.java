@@ -44,7 +44,7 @@ import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
 import org.cnx.exceptions.CnxInternalServerErrorException;
 import org.cnx.repository.RepositoryConstants;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.ServletUris;
@@ -73,8 +73,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_POST_NEW}, then this method
-     * is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_POST_NEW}, then this method is
+     * invoked.
      * 
      * This method in turn sends request to {@link CnxRepositoryService#createModule}.
      * 
@@ -96,8 +96,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_POST_MIGRATION}, then this
-     * method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_POST_MIGRATION}, then this method
+     * is invoked.
      * 
      * This is a special function provided in order to allow migration and retaining of old
      * ModulesIds from CNX. Once migration is complete, this method will be removed.
@@ -130,12 +130,11 @@ public class CnxAtomModuleServlet {
              * TODO(arjuns): Repository service should return following : 1. date.
              */
             IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), MODULE);
-            VersionWrapper firstVersion = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
+            VersionWrapper firstVersion = CnxAtomPubUtils.NEW_MODULE_DEFAULT_VERSION;
 
             Entry entry = new Entry();
             String atomPubId =
-                    CnxAtomPubConstants
-                            .getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
             entry.setId(atomPubId);
 
             // TODO(arjuns) : Change URL to URI.
@@ -154,8 +153,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-PUT on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this
-     * method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this method
+     * is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#addModuleVersion}.
      * 
@@ -192,14 +191,12 @@ public class CnxAtomModuleServlet {
         String resourceMappingDoc;
         try {
             decodedModuleEntryValue =
-                    atomPubService.getConstants().decodeFromBase64EncodedString(
-                            encodedModuleEntryContent.getValue());
-            cnxmlDoc =
-                    atomPubService.getConstants().getCnxmlFromModuleEntryXml(
-                            decodedModuleEntryValue);
+                    CnxAtomPubUtils.decodeFromBase64EncodedString(encodedModuleEntryContent
+                            .getValue());
+            cnxmlDoc = CnxAtomPubUtils.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
             resourceMappingDoc =
-                    atomPubService.getConstants().getResourceMappingDocFromModuleEntryXml(
-                            decodedModuleEntryValue);
+                    CnxAtomPubUtils
+                            .getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
         } catch (UnsupportedEncodingException e) {
             throw new CnxBadRequestException("Invalid Encoding", e);
         } catch (JDOMException e) {
@@ -224,7 +221,7 @@ public class CnxAtomModuleServlet {
 
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getNewVersionNumber());
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
 
             entry.setId(atomPubId);
             entry.setPublished(new Date());
@@ -241,8 +238,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this
-     * method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this method
+     * is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#getModuleVersion}.
      * 
@@ -264,7 +261,7 @@ public class CnxAtomModuleServlet {
             throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
-        
+
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
@@ -281,11 +278,11 @@ public class CnxAtomModuleServlet {
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
             Entry entry = new Entry();
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
             entry.setId(atomPubId);
             // TODO(arjuns) : See if this can be refactored.
             try {
-                entry.setContents(atomPubService.getConstants().getAtomPubListOfContent(cnxmlDoc,
+                entry.setContents(CnxAtomPubUtils.getAtomPubListOfContent(cnxmlDoc,
                         resourceMappingDoc));
             } catch (JAXBException e) {
                 throw new CnxInternalServerErrorException("JAXBException", e);
@@ -305,8 +302,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_CNXML}, then this
-     * method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_CNXML}, then this method
+     * is invoked.
      * 
      * This method is used to fetch CNXML.
      * 
@@ -336,8 +333,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_RESOURCE_MAPPING},
-     * then this method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_RESOURCE_MAPPING}, then
+     * this method is invoked.
      * 
      * This method is used to fetch ResourceMapping XML.
      * 

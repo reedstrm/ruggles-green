@@ -19,6 +19,8 @@ import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollect
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxModule;
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxResource;
 
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -31,7 +33,7 @@ import com.sun.syndication.propono.atom.common.AtomService;
 import com.sun.syndication.propono.atom.common.Workspace;
 
 /**
- * Cnx AtomPub Service.
+ * CNX AtomPub Service.
  * 
  * @author Arjun Satyapal
  */
@@ -49,7 +51,7 @@ public class CnxAtomService extends AtomService {
 
         URL atomPubUrl = null;
         try {
-            atomPubUrl = new URL(hostUrl + "/" + CnxAtomPubConstants.ATOMPUB_URL_PREFIX);
+            atomPubUrl = new URL(hostUrl + "/" + CnxAtomPubUtils.ATOMPUB_URL_PREFIX);
         } catch (MalformedURLException e) {
             // TODO(arjuns) : Handle exception properly.
             throw new RuntimeException(e);
@@ -58,22 +60,15 @@ public class CnxAtomService extends AtomService {
         constants = new CnxAtomPubConstants(atomPubUrl);
 
         /*
-         * For Connexions repository, there is only one workspace. Each workspace will have three
-         * AtomPubcollections : 
-         *      1. Resources 
-         *      2. Modules 
-         *      3. Collections.
+         * For CNX repository, there is only one workspace. Each workspace will have three
+         * AtomPubcollections : 1. Resources 2. Modules 3. Collections.
          */
-        workspace =
-                new Workspace(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, CnxMediaTypes.TEXT_XML_UTF8);
+        workspace = new Workspace(CnxAtomPubUtils.CNX_WORKSPACE_TITLE, CnxMediaTypes.TEXT_XML_UTF8);
         getWorkspaces().add(workspace);
 
-        workspace
-                .addCollection(getCollectionForCnxResource(constants.getCollectionResourceScheme()));
-        workspace.addCollection(getCollectionForCnxModule(constants.getCollectionModuleScheme()));
-        workspace.addCollection(getCollectionForCnxCollection(constants
-                .getCollectionCnxCollectionScheme()));
-
+        workspace.addCollection(getCollectionForCnxResource(constants.getAPCResourceScheme()));
+        workspace.addCollection(getCollectionForCnxModule(constants.getAPCModuleScheme()));
+        workspace.addCollection(getCollectionForCnxCollection(constants.getAPCCollectionScheme()));
     }
 
     /**

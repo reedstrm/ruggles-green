@@ -15,6 +15,8 @@
  */
 package org.cnx.atompubclient;
 
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+
 import com.google.common.base.Preconditions;
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
@@ -144,21 +146,21 @@ public class CnxAtomPubClient {
      * Get AtomPub collection for CNX Resources.
      */
     public ClientCollection getCollectionResource() {
-        return getCollectionByTitle(CnxAtomPubConstants.COLLECTION_RESOURCE_TITLE);
+        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_RESOURCE_TITLE);
     }
 
     /**
      * Get AtomPub collection for CNX Modules.
      */
     public ClientCollection getCollectionModule() {
-        return getCollectionByTitle(CnxAtomPubConstants.COLLECTION_MODULE_TITLE);
+        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_MODULE_TITLE);
     }
 
     /**
      * Get AtomPub collection for CNX Collections.
      */
     public ClientCollection getCollectionCnxCollection() {
-        return getCollectionByTitle(CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_TITLE);
+        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_CNX_COLLECTION_TITLE);
     }
 
     /**
@@ -277,7 +279,7 @@ public class CnxAtomPubClient {
     public void createNewModuleVersion(ClientEntry moduleVersionEntry, final String cnxmlDoc,
             final String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
             IOException {
-        moduleVersionEntry.setContents(constants.getAtomPubListOfContent(cnxmlDoc,
+        moduleVersionEntry.setContents(CnxAtomPubUtils.getAtomPubListOfContent(cnxmlDoc,
                 resourceMappingXml));
         moduleVersionEntry.update();
     }
@@ -306,8 +308,8 @@ public class CnxAtomPubClient {
     public String getCnxml(ClientEntry moduleVersionEntry) throws JDOMException, IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-                constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
-        return constants.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
+                CnxAtomPubUtils.decodeFromBase64EncodedString(encodedModuleEntryValue);
+        return CnxAtomPubUtils.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
     }
 
     /**
@@ -323,8 +325,8 @@ public class CnxAtomPubClient {
             IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-                constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
-        return constants.getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
+                CnxAtomPubUtils.decodeFromBase64EncodedString(encodedModuleEntryValue);
+        return CnxAtomPubUtils.getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
     }
 
     /**
@@ -368,7 +370,7 @@ public class CnxAtomPubClient {
             resourceFromEntry.setLocationInformation(locationInformation);
         }
 
-        return constants.jaxbObjectToString(Resources.class, resources);
+        return CnxAtomPubUtils.jaxbObjectToString(Resources.class, resources);
     }
 
     /**
@@ -445,7 +447,7 @@ public class CnxAtomPubClient {
     public void
             createNewCollectionVersion(ClientEntry collectionVersionEntry, final String collXml)
                     throws ProponoException, JAXBException, JDOMException, IOException {
-        collectionVersionEntry.setContents(constants
+        collectionVersionEntry.setContents(CnxAtomPubUtils
                 .getAtomPubListOfContentForCollectionEntry(collXml));
         collectionVersionEntry.update();
     }

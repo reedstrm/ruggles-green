@@ -17,10 +17,8 @@ package org.cnx.atompubclient;
 
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-
 import java.util.List;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 
 /**
  * Utility class for CNX Clients.
@@ -47,7 +45,7 @@ public class CnxClientUtils {
         List<Link> otherLinks = entry.getOtherLinks();
 
         for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL)) {
+            if (currLink.getRel().equals(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL)) {
                 return currLink;
             }
         }
@@ -67,7 +65,7 @@ public class CnxClientUtils {
         List<Link> otherLinks = entry.getOtherLinks();
 
         for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubConstants.REL_TAG_FOR_SELF_URL)) {
+            if (currLink.getRel().equals(CnxAtomPubUtils.REL_TAG_FOR_SELF_URL)) {
                 return currLink;
             }
         }

@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
  * CNX Exception to represent NOT_FOUND (404).
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class CnxInvalidUrlException extends CnxRuntimeException {
     public CnxInvalidUrlException(String message, Throwable throwable) {
         super(Status.NOT_FOUND, message, throwable);

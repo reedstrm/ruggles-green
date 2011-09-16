@@ -33,6 +33,7 @@ import com.google.inject.Key;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 
+@SuppressWarnings("serial")
 public class FrontPageServlet extends HttpServlet {
     private Injector injector;
 

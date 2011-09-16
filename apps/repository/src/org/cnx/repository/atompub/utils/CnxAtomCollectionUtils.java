@@ -15,13 +15,11 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import java.net.URL;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
+import java.net.URL;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 
 /**
  * Utility class for CNX AtomCollections.
@@ -34,17 +32,17 @@ public class CnxAtomCollectionUtils {
     }
 
     public static Collection getCollectionForCnxResource(URL resourceScheme) {
-        return getCnxCollection(CnxAtomPubConstants.COLLECTION_RESOURCE_TITLE, resourceScheme,
+        return getCnxCollection(CnxAtomPubUtils.COLLECTION_RESOURCE_TITLE, resourceScheme,
                 CnxAtomCategoryUtils.getCnxResourceCategoryEle(resourceScheme));
     }
 
     public static Collection getCollectionForCnxModule(URL moduleScheme) {
-        return getCnxCollection(CnxAtomPubConstants.COLLECTION_MODULE_TITLE, moduleScheme,
+        return getCnxCollection(CnxAtomPubUtils.COLLECTION_MODULE_TITLE, moduleScheme,
                 CnxAtomCategoryUtils.getCnxModuleCategoryEle(moduleScheme));
     }
 
     public static Collection getCollectionForCnxCollection(URL cnxCollectionScheme) {
-        return getCnxCollection(CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_TITLE,
+        return getCnxCollection(CnxAtomPubUtils.COLLECTION_CNX_COLLECTION_TITLE,
                 cnxCollectionScheme,
                 CnxAtomCategoryUtils.getCnxCollectionCategoryEle(cnxCollectionScheme));
     }

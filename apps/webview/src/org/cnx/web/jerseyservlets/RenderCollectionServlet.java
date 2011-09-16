@@ -19,6 +19,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -185,8 +187,7 @@ public class RenderCollectionServlet {
         }
 
         String collXml =
-                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
-                        collectionVersionEntry);
+                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
 
         final Collection collection =
                 injector.getInstance(CollectionFactory.class).create(collectionId,
@@ -331,8 +332,7 @@ public class RenderCollectionServlet {
         }
 
         String collXml =
-                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
-                        collectionVersionEntry);
+                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
 
         final Collection collection =
                 injector.getInstance(CollectionFactory.class).create(collectionId,

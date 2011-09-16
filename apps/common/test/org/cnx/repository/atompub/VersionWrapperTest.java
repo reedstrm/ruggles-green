@@ -15,6 +15,7 @@
  */
 package org.cnx.repository.atompub;
 
+import static org.cnx.repository.atompub.CnxAtomPubUtils.LATEST_VERSION_STRING;
 import static org.junit.Assert.*;
 
 import org.cnx.exceptions.CnxInvalidUrlException;
@@ -51,7 +52,7 @@ public class VersionWrapperTest {
         VersionWrapper versionWrapper = new VersionWrapper("100");
         assertEquals("100", versionWrapper.toString());
 
-        versionWrapper = new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING);
+        versionWrapper = new VersionWrapper(LATEST_VERSION_STRING);
         assertNull(versionWrapper.getVersionInt());
 
         // Now testing for invalid values.
@@ -95,7 +96,7 @@ public class VersionWrapperTest {
             // expected.
         }
         
-        versionWrapper = new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING);
+        versionWrapper = CnxAtomPubUtils.LATEST_VERSION_WRAPPER;
         try {
             versionWrapper.getNextVersion();
         } catch (IllegalStateException e) {

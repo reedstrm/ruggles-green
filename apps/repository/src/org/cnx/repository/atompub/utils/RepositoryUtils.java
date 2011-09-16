@@ -15,14 +15,12 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import java.net.URL;
-import java.util.List;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.service.api.RepositoryRequestContext;
-
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.atom.Link;
+import java.net.URL;
+import java.util.List;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.repository.service.api.RepositoryRequestContext;
 
 /**
  *
@@ -42,14 +40,14 @@ public class RepositoryUtils {
 
         if (selfUrl != null) {
             Link selfLink = new Link();
-            selfLink.setRel(CnxAtomPubConstants.LINK_RELATION_SELF_TAG);
+            selfLink.setRel(CnxAtomPubUtils.LINK_RELATION_SELF_TAG);
             selfLink.setHref(selfUrl.toString());
             listOfLinks.add(selfLink);
         }
 
         if (editUrl != null) {
             Link editLink = new Link();
-            editLink.setRel(CnxAtomPubConstants.LINK_RELATION_EDIT_TAG);
+            editLink.setRel(CnxAtomPubUtils.LINK_RELATION_EDIT_TAG);
             editLink.setHref(editUrl.toString());
             listOfLinks.add(editLink);
         }

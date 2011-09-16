@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.atompubclient.CnxClientUtils;
 import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.junit.Before;
@@ -63,9 +63,9 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     public void testCreateCollection() throws Exception {
         File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
         String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
-        
+
         ClientEntry collectionEntry = cnxClient.createNewCollection();
-        IdWrapper collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
+        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
 
         // TODO(arjuns) : Add a regex test here.
         String expectedCollectionUrl =
@@ -80,14 +80,14 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
 
         logger.info("New location for collection = \n" + expectedCollectionUrl);
 
-        VersionWrapper latestVersion =
-                new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING);
-        ClientEntry getEntry = cnxClient.getCollectionVersionEntry(collectionId, latestVersion);
+        ClientEntry getEntry =
+                cnxClient.getCollectionVersionEntry(collectionId,
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
 
         String downloadedCollXml =
-                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(getEntry);
+                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(getEntry);
 
-         assertEquals(collXmlAsString, downloadedCollXml);
+        assertEquals(collXmlAsString, downloadedCollXml);
     }
 
     @Test
@@ -99,14 +99,13 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
         cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
 
-        IdWrapper collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
+        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
         ClientEntry latestEntry =
-                cnxClient.getCollectionVersionEntry(collectionId, new VersionWrapper(
-                        CnxAtomPubConstants.LATEST_VERSION_STRING));
+                cnxClient.getCollectionVersionEntry(collectionId,
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
         assertEquals(new VersionWrapper(2),
-                CnxAtomPubConstants.getVersionFromAtomPubId(latestEntry.getId()));
+                CnxAtomPubUtils.getVersionFromAtomPubId(latestEntry.getId()));
     }
-
 
     /*
      * Purpose of this test is to test the state after creating a moduleId but not publishing any
@@ -116,11 +115,11 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     public void testGetCollectionVersion_withoutPublishingAnyVersion() throws Exception {
         ClientEntry collectionEntry = cnxClient.createNewCollection();
 
-        IdWrapper collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
+        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
 
         List<VersionWrapper> listOfInvalidVersions =
-                Lists.newArrayList(new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING),
-                        new VersionWrapper(0), new VersionWrapper(1));
+                Lists.newArrayList(CnxAtomPubUtils.LATEST_VERSION_WRAPPER, new VersionWrapper(0),
+                        new VersionWrapper(1));
 
         for (VersionWrapper currentVersion : listOfInvalidVersions) {
             try {
@@ -136,9 +135,9 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     public void testGetCollectionVersion_0() throws Exception {
         File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
         String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
-        
+
         ClientEntry collectionEntry = cnxClient.createNewCollection();
-        IdWrapper collectionId = CnxAtomPubConstants.getIdFromAtomPubId(collectionEntry.getId());
+        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
 
         cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
 
@@ -150,20 +149,20 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         } catch (CnxInvalidUrlException e) {
             // expected.
         }
-        
+
         version = new VersionWrapper(1);
         try {
             ClientEntry entry = cnxClient.getCollectionVersionEntry(collectionId, version);
-            IdWrapper downloadedId = CnxAtomPubConstants.getIdFromAtomPubId(entry.getId());
+            IdWrapper downloadedId = CnxAtomPubUtils.getIdFromAtomPubId(entry.getId());
             VersionWrapper downloadedVersion =
-                    CnxAtomPubConstants.getVersionFromAtomPubId(entry.getId());
-            
+                    CnxAtomPubUtils.getVersionFromAtomPubId(entry.getId());
+
             assertEquals(collectionId, downloadedId);
             assertEquals(version, downloadedVersion);
         } catch (Exception e) {
             fail("should not have failed." + Throwables.getStackTraceAsString(e));
         }
     }
-    
+
     // TODO(arjuns) : Add test for collectionMigration for forced ids.
 }

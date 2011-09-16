@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
  *
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class CnxInternalServerErrorException extends CnxException {
     public CnxInternalServerErrorException(String message, Throwable throwable) {
         super(Status.INTERNAL_SERVER_ERROR, message, throwable);

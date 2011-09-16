@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
  * 
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class CnxBadRequestException extends CnxException {
     public CnxBadRequestException(String message, Throwable throwable) {
         super(Status.BAD_REQUEST, message, throwable);

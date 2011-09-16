@@ -42,7 +42,7 @@ import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
 import org.cnx.exceptions.CnxInternalServerErrorException;
 import org.cnx.repository.RepositoryConstants;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.ServletUris;
@@ -133,13 +133,12 @@ public class CnxAtomCollectionServlet {
             CreateCollectionResult result = createdCollection.getResult();
             Entry entry = new Entry();
 
-            VersionWrapper firstVersion = CnxAtomPubConstants.NEW_CNX_COLLECTION_DEFAULT_VERSION;
+            VersionWrapper firstVersion = CnxAtomPubUtils.NEW_CNX_COLLECTION_DEFAULT_VERSION;
 
             IdWrapper repoIdWrapper = new IdWrapper(result.getCollectionId(), COLLECTION);
 
             String atomPubId =
-                    CnxAtomPubConstants
-                            .getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
             entry.setId(atomPubId);
 
             URL editUrl =
@@ -157,8 +156,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-PUT on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then
-     * this method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
+     * method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#addCollectionVersion}.
      * 
@@ -189,7 +188,7 @@ public class CnxAtomCollectionServlet {
         }
 
         String decodedCollXml =
-                atomPubService.getConstants().getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
+                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
 
         RepositoryResponse<AddCollectionVersionResult> createdCollection =
                 repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
@@ -208,7 +207,7 @@ public class CnxAtomCollectionServlet {
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getNewVersionNumber());
 
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(idWrapper, repoVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(idWrapper, repoVersion);
 
             entry.setId(atomPubId);
             // TODO(arjuns) : Repository should return date.
@@ -225,8 +224,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then
-     * this method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
+     * method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#getCollectionVersion}.
      * 
@@ -263,12 +262,12 @@ public class CnxAtomCollectionServlet {
 
             Entry entry = new Entry();
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(idWrapper, repoVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(idWrapper, repoVersion);
             entry.setId(atomPubId);
 
             // TODO(arjuns) : See if this can be refactored.
             try {
-                entry.setContents(atomPubService.getConstants()
+                entry.setContents(CnxAtomPubUtils
                         .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
             } catch (JAXBException e) {
                 throw new CnxInternalServerErrorException("JAXBException", e);
@@ -287,8 +286,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML},
-     * then this method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML}, then
+     * this method is invoked.
      * 
      * This method is used to fetch CNXML.
      * 
@@ -315,14 +314,15 @@ public class CnxAtomCollectionServlet {
 
         return fromRepositoryError(logger, collectionVersionResult);
     }
-    
+
     private List<Link> getListOfLinks(IdWrapper id, VersionWrapper version) {
         // URL to fetch the Collection which was published now.
         URL selfUrl = atomPubService.getConstants().getCollectionVersionAbsPath(id, version);
 
         // URL where client should do HTTP PUT next time in order to publish new version.
         URL editUrl =
-                atomPubService.getConstants().getCollectionVersionAbsPath(id, version.getNextVersion());
+                atomPubService.getConstants().getCollectionVersionAbsPath(id,
+                        version.getNextVersion());
 
         List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
 

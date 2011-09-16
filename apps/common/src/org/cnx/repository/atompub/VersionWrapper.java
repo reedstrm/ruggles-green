@@ -15,10 +15,9 @@
  */
 package org.cnx.repository.atompub;
 
-import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_STRING;
+import static org.cnx.repository.atompub.CnxAtomPubUtils.LATEST_VERSION_STRING;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import org.cnx.exceptions.CnxInvalidUrlException;
 
 /**
@@ -52,7 +51,7 @@ public class VersionWrapper {
     public VersionWrapper getNextVersion() {
         if (version == null) {
             throw new IllegalStateException("getNext operation is not valid for version="
-                    + CnxAtomPubConstants.LATEST_VERSION_STRING);
+                    + LATEST_VERSION_STRING);
         }
         return new VersionWrapper(version + 1);
     }
@@ -88,7 +87,7 @@ public class VersionWrapper {
 
     @VisibleForTesting
     static boolean isValidVersion(String version) {
-        if (version.equals(CnxAtomPubConstants.LATEST_VERSION_STRING)) {
+        if (version.equals(LATEST_VERSION_STRING)) {
             return true;
         }
 

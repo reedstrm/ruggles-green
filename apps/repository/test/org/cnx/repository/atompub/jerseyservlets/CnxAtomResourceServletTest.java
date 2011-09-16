@@ -18,13 +18,14 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.atompubclient.CnxClientUtils;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,11 +75,11 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
         assertEquals(2, listOfLinks.size());
 
         Link selfLink = listOfLinks.get(0);
-        assertEquals(CnxAtomPubConstants.REL_TAG_FOR_SELF_URL, selfLink.getRel());
+        assertEquals(CnxAtomPubUtils.REL_TAG_FOR_SELF_URL, selfLink.getRel());
         assertEquals(expectedResourceUrl, selfLink.getHref());
 
         Link blobStoreLink = listOfLinks.get(1);
-        assertEquals(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL, blobStoreLink.getRel());
+        assertEquals(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL, blobStoreLink.getRel());
         assertNotNull(blobStoreLink.getHref());
 
         // Now upload blob to AppEngine.

@@ -18,6 +18,8 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.client.ClientWorkspace;
 import com.sun.syndication.propono.atom.common.Categories;
@@ -27,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.ServletUris;
 import org.junit.Before;
@@ -54,20 +55,18 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     public void testCnxServiceDocument() {
         ClientWorkspace workspace = cnxClient.getWorkspace();
         assertEquals(3, workspace.getCollections().size());
-        assertEquals(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, workspace.getTitle());
+        assertEquals(CnxAtomPubUtils.CNX_WORKSPACE_TITLE, workspace.getTitle());
         assertEquals(CnxMediaTypes.TEXT_XML_UTF8, workspace.getTitleType());
 
         // Now validate each collection individually.
         validateCollection(cnxClient.getCollectionResource(),
-                ServletUris.Resource.RESOURCE_SERVLET, getConstants()
-                        .getCollectionResourceScheme());
+                ServletUris.Resource.RESOURCE_SERVLET, getConstants().getAPCResourceScheme());
 
         validateCollection(cnxClient.getCollectionModule(), ServletUris.Module.MODULE_SERVLET,
-                getConstants().getCollectionModuleScheme());
+                getConstants().getAPCModuleScheme());
 
         validateCollection(cnxClient.getCollectionCnxCollection(),
-                ServletUris.Collection.COLLECTION_SERVLET, getConstants()
-                        .getCollectionCnxCollectionScheme());
+                ServletUris.Collection.COLLECTION_SERVLET, getConstants().getAPCCollectionScheme());
     }
 
     private void

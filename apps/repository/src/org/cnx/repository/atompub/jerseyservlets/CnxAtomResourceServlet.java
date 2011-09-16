@@ -21,10 +21,6 @@ import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromReposito
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
 import static org.cnx.repository.atompub.utils.ServerUtil.getPostedEntry;
 
-import org.cnx.repository.RepositoryConstants;
-
-import org.cnx.repository.atompub.ServletUris;
-
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
@@ -47,9 +43,11 @@ import javax.ws.rs.core.Response.Status;
 import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
 import org.cnx.repository.FileContentTypeEnum;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.RepositoryConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
@@ -159,7 +157,7 @@ public class CnxAtomResourceServlet {
 
             URI editUrl = getURI(uploadUrl);
             Link blobstoreLink = new Link();
-            blobstoreLink.setRel(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL);
+            blobstoreLink.setRel(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL);
             blobstoreLink.setHref(editUrl.toString());
 
             listOfLinks.add(blobstoreLink);

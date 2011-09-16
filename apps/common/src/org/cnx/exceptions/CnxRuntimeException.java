@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
  * 
  * @author (Arjun Satyapal)
  */
+@SuppressWarnings("serial")
 public class CnxRuntimeException extends RuntimeException {
     private Status jerseyStatus;
     public CnxRuntimeException(Status jerseyStatus, String message, Throwable throwable) {

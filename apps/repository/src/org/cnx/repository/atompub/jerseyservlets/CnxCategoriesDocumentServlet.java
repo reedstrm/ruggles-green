@@ -53,10 +53,9 @@ public class CnxCategoriesDocumentServlet {
 
         CnxAtomPubConstants constants = atomService.getConstants();
         Categories categories = new Categories();
-        categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
-        categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));
-        categories.addCategory(getCnxCollectionCategoryEle(constants
-                .getCollectionCnxCollectionScheme()));
+        categories.addCategory(getCnxResourceCategoryEle(constants.getAPCResourceScheme()));
+        categories.addCategory(getCnxModuleCategoryEle(constants.getAPCModuleScheme()));
+        categories.addCategory(getCnxCollectionCategoryEle(constants.getAPCCollectionScheme()));
 
         return Response
                 .ok()

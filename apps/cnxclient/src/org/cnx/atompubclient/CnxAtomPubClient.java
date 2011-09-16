@@ -198,13 +198,11 @@ public class CnxAtomPubClient {
      * Upload file to blobstore.
      * 
      * @param resourceEntry Entry of Resource, which contains link to Blobstore.
-     * @param resourceName : Pretty name for the resource. This will be used to create the
-     *            resourceMappingDoc.
      * @param file : File to be uploaded to CNX Repository.
      * 
      *            TODO(arjuns) : Replace file with InputStream so that it can work on AppEngine.
      */
-    public void uploadFileToBlobStore(ClientEntry resourceEntry, String resourceName, File file)
+    public void uploadFileToBlobStore(ClientEntry resourceEntry, File file)
             throws HttpException, IOException {
         Link blobstoreUrl = CnxClientUtils.getBlobstoreUri(resourceEntry);
         URL postUrl = new URL(blobstoreUrl.getHrefResolved());

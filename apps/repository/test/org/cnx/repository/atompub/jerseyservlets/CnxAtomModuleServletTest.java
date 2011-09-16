@@ -72,7 +72,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         for (File currFile : listOfResourcesToUpload) {
             ClientEntry resourceEntry = cnxClient.createNewResource();
             logger.info("Attempting to upload : " + currFile.getAbsolutePath());
-            cnxClient.uploadFileToBlobStore(resourceEntry, currFile.getName(), currFile);
+            cnxClient.uploadFileToBlobStore(resourceEntry, currFile);
             listOfEntryForUploadedResources.add(resourceEntry);
             logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
                     + resourceEntry.getId() + "], and can be found here ["

@@ -62,7 +62,7 @@ public class ParallelResourceMigrator implements Runnable {
             try {
                 logger.info("Trying to upload : " + resourceLocation);
                 resourceEntry = cnxClient.createNewResource();
-                cnxClient.uploadFileToBlobStore(resourceEntry, file.getName(), file);
+                cnxClient.uploadFileToBlobStore(resourceEntry, file);
                 success = true;
                 String resourceUrl = CnxClientUtils.getSelfUri(resourceEntry).getHrefResolved();
                 logger.info("Successfully uploaded : " + resourceLocation + " to : " + resourceUrl);

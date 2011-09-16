@@ -49,7 +49,7 @@ public class IdWrapperTest {
     @Test
     public void testIdsForRestrictedIds() {
         List<String> listOfValidIds = Lists.newArrayList("m0001", "m0010", "m0100",
-                "col0001", "r0001", "m0405");
+                "col0001", "col0010", "col0100", "r0001", "r0010", "r0100", "m0405");
 
         for (String currString : listOfValidIds) {
             IdWrapper idWrapper = IdWrapper.getIdWrapper(currString);    

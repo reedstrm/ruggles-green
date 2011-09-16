@@ -18,6 +18,8 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.cnx.exceptions.CnxConflictException;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -68,9 +70,9 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
         for (File currFile : listOfResourcesToUpload) {
+            ClientEntry resourceEntry = cnxClient.createNewResource();
             logger.info("Attempting to upload : " + currFile.getAbsolutePath());
-            ClientEntry resourceEntry =
-                    cnxClient.uploadFileToBlobStore(currFile.getName(), currFile);
+            cnxClient.uploadFileToBlobStore(resourceEntry, currFile.getName(), currFile);
             listOfEntryForUploadedResources.add(resourceEntry);
             logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
                     + resourceEntry.getId() + "], and can be found here ["
@@ -190,6 +192,19 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
             assertEquals(version, downloadedVersion);
         } catch (Exception e) {
             fail("should not have failed." + Throwables.getStackTraceAsString(e));
+        }
+    }
+    
+    @Test
+    public void test_cretateNewResourceForMigration() throws Exception {
+        // TODO(arjuns) : ensure that resource does not exist earlier.Current hack.
+        try {
+            IdWrapper id = new IdWrapper("m0010", IdWrapper.Type.MODULE);
+            cnxClient.createNewModuleForMigration(id);
+            cnxClient.createNewModuleForMigration(id);
+            fail("should have failed.");
+        } catch (CnxConflictException e) {
+            // expected.
         }
     }
 }

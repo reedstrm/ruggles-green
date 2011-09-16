@@ -18,6 +18,8 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.cnx.exceptions.CnxConflictException;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -164,5 +166,18 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         }
     }
 
+    @Test
+    public void test_cretateNewResourceForMigration() throws Exception {
+        // TODO(arjuns) : ensure that resource does not exist earlier.Current hack.
+
+        try {
+            IdWrapper id = new IdWrapper("col0010", IdWrapper.Type.COLLECTION);
+            cnxClient.createNewCollectionForMigration(id);
+            cnxClient.createNewCollectionForMigration(id);
+            fail("should have failed.");
+        } catch (CnxConflictException e) {
+            // expected.
+        }
+    }
     // TODO(arjuns) : Add test for collectionMigration for forced ids.
 }

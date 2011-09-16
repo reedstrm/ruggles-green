@@ -16,8 +16,11 @@
 
 package org.cnx.repository.atompub.utils;
 
-import static org.cnx.repository.atompub.utils.PrettyXmlOutputter.prettyXmlOutputEntry;
-
+import com.google.appengine.api.utils.SystemProperty;
+import com.google.common.base.Charsets;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,18 +28,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
-
-import com.google.appengine.api.utils.SystemProperty;
-import com.google.common.base.Charsets;
-
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.impl.Atom10Parser;
-
 import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
+import org.cnx.repository.PrettyXmlOutputter;
 import org.jdom.JDOMException;
 
 /**
@@ -95,7 +90,7 @@ public class ServerUtil {
             throw new CnxBadRequestException("FeedException.", e);
         }
 
-        logger.fine("Received Entry : " + prettyXmlOutputEntry(postedEntry));
+        logger.fine("Received Entry : " + PrettyXmlOutputter.prettyXmlOutputEntry(postedEntry));
         return postedEntry;
     }
 }

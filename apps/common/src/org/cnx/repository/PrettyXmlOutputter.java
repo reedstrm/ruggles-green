@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.utils;
+package org.cnx.repository;
 
 import java.io.IOException;
 import java.io.StringWriter;

@@ -19,7 +19,6 @@ import static org.cnx.repository.atompub.CommonUtils.getURI;
 import static org.cnx.repository.atompub.IdWrapper.Type.RESOURCE;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
-import static org.cnx.repository.atompub.utils.ServerUtil.getPostedEntry;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
@@ -71,8 +70,8 @@ public class CnxAtomResourceServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_NEW}, then this
-     * method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_NEW}, then this method
+     * is invoked.
      * 
      * This method in turn sends request to {@link CnxRepositoryService#createResource}.
      * 
@@ -86,18 +85,16 @@ public class CnxAtomResourceServlet {
     public Response createNewResource(@Context HttpServletRequest req) throws CnxException {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        Entry postedEntry = getPostedEntry(logger, req);
-
         RepositoryResponse<CreateResourceResult> createdResource =
                 repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
-        return handleCreationOfResource(req, atomPubService, postedEntry, createdResource);
+        return handleCreationOfResource(req, atomPubService, createdResource);
     }
 
     /**
      * When Clients does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_MIGRATION}, then
-     * this method is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_MIGRATION}, then this
+     * method is invoked.
      * 
      * This is a special function provided in order to allow migration and retaining old ResourceIds
      * from CNX. Once migration is complete, this method will be removed.
@@ -112,24 +109,21 @@ public class CnxAtomResourceServlet {
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
     @Path(ServletUris.Resource.RESOURCE_POST_MIGRATION)
     public Response createNewResourceForMigration(@Context HttpServletRequest req,
-            @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId)
-            throws CnxException {
+            @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
-
-        Entry postedEntry = getPostedEntry(logger, req);
 
         RepositoryResponse<CreateResourceResult> createdResource =
                 repositoryService.migrationCreateResourceWithId(
                         RepositoryUtils.getRepositoryContext(), idWrapper.getId());
 
-        return handleCreationOfResource(req, atomPubService, postedEntry, createdResource);
+        return handleCreationOfResource(req, atomPubService, createdResource);
     }
 
-    private Response handleCreationOfResource(HttpServletRequest req,
-            CnxAtomService atomPubService, Entry postedEntry,
-            RepositoryResponse<CreateResourceResult> createdResource)
-            throws CnxBadRequestException, CnxException {
+    private Response
+            handleCreationOfResource(HttpServletRequest req, CnxAtomService atomPubService,
+                    RepositoryResponse<CreateResourceResult> createdResource)
+                    throws CnxBadRequestException, CnxException {
         if (createdResource.isOk()) {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
@@ -137,7 +131,6 @@ public class CnxAtomResourceServlet {
             CreateResourceResult repoResult = createdResource.getResult();
             Entry entry = new Entry();
             entry.setId(repoResult.getResourceId());
-            entry.setTitle(postedEntry.getTitle());
             entry.setPublished(new Date());
 
             // TODO(arjuns) : Create a function for this.
@@ -175,15 +168,14 @@ public class CnxAtomResourceServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_PATH}, then this method
-     * is invoked.
+     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_PATH}, then this method is
+     * invoked.
      * 
      * This method in turn contacts {@link CnxRepositoryService#serveResouce}.
      * 
-     *  This method is used to fetch Resource from repository. Repository returns a set of headers, 
-     *  which are set as part of the response. One of the important headers is BlobKey.
-     *  This header is consumed by AppEngine, and AppEngine replaces this header with actual 
-     *  Blobstore content.
+     * This method is used to fetch Resource from repository. Repository returns a set of headers,
+     * which are set as part of the response. One of the important headers is BlobKey. This header
+     * is consumed by AppEngine, and AppEngine replaces this header with actual Blobstore content.
      * 
      * @param res HttpServletResponse.
      * @param resourceId ResourceId requested by Client.

@@ -14,22 +14,17 @@
  * the License.
  */
 package org.cnx.exceptions;
+
 import javax.ws.rs.core.Response.Status;
 
 /**
- * A wrapper exception that will be used to send exception details back to client.
+ * CnxException to indicate a {@link Status#CONFLICT}.
  * 
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
-public class CnxException extends Exception {
-    private Status jerseyStatus;
-    public CnxException(Status jerseyStatus, String message, Throwable throwable) {
-        super(message, throwable);
-        this.jerseyStatus = jerseyStatus;
-    }
-    
-    public Status getJerseyStatus() {
-        return jerseyStatus;
+public class CnxConflictException extends CnxException {
+    public CnxConflictException(String message, Throwable throwable) {
+        super(Status.CONFLICT, message, throwable);
     }
 }

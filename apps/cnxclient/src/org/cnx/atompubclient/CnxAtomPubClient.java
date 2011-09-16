@@ -39,7 +39,6 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -52,6 +51,7 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.resourceentry.ResourceEntryValue;
 import org.cnx.resourcemapping.LocationInformation;
@@ -67,8 +67,6 @@ import org.jdom.JDOMException;
  * @author Arjun Satyapal
  */
 public class CnxAtomPubClient {
-    Logger logger = Logger.getLogger(CnxAtomPubClient.class.getName());
-
     // TODO(arjuns0 : Currently hardcoding these values.
     private final String REPOSITORY_ID = "cnx-repo";
     private final BigDecimal RESOURCE_MAPPING_DOC_VERSION = new BigDecimal(1.0);
@@ -121,7 +119,8 @@ public class CnxAtomPubClient {
         constants = new CnxAtomPubConstants(atomPubServerUrl);
 
         URL serviceDocumentUri =
-                new URL(atomPubServerUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
+                new URL(atomPubServerUrl.toString()
+                        + ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET);
 
         service =
                 AtomClientFactory.getAtomService(serviceDocumentUri.toString(),
@@ -221,7 +220,7 @@ public class CnxAtomPubClient {
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
         Part[] parts = { new FilePart(file.getName(), file), };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
-        int status = httpClient.executeMethod(postMethod);
+//        int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
         // Preconditions.checkState(status == 302);
     }
@@ -267,7 +266,7 @@ public class CnxAtomPubClient {
      * {@link #createNewModule()}.
      * 
      * @param moduleVersionEntry Module Version entry to be updated. On success, moduleVersionEntry
-     *      will be updated with response returned from Repository.
+     *            will be updated with response returned from Repository.
      * @param cnxmlDoc CNXML Doc.
      * @param resourceMappingXml XML for Resource Mapping.
      * 
@@ -275,9 +274,9 @@ public class CnxAtomPubClient {
      * @throws IOException
      * @throws JDOMException
      */
-    public void createNewModuleVersion(ClientEntry moduleVersionEntry,
-            final String cnxmlDoc, final String resourceMappingXml) throws ProponoException,
-            JAXBException, JDOMException, IOException {
+    public void createNewModuleVersion(ClientEntry moduleVersionEntry, final String cnxmlDoc,
+            final String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
+            IOException {
         moduleVersionEntry.setContents(constants.getAtomPubListOfContent(cnxmlDoc,
                 resourceMappingXml));
         moduleVersionEntry.update();
@@ -299,9 +298,8 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * Get CNXML from AtomEntry for a Module-Version.
-     *  TODO(arjuns) : Move this to utility class.
-     *  
+     * Get CNXML from AtomEntry for a Module-Version. TODO(arjuns) : Move this to utility class.
+     * 
      * @param moduleVersionEntry Atom Entry returned by Server for a particular module-version.
      * @return Returns CNXML (response is already decoded).
      */
@@ -436,17 +434,17 @@ public class CnxAtomPubClient {
      * NOTE : If it is first version, then a collectionId must be obtained using
      * {@link #createNewCollection}.
      * 
-     * @param collectionVersionEntry Collection Entry that needs to be published. On success, 
-     *      collectionVersionEntry will be updated with response returned from Repository.
+     * @param collectionVersionEntry Collection Entry that needs to be published. On success,
+     *            collectionVersionEntry will be updated with response returned from Repository.
      * @param collXml Collection XML Doc.
      * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
      */
-    public void createNewCollectionVersion(ClientEntry collectionVersionEntry,
-            final String collXml) throws ProponoException, JAXBException, JDOMException,
-            IOException {
+    public void
+            createNewCollectionVersion(ClientEntry collectionVersionEntry, final String collXml)
+                    throws ProponoException, JAXBException, JDOMException, IOException {
         collectionVersionEntry.setContents(constants
                 .getAtomPubListOfContentForCollectionEntry(collXml));
         collectionVersionEntry.update();

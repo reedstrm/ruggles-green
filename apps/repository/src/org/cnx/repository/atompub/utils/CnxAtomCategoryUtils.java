@@ -15,15 +15,14 @@
  */
 package org.cnx.repository.atompub.utils;
 
-import java.net.URL;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-
 import com.sun.syndication.feed.atom.Category;
+import java.net.URL;
+import org.cnx.repository.atompub.ServletUris;
 
 /**
  * Utility class for AtomCategories.
  * 
+ * TODO(arjuns) : Revisit this class.
  * @author Arjun Satyapal
  */
 public class CnxAtomCategoryUtils {
@@ -32,34 +31,34 @@ public class CnxAtomCategoryUtils {
     }
 
     /**
-     * Get Category for Cnx Resources.
+     * Get Category for CNX Resources.
      * 
-     * @param resourceScheme Scheme for Cnx Resources.
+     * @param resourceScheme Scheme for CNX Resources.
      */
     public static Category getCnxResourceCategoryEle(URL resourceScheme) {
-        return getCnxCategoryEle(resourceScheme, CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH,
-                CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH);
+        return getCnxCategoryEle(resourceScheme, ServletUris.Resource.RESOURCE_SERVLET,
+                ServletUris.Resource.RESOURCE_SERVLET);
     }
 
     /**
-     * Get Category for Cnx Modules..
+     * Get Category for CNX Modules..
      * 
-     * @param moduleScheme Scheme for Cnx Modules..
+     * @param moduleScheme Scheme for CNX Modules..
      */
     public static Category getCnxModuleCategoryEle(URL moduleScheme) {
-        return getCnxCategoryEle(moduleScheme, CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH,
-                CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH);
+        return getCnxCategoryEle(moduleScheme, ServletUris.Module.MODULE_SERVLET,
+                ServletUris.Module.MODULE_SERVLET);
     }
 
     /**
-     * Get Category for Cnx Collection..
+     * Get Category for CNX Collection.
      * 
-     * @param cnxCollectionScheme Scheme for Cnx Collections.
+     * @param cnxCollectionScheme Scheme for CNX Collections.
      */
     public static Category getCnxCollectionCategoryEle(URL cnxCollectionScheme) {
         return getCnxCategoryEle(cnxCollectionScheme,
-                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH,
-                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH);
+                ServletUris.Collection.COLLECTION_SERVLET,
+                ServletUris.Collection.COLLECTION_SERVLET);
     }
 
     private static Category getCnxCategoryEle(URL scheme, String label, String term) {

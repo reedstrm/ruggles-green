@@ -16,6 +16,8 @@
 
 package org.cnx.web;
 
+import org.cnx.repository.atompub.ServletUris;
+
 import java.net.URI;
 import java.util.logging.Logger;
 
@@ -77,7 +79,7 @@ public class WebViewLinkResolver implements LinkResolver {
         StringBuilder uriBuilder = new StringBuilder(CommonHack.CONTENT_NAME_SPACE);
         if (collection != null && collection.hasModule(moduleId)) {
             uriBuilder
-                    .append(CommonHack.COLLECTION)
+                    .append(ServletUris.Collection.COLLECTION_SERVLET)
                     .append("/")
                     .append(collection.getId())
                     .append("/")
@@ -85,7 +87,7 @@ public class WebViewLinkResolver implements LinkResolver {
         }
 
         uriBuilder
-                .append(CommonHack.MODULE)
+                .append(ServletUris.Module.MODULE_SERVLET)
                 .append("/")
                 .append(moduleId)
                 .append("/")

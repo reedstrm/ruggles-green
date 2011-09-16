@@ -162,12 +162,9 @@ public class IdWrapper {
         return false;
     }
 
-    /**
-     * This should not be called as toString is ambiguous for this class.
-     */
     @Override
     public String toString() {
-        throw new RuntimeException("This should not be called.");
+        return id;
     }
 
     /**

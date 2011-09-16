@@ -19,6 +19,8 @@ import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxCollec
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxModuleCategoryEle;
 import static org.cnx.repository.atompub.utils.CnxAtomCategoryUtils.getCnxResourceCategoryEle;
 
+import org.cnx.repository.atompub.ServletUris;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,21 +38,18 @@ import com.sun.syndication.propono.atom.common.Categories;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
-@Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
+@Path(ServletUris.CategoryDocument.CATEGORY_DOCUMENT_SERVLET)
 public class CnxCategoriesDocumentServlet {
-    private final String CATEGORY_DOCUMENT_GET = "/";
-
     @GET
     @Produces(CnxMediaTypes.TEXT_XML)
-    @Path(CATEGORY_DOCUMENT_GET)
+    @Path(ServletUris.CategoryDocument.CATEGORY_DOCUMENT_PATH)
     public Response getServiceDocument(@Context HttpServletRequest req) {
-        // TODO(arjuns) : Add caching and exception handling.
+        // TODO(arjuns) : Add caching.
 
-        CnxAtomService atomService =
-                new CnxAtomService(ServerUtil.computeHostUrl(req));
+        CnxAtomService atomService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         CnxAtomPubConstants constants = atomService.getConstants();
         Categories categories = new Categories();
@@ -59,7 +58,9 @@ public class CnxCategoriesDocumentServlet {
         categories.addCategory(getCnxCollectionCategoryEle(constants
                 .getCollectionCnxCollectionScheme()));
 
-        return Response.ok().entity(
-                PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
+        return Response
+                .ok()
+                .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
+                .build();
     }
 }

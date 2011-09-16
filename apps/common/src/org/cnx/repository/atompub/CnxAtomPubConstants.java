@@ -51,6 +51,7 @@ import javax.xml.bind.Marshaller;
 public class CnxAtomPubConstants {
     private final Logger logger = Logger.getLogger(CnxAtomPubConstants.class.getName());
 
+    // TODO(arjuns) : Fix URL to URI.
     /** Sub-domain for AtomPub relative to host. */
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
@@ -82,26 +83,15 @@ public class CnxAtomPubConstants {
     /** String representation for latest version. */
     public static String LATEST_VERSION_STRING = "latest";
 
-    /**
-     * Constants related to Service Document.
-     */
-    /** Path for Service Document relative to {@link #atomPubRestUrl}. */
-    public static final String SERVICE_DOCUMENT_PATH = "/service_document";
-
+   
     /** Get URI for CategoryDocument. */
     public String getServiceDocumentAbsPath() {
-        return atomPubRestUrl + SERVICE_DOCUMENT_PATH;
+        return atomPubRestUrl + ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET;
     }
-
-    /**
-     * Constants related to Category Document.
-     */
-    /** Path for CategoryDocument relative to {@link #atomPubRestUrl}. */
-    public static final String CATEGORIES_DOCUMENT_PATH = "/category_document";
 
     /** Get URI for CategoryDocument. */
     public String getCategoryDocumentAbsPath() {
-        return atomPubRestUrl + CATEGORIES_DOCUMENT_PATH;
+        return atomPubRestUrl + ServletUris.CategoryDocument.CATEGORY_DOCUMENT_SERVLET;
     }
 
     /**
@@ -110,13 +100,12 @@ public class CnxAtomPubConstants {
     /** Name for AtomPub collection for CnxResources. */
     public static final String COLLECTION_RESOURCE_TITLE = "AtomPub Collection for CNX Resources.";
 
-    /** Path for Resource AtomPub collection relative to {@link #atomPubRestUrl}. */
-    public static final String COLLECTION_RESOURCE_REL_PATH = "/resource";
+
 
     /** Get URL for AtomPub collection for CNX Resources. */
     public URL getCollectionResourcesAbsPath() {
         try {
-            return new URL(atomPubRestUrl + COLLECTION_RESOURCE_REL_PATH);
+            return new URL(atomPubRestUrl + ServletUris.Resource.RESOURCE_SERVLET);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -179,12 +168,6 @@ public class CnxAtomPubConstants {
     /** Name for AtomPub collection for CnxModules. */
     public static final String COLLECTION_MODULE_TITLE = "AtomPub Collection for CNX Modules.";
 
-    /** Path for Module AtomPub Collection relative to {@link #atomPubRestUrl}. */
-    public static final String COLLECTION_MODULE_REL_PATH = "/module";
-    /** Path for GET operation relative to {@link #COLLECTION_MODULE_REL_PATH}. */
-    public static final String COLLECTION_MODULE_GET_PATH = "/";
-    public static final String COLLECTION_MODULE_POST_PATH = "/";
-
     /** Default new Version for any module. */
     public static final VersionWrapper NEW_CNX_COLLECTION_DEFAULT_VERSION = new VersionWrapper("1");
 
@@ -193,9 +176,10 @@ public class CnxAtomPubConstants {
             LATEST_VERSION_STRING);
 
     /** Get URI for AtomPub collection for CNX Modules. */
+    // TODO(arjuns): Rename this.
     public URL getCollectionModulesAbsPath() {
         try {
-            return new URL(atomPubRestUrl + COLLECTION_MODULE_REL_PATH);
+            return new URL(atomPubRestUrl + ServletUris.Module.MODULE_SERVLET);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 
@@ -266,18 +250,12 @@ public class CnxAtomPubConstants {
     public static final String COLLECTION_CNX_COLLECTION_TITLE =
             "AtomPub Collection for Cnx Collections.";
 
-    /** Path for CnxCollection AtomPub collection relative to {@link #atomPubRestUrl}. */
-    public static final String COLLECTION_CNX_COLLECTION_REL_PATH = "/collection";
-
-    /** Path for GET operation relative to {@link #COLLECTION_CNX_COLLECTION_REL_PATH}. */
-    public static final String COLLECTION_CNX_COLLECTION_GET_PATH = "/";
-
     // TODO(arjuns) : Rename CnxCollection -> Collection and Collection-> AtomPubCollection
     // so that it is consistent with repository.
     /** Get URI for AtomPub collection for CNX Collections. */
     public URL getCollectionCnxCollectionsAbsPath() {
         try {
-            return new URL(atomPubRestUrl + COLLECTION_CNX_COLLECTION_REL_PATH);
+            return new URL(atomPubRestUrl + ServletUris.Collection.COLLECTION_SERVLET);
         } catch (MalformedURLException e) {
             logger.severe("Failed to create URL due to : " + Throwables.getStackTraceAsString(e));
 

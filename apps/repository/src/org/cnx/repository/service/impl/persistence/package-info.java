@@ -15,10 +15,13 @@
  */
 
 /**
- * CNX repository service implementation for Google App Engine.
+ * An persistence layer implemented on top of appengine datastore.
  * <p>
- * This package is the root package of the implementation of
- * {@link org.cnx.repository.service.api.CnxRepositoryService} for the Google App Engine.
+ * This package provides an abstraction of entity persistence using the underlying
+ * appengine datastore an object relational mapping (ORM) for the CNX repository
+ * entities.
+ * 
+ * @author Tal Dayan
  */
-package org.cnx.repository.tempservlets;
+package org.cnx.repository.service.impl.persistence;
 

@@ -19,11 +19,11 @@ package org.cnx.repository.service.impl.persistence;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.repository.RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
 
+import java.util.logging.Logger;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyRange;
-
-import java.util.logging.Logger;
 
 /**
  * Utilities related to the data migration from old CNX repository.
@@ -47,12 +47,9 @@ public class PersistenceMigrationUtil {
      */
     public static void protectAllReservedKeys(DatastoreService datastore) {
 
-        protectEntityReservedKeys(datastore, OrmCollectionEntity.getSpec(),
-                MIN_NON_RESERVED_KEY_ID);
-        protectEntityReservedKeys(datastore, OrmModuleEntity.getSpec(),
-                MIN_NON_RESERVED_KEY_ID);
-        protectEntityReservedKeys(datastore, OrmResourceEntity.getSpec(),
-                MIN_NON_RESERVED_KEY_ID);
+        protectEntityReservedKeys(datastore, OrmCollectionEntity.getSpec(), MIN_NON_RESERVED_KEY_ID);
+        protectEntityReservedKeys(datastore, OrmModuleEntity.getSpec(), MIN_NON_RESERVED_KEY_ID);
+        protectEntityReservedKeys(datastore, OrmResourceEntity.getSpec(), MIN_NON_RESERVED_KEY_ID);
     }
 
     private static void protectEntityReservedKeys(DatastoreService datastore,

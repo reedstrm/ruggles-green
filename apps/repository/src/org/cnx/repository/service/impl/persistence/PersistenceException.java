@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2011 The CNX Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -14,11 +14,13 @@
  * the License.
  */
 
-/**
- * CNX repository service implementation for Google App Engine.
- * <p>
- * This package is the root package of the implementation of
- * {@link org.cnx.repository.service.api.CnxRepositoryService} for the Google App Engine.
- */
-package org.cnx.repository.tempservlets;
+package org.cnx.repository.service.impl.persistence;
 
+@SuppressWarnings("serial")
+public class PersistenceException extends Exception {
+
+    public PersistenceException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+}

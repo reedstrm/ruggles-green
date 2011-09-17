@@ -59,7 +59,6 @@ public enum RepositoryStatus {
      */
     VERSION_CONFLICT;
 
-
     public boolean isOk() {
         return this == OK;
     }

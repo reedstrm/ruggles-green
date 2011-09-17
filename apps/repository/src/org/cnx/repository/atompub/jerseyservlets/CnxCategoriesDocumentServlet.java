@@ -36,7 +36,7 @@ import com.sun.syndication.propono.atom.common.Categories;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.CATEGORIES_DOCUMENT_PATH)
@@ -49,17 +49,17 @@ public class CnxCategoriesDocumentServlet {
     public Response getServiceDocument(@Context HttpServletRequest req) {
         // TODO(arjuns) : Add caching and exception handling.
 
-        CnxAtomService atomService =
-                new CnxAtomService(ServerUtil.computeHostUrl(req));
+        CnxAtomService atomService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         CnxAtomPubConstants constants = atomService.getConstants();
         Categories categories = new Categories();
         categories.addCategory(getCnxResourceCategoryEle(constants.getCollectionResourceScheme()));
         categories.addCategory(getCnxModuleCategoryEle(constants.getCollectionModuleScheme()));
         categories.addCategory(getCnxCollectionCategoryEle(constants
-                .getCollectionCnxCollectionScheme()));
+            .getCollectionCnxCollectionScheme()));
 
-        return Response.ok().entity(
-                PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement())).build();
+        return Response.ok()
+            .entity(PrettyXmlOutputter.prettyXmlOutputElement(categories.categoriesToElement()))
+            .build();
     }
 }

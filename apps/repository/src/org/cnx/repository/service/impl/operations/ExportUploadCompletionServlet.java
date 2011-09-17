@@ -35,11 +35,11 @@ import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
 import org.cnx.repository.service.impl.persistence.OrmEntity;
 import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
+import org.cnx.repository.service.impl.persistence.PersistenceTransaction;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
@@ -57,7 +57,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 public class ExportUploadCompletionServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(ExportUploadCompletionServlet.class
-        .getName());
+            .getName());
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -85,13 +85,13 @@ public class ExportUploadCompletionServlet extends HttpServlet {
         // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
         // to delete unused blobs when leaving the method.
         final Date transactionTime = new Date();
-        Transaction tx = null;
+        PersistenceTransaction tx = null;
         try {
             exportReference = ExportUtil.exportReferenceFromRequestParameters(req);
 
             // Validate incoming export reference
             final ExportReferenceValidationResult validationResult =
-                ExportReferenceValidationResult.validateReference(exportReference);
+                    ExportReferenceValidationResult.validateReference(exportReference);
             checkArgument(validationResult.getRepositoryStatus().isOk(),
                     "Invalid export reference: %s, error: %s", exportReference,
                     validationResult.getStatusDescription());
@@ -102,8 +102,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                         resp,
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Resource upload completion handler "
-                            + "expected to find exactly one blob but found ["
-                            + incomingBlobs.size() + "]", null, log, Level.WARNING);
+                                + "expected to find exactly one blob but found ["
+                                + incomingBlobs.size() + "]", null, log, Level.WARNING);
                 return;
             }
 
@@ -124,16 +124,16 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             if (blobInfo.getSize() > validationResult.getExportType().getMaxSizeInBytes()) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                         "Export too large: " + blobInfo + " vs. "
-                            + validationResult.getExportType().getMaxSizeInBytes() + ", export: "
-                            + exportReference, null, log, Level.WARNING);
+                                + validationResult.getExportType().getMaxSizeInBytes() + ", export: "
+                                + exportReference, null, log, Level.WARNING);
                 return;
             }
             if (!validationResult.getExportType().getContentType()
-                .equals(blobInfo.getContentType())) {
+                    .equals(blobInfo.getContentType())) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                         "Expected content type "
-                            + validationResult.getExportType().getContentType() + ", found "
-                            + blobInfo.getContentType(), null, log, Level.WARNING);
+                                + validationResult.getExportType().getContentType() + ", found "
+                                + blobInfo.getContentType(), null, log, Level.WARNING);
                 return;
             }
 
@@ -145,16 +145,16 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
             @SuppressWarnings({ "unused", "unchecked" })
             final OrmEntity parentEntity =
-                (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
-                        validationResult.getParentKey());
+            (OrmEntity) Services.persistence.read(validationResult.getParentEntityClass(),
+                    validationResult.getParentKey());
 
             // Lookup for existing export entity, if found save it blob key for deletion.
             @Nullable
             BlobKey oldBlobKey = null;
             try {
                 final OrmExportItemEntity oldExportItemEntity =
-                    Services.persistence.read(OrmExportItemEntity.class,
-                            validationResult.getExportKey());
+                        Services.persistence.read(OrmExportItemEntity.class,
+                                validationResult.getExportKey());
                 oldBlobKey = checkNotNull(oldExportItemEntity.getBlobInfo().getBlobKey());
             } catch (EntityNotFoundException e) {
                 // Do nothing here. this is normal.
@@ -162,8 +162,8 @@ public class ExportUploadCompletionServlet extends HttpServlet {
 
             // Create a new entity
             final OrmExportItemEntity newExportItemEntity =
-                new OrmExportItemEntity(validationResult.getExportKey(), transactionTime,
-                    new OrmBlobInfo(blobInfo));
+                    new OrmExportItemEntity(validationResult.getExportKey(), transactionTime,
+                            new OrmBlobInfo(blobInfo));
             Services.persistence.write(newExportItemEntity);
             tx.commit();
 
@@ -175,7 +175,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             }
         } catch (Throwable e) {
             if (tx != null) {
-                tx.rollback();
+                tx.safeRollback();
             }
             final String message = "Error when writing export item: " + e.getMessage();
             log.log(Level.SEVERE, message, e);

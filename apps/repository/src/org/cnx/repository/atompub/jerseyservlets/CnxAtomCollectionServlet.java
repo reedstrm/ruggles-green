@@ -17,30 +17,9 @@ package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.cnx.repository.atompub.CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH;
 import static org.cnx.repository.atompub.CommonUtils.getURI;
+import static org.cnx.repository.atompub.IdWrapper.Type.COLLECTION;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
-import static org.cnx.repository.atompub.IdWrapper.Type.COLLECTION;
-
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-
-import org.cnx.exceptions.CnxBadRequestException;
-import org.cnx.exceptions.CnxException;
-import org.cnx.exceptions.CnxInternalServerErrorException;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.RepositoryUtils;
-import org.cnx.repository.atompub.utils.ServerUtil;
-import org.cnx.repository.service.api.AddCollectionVersionResult;
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateCollectionResult;
-import org.cnx.repository.service.api.GetCollectionVersionResult;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-import org.jdom.JDOMException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -60,6 +39,27 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 
+import org.cnx.exceptions.CnxBadRequestException;
+import org.cnx.exceptions.CnxException;
+import org.cnx.exceptions.CnxInternalServerErrorException;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.repository.atompub.service.CnxAtomService;
+import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
+import org.cnx.repository.service.api.AddCollectionVersionResult;
+import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.CreateCollectionResult;
+import org.cnx.repository.service.api.GetCollectionVersionResult;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+import org.jdom.JDOMException;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+
 /**
  * Servlet to Handle CNX Collections..
  * 
@@ -74,14 +74,14 @@ public class CnxAtomCollectionServlet {
 
     private final String COLLECTION_NEW_POST = "/";
     private final String COLLECTION_MIGRATION_POST = "/migration/{" + COLLECTION_ID_PATH_PARAM
-            + "}";
+        + "}";
 
     /**
      * URL Pattern wrt {@link #COLLECTION_CNX_COLLECTION_REL_PATH}
      * /<collectionId>/<collectionVersion>
      */
     private final String COLLECTION_VERSION_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM + "}/{"
-            + COLLECTION_VERSION_PATH_PARAM + "}";
+        + COLLECTION_VERSION_PATH_PARAM + "}";
 
     private final String COLLECTION_VERSION_XML_URL = COLLECTION_VERSION_URL_PATTERN + "/xml";
 
@@ -98,7 +98,7 @@ public class CnxAtomCollectionServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateCollectionResult> createdCollection =
-                repositoryService.createCollection(RepositoryUtils.getRepositoryContext());
+            repositoryService.createCollection(RepositoryUtils.getRepositoryContext());
 
         return handleCreateCollection(atomPubService, createdCollection);
     }
@@ -116,15 +116,15 @@ public class CnxAtomCollectionServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateCollectionResult> createdCollection =
-                repositoryService.migrationCreateCollectionWithId(
-                        RepositoryUtils.getRepositoryContext(), idWrapper.getId());
+            repositoryService.migrationCreateCollectionWithId(
+                    RepositoryUtils.getRepositoryContext(), idWrapper.getId());
 
         return handleCreateCollection(atomPubService, createdCollection);
     }
 
     private Response handleCreateCollection(CnxAtomService atomPubService,
             RepositoryResponse<CreateCollectionResult> createdCollection) throws CnxException,
-            CnxBadRequestException {
+        CnxBadRequestException {
         if (createdCollection.isOk()) {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
@@ -137,13 +137,12 @@ public class CnxAtomCollectionServlet {
             IdWrapper repoIdWrapper = new IdWrapper(result.getCollectionId(), COLLECTION);
 
             String atomPubId =
-                    CnxAtomPubConstants
-                            .getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
+                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
             entry.setId(atomPubId);
 
             URL editUrl =
-                    atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
-                            firstVersion);
+                atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
+                        firstVersion);
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(null /* selfUrl */, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -169,7 +168,7 @@ public class CnxAtomCollectionServlet {
     public Response createNewCnxCollectionVersion(@Context HttpServletRequest req,
             @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(COLLECTION_VERSION_PATH_PARAM) String versionString) throws IOException,
-            CnxException {
+        CnxException {
         final IdWrapper idWrapper = new IdWrapper(collectionId, COLLECTION);
         final VersionWrapper newVersion = new VersionWrapper(versionString);
 
@@ -181,11 +180,11 @@ public class CnxAtomCollectionServlet {
         }
 
         String decodedCollXml =
-                atomPubService.getConstants().getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
+            atomPubService.getConstants().getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
 
         RepositoryResponse<AddCollectionVersionResult> createdCollection =
-                repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), newVersion.getVersionInt(), decodedCollXml);
+            repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), newVersion.getVersionInt(), decodedCollXml);
 
         if (createdCollection.isOk()) {
             /*
@@ -198,9 +197,9 @@ public class CnxAtomCollectionServlet {
             // TODO(arjuns) : Move this to repository.
             IdWrapper repoIdWrapper = new IdWrapper(repoResult.getCollectionId(), COLLECTION);
             VersionWrapper createdVersion = new VersionWrapper(repoResult.getNewVersionNumber());
-         
+
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(idWrapper, createdVersion);
+                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(idWrapper, createdVersion);
 
             entry.setId(atomPubId);
             // TODO(arjuns) : Repository should return date.
@@ -210,13 +209,13 @@ public class CnxAtomCollectionServlet {
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                    atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
-                            createdVersion);
+                atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
+                        createdVersion);
 
             // URL where client should Put next time in order to publish new version.
             URL editUrl =
-                    atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
-                            nextVersion);
+                atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
+                        nextVersion);
 
             // TODO(arjuns0 : Create a function for this.
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
@@ -247,8 +246,8 @@ public class CnxAtomCollectionServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<GetCollectionVersionResult> collectionVersionResult =
-                repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt());
+            repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), versionWrapper.getVersionInt());
 
         if (collectionVersionResult.isOk()) {
             GetCollectionVersionResult repoResult = collectionVersionResult.getResult();
@@ -256,16 +255,16 @@ public class CnxAtomCollectionServlet {
 
             IdWrapper repoIdWrapper = new IdWrapper(repoResult.getCollectionId(), COLLECTION);
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
-            
+
             Entry entry = new Entry();
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(idWrapper, repoVersion);
+                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(idWrapper, repoVersion);
             entry.setId(atomPubId);
 
             // TODO(arjuns) : See if this can be refactored.
             try {
                 entry.setContents(atomPubService.getConstants()
-                        .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
+                    .getAtomPubListOfContentForCollectionEntry(collXmlDoc));
             } catch (JAXBException e) {
                 throw new CnxInternalServerErrorException("JAXBException", e);
             } catch (JDOMException e) {
@@ -276,14 +275,14 @@ public class CnxAtomCollectionServlet {
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                    atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
-                            repoVersion);
+                atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
+                        repoVersion);
 
             VersionWrapper nextVersion = repoVersion.getNextVersion();
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
-                    atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
-                            nextVersion);
+                atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
+                        nextVersion);
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
 
@@ -310,8 +309,8 @@ public class CnxAtomCollectionServlet {
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
 
         RepositoryResponse<GetCollectionVersionResult> collectionVersionResult =
-                repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt());
+            repositoryService.getCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), versionWrapper.getVersionInt());
 
         if (collectionVersionResult.isOk()) {
             return Response.ok().entity(collectionVersionResult.getResult().getColxmlDoc()).build();

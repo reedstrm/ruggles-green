@@ -90,7 +90,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
 
     /**
      * Construct a module version key.
-     *
+     * 
      * @param moduleKey the key of the parent module entity.
      * @param versionNumber version number (asserted to be >= 1)
      * @return the module version key.

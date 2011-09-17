@@ -30,7 +30,7 @@ import org.cnx.repository.atompub.utils.ServerUtil;
 
 /**
  * REST Resource for fetching ServiceDocument.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)
@@ -44,7 +44,7 @@ public class CnxServiceDocumentServlet {
         CnxAtomService atomService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         return Response.ok()
-                .entity(PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument()))
-                .build();
+            .entity(PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument()))
+            .build();
     }
 }

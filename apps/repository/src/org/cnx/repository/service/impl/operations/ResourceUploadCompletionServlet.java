@@ -32,11 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
 import org.cnx.repository.service.impl.persistence.OrmResourceEntity;
+import org.cnx.repository.service.impl.persistence.PersistenceTransaction;
 
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
@@ -84,7 +84,7 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
 
         // NOTE(tal): this try/catch/finally clause is used not only to handle exception but also
         // to delete unused blobs when leaving the method.
-        Transaction tx = null;
+        PersistenceTransaction tx = null;
         try {
             // Convert encoded resource id to internal resource id
             final Key resourceKey = OrmResourceEntity.resourceIdToKey(resourceId);
@@ -149,12 +149,13 @@ public class ResourceUploadCompletionServlet extends HttpServlet {
             // New blob is now in use. Make sure we don't delete it upon exit.
             blobsToDeleteOnExit.clear();
         } catch (Throwable e) {
+            if (tx != null) {
+                tx.safeRollback();
+            }
             ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                     "Resource upload completion handler encountered an error. id = " + resourceId,
                     e, log, Level.SEVERE);
-            if (tx != null) {
-                tx.rollback();
-            }
+
             return;
         } finally {
             checkArgument(tx == null || !tx.isActive(), "Transaction left active: %s",

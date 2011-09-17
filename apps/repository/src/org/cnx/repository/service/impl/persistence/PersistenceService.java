@@ -34,7 +34,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.QueryResultList;
-import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
@@ -77,7 +76,7 @@ public class PersistenceService {
     }
 
     public <T extends OrmEntity> T read(Class<T> entityClass, Key key)
-            throws EntityNotFoundException {
+        throws EntityNotFoundException {
         final Entity entity = datastore.get(key);
         return deserialize(entityClass, entity);
     }
@@ -91,8 +90,8 @@ public class PersistenceService {
         }
     }
 
-    public Transaction beginTransaction() {
-        return datastore.beginTransaction();
+    public PersistenceTransaction beginTransaction() {
+        return new PersistenceTransaction(datastore.beginTransaction());
     }
 
     /**
@@ -110,7 +109,7 @@ public class PersistenceService {
         query.setAncestor(parentKey);
 
         final List<Entity> entities =
-                datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+            datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
         final List<T> ormEntities = Lists.newArrayList();
 
@@ -150,7 +149,7 @@ public class PersistenceService {
      * guarantees returning all the matching entities that existed before from before the first call
      * until the end of the last call.
      * 
-     * IMPORTANT, callers should impose a reasonable max on {@code maxResults}} to avoid memory
+     * IMPORTANT, callers should impose a reasonable max on {@code maxResults} to avoid memory
      * explosion.
      * 
      * TODO(tal): consider to use QueryResultIterator instead of QueryResultList for reduced memory
@@ -196,8 +195,8 @@ public class PersistenceService {
 
         @Nullable
         final String endCursor =
-        endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
-            .toWebSafeString();
+            endOfData ? null : checkNotNull(results.getCursor(), "Null end cursor")
+                .toWebSafeString();
 
         return Pair.of(keys, endCursor);
     }

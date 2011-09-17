@@ -53,21 +53,32 @@ public class IdUtilTest {
     }
 
     @Test
-    public void keyToId() {
-        final OrmEntitySpec spec0 = new OrmEntitySpec("spec0", "");
-        final OrmEntitySpec spec1 = new OrmEntitySpec("spec1", "X");
+    public void idToKey() {
+        final OrmEntitySpec spec = new OrmEntitySpec("spec", "X");
 
-        assertEquals("0001", IdUtil.keyToId(spec0, KeyFactory.createKey("spec0", 1)));
-        assertEquals("9223372036854775807",
-                IdUtil.keyToId(spec0, KeyFactory.createKey("spec0", 9223372036854775807L)));
+        // Good ids
+        assertEquals(KeyFactory.createKey("spec", 1), IdUtil.idToKey(spec, "X0001"));
+        assertEquals(KeyFactory.createKey("spec", 9223372036854775807L), IdUtil.idToKey(spec, "X9223372036854775807"));
 
-        assertEquals("X0001", IdUtil.keyToId(spec1, KeyFactory.createKey("spec1", 1)));
-        assertEquals("X9223372036854775807",
-                IdUtil.keyToId(spec1, KeyFactory.createKey("spec1", 9223372036854775807L)));
+        // Bad ids
+        assertEquals(null, IdUtil.idToKey(spec, "X0"));
+        assertEquals(null, IdUtil.idToKey(spec, "X1"));
+        assertEquals(null, IdUtil.idToKey(spec, "X001"));
+        assertEquals(null, IdUtil.idToKey(spec, "X00001"));
+        assertEquals(null, IdUtil.idToKey(spec, "X-0001"));
     }
 
     @Test
-    public void compatability() {
+    public void keyToId() {
+        final OrmEntitySpec spec = new OrmEntitySpec("spec", "X");
+
+        assertEquals("X0001", IdUtil.keyToId(spec, KeyFactory.createKey("spec", 1)));
+        assertEquals("X9223372036854775807",
+                IdUtil.keyToId(spec, KeyFactory.createKey("spec", 9223372036854775807L)));
+    }
+
+    @Test
+    public void ompatability() {
         final long ids[] = { 1, Long.MAX_VALUE, 0x7fffffffffffffffL };
 
         final OrmEntitySpec spec = new OrmEntitySpec("spec", "X");

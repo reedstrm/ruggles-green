@@ -16,31 +16,9 @@
 package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.cnx.repository.atompub.CommonUtils.getURI;
+import static org.cnx.repository.atompub.IdWrapper.Type.MODULE;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
-import static org.cnx.repository.atompub.IdWrapper.Type.MODULE;
-
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-
-import org.cnx.exceptions.CnxBadRequestException;
-import org.cnx.exceptions.CnxException;
-import org.cnx.exceptions.CnxInternalServerErrorException;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.RepositoryUtils;
-import org.cnx.repository.atompub.utils.ServerUtil;
-import org.cnx.repository.service.api.AddModuleVersionResult;
-import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateModuleResult;
-import org.cnx.repository.service.api.GetModuleVersionResult;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-import org.jdom.JDOMException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -61,6 +39,28 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 
+import org.cnx.exceptions.CnxBadRequestException;
+import org.cnx.exceptions.CnxException;
+import org.cnx.exceptions.CnxInternalServerErrorException;
+import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.repository.atompub.service.CnxAtomService;
+import org.cnx.repository.atompub.utils.RepositoryUtils;
+import org.cnx.repository.atompub.utils.ServerUtil;
+import org.cnx.repository.service.api.AddModuleVersionResult;
+import org.cnx.repository.service.api.CnxRepositoryService;
+import org.cnx.repository.service.api.CreateModuleResult;
+import org.cnx.repository.service.api.GetModuleVersionResult;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+import org.jdom.JDOMException;
+
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
+
 /**
  * Servlet to Handle CNX Resources.
  * 
@@ -80,10 +80,10 @@ public class CnxAtomModuleServlet {
 
     // URL Pattern = /module/<moduleId>/<version>
     private final String MODULE_VERSION_URL_PATTERN = "/{" + MODULE_ID_PATH_PARAM + "}/{"
-            + MODULE_VERSION_PATH_PARAM + "}";
+        + MODULE_VERSION_PATH_PARAM + "}";
     private final String MODULE_VERSION_CNXML_URL = MODULE_VERSION_URL_PATTERN + "/xml";
     private final String MODULE_VERSION_RESOURCE_MAPPING_URL = MODULE_VERSION_URL_PATTERN
-            + "/resources";
+        + "/resources";
 
     private CnxAtomService atomPubService;
     private final CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
@@ -98,7 +98,7 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
-                repositoryService.createModule(RepositoryUtils.getRepositoryContext());
+            repositoryService.createModule(RepositoryUtils.getRepositoryContext());
 
         return handleCreationOfModule(atomPubService, createdModule);
     }
@@ -116,8 +116,8 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateModuleResult> createdModule =
-                repositoryService.migrationCreateModuleWithId(
-                        RepositoryUtils.getRepositoryContext(), idWrapper.getId());
+            repositoryService.migrationCreateModuleWithId(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId());
         return handleCreationOfModule(atomPubService, createdModule);
     }
 
@@ -128,20 +128,17 @@ public class CnxAtomModuleServlet {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */
-            IdWrapper repoIdWrapper =
-                    new IdWrapper(repoResult.getModuleId(), MODULE);
+            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), MODULE);
             VersionWrapper firstVersion = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
 
             Entry entry = new Entry();
             String atomPubId =
-                    CnxAtomPubConstants
-                            .getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
+                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
             entry.setId(atomPubId);
 
             // TODO(arjuns) : Change URL to URI.
             URL editUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            firstVersion);
+                atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper, firstVersion);
             entry.setOtherLinks(RepositoryUtils.getListOfLinks(null /* selfUrl */, editUrl));
 
             URL modulePath = atomPubService.getConstants().getModuleAbsPath(repoIdWrapper);
@@ -176,7 +173,7 @@ public class CnxAtomModuleServlet {
 
         if (postedEntry == null) {
             throw new CnxBadRequestException(
-                    "Invalid Request : Missing data for CNXML and ResourceMapping XML.", null);
+                "Invalid Request : Missing data for CNXML and ResourceMapping XML.", null);
         }
 
         // TODO(arjuns) : Fix this. Move this to common.
@@ -186,14 +183,13 @@ public class CnxAtomModuleServlet {
         String resourceMappingDoc;
         try {
             decodedModuleEntryValue =
-                    atomPubService.getConstants().decodeFromBase64EncodedString(
-                            encodedModuleEntryContent.getValue());
+                atomPubService.getConstants().decodeFromBase64EncodedString(
+                        encodedModuleEntryContent.getValue());
             cnxmlDoc =
-                    atomPubService.getConstants().getCnxmlFromModuleEntryXml(
-                            decodedModuleEntryValue);
+                atomPubService.getConstants().getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
             resourceMappingDoc =
-                    atomPubService.getConstants().getResourceMappingDocFromModuleEntryXml(
-                            decodedModuleEntryValue);
+                atomPubService.getConstants().getResourceMappingDocFromModuleEntryXml(
+                        decodedModuleEntryValue);
         } catch (UnsupportedEncodingException e) {
             throw new CnxBadRequestException("Invalid Encoding", e);
         } catch (JDOMException e) {
@@ -203,9 +199,9 @@ public class CnxAtomModuleServlet {
         }
 
         RepositoryResponse<AddModuleVersionResult> createdModule =
-                repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt(), cnxmlDoc,
-                        resourceMappingDoc);
+            repositoryService
+                .addModuleVersion(RepositoryUtils.getRepositoryContext(), idWrapper.getId(),
+                        versionWrapper.getVersionInt(), cnxmlDoc, resourceMappingDoc);
 
         if (createdModule.isOk()) {
             /*
@@ -220,19 +216,17 @@ public class CnxAtomModuleServlet {
             VersionWrapper nextVersion = repoVersion.getNextVersion();
 
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
+                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
             entry.setId(atomPubId);
             entry.setPublished(new Date());
 
             // URL to fetch the Module which was published now.
             URL selfUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            repoVersion);
+                atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper, repoVersion);
 
             // URL where client should do HTTP PUT next time in order to publish new version.
             URL editUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            nextVersion);
+                atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper, nextVersion);
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -262,8 +256,8 @@ public class CnxAtomModuleServlet {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-                repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt());
+            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), versionWrapper.getVersionInt());
 
         if (moduleVersionResult.isOk()) {
             GetModuleVersionResult repoResult = moduleVersionResult.getResult();
@@ -275,7 +269,7 @@ public class CnxAtomModuleServlet {
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
             Entry entry = new Entry();
             String atomPubId =
-                    CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
+                CnxAtomPubConstants.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, repoVersion);
             entry.setId(atomPubId);
             // TODO(arjuns) : See if this can be refactored.
             try {
@@ -291,14 +285,12 @@ public class CnxAtomModuleServlet {
 
             // URL to fetch the Module published now.
             URL selfUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            repoVersion);
+                atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper, repoVersion);
 
             VersionWrapper nextVersion = repoVersion.getNextVersion();
             // URL where client should PUT next time in order to publish new version.
             URL editUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            nextVersion);
+                atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper, nextVersion);
 
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
             entry.setOtherLinks(listOfLinks);
@@ -325,8 +317,8 @@ public class CnxAtomModuleServlet {
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-                repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt());
+            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), versionWrapper.getVersionInt());
 
         if (moduleVersionResult.isOk()) {
             return Response.ok().entity(moduleVersionResult.getResult().getCnxmlDoc()).build();
@@ -351,12 +343,12 @@ public class CnxAtomModuleServlet {
         final IdWrapper idWrapper = new IdWrapper(moduleId, MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
-                repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt());
+            repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), versionWrapper.getVersionInt());
 
         if (moduleVersionResult.isOk()) {
             return Response.ok().entity(moduleVersionResult.getResult().getResourceMapDoc())
-                    .build();
+                .build();
         }
 
         return fromRepositoryError(logger, moduleVersionResult);

@@ -48,8 +48,8 @@ public class CreateResourceServlet extends HttpServlet {
         // Query the repository service
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateResourceResult> repositoryResponse =
-                ((forcedId == null) ? repository.createResource(context) : repository
-                    .migrationCreateResourceWithId(context, forcedId));
+            ((forcedId == null) ? repository.createResource(context) : repository
+                .migrationCreateResourceWithId(context, forcedId));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

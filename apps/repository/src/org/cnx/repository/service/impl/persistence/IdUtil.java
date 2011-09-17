@@ -34,11 +34,16 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 public class IdUtil {
 
     /**
-     * Regex for the post prefix portion of the id. We match exactly strings that can
-     * be formatted by "%04d" with numeric value >= 0. We later filter out the invalid
-     * zero value.
+     * Regex for the post prefix portion of the id. We match exactly strings that can be formatted
+     * by "%04d" with numeric value >= 1.
+     * 
+     * It pass 4 digits numbers with at least one non zero digit and 5 or more digit numbers with
+     * non zero first digit.
      */
-    private static final Pattern SUB_ID_PATTERN = Pattern.compile("[0-9]{4}|[1-9][0-9]{4,20}");
+    private static final String SUB_ID_REGEX = "[1-9][0-9][0-9][0-9]|" + "[0-9][1-9][0-9][0-9]|"
+        + "[0-9][0-9][1-9][0-9]|" + "[0-9][0-9][0-9][1-9]|" + "[1-9][0-9]{4,20}";
+
+    private static final Pattern SUB_ID_PATTERN = Pattern.compile(SUB_ID_REGEX);
 
     /**
      * Convert key to id.
@@ -78,14 +83,11 @@ public class IdUtil {
         final long numericId;
         try {
             numericId = Long.valueOf(subId);
+            // NOTE(tal): should not fail due to the regex validation above.
+            checkArgument(numericId > 0, "id: %s", id);
         } catch (NumberFormatException e) {
-            return null;
-        }
-
-        // NOTE(tal): app engine keys reject numeric id 0. This is not captured by the 
-        // regex to keep the regex simple.
-        if (numericId < 1) {
-            return null;
+            // NOTE(tal): should not fail due to the regex validation above.
+            throw new RuntimeException("Id: " + id, e);
         }
 
         return KeyFactory.createKey(entitySpec.getKeyKind(), numericId);

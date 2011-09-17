@@ -21,14 +21,13 @@ import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromReposito
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
 import static org.cnx.repository.atompub.utils.ServerUtil.getPostedEntry;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -40,6 +39,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+
 import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
 import org.cnx.repository.FileContentTypeEnum;
@@ -56,6 +56,9 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
 
 /**
  * Jersey Servlet for CNX Resources.
@@ -93,7 +96,7 @@ public class CnxAtomResourceServlet {
         Entry postedEntry = getPostedEntry(logger, req);
 
         RepositoryResponse<CreateResourceResult> createdResource =
-                repositoryService.createResource(RepositoryUtils.getRepositoryContext());
+            repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
         return handleCreationOfResource(req, atomPubService, postedEntry, createdResource);
     }
@@ -113,8 +116,8 @@ public class CnxAtomResourceServlet {
         Entry postedEntry = getPostedEntry(logger, req);
 
         RepositoryResponse<CreateResourceResult> createdResource =
-                repositoryService.migrationCreateResourceWithId(
-                        RepositoryUtils.getRepositoryContext(), idWrapper.getId());
+            repositoryService.migrationCreateResourceWithId(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId());
 
         return handleCreationOfResource(req, atomPubService, postedEntry, createdResource);
     }
@@ -122,7 +125,7 @@ public class CnxAtomResourceServlet {
     private Response handleCreationOfResource(HttpServletRequest req,
             CnxAtomService atomPubService, Entry postedEntry,
             RepositoryResponse<CreateResourceResult> createdResource)
-            throws CnxBadRequestException, CnxException {
+        throws CnxBadRequestException, CnxException {
         if (createdResource.isOk()) {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
@@ -173,8 +176,8 @@ public class CnxAtomResourceServlet {
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-                repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), res);
+            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
+                    idWrapper.getId(), res);
 
         if (serveResourceResult.isOk()) {
 
@@ -186,14 +189,14 @@ public class CnxAtomResourceServlet {
             }
 
             RepositoryResponse<GetResourceInfoResult> repositoryInfo =
-                    repositoryService.getResourceInfo(repositoryContext, idWrapper.getId());
+                repositoryService.getResourceInfo(repositoryContext, idWrapper.getId());
 
             // TODO(arjuns) : Repository should return this.
             if (repositoryInfo.isOk()) {
                 String fileName =
-                        repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
+                    repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
                 FileContentTypeEnum contentType =
-                        FileContentTypeEnum.getFileContentTypeEnumFromFileName(fileName);
+                    FileContentTypeEnum.getFileContentTypeEnumFromFileName(fileName);
                 responseBuilder.header("Content-Type", contentType.getContentType());
 
                 responseBuilder.header("Content-Disposition", ("filename=\"" + fileName + "\""));

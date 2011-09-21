@@ -19,7 +19,7 @@
         Copies jaxb jar to ${target_dir}.
     </description>
 
-    <fileset id="jaxb-ri-20090708" dir="jaxb/jaxb-ri-20090708/lib" includes="*.jar" />
+    <fileset id="jaxb-ri-20100511" dir="jaxb/jaxb-ri-20100511/lib" includes="*.jar" />
 
     <target name="default">
         <fail message="Target path for jars is not set.">
@@ -33,7 +33,7 @@
         </fail>
 
         <copy todir="${target_dir}">
-            <fileset refid="jaxb-ri-20090708" />
+            <fileset refid="jaxb-ri-20100511" />
         </copy>
     </target>
 </project>

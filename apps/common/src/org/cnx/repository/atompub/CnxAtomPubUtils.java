@@ -75,10 +75,10 @@ public class CnxAtomPubUtils {
 
     /** Name for AtomPub collection for CnxCollections.. */
     public static final String COLLECTION_CNX_COLLECTION_TITLE =
-            "AtomPub Collection for Cnx Collections.";
+            "AtomPub Collection for CNX Collections.";
 
     /** Name for CNX Workspace. */
-    public static final String CNX_WORKSPACE_TITLE = "Connexions Workspace";
+    public static final String CNX_WORKSPACE_TITLE = "CNXv2 Workspace";
 
     /** Relation tag for Self links for CNX Resources/Modules/Collections. */
     public static final String LINK_RELATION_SELF_TAG = "self";
@@ -261,11 +261,14 @@ public class CnxAtomPubUtils {
      * 
      * @return XML representation for JAXB Object.
      */
+    // TODO(arjuns) : Move this to XmlPrinter.
     @SuppressWarnings("rawtypes")
     public static String jaxbObjectToString(Class rootClass, Object jaxbObject)
             throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(rootClass);
         Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, Charsets.UTF_8.displayName());
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
         StringWriter stringWriter = new StringWriter();
         marshaller.marshal(jaxbObject, stringWriter);

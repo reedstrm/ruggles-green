@@ -33,6 +33,8 @@ import com.sun.syndication.io.impl.Atom10Generator;
  * Utility class to print PrettyXmls for JDOM.
  * 
  * @author Arjun Satyapal
+ * 
+ * TODO(arjuns) : Rename this to StringConverter or some better name.
  */
 public class PrettyXmlOutputter {
     // Utility class.

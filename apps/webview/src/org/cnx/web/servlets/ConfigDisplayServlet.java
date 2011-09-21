@@ -35,6 +35,7 @@ import com.google.inject.Injector;
  *
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class ConfigDisplayServlet extends HttpServlet {
     private Injector injector;
     private WebViewConfiguration configuration;

@@ -38,6 +38,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
  * 
  * @author Tal Dayan
  */
+@SuppressWarnings("synthetic-access")
 public class ExportUtil {
 
     /**
@@ -67,6 +68,7 @@ public class ExportUtil {
      *            {@link #exportReferenceToRequestParameters}
      */
     public static ExportReference exportReferenceFromRequestParameters(HttpServletRequest req) {
+        
         final ExportScopeType scopeType =
             ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter(ExportParams.SCOPE.name));
 
@@ -142,5 +144,4 @@ public class ExportUtil {
 
         return builder.toString();
     }
-
 }

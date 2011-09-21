@@ -18,34 +18,30 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import com.google.common.base.Throwables;
-
-import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.exceptions.CnxConflictException;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.jdom.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 /**
  * Test for {@link CnxAtomModuleServlet}
@@ -74,9 +70,9 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
         for (File currFile : listOfResourcesToUpload) {
+            ClientEntry resourceEntry = cnxClient.createNewResource();
             logger.info("Attempting to upload : " + currFile.getAbsolutePath());
-            ClientEntry resourceEntry =
-                    cnxClient.uploadFileToBlobStore(currFile.getName(), currFile);
+            cnxClient.uploadFileToBlobStore(resourceEntry, currFile);
             listOfEntryForUploadedResources.add(resourceEntry);
             logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
                     + resourceEntry.getId() + "], and can be found here ["
@@ -97,8 +93,8 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         // TODO(arjuns) : Add more validations here.
 
         // TODO(arjuns) : refactor this.
-        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
-        VersionWrapper version = CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId());
+        IdWrapper moduleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
+        VersionWrapper version = CnxAtomPubUtils.getVersionFromAtomPubId(moduleEntry.getId());
         ClientEntry getEntry = cnxClient.getModuleVersionEntry(moduleId, version);
 
         String downloadedCnxmlDoc = cnxClient.getCnxml(getEntry);
@@ -124,12 +120,12 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingXml);
 
-        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        IdWrapper moduleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
         ClientEntry latestEntry =
                 cnxClient.getModuleVersionEntry(moduleId, new VersionWrapper(
-                        CnxAtomPubConstants.LATEST_VERSION_STRING));
+                        CnxAtomPubUtils.LATEST_VERSION_STRING));
         assertEquals(new VersionWrapper(2),
-                CnxAtomPubConstants.getVersionFromAtomPubId(latestEntry.getId()));
+                CnxAtomPubUtils.getVersionFromAtomPubId(latestEntry.getId()));
 
         String downloadedCnxml = cnxClient.getCnxml(latestEntry);
         assertEquals(cnxmlAsString, downloadedCnxml);
@@ -146,10 +142,10 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     public void testGetModuleVersion_withoutPublishingAnyVersion() throws Exception {
         ClientEntry moduleEntry = cnxClient.createNewModule();
 
-        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        IdWrapper moduleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
 
         List<VersionWrapper> listOfInvalidVersions =
-                Lists.newArrayList(new VersionWrapper(CnxAtomPubConstants.LATEST_VERSION_STRING),
+                Lists.newArrayList(new VersionWrapper(CnxAtomPubUtils.LATEST_VERSION_STRING),
                         new VersionWrapper(0), new VersionWrapper(1));
 
         for (VersionWrapper currentVersion : listOfInvalidVersions) {
@@ -175,7 +171,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
 
         cnxClient.createNewModuleVersion(moduleEntry, cnxmlAsString, resourceMappingXml);
 
-        IdWrapper moduleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        IdWrapper moduleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
         VersionWrapper version = new VersionWrapper(0);
 
         try {
@@ -188,14 +184,27 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         version = new VersionWrapper(1);
         try {
             ClientEntry entry = cnxClient.getModuleVersionEntry(moduleId, version);
-            IdWrapper downloadedId = CnxAtomPubConstants.getIdFromAtomPubId(entry.getId());
+            IdWrapper downloadedId = CnxAtomPubUtils.getIdFromAtomPubId(entry.getId());
             VersionWrapper downloadedVersion =
-                    CnxAtomPubConstants.getVersionFromAtomPubId(entry.getId());
-            
+                    CnxAtomPubUtils.getVersionFromAtomPubId(entry.getId());
+
             assertEquals(moduleId, downloadedId);
             assertEquals(version, downloadedVersion);
         } catch (Exception e) {
             fail("should not have failed." + Throwables.getStackTraceAsString(e));
+        }
+    }
+    
+    @Test
+    public void test_cretateNewResourceForMigration() throws Exception {
+        // TODO(arjuns) : ensure that resource does not exist earlier.Current hack.
+        try {
+            IdWrapper id = new IdWrapper("m0010", IdWrapper.Type.MODULE);
+            cnxClient.createNewModuleForMigration(id);
+            cnxClient.createNewModuleForMigration(id);
+            fail("should have failed.");
+        } catch (CnxConflictException e) {
+            // expected.
         }
     }
 }

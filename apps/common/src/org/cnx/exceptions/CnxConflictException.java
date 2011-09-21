@@ -18,12 +18,13 @@ package org.cnx.exceptions;
 import javax.ws.rs.core.Response.Status;
 
 /**
- * CNX Exception to represent NOT_FOUND (404).
+ * CnxException to indicate a {@link Status#CONFLICT}.
+ * 
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
-public class CnxInvalidUrlException extends CnxRuntimeException {
-    public CnxInvalidUrlException(String message, Throwable throwable) {
-        super(Status.NOT_FOUND, message, throwable);
+public class CnxConflictException extends CnxException {
+    public CnxConflictException(String message, Throwable throwable) {
+        super(Status.CONFLICT, message, throwable);
     }
 }

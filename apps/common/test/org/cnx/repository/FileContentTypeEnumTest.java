@@ -44,7 +44,7 @@ public class FileContentTypeEnumTest {
     @Test
     public void test_getFileContentTypeEnumFromExtension() {
         SecureRandom random = new SecureRandom();
-        int randomIndex = random.nextInt() % FileContentTypeEnum.values().length;
+        int randomIndex = Math.abs(random.nextInt()) % FileContentTypeEnum.values().length;
 
         FileContentTypeEnum expectedEnum = FileContentTypeEnum.values()[randomIndex];
 

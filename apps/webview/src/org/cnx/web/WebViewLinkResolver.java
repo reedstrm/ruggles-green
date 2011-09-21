@@ -16,23 +16,21 @@
 
 package org.cnx.web;
 
-import java.net.URI;
-import java.util.logging.Logger;
-
-import javax.annotation.Nullable;
-
-import org.cnx.cnxml.LinkResolver;
-import org.cnx.cnxml.Links;
-import org.cnx.cnxml.Module;
-import org.cnx.common.collxml.Collection;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.resourcemapping.Resource;
-import org.cnx.resourcemapping.Resources;
-
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.net.URI;
+import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import org.cnx.cnxml.LinkResolver;
+import org.cnx.cnxml.Links;
+import org.cnx.cnxml.Module;
+import org.cnx.common.collxml.Collection;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.repository.atompub.ServletUris;
+import org.cnx.resourcemapping.Resource;
+import org.cnx.resourcemapping.Resources;
 
 /**
  * Resolves links for Modules and Collections.
@@ -71,13 +69,13 @@ public class WebViewLinkResolver implements LinkResolver {
         final Collection collection = collectionProvider.get();
 
         if (moduleVersion == null) {
-            moduleVersion = CnxAtomPubConstants.LATEST_VERSION_STRING;
+            moduleVersion = CnxAtomPubUtils.LATEST_VERSION_STRING;
         }
 
         StringBuilder uriBuilder = new StringBuilder(CommonHack.CONTENT_NAME_SPACE);
         if (collection != null && collection.hasModule(moduleId)) {
             uriBuilder
-                    .append(CommonHack.COLLECTION)
+                    .append(ServletUris.Collection.COLLECTION_SERVLET)
                     .append("/")
                     .append(collection.getId())
                     .append("/")
@@ -85,7 +83,7 @@ public class WebViewLinkResolver implements LinkResolver {
         }
 
         uriBuilder
-                .append(CommonHack.MODULE)
+                .append(ServletUris.Module.MODULE_SERVLET)
                 .append("/")
                 .append(moduleId)
                 .append("/")

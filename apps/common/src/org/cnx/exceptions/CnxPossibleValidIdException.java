@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response.Status;
  * 
  * @author Arjun Satyapal
  */
+@SuppressWarnings("serial")
 public class CnxPossibleValidIdException extends CnxRuntimeException {
     private final IdWrapper id;
 

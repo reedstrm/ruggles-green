@@ -16,17 +16,10 @@
 package org.cnx.web.jerseyservlets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.cnx.repository.atompub.CnxAtomPubConstants.END_URL_XML;
-import static org.cnx.web.CommonHack.COLLECTION_ID_PATH_PARAM;
-import static org.cnx.web.CommonHack.COLLECTION_VERSION_PATH_PARAM;
-import static org.cnx.web.CommonHack.MODULE;
-import static org.cnx.web.CommonHack.MODULE_ID_PATH_PARAM;
-import static org.cnx.web.CommonHack.MODULE_VERSION_PATH_PARAM;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
-import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_RESOURCES_URL_PATTERN;
-import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_URL_PATTERN;
-import static org.cnx.web.jerseyservlets.RenderModuleServlet.MODULE_VERSION_XML_URL_PATTERN;
+
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -34,10 +27,26 @@ import com.google.inject.Provider;
 import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
-
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.propono.atom.client.ClientEntry;
-
+import com.sun.syndication.propono.utils.ProponoException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.xml.parsers.SAXParser;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
@@ -54,80 +63,52 @@ import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.util.RenderScope;
 import org.cnx.web.CommonHack;
 import org.cnx.web.Utils;
 import org.cnx.web.WebViewConfiguration;
 import org.cnx.web.WebViewTemplate;
-
-import java.net.URI;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.xml.parsers.SAXParser;
+import org.jdom.JDOMException;
+import org.xml.sax.SAXException;
 
 /**
  * Servlet to Handle CNX Resources.
  * 
- * TODO(arjuns) : Create separate package for jersey servlets vs httpservlets.
- * 
  * @author Arjun Satyapal
  */
-@Path(CommonHack.COLLECTION)
+@Path(ServletUris.Collection.COLLECTION_SERVLET)
 public class RenderCollectionServlet {
-    private static final Logger logger = Logger.getLogger(RenderCollectionServlet.class.getName());
-
+    private final Logger logger = Logger.getLogger(RenderCollectionServlet.class.getName());
     /**
-     * This will fetch the specific version. Possible value for version = [{version}, {latest}]
+     * URI relative to :
+     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}
      * 
-     * URL Pattern = /collection/<collectionId>/<collectionVersion>
-     */
-    private final String COLLECTION_VERSION_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM + "}/{"
-            + COLLECTION_VERSION_PATH_PARAM + "}";
-
-    /**
-     * This will fetch the CollXml for specific collection-version.
+     * In order to fetch Module under context of a collection.
      * 
-     * URL Pattern = /collection/<collectionId>/<collectionVersion>/xml
+     * URL Pattern : {jersey-home}/collection/<collectionId>/<collectionVersion>/module/<moduleId>/<
+     * moduleVersion>
      */
-    private final String COLLECTION_VERSION_XML_URL_PATTERN = "/{" + COLLECTION_ID_PATH_PARAM
-            + "}/{" + COLLECTION_VERSION_PATH_PARAM + "}" + END_URL_XML;
+    static final String COLLECTION_VERSION_MODULE_VERSION_URI =
+            ServletUris.Collection.COLLECTION_VERSION_PATH + ServletUris.Module.MODULE_SERVLET
+                    + ServletUris.Module.MODULE_VERSION_PATH;
 
     /**
-     * URL Pattern wrt /collection
-     * /<collectionId>/<collectionVersion>/module/<moduleId>/<moduleVersion>
+     * URI relative to : {@link #COLLECTION_VERSION_MODULE_VERSION_URI}.
+     * 
+     * Helper URI to fetch CNXML for a module under Collection Context.
      */
-    private final String COLLECTION_MODULE_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN + MODULE
-            + MODULE_VERSION_URL_PATTERN;
+    static final String COLLECTION_VERSION_MODULE_VERSION_XML_URI =
+            COLLECTION_VERSION_MODULE_VERSION_URI + "/" + ServletUris.XML_DOC;
 
     /**
-     * URL Pattern wrt /collection
-     * /<collectionId>/<collectionVersion>/module/<moduleId>/<moduleVersion>/xml
+     * URI relative to : {@link #COLLECTION_VERSION_MODULE_VERSION_URI}.
+     * 
+     * Helper URI to fetch ResourceMappingXml under Collection context.
      */
-    private final String COLLECTION_MODULE_XML_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN
-            + MODULE + MODULE_VERSION_XML_URL_PATTERN;
-
-    /**
-     * URL Pattern wrt /collection
-     * /<collectionId>/<collectionVersion>/module/<moduleId>/<moduleVersion>/resources
-     */
-    private final String COLLECTION_MODULE_RESOURCES_URL_PATTERN = COLLECTION_VERSION_URL_PATTERN
-            + MODULE + MODULE_VERSION_RESOURCES_URL_PATTERN;
+    static final String COLLECTION_VERSION_MODULE_VERSION_RESOURCE_MAPPING_URL =
+            COLLECTION_VERSION_MODULE_VERSION_URI + "/" + ServletUris.RESOURCE_MAPPING_DOC;
 
     // Soy parameters
     private static final String AUTHORS_PARAM = "authors";
@@ -168,14 +149,28 @@ public class RenderCollectionServlet {
         }
     }
 
+    /**
+     * When client does HTTP-GET on
+     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
+     * method is triggered.
+     * 
+     * Purpose of this method is to fetch CollXml from Repository, then create a HTML and then serve
+     * it back to client.
+     * 
+     * @param collectionId Id of desired Collection.
+     * @param collectionVersionString Version of desiredModule.
+     * @return Response which contains HTML representation of the desired module.
+     * @throws ProponoException
+     * @throws SAXException
+     * @throws IOException
+     */
     @GET
     @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
-    @Path(COLLECTION_VERSION_URL_PATTERN)
-    public Response getCollectionVersion(@Context HttpServletRequest req,
-            @Context HttpServletResponse res,
-            @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
-            @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
-            throws Exception {
+    @Path(ServletUris.Collection.COLLECTION_VERSION_PATH)
+    public Response getCollectionVersion(
+            @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
+            @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
+            throws ProponoException, SAXException, IOException {
         // TODO(arjuns) : Handle exception.
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
@@ -192,8 +187,7 @@ public class RenderCollectionServlet {
         }
 
         String collXml =
-                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
-                        collectionVersionEntry);
+                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
 
         final Collection collection =
                 injector.getInstance(CollectionFactory.class).create(collectionId,
@@ -266,13 +260,25 @@ public class RenderCollectionServlet {
         return myresponse.build();
     }
 
+    /**
+     * When client does HTTP-GET on
+     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML}, then
+     * this method is triggered.
+     * 
+     * This is a helper method which is used for providing CollXml for desired Collection.
+     * 
+     * @param collectionId Id of desired Collection.
+     * @param collectionVersionString Desired version of Collection.
+     * @return CollXml.
+     * @throws IOException
+     */
     @GET
     @Produces(CnxMediaTypes.TEXT_XML_UTF8)
-    @Path(COLLECTION_VERSION_XML_URL_PATTERN)
+    @Path(ServletUris.Collection.COLLECTION_VERSION_COLLXML)
     public Response getCollectionVersionXml(
-            @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
-            @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
-            throws Exception {
+            @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
+            @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
+            throws IOException {
         // TODO(arjuns) : Handle exception.
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
@@ -283,17 +289,31 @@ public class RenderCollectionServlet {
         return fetchFromRepositoryAndReturn(url);
     }
 
-    // TODO(arjuns) : Add returns.
+    /**
+     * When client does HTTP-GET on {@link #COLLECTION_VERSION_MODULE_VERSION_URI}, then this method
+     * is triggered.
+     * 
+     * Purpose of this method is to render a Module in Collection's context.
+     * 
+     * @param collectionId Id of desired Collection.
+     * @param collectionVersionString Version of desiredModule.
+     * @param moduleId Id of desired Module.
+     * @param moduleVersionString Version of desired Module.
+     * @return Response which contains HTML representation of the desired module.
+     * @throws ProponoException
+     * @throws SAXException
+     * @throws IOException
+     * @throws JDOMException
+     */
     @GET
     @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
-    @Path(COLLECTION_MODULE_URL_PATTERN)
-    public Response getModuleVersionUnderCollectionVersion(@Context HttpServletRequest req,
-            @Context HttpServletResponse res,
-            @PathParam(COLLECTION_ID_PATH_PARAM) String collectionId,
-            @PathParam(COLLECTION_VERSION_PATH_PARAM) String collectionVersionString,
-            @PathParam(CommonHack.MODULE_ID_PATH_PARAM) String moduleId,
-            @PathParam(CommonHack.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
-            throws Exception {
+    @Path(COLLECTION_VERSION_MODULE_VERSION_URI)
+    public Response getModuleVersionUnderCollectionVersion(
+            @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
+            @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String collectionVersionString,
+            @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
+            throws ProponoException, SAXException, IOException, JDOMException {
         // TODO(arjuns) : handle exceptions.
         final IdWrapper collectionIdWrapper =
                 new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
@@ -312,8 +332,7 @@ public class RenderCollectionServlet {
         }
 
         String collXml =
-                cnxClient.getConstants().getCollXmlDocFromAtomPubCollectionEntry(
-                        collectionVersionEntry);
+                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
 
         final Collection collection =
                 injector.getInstance(CollectionFactory.class).create(collectionId,
@@ -412,36 +431,60 @@ public class RenderCollectionServlet {
     }
 
     private String getCollectionUri(String collectionId, VersionWrapper collectionVersion) {
-        return CommonHack.CONTENT_NAME_SPACE + CommonHack.COLLECTION + "/" + collectionId + "/"
-                + collectionVersion.toString();
+        return CommonHack.CONTENT_NAME_SPACE + ServletUris.Collection.COLLECTION_SERVLET + "/"
+                + collectionId + "/" + collectionVersion.toString();
     }
 
+    /**
+     * When client does HTTP-GET on {@link #COLLECTION_VERSION_MODULE_VERSION_XML_URI}, then this
+     * method is triggered.
+     * 
+     * This is a helper method which is used for providing XML for a Module. This method in turn
+     * delegates the responsibility to {@link RenderModuleServlet#getModuleVersion};
+     * 
+     * @param context ServletContext.
+     * @param moduleId Id of desired Module.
+     * @param moduleVersionString Version of desired Module.
+     * @return Response containing CNXML for desired Module.
+     * @throws IOException
+     */
     @GET
     @Produces(CnxMediaTypes.TEXT_XML_UTF8)
-    @Path(COLLECTION_MODULE_XML_URL_PATTERN)
-    public Response getModuleVersionXmlUnderCollectionVersion(
-            @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-            @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
-        VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
-        URL url = cnxClient.getConstants().getModuleVersionXmlAbsPath(idWrapper, versionWrapper);
+    @Path(COLLECTION_VERSION_MODULE_VERSION_XML_URI)
+    public Response getModuleVersionXmlUnderCollectionVersion(@Context ServletContext context,
+            @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
+            throws IOException {
+        RenderModuleServlet moduleServlet = new RenderModuleServlet(context);
 
-        return fetchFromRepositoryAndReturn(url);
+        return moduleServlet.getModuleVersionResourcesXml(moduleId, moduleVersionString);
     }
 
+    /**
+     * When client does HTTP-GET on {@link #COLLECTION_VERSION_MODULE_VERSION_RESOURCE_MAPPING_URL},
+     * then this method is triggered.
+     * 
+     * This is a helper method which is used for providing ResrouceMappingXml for a Module. This
+     * method in turn delegates the responsibility to
+     * {@link RenderModuleServlet#getModuleVersionResourcesXml};
+     * 
+     * @param context ServletContext.
+     * @param moduleId Id of desired Module.
+     * @param moduleVersionString Version of desired Module.
+     * @return Response containing CNXML for desired Module.
+     * @throws IOException
+     */
     @GET
     @Produces(CnxMediaTypes.TEXT_XML_UTF8)
-    @Path(COLLECTION_MODULE_RESOURCES_URL_PATTERN)
+    @Path(COLLECTION_VERSION_MODULE_VERSION_RESOURCE_MAPPING_URL)
     public Response getModuleVersionResourcesXmlUnderCollectionVersion(
-            @PathParam(MODULE_ID_PATH_PARAM) String moduleId,
-            @PathParam(MODULE_VERSION_PATH_PARAM) String moduleVersionString) throws Exception {
-        IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
-        VersionWrapper versionWrapper = new VersionWrapper(moduleVersionString);
-        URL url =
-                cnxClient.getConstants().getModuleVersionResourceMappingAbsPath(idWrapper,
-                        versionWrapper);
+            @Context ServletContext context,
+            @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
+            throws IOException {
+        RenderModuleServlet moduleServlet = new RenderModuleServlet(context);
 
-        return fetchFromRepositoryAndReturn(url);
+        return moduleServlet.getModuleVersionResourcesXml(moduleId, moduleVersionString);
     }
 
     private SoyData convertCollectionItemToSoyData(@Nullable CollectionItem item) {

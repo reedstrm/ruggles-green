@@ -15,24 +15,21 @@
  */
 package org.cnx.repository.scripts;
 
-import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
+import java.net.MalformedURLException;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.net.MalformedURLException;
 
 /**
  * Test for {@link ParallelModuleMigrator}
@@ -63,7 +60,7 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
 
         VersionWrapper expectedVersion = new VersionWrapper(1);
         assertEquals(expectedVersion,
-                CnxAtomPubConstants.getVersionFromAtomPubId(moduleEntry.getId()));
+                CnxAtomPubUtils.getVersionFromAtomPubId(moduleEntry.getId()));
     }
 
     @Test
@@ -74,9 +71,9 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
                     null /* cnxModuleId */, null/* aerModuleId */, null /* version */);
         Entry moduleEntry = migrator.migrateModuleVersion();
 
-        IdWrapper aerModuleId = CnxAtomPubConstants.getIdFromAtomPubId(moduleEntry.getId());
+        IdWrapper aerModuleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
 
-        VersionWrapper firstVersion = CnxAtomPubConstants.NEW_MODULE_DEFAULT_VERSION;
+        VersionWrapper firstVersion = CnxAtomPubUtils.NEW_MODULE_DEFAULT_VERSION;
         // Now publishing second version.
         ParallelModuleMigrator migrator2 =
             new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, null /* collXmlModuleId */,
@@ -86,10 +83,10 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
 
         // Validating version.
         ClientEntry clientEntry =
-            cnxClient.getModuleVersionEntry(aerModuleId, LATEST_VERSION_WRAPPER);
+            cnxClient.getModuleVersionEntry(aerModuleId, CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
         VersionWrapper expectedVersion = new VersionWrapper(2);
         VersionWrapper actualVersion =
-            CnxAtomPubConstants.getVersionFromAtomPubId(clientEntry.getId());
+                CnxAtomPubUtils.getVersionFromAtomPubId(clientEntry.getId());
 
         assertEquals(expectedVersion, actualVersion);
     }

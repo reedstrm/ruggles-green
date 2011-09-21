@@ -39,7 +39,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Logger;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -50,8 +50,12 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.cnx.exceptions.CnxConflictException;
+import org.cnx.exceptions.CnxException;
 import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.resourceentry.ResourceEntryValue;
 import org.cnx.resourcemapping.LocationInformation;
@@ -67,8 +71,6 @@ import org.jdom.JDOMException;
  * @author Arjun Satyapal
  */
 public class CnxAtomPubClient {
-    Logger logger = Logger.getLogger(CnxAtomPubClient.class.getName());
-
     // TODO(arjuns0 : Currently hardcoding these values.
     private final String REPOSITORY_ID = "cnx-repo";
     private final BigDecimal RESOURCE_MAPPING_DOC_VERSION = new BigDecimal(1.0);
@@ -121,7 +123,8 @@ public class CnxAtomPubClient {
         constants = new CnxAtomPubConstants(atomPubServerUrl);
 
         URL serviceDocumentUri =
-                new URL(atomPubServerUrl.toString() + CnxAtomPubConstants.SERVICE_DOCUMENT_PATH);
+                new URL(atomPubServerUrl.toString()
+                        + ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET);
 
         service =
                 AtomClientFactory.getAtomService(serviceDocumentUri.toString(),
@@ -145,21 +148,21 @@ public class CnxAtomPubClient {
      * Get AtomPub collection for CNX Resources.
      */
     public ClientCollection getCollectionResource() {
-        return getCollectionByTitle(CnxAtomPubConstants.COLLECTION_RESOURCE_TITLE);
+        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_RESOURCE_TITLE);
     }
 
     /**
      * Get AtomPub collection for CNX Modules.
      */
     public ClientCollection getCollectionModule() {
-        return getCollectionByTitle(CnxAtomPubConstants.COLLECTION_MODULE_TITLE);
+        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_MODULE_TITLE);
     }
 
     /**
      * Get AtomPub collection for CNX Collections.
      */
     public ClientCollection getCollectionCnxCollection() {
-        return getCollectionByTitle(CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_TITLE);
+        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_CNX_COLLECTION_TITLE);
     }
 
     /**
@@ -194,21 +197,50 @@ public class CnxAtomPubClient {
     /**
      * Upload file to blobstore.
      * 
-     * @param resourceName : Pretty name for the resource. This will be used to create the
-     *            resourceMappingDoc.
+     * @param resourceEntry Entry of Resource, which contains link to Blobstore.
      * @param file : File to be uploaded to CNX Repository.
      * 
      *            TODO(arjuns) : Replace file with InputStream so that it can work on AppEngine.
      */
-    public ClientEntry uploadFileToBlobStore(String resourceName, File file)
-            throws ProponoException, HttpException, IOException {
-        ClientEntry resourceEntry = createUploadUrl(resourceName);
-
+    public void uploadFileToBlobStore(ClientEntry resourceEntry, File file)
+            throws HttpException, IOException {
         Link blobstoreUrl = CnxClientUtils.getBlobstoreUri(resourceEntry);
-
         URL postUrl = new URL(blobstoreUrl.getHrefResolved());
         postFileToBlobstore(postUrl, file);
-        return resourceEntry;
+    }
+
+    /**
+     * Create New Resource on CNX Repository.
+     */
+    public ClientEntry createNewResource() throws ProponoException {
+        ClientCollection collectionResource = getCollectionResource();
+        ClientEntry entry = new ClientEntry(service, collectionResource);
+        collectionResource.addEntry(entry);
+        return entry;
+    }
+
+    /**
+     * Create New Module on CNX Repository for Migration.
+     * 
+     * @param resourceId Original CNX Module id on cnx.org.
+     * @throws IOException
+     * @throws ProponoException
+     * @throws FeedException
+     * @throws JDOMException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws CnxException
+     */
+    public ClientEntry createNewResourceForMigration(IdWrapper resourceId) throws IOException,
+            ProponoException, JDOMException, FeedException, IllegalAccessException,
+            InvocationTargetException, CnxException {
+        // TODO(arjuns) : Create a function for URL appending.
+        // TODO(arjuns) : move this url to constants.
+        String migrationUrlForResource =
+                constants.getAtomPubRestUrl().toString() + "/resource/migration/"
+                        + resourceId.getId();
+        return handlePostForMigration(migrationUrlForResource);
     }
 
     /**
@@ -217,11 +249,11 @@ public class CnxAtomPubClient {
      * @param blobstoreUrl where file needs to be uploaded.
      * @param file File to be uploaded to Blobstore.
      */
-    void postFileToBlobstore(URL blobstoreUrl, File file) throws IOException {
+    private void postFileToBlobstore(URL blobstoreUrl, File file) throws IOException {
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
         Part[] parts = { new FilePart(file.getName(), file), };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
-        int status = httpClient.executeMethod(postMethod);
+        // int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
         // Preconditions.checkState(status == 302);
     }
@@ -247,17 +279,17 @@ public class CnxAtomPubClient {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      * @throws IllegalAccessException
+     * @throws CnxConflictException
      */
-    @SuppressWarnings("deprecation")
     public ClientEntry createNewModuleForMigration(IdWrapper cnxModuleId) throws IOException,
             ProponoException, IllegalArgumentException, JDOMException, FeedException,
-            IllegalAccessException, InvocationTargetException {
+            IllegalAccessException, InvocationTargetException, CnxConflictException {
         // TODO(arjuns) : Create a function for URL appending.
         // TODO(arjuns) : move this url to constants.
-        String migrateModule =
+        String migrationUrlForModule =
                 constants.getAtomPubRestUrl().toString() + "/module/migration/"
                         + cnxModuleId.getId();
-        return handlePostForMigration(migrateModule);
+        return handlePostForMigration(migrationUrlForModule);
     }
 
     /**
@@ -267,7 +299,7 @@ public class CnxAtomPubClient {
      * {@link #createNewModule()}.
      * 
      * @param moduleVersionEntry Module Version entry to be updated. On success, moduleVersionEntry
-     *      will be updated with response returned from Repository.
+     *            will be updated with response returned from Repository.
      * @param cnxmlDoc CNXML Doc.
      * @param resourceMappingXml XML for Resource Mapping.
      * 
@@ -275,10 +307,10 @@ public class CnxAtomPubClient {
      * @throws IOException
      * @throws JDOMException
      */
-    public void createNewModuleVersion(ClientEntry moduleVersionEntry,
-            final String cnxmlDoc, final String resourceMappingXml) throws ProponoException,
-            JAXBException, JDOMException, IOException {
-        moduleVersionEntry.setContents(constants.getAtomPubListOfContent(cnxmlDoc,
+    public void createNewModuleVersion(ClientEntry moduleVersionEntry, final String cnxmlDoc,
+            final String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
+            IOException {
+        moduleVersionEntry.setContents(CnxAtomPubUtils.getAtomPubListOfContent(cnxmlDoc,
                 resourceMappingXml));
         moduleVersionEntry.update();
     }
@@ -299,17 +331,16 @@ public class CnxAtomPubClient {
     }
 
     /**
-     * Get CNXML from AtomEntry for a Module-Version.
-     *  TODO(arjuns) : Move this to utility class.
-     *  
+     * Get CNXML from AtomEntry for a Module-Version. TODO(arjuns) : Move this to utility class.
+     * 
      * @param moduleVersionEntry Atom Entry returned by Server for a particular module-version.
      * @return Returns CNXML (response is already decoded).
      */
     public String getCnxml(ClientEntry moduleVersionEntry) throws JDOMException, IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-                constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
-        return constants.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
+                CnxAtomPubUtils.decodeFromBase64EncodedString(encodedModuleEntryValue);
+        return CnxAtomPubUtils.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
     }
 
     /**
@@ -325,8 +356,8 @@ public class CnxAtomPubClient {
             IOException {
         String encodedModuleEntryValue = getContentFromEntry(moduleVersionEntry).getValue();
         String decodedModuleEntryValue =
-                constants.decodeFromBase64EncodedString(encodedModuleEntryValue);
-        return constants.getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
+                CnxAtomPubUtils.decodeFromBase64EncodedString(encodedModuleEntryValue);
+        return CnxAtomPubUtils.getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
     }
 
     /**
@@ -370,7 +401,7 @@ public class CnxAtomPubClient {
             resourceFromEntry.setLocationInformation(locationInformation);
         }
 
-        return constants.jaxbObjectToString(Resources.class, resources);
+        return CnxAtomPubUtils.jaxbObjectToString(Resources.class, resources);
     }
 
     /**
@@ -394,32 +425,38 @@ public class CnxAtomPubClient {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      * @throws IllegalAccessException
+     * @throws CnxConflictException
      */
-    @SuppressWarnings("deprecation")
     public ClientEntry createNewCollectionForMigration(IdWrapper cnxCollectionId)
             throws IOException, ProponoException, IllegalArgumentException, JDOMException,
-            FeedException, IllegalAccessException, InvocationTargetException {
+            FeedException, IllegalAccessException, InvocationTargetException, CnxConflictException {
         // TODO(arjuns) : Create a function for URL appending.
         // TODO(arjuns) : move this url to constants.
         // TODO(arjuns): Handle exceptions.
-        String migrateModule =
+        String migrationUrlForCollection =
                 constants.getAtomPubRestUrl().toString() + "/collection/migration/"
                         + cnxCollectionId.getId();
-        return handlePostForMigration(migrateModule);
+        return handlePostForMigration(migrationUrlForCollection);
     }
 
     @SuppressWarnings("deprecation")
-    private ClientEntry handlePostForMigration(String migrateModule) throws IOException,
+    private ClientEntry handlePostForMigration(String migrationUrl) throws IOException,
             ProponoException, JDOMException, FeedException, IllegalAccessException,
-            InvocationTargetException {
-        PostMethod postMethod = new PostMethod(migrateModule);
+            InvocationTargetException, CnxConflictException {
+        PostMethod postMethod = new PostMethod(migrationUrl);
+
         postMethod.setRequestEntity(new StringRequestEntity(""));
+
         httpClient.executeMethod(postMethod);
         int code = postMethod.getStatusCode();
 
         // TODO(arjuns) : Refactor following method to customHttpClient
         InputStream is = postMethod.getResponseBodyAsStream();
         code = postMethod.getStatusCode();
+
+        if (code == Status.CONFLICT.getStatusCode()) {
+            throw new CnxConflictException("ServerSide conflict for URL : " + migrationUrl, null /* throwable */);
+        }
         if (code != 200 && code != 201) {
             throw new ProponoException("ERROR HTTP status=" + code + " : "
                     + Utilities.streamToString(is));
@@ -436,18 +473,18 @@ public class CnxAtomPubClient {
      * NOTE : If it is first version, then a collectionId must be obtained using
      * {@link #createNewCollection}.
      * 
-     * @param collectionVersionEntry Collection Entry that needs to be published. On success, 
-     *      collectionVersionEntry will be updated with response returned from Repository.
+     * @param collectionVersionEntry Collection Entry that needs to be published. On success,
+     *            collectionVersionEntry will be updated with response returned from Repository.
      * @param collXml Collection XML Doc.
      * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
      */
-    public void createNewCollectionVersion(ClientEntry collectionVersionEntry,
-            final String collXml) throws ProponoException, JAXBException, JDOMException,
-            IOException {
-        collectionVersionEntry.setContents(constants
+    public void
+            createNewCollectionVersion(ClientEntry collectionVersionEntry, final String collXml)
+                    throws ProponoException, JAXBException, JDOMException, IOException {
+        collectionVersionEntry.setContents(CnxAtomPubUtils
                 .getAtomPubListOfContentForCollectionEntry(collXml));
         collectionVersionEntry.update();
     }

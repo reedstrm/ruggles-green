@@ -15,35 +15,29 @@
  */
 package org.cnx.repository.scripts.migrators;
 
-import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.exceptions.CnxRuntimeException;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.jdom.JDOMException;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.exceptions.CnxRuntimeException;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.jdom.JDOMException;
 
 /**
  * Migrator for a Collection.
@@ -90,7 +84,7 @@ public class ParallelCollectionMigrator implements Runnable {
         List<Link> otherLinks = entry.getOtherLinks();
 
         for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubConstants.REL_TAG_FOR_SELF_URL)) {
+            if (currLink.getRel().equals(CnxAtomPubUtils.REL_TAG_FOR_SELF_URL)) {
                 return currLink;
             }
         }
@@ -119,7 +113,7 @@ public class ParallelCollectionMigrator implements Runnable {
                 if (cnxCollectionId != null && preserveModuleIds) {
                     // Publish version in restricted range.
                     requiredCnxModuleId = new IdWrapper(cnxModuleId, IdWrapper.Type.MODULE);
-                    requiredVersion = CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
+                    requiredVersion = CnxAtomPubUtils.LATEST_VERSION_WRAPPER;
                 }
 
                 if (aerCollectionId != null && preserveModuleIds) {
@@ -165,7 +159,7 @@ public class ParallelCollectionMigrator implements Runnable {
             for (String cnxModuleId : mapOfModuleIdToNewModuleEntry.keySet()) {
                 Entry newModuleEntry = mapOfModuleIdToNewModuleEntry.get(cnxModuleId);
                 IdWrapper aerModuleId =
-                        CnxAtomPubConstants.getIdFromAtomPubId(newModuleEntry.getId());
+                        CnxAtomPubUtils.getIdFromAtomPubId(newModuleEntry.getId());
                 String oldString = "\"" + cnxModuleId + "\"";
                 String newString = "\"" + aerModuleId.getId() + "\"";
                 collXmlAsString = collXmlAsString.replaceAll(oldString, newString);
@@ -185,7 +179,7 @@ public class ParallelCollectionMigrator implements Runnable {
                 try {
                     existingEntry =
                             cnxClient.getCollectionVersionEntry(cnxCollectionId,
-                                    LATEST_VERSION_WRAPPER);
+                                    CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
                 } catch (CnxRuntimeException e) {
                     if (e.getJerseyStatus() == Status.NOT_FOUND) {
                         // Expected.

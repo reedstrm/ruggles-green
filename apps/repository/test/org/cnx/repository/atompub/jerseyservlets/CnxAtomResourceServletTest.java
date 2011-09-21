@@ -17,6 +17,11 @@ package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import org.cnx.exceptions.CnxConflictException;
+
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
@@ -24,7 +29,6 @@ import com.sun.syndication.propono.utils.ProponoException;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.atompubclient.CnxClientUtils;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.IdWrapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,10 +58,11 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
     }
 
     @Test
-    public void testResource() throws Exception {
-        ClientEntry createResourceEntry = cnxClient.createUploadUrl("test-resource");
+    public void test_createNewResource() throws Exception {
+        ClientEntry createResourceEntry = cnxClient.createNewResource();
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());
+
         String resourceId = createResourceEntry.getId();
         String expectedResourceUrl =
                 getConstants().getResourceAbsPath(
@@ -66,26 +71,40 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
                 .getHrefResolved());
 
         /*
-         * There should be two links in following order :<br> 1. Link for Blobstore.<br> 2. Link for
-         * Resource.<br>
+         * There should be two links in following order :<br> 1. Link for Blobstore. 2. Link for
+         * Resource.
          */
         @SuppressWarnings("unchecked")
         List<Link> listOfLinks = createResourceEntry.getOtherLinks();
         assertEquals(2, listOfLinks.size());
 
         Link selfLink = listOfLinks.get(0);
-        assertEquals(CnxAtomPubConstants.REL_TAG_FOR_SELF_URL, selfLink.getRel());
+        assertEquals(CnxAtomPubUtils.REL_TAG_FOR_SELF_URL, selfLink.getRel());
         assertEquals(expectedResourceUrl, selfLink.getHref());
 
         Link blobStoreLink = listOfLinks.get(1);
-        assertEquals(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL, blobStoreLink.getRel());
+        assertEquals(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL, blobStoreLink.getRel());
         assertNotNull(blobStoreLink.getHref());
 
         // Now upload blob to AppEngine.
-        cnxClient.uploadFileToBlobStore(file.getName(), file);
+        cnxClient.uploadFileToBlobStore(createResourceEntry, file);
 
         // TODO(arjuns) : Add test for get once it works.
         // TODO(arjuns) : Add link in entry for get.
         // TODO(arjuns) : Add test for resourceName with white spaces.
+    }
+
+    @Test
+    public void test_cretateNewResourceForMigration() throws Exception {
+        // TODO(arjuns) : ensure that resource does not exist earlier.Current hack.
+
+        try {
+            IdWrapper id = new IdWrapper("r0010", IdWrapper.Type.RESOURCE);
+            cnxClient.createNewResourceForMigration(id);
+            cnxClient.createNewResourceForMigration(id);
+            fail("should have failed.");
+        } catch (CnxConflictException e) {
+            // expected.
+        }
     }
 }

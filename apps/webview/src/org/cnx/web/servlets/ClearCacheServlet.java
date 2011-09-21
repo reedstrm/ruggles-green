@@ -31,6 +31,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.common.io.ByteStreams;
 
+@SuppressWarnings("serial")
 public class ClearCacheServlet extends HttpServlet {
     private static final String TEMPLATE_FILE = "clear-cache.html";
 

@@ -19,20 +19,17 @@ package org.cnx.repository.atompub.utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-
 import com.sun.syndication.feed.atom.Entry;
-
-import org.cnx.exceptions.CnxException;
-import org.cnx.repository.service.api.RepositoryResponse;
-import org.cnx.repository.service.api.RepositoryStatus;
-
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import org.cnx.exceptions.CnxException;
+import org.cnx.repository.PrettyXmlOutputter;
+import org.cnx.repository.service.api.RepositoryResponse;
+import org.cnx.repository.service.api.RepositoryStatus;
 
 /**
  * @author arjuns@google.com (Arjun Satyapal)

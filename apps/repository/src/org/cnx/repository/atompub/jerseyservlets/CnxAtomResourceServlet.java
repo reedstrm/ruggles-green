@@ -19,15 +19,15 @@ import static org.cnx.repository.atompub.CommonUtils.getURI;
 import static org.cnx.repository.atompub.IdWrapper.Type.RESOURCE;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
-import static org.cnx.repository.atompub.utils.ServerUtil.getPostedEntry;
 
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -39,13 +39,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-
 import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
 import org.cnx.repository.FileContentTypeEnum;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
+import org.cnx.repository.RepositoryConstants;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.CnxMediaTypes;
 import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
@@ -57,75 +58,72 @@ import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-
 /**
  * Jersey Servlet for CNX Resources.
  * 
  * @author Arjun Satyapal
  */
-@Path(CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH)
+@Path(ServletUris.Resource.RESOURCE_SERVLET)
 public class CnxAtomResourceServlet {
     private final Logger logger = Logger.getLogger(CnxAtomResourceServlet.class.getName());
-    // TODO(arjuns) : Move these servlet strings to a common place.
-
-    private final String RESOURCE_ID_PATH_PARAM = "resourceId";
-
-    // In order to create a new ResourceId, client should post to this URL.
-    private final String RESOURCE_POST = "/";
-
-    // In order to create ResourceId in restricted Id Range, client should post to this URL.
-    private final String RESOURCE_MIGRATION_POST = "/migration/{" + RESOURCE_ID_PATH_PARAM + "}";
-
-    // In order to get resource, client should do HTTP Get at this URL.
-    private final String RESOURCE_GET_URL_PATTERN = "/{" + RESOURCE_ID_PATH_PARAM + "}";
-
     private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
     /**
-     * Clients should post to {@link #RESOURCE_POST} in order to get a new ResourceId and Blobstore
-     * URL where client will upload the blob.
+     * When Client does HTTP-POST on
+     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_NEW}, then this method
+     * is invoked.
+     * 
+     * This method in turn sends request to {@link CnxRepositoryService#createResource}.
+     * 
+     * This method is used to create a new ResourceId.
+     * 
+     * @param req HttpServletRequest
      */
     @POST
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
-    @Path(RESOURCE_POST)
+    @Path(ServletUris.Resource.RESOURCE_POST_NEW)
     public Response createNewResource(@Context HttpServletRequest req) throws CnxException {
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        Entry postedEntry = getPostedEntry(logger, req);
-
         RepositoryResponse<CreateResourceResult> createdResource =
-            repositoryService.createResource(RepositoryUtils.getRepositoryContext());
+                repositoryService.createResource(RepositoryUtils.getRepositoryContext());
 
-        return handleCreationOfResource(req, atomPubService, postedEntry, createdResource);
+        return handleCreationOfResource(req, atomPubService, createdResource);
     }
 
     /**
-     * Clients should post to {@link #RESOURCE_POST} in order to get a new ResourceId and Blobstore
-     * URL where client will upload the blob.
+     * When Clients does HTTP-POST on
+     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_MIGRATION}, then this
+     * method is invoked.
+     * 
+     * This is a special function provided in order to allow migration and retaining old ResourceIds
+     * from CNX. Once migration is complete, this method will be removed.
+     * 
+     * In functionality it is similar to {@link #createNewResource}.
+     * 
+     * @param req HttpServletRequest.
+     * @param resourceId Id that client wants to retain. It should be less then
+     *            {@link RepositoryConstants#MIN_NON_RESERVED_KEY_ID}.
      */
     @POST
     @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
-    @Path(RESOURCE_MIGRATION_POST)
+    @Path(ServletUris.Resource.RESOURCE_POST_MIGRATION)
     public Response createNewResourceForMigration(@Context HttpServletRequest req,
-            @PathParam(RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
+            @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        Entry postedEntry = getPostedEntry(logger, req);
-
         RepositoryResponse<CreateResourceResult> createdResource =
-            repositoryService.migrationCreateResourceWithId(RepositoryUtils.getRepositoryContext(),
-                    idWrapper.getId());
+                repositoryService.migrationCreateResourceWithId(
+                        RepositoryUtils.getRepositoryContext(), idWrapper.getId());
 
-        return handleCreationOfResource(req, atomPubService, postedEntry, createdResource);
+        return handleCreationOfResource(req, atomPubService, createdResource);
     }
 
-    private Response handleCreationOfResource(HttpServletRequest req,
-            CnxAtomService atomPubService, Entry postedEntry,
-            RepositoryResponse<CreateResourceResult> createdResource)
-        throws CnxBadRequestException, CnxException {
+    private Response
+            handleCreationOfResource(HttpServletRequest req, CnxAtomService atomPubService,
+                    RepositoryResponse<CreateResourceResult> createdResource)
+                    throws CnxBadRequestException, CnxException {
         if (createdResource.isOk()) {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
@@ -133,7 +131,6 @@ public class CnxAtomResourceServlet {
             CreateResourceResult repoResult = createdResource.getResult();
             Entry entry = new Entry();
             entry.setId(repoResult.getResourceId());
-            entry.setTitle(postedEntry.getTitle());
             entry.setPublished(new Date());
 
             // TODO(arjuns) : Create a function for this.
@@ -153,7 +150,7 @@ public class CnxAtomResourceServlet {
 
             URI editUrl = getURI(uploadUrl);
             Link blobstoreLink = new Link();
-            blobstoreLink.setRel(CnxAtomPubConstants.REL_TAG_FOR_BLOBSTORE_URL);
+            blobstoreLink.setRel(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL);
             blobstoreLink.setHref(editUrl.toString());
 
             listOfLinks.add(blobstoreLink);
@@ -168,16 +165,32 @@ public class CnxAtomResourceServlet {
     // TODO(arjuns) : Do we need URL to return AtomEntry for Resources?
 
     // TODO(arjuns) : Repository should start sending the content-type.
+
+    /**
+     * When client does HTTP-GET on
+     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_PATH}, then this method is
+     * invoked.
+     * 
+     * This method in turn contacts {@link CnxRepositoryService#serveResouce}.
+     * 
+     * This method is used to fetch Resource from repository. Repository returns a set of headers,
+     * which are set as part of the response. One of the important headers is BlobKey. This header
+     * is consumed by AppEngine, and AppEngine replaces this header with actual Blobstore content.
+     * 
+     * @param res HttpServletResponse.
+     * @param resourceId ResourceId requested by Client.
+     * @return Response with headers returned by {@link CnxRepositoryService}
+     */
     @GET
-    @Path(RESOURCE_GET_URL_PATTERN)
+    @Path(ServletUris.Resource.RESOURCE_PATH)
     public Response getResource(@Context HttpServletResponse res,
-            @PathParam(RESOURCE_ID_PATH_PARAM) String resourceId) {
+            @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) {
         final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
         RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
 
         RepositoryResponse<ServeResourceResult> serveResourceResult =
-            repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
-                    idWrapper.getId(), res);
+                repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
+                        idWrapper.getId(), res);
 
         if (serveResourceResult.isOk()) {
 
@@ -189,14 +202,14 @@ public class CnxAtomResourceServlet {
             }
 
             RepositoryResponse<GetResourceInfoResult> repositoryInfo =
-                repositoryService.getResourceInfo(repositoryContext, idWrapper.getId());
+                    repositoryService.getResourceInfo(repositoryContext, idWrapper.getId());
 
             // TODO(arjuns) : Repository should return this.
             if (repositoryInfo.isOk()) {
                 String fileName =
-                    repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
+                        repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
                 FileContentTypeEnum contentType =
-                    FileContentTypeEnum.getFileContentTypeEnumFromFileName(fileName);
+                        FileContentTypeEnum.getFileContentTypeEnumFromFileName(fileName);
                 responseBuilder.header("Content-Type", contentType.getContentType());
 
                 responseBuilder.header("Content-Disposition", ("filename=\"" + fileName + "\""));

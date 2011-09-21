@@ -15,6 +15,9 @@
  */
 package com.sun.syndication.propono.atom.client;
 
+import org.apache.commons.httpclient.URI;
+
+import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,9 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
 import javax.ws.rs.core.Response.Status;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -42,8 +43,6 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 
-import com.google.common.io.CharStreams;
-
 /**
  * Rome-propono uses commons-httpclient which does not work on AppEngine. So creating a custom HTTP
  * Client which wraps URL Fetch service offered by AppEngine.
@@ -51,6 +50,8 @@ import com.google.common.io.CharStreams;
  * @author Arjun Satyapal
  */
 public class CustomHttpClient extends HttpClient {
+    // Timeout = 30 ms.
+    private static final int DEFAULT_CONNECTION_TIMEOUT_IN_MILLIS = 30 * 1000;
     private static final String FIELD_RESPONSE_BODY_NAME = "responseBody";
     private static final String FIELD_RESPONSE_STATUS = "statusLine";
     @SuppressWarnings("rawtypes")
@@ -94,13 +95,8 @@ public class CustomHttpClient extends HttpClient {
     private String handlePutMethod(HttpMethod method) throws MalformedURLException, URIException,
             IOException, ProtocolException, NoSuchFieldException, HttpException,
             IllegalAccessException {
-        String response;
-        URL url = new URL(method.getURI().toString());
         PutMethod putMethod = (PutMethod) method;
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
-
+        HttpURLConnection connection = getHttpUrlConnection(method.getURI(), true /*isOutputAllowed*/);
         connection.setRequestMethod("PUT");
 
         RequestEntity requestEntity = putMethod.getRequestEntity();
@@ -119,12 +115,11 @@ public class CustomHttpClient extends HttpClient {
             stringEntity.writeRequest(connection.getOutputStream());
         } else {
             throw new RuntimeException("EntityType[" + requestEntity.getClass()
-                + "] is not yet implemented.");
+                    + "] is not yet implemented.");
         }
 
         updateStatusLineInResponseBody(method, connection.getResponseCode());
-        response = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
-        return response;
+        return CharStreams.toString(new InputStreamReader(connection.getInputStream()));
     }
 
     /**
@@ -136,7 +131,7 @@ public class CustomHttpClient extends HttpClient {
         responseBodyField.setAccessible(true);
 
         StringBuilder statusLineBuilder =
-            new StringBuilder("HTTP/1.1 ").append(responseCode).append(" OK");
+                new StringBuilder("HTTP/1.1 ").append(responseCode).append(" OK");
         StatusLine statusLine = new StatusLine(statusLineBuilder.toString());
         responseBodyField.set(method, statusLine);
     }
@@ -147,12 +142,9 @@ public class CustomHttpClient extends HttpClient {
     private String handlePostMethod(HttpMethod method) throws MalformedURLException, URIException,
             IOException, ProtocolException, NoSuchFieldException, HttpException,
             IllegalAccessException {
-        String response = "";
-        URL url = new URL(method.getURI().toString());
         PostMethod postMethod = (PostMethod) method;
+        HttpURLConnection connection = getHttpUrlConnection(method.getURI(), true /*isOutputAllowed*/);
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
         // TODO(arjuns): reuse for put.
         connection.setRequestMethod("POST");
 
@@ -179,15 +171,15 @@ public class CustomHttpClient extends HttpClient {
             stringEntity.writeRequest(connection.getOutputStream());
         } else {
             throw new RuntimeException("EntityType[" + requestEntity.getClass()
-                + "] is not yet implemented.");
-
+                    + "] is not yet implemented.");
         }
 
         int responseCode = connection.getResponseCode();
         updateStatusLineInResponseBody(method, responseCode);
 
+        String response = "";
         if (responseCode == Status.OK.getStatusCode()
-            || responseCode == Status.CREATED.getStatusCode()) {
+                || responseCode == Status.CREATED.getStatusCode()) {
             response = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
         }
         return response;
@@ -198,8 +190,8 @@ public class CustomHttpClient extends HttpClient {
      */
     private String handleGetMethod(HttpMethod method) throws IOException, URIException,
             NoSuchFieldException, IllegalAccessException {
-        URL url = new URL(method.getURI().toString());
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = getHttpUrlConnection(method.getURI(), 
+                false /*isOutputAllowed*/);
 
         try {
             InputStream inputStream = (InputStream) connection.getContent();
@@ -214,5 +206,28 @@ public class CustomHttpClient extends HttpClient {
             updateStatusLineInResponseBody(method, 404);
             return "";
         }
+    }
+
+    /**
+     * Get HTTP Url Connection.
+     * 
+     * @param uri Destination URI with which connection needs to be established.
+     * @param isOutputAllowed Indicates if this connection is going to be used for sending
+     *      some data to destination.
+     *      
+     * @return {@link HttpURLConnection} for destination.
+     * @throws IOException 
+     */
+    private HttpURLConnection getHttpUrlConnection(URI uri, boolean isOutputAllowed)
+            throws IOException {
+        URL url = new URL(uri.toString());
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_IN_MILLIS);
+        
+        if (isOutputAllowed) {
+            connection.setDoOutput(true);
+        }
+        
+        return connection;
     }
 }

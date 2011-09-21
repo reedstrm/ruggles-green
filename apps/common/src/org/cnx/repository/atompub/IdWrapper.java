@@ -17,8 +17,6 @@ package org.cnx.repository.atompub;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import org.cnx.repository.RepositoryConstants;
 
 import java.util.regex.Matcher;
@@ -31,6 +29,19 @@ import org.cnx.exceptions.CnxInvalidUrlException;
  * @author Arjun Satyapal
  */
 public class IdWrapper {
+    /**
+     * Regex for the post prefix portion of the id. We match exactly strings that can be formatted
+     * by "%04d" with numeric value >= 1.
+     * 
+     * It pass 4 digits numbers with at least one non zero digit and 5 or more digit numbers with
+     * non zero first digit.
+     */
+    private static final String SUB_ID_REGEX = "(^[1-9][\\d]{3,20})|" +
+            "(^[0]{3}[1-9])|" + "(^[0]{2}[1-9][\\d])|" + "([0][1-9][\\d]{2})";
+
+    private static final Pattern SUB_ID_PATTERN = Pattern.compile(SUB_ID_REGEX);
+    
+    
     // TODO(arjuns) : Share this with Repository.
     final static String COLLECTION_ID_PREFIX = "col";
     final static String MODULE_ID_PREFIX = "m";
@@ -113,16 +124,7 @@ public class IdWrapper {
             throwInvalidIdExecption(idWithoutPrefix, type, null /* throwable */);
         }
 
-        Pattern pattern;
-        Matcher matcher;
-        if (idWithoutPrefix.startsWith("0")) {
-            pattern = Pattern.compile("[0-9]{3}[1-9][\\d]*");
-            matcher = pattern.matcher(idWithoutPrefix);
-        } else {
-            pattern = Pattern.compile("\\d{4,}+");
-            matcher = pattern.matcher(idWithoutPrefix);
-        }
-
+        Matcher matcher = SUB_ID_PATTERN.matcher(idWithoutPrefix);
         if (!matcher.matches()) {
             throwInvalidIdExecption(idWithoutPrefix, type, null /* throwable */);
         }
@@ -160,12 +162,9 @@ public class IdWrapper {
         return false;
     }
 
-    /**
-     * This should not be called as toString is ambiguous for this class.
-     */
     @Override
     public String toString() {
-        throw new RuntimeException("This should not be called.");
+        return id;
     }
 
     /**

@@ -49,14 +49,7 @@ public class CommonHack {
     public static final String COLLECTION_MODULE_TEMPLATE_NAME = "org.cnx.web.collectionModule";
 
     public static final String CONTENT_NAME_SPACE = "/content";
-    public static final String COLLECTION = "/collection";
-    public static final String MODULE = "/module";
     public static final String CONFIG = "/config";
-
-    public static final String MODULE_ID_PATH_PARAM = "moduleId";
-    public static final String MODULE_VERSION_PATH_PARAM = "moduleVersion";
-    public static final String COLLECTION_ID_PATH_PARAM = "collectionId";
-    public static final String COLLECTION_VERSION_PATH_PARAM = "collectionVersion";
 
     public static Document parseXmlString(final SAXParser parser, final String source)
             throws SAXException, IOException {

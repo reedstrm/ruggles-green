@@ -18,25 +18,25 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.junit.Before;
-import org.junit.Test;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
 
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.client.ClientWorkspace;
 import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
 import com.sun.syndication.propono.utils.ProponoException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.ServletUris;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test for {@link CnxServiceDocumentServlet}
- *
+ * 
  * @author Arjun Satyapal
  */
 public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
@@ -55,21 +55,18 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     public void testCnxServiceDocument() {
         ClientWorkspace workspace = cnxClient.getWorkspace();
         assertEquals(3, workspace.getCollections().size());
-        assertEquals(CnxAtomPubConstants.CNX_WORKSPACE_TITLE, workspace.getTitle());
+        assertEquals(CnxAtomPubUtils.CNX_WORKSPACE_TITLE, workspace.getTitle());
         assertEquals(CnxMediaTypes.TEXT_XML_UTF8, workspace.getTitleType());
 
         // Now validate each collection individually.
         validateCollection(cnxClient.getCollectionResource(),
-                CnxAtomPubConstants.COLLECTION_RESOURCE_REL_PATH, getConstants()
-                    .getCollectionResourceScheme());
+                ServletUris.Resource.RESOURCE_SERVLET, getConstants().getAPCResourceScheme());
 
-        validateCollection(cnxClient.getCollectionModule(),
-                CnxAtomPubConstants.COLLECTION_MODULE_REL_PATH, getConstants()
-                    .getCollectionModuleScheme());
+        validateCollection(cnxClient.getCollectionModule(), ServletUris.Module.MODULE_SERVLET,
+                getConstants().getAPCModuleScheme());
 
         validateCollection(cnxClient.getCollectionCnxCollection(),
-                CnxAtomPubConstants.COLLECTION_CNX_COLLECTION_REL_PATH, getConstants()
-                    .getCollectionCnxCollectionScheme());
+                ServletUris.Collection.COLLECTION_SERVLET, getConstants().getAPCCollectionScheme());
     }
 
     private void

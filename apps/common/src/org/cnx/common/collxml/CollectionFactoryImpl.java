@@ -32,11 +32,6 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 
 public class CollectionFactoryImpl implements CollectionFactory {
-    private static final String METADATA_TAG_NAME = "metadata";
-    private static final String CONTENT_TAG_NAME = "content";
-    private static final String MODULE_TAG_NAME = "module";
-    private static final String SUBCOLLECTION_TAG_NAME = "subcollection";
-
     private final MdmlMetadata.Factory metadataFactory;
 
     @Inject public CollectionFactoryImpl(MdmlMetadata.Factory metadataFactory) {
@@ -63,7 +58,7 @@ public class CollectionFactoryImpl implements CollectionFactory {
         return parseNodes(0, elem);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "cast" })
     private ArrayList<CollectionItem> parseNodes(final int depth, final Element parent) {
         final ArrayList<CollectionItem> nodes = new ArrayList<CollectionItem>();
         final List<Element> children = (List<Element>)parent.getContent(

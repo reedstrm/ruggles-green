@@ -15,24 +15,14 @@
  */
 package org.cnx.repository.scripts.migrators;
 
-import static org.cnx.repository.atompub.CnxAtomPubConstants.LATEST_VERSION_WRAPPER;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.exceptions.CnxRuntimeException;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
-import org.jdom.JDOMException;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -40,9 +30,14 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.exceptions.CnxRuntimeException;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.repository.atompub.VersionWrapper;
+import org.jdom.JDOMException;
 
 /**
  * Migrator for a module.
@@ -190,8 +185,8 @@ public class ParallelModuleMigrator implements Runnable {
 
                     try {
                         existingEntry =
-                                cnxClient
-                                        .getModuleVersionEntry(cnxModuleId, LATEST_VERSION_WRAPPER);
+                                cnxClient.getModuleVersionEntry(cnxModuleId,
+                                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
                     } catch (CnxRuntimeException e) {
                         if (e.getJerseyStatus() == Status.NOT_FOUND) {
                             // Expected.

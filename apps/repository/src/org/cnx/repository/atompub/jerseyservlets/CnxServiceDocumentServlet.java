@@ -15,17 +15,17 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
+import static org.cnx.repository.PrettyXmlOutputter.prettyXmlOutputDocument;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
 import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.service.CnxAtomService;
-import org.cnx.repository.atompub.utils.PrettyXmlOutputter;
 import org.cnx.repository.atompub.utils.ServerUtil;
 
 /**
@@ -33,18 +33,16 @@ import org.cnx.repository.atompub.utils.ServerUtil;
  * 
  * @author Arjun Satyapal
  */
-@Path(CnxAtomPubConstants.SERVICE_DOCUMENT_PATH)
+@Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET)
 public class CnxServiceDocumentServlet {
-    private final String SERVICE_DOCUMENT_GET = "/";
 
     @GET
     @Produces(CnxMediaTypes.TEXT_XML)
-    @Path(SERVICE_DOCUMENT_GET)
+    @Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_PATH)
     public Response getServiceDocument(@Context HttpServletRequest req) {
         CnxAtomService atomService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        return Response.ok()
-            .entity(PrettyXmlOutputter.prettyXmlOutputDocument(atomService.getServiceDocument()))
-            .build();
+        return Response.ok().entity(prettyXmlOutputDocument(atomService.getServiceDocument()))
+                .build();
     }
 }

@@ -17,20 +17,17 @@ package org.cnx.web.jerseyservlets.exceptionhandlers;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Injector;
-
-import org.cnx.exceptions.CnxException;
-import org.cnx.exceptions.CnxPossibleValidIdException;
-import org.cnx.exceptions.CnxRuntimeException;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.web.ErrorPages;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import org.cnx.exceptions.CnxException;
+import org.cnx.exceptions.CnxPossibleValidIdException;
+import org.cnx.exceptions.CnxRuntimeException;
+import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.web.ErrorPages;
 
 /**
  * Utility class to help exception handlers.
@@ -69,7 +66,7 @@ public class ExceptionLogger {
                     // TODO(arjuns) : Move this to constant
                     String redirectUrl =
                             "http://cnx.org/content/" + exception.getId().getId()
-                                    + "/" + CnxAtomPubConstants.LATEST_VERSION_STRING;
+                                    + "/" + CnxAtomPubUtils.LATEST_VERSION_STRING;
                     builder.append(errorPages.render404OldSite(redirectUrl));
                     break;
                 }

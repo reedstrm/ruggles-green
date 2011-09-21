@@ -75,7 +75,7 @@ public class CnxAtomPubUtils {
 
     /** Name for AtomPub collection for CnxCollections.. */
     public static final String COLLECTION_CNX_COLLECTION_TITLE =
-            "AtomPub Collection for Cnx Collections.";
+            "AtomPub Collection for CNX Collections.";
 
     /** Name for CNX Workspace. */
     public static final String CNX_WORKSPACE_TITLE = "Connexions Workspace";

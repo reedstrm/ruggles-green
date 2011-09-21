@@ -13,24 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.migrator.workers;
+package org.cnx.migrator.migrators;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.migrator.MigratorConfiguration;
+import org.cnx.migrator.config.MigratorConfiguration;
+import org.cnx.migrator.util.Log;
+import org.cnx.migrator.workqueue.WorkItem;
 
 /**
- * Base class of migration work units.
+ * Base class of migration items migrators.
  * 
  * @author tal
  */
-public abstract class MigratorWorkUnit {
+public abstract class ItemMigrator implements WorkItem {
 
+    /** Migrator config in effect */
     private final MigratorConfiguration config;
+
+    /** CNX client to use to write to repository */
     private final CnxAtomPubClient cnxClient;
 
-    protected MigratorWorkUnit(MigratorConfiguration config, CnxAtomPubClient cnxClient) {
+    protected ItemMigrator(MigratorConfiguration config, CnxAtomPubClient cnxClient) {
         this.config = checkNotNull(config);
         this.cnxClient = checkNotNull(cnxClient);
     }
@@ -41,5 +46,10 @@ public abstract class MigratorWorkUnit {
 
     protected CnxAtomPubClient getCnxClient() {
         return cnxClient;
+    }
+
+    /** Print a diagnostic message */
+    protected void message(String format, Object... args) {
+        Log.message(format, args);
     }
 }

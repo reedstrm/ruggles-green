@@ -13,20 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.migrator.io;
+package org.cnx.migrator.workqueue;
 
-import java.io.File;
-
-/** An abstraction of a CNX input data directory that is part of a sharded directory */
-public class DirectoryShard extends Directory {
-    private final int shardIndex;
-
-    public DirectoryShard(File dir, int shardIndex) {
-        super(dir);
-        this.shardIndex = shardIndex;
-    }
-
-    public int getShardIndex() {
-        return shardIndex;
-    }
+/**
+ * Interface of queued work items.
+ * 
+ * @author tal
+ */
+public interface WorkItem {
+    /**
+     * Do the work represented by this item. Work is considered to be completed successfully upon
+     * return
+     */
+    void doWork();
 }

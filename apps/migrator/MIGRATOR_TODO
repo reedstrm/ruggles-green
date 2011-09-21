@@ -1,0 +1,12 @@
+Migrator global todo items
+
+* Add retry to resource upload
+* Add migration of  abstract.txt
+* Migrate resource file name and content type (repository modification)
+* Implement version gap filling (requires repository modification)
+* Map reference to module versions (in collection and modules)
+* Migrate author profiles
+* Migrate exports
+
+
+

@@ -13,26 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.migrator;
+package org.cnx.migrator.util;
 
-import org.cnx.migrator.config.MigratorConfiguration;
-import org.cnx.migrator.util.Log;
+/** Provides synchronized diagnostic message printing from multiple threads */
+public class Log {
 
+    private static final Object lock = new Object();
 
-/**
- * A thin command line wrapper for the migrator.
- * 
- * @author tal
- */
-public class MigratorMain {
-    public static void main(String args[]) {
-        try {
-            final MigratorConfiguration config = new MigratorConfiguration(args);
-            final Migrator migrator = new Migrator(config);
-            migrator.migrateAll();
-            Log.message("\nAll done OK");
-        } catch (Throwable e) {
-            Log.message("Program failed", e);
+    public static void message(String format, Object... args) {
+        synchronized (lock) {
+            System.out.println(String.format(format, args));
+        }
+    }
+
+    public static void printStackTrace(Throwable e) {
+        synchronized (lock) {
+            e.printStackTrace(System.out);
         }
     }
 }

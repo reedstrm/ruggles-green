@@ -15,6 +15,8 @@
  */
 package org.cnx.migrator.io;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.File;
 
 import com.google.common.collect.ImmutableList;
@@ -33,11 +35,15 @@ public class ShardedDirectory extends Directory {
         super(dir);
     }
 
-    public ImmutableList<DirectoryShard> getShards() {
-        ImmutableList.Builder<DirectoryShard> builder = new ImmutableList.Builder<DirectoryShard>();
+    public ImmutableList<Directory> getShards() {
+        final int n = getSubDirectories().size();
+        checkArgument(n == SHARD_COUNT,
+                "Expecting %s shards, found %s entires in sharded directory: %s", SHARD_COUNT, n,
+                toString());
+        ImmutableList.Builder<Directory> builder = new ImmutableList.Builder<Directory>();
         for (int i = 0; i < SHARD_COUNT; i++) {
             final String name = String.format("%03d", i);
-            builder.add(new DirectoryShard(new File(getDir(), name), i));
+            builder.add(new Directory(new File(getUnderlyingDirectory(), name)));
         }
         return builder.build();
     }

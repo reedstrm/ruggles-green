@@ -29,14 +29,14 @@ public class DataRootDirectory extends Directory {
     }
 
     public ShardedDirectory getResourcesRoot() {
-        return new ShardedDirectory(new File(getDir(), "resources"));
+        return new ShardedDirectory(new File(getUnderlyingDirectory(), "resources"));
     }
 
     public ShardedDirectory getModulesRoot() {
-        return new ShardedDirectory(new File(getDir(), "modules"));
+        return new ShardedDirectory(new File(getUnderlyingDirectory(), "modules"));
     }
 
     public ShardedDirectory getCollectionsRoot() {
-        return new ShardedDirectory(new File(getDir(), "collections"));
+        return new ShardedDirectory(new File(getUnderlyingDirectory(), "collections"));
     }
 }

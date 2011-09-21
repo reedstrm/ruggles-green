@@ -28,7 +28,9 @@ import java.util.Properties;
 
 import org.cnx.migrator.util.MigratorUtil;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Files;
 
 /**
  * An abstraction of a directory in the CNX input data structure.
@@ -44,8 +46,13 @@ public class Directory {
         checkArgument(dir.isDirectory(), "Not a directory: %s", dir);
     }
 
-    public File getDir() {
+    protected File getUnderlyingDirectory() {
         return dir;
+    }
+
+    /** Get basic directory name without parent path */
+    public String getName() {
+        return dir.getName();
     }
 
     public Directory subDirectory(String name) {
@@ -94,6 +101,16 @@ public class Directory {
             throw new RuntimeException(e);
         } finally {
             MigratorUtil.safeClose(in);
+        }
+    }
+
+    /** Return the content of an XML file under this directory */
+    public String readXmlFile(String fileName) {
+        try {
+            final File file = subFile(fileName);
+            return Files.toString(file, Charsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

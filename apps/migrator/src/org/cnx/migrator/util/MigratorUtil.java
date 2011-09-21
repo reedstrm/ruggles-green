@@ -15,9 +15,13 @@
  */
 package org.cnx.migrator.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.InputStream;
 
 import javax.annotation.Nullable;
+
+import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * Assorted util methods.
@@ -26,6 +30,7 @@ import javax.annotation.Nullable;
  */
 public class MigratorUtil {
 
+    /** Like Thread.sleep() but throws an unchecked exception instead */
     public static void sleep(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -34,6 +39,7 @@ public class MigratorUtil {
         }
     }
 
+    /** Similar to InputStream.close() but throws an unchecked exception instead. */
     public static void safeClose(@Nullable InputStream in) {
         try {
             if (in != null) {
@@ -42,5 +48,14 @@ public class MigratorUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /** Assert that an atompub entry has given base id and version number */
+    public static void checkAtombuyEntryId(String expectedBaseId, int expectedVersionNumber,
+            ClientEntry actualEntry) {
+        final String actualId = actualEntry.getId();
+        final String expectedId = String.format("%s:%d", expectedBaseId, expectedVersionNumber);
+        checkArgument(expectedId.equals(actualEntry.getId()),
+                "Entry ID mismatch, Expected: %s, found: %s", expectedId, actualId);
     }
 }

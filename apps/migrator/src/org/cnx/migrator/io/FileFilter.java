@@ -53,7 +53,7 @@ public class FileFilter implements FilenameFilter {
         }
 
         // Filter by optional kind filter
-        if (kindFilter == null  || kindFilter == KindFilter.ALL) {
+        if (kindFilter == null || kindFilter == KindFilter.ALL) {
             return true;
         }
 

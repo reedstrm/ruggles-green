@@ -285,6 +285,26 @@
     <url-pattern>/atompub/*</url-pattern>
   </servlet-mapping>
 
+  <!-- Mapreduce dashboard -->
+
+  <servlet>
+    <servlet-name>mapreduce</servlet-name>
+    <servlet-class>com.google.appengine.tools.mapreduce.MapReduceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mapreduce</servlet-name>
+    <url-pattern>/mapreduce/*</url-pattern>
+  </servlet-mapping>
+
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/mapreduce/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>CnxDemo.html</welcome-file>

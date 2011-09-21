@@ -103,6 +103,11 @@
              target="default"
              dir="${third_party}" />
 
+        <ant antfile="appengine/mapreduce/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <ant antfile="jdom/build.xml"
              inheritAll="true"
              target="default"

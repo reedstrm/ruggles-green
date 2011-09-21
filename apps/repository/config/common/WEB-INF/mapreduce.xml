@@ -1,0 +1,33 @@
+<configurations>
+
+  <configuration name="1. CNX Entity Counter">
+    <property>
+      <name>mapreduce.map.class</name>
+      <value>org.cnx.repository.facilities.stats.EntityCounterMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>
+    <property>
+      <name human="Entity kind to count">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">ModuleVer</value>
+    </property>
+  </configuration>
+  
+   <configuration name="2. CNX Entity Wiper">
+    <property>
+      <name>mapreduce.map.class</name>
+      <value>org.cnx.repository.facilities.datawipe.DataWiperMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>
+    <property>
+      <name human="Entity kind to delete">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional"></value>
+    </property>
+  </configuration>
+
+</configurations>

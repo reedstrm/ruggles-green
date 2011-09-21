@@ -31,5 +31,8 @@
 	<classpathentry kind="lib" path="build/test/lib/appengine-api.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/appengine-testing.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/args4j-2.0.12.jar"/>
+	<classpathentry kind="lib" path="build/jars/appengine-mapper.jar"/>
+	<classpathentry kind="lib" path="build/jars/charts4j-1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/hadoop-0.20.2-core.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

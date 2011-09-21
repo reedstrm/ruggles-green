@@ -253,7 +253,7 @@ public class CnxAtomPubClient {
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
         Part[] parts = { new FilePart(file.getName(), file), };
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
-        // int status = httpClient.executeMethod(postMethod);
+         int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
         // Preconditions.checkState(status == 302);
     }

@@ -20,14 +20,13 @@ import static org.cnx.repository.atompub.IdWrapper.Type.RESOURCE;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -39,9 +38,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+
 import org.cnx.exceptions.CnxBadRequestException;
 import org.cnx.exceptions.CnxException;
-import org.cnx.repository.FileContentTypeEnum;
 import org.cnx.repository.RepositoryConstants;
 import org.cnx.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.atompub.CnxMediaTypes;
@@ -52,11 +51,13 @@ import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
-import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
 
 /**
  * Jersey Servlet for CNX Resources.
@@ -121,8 +122,8 @@ public class CnxAtomResourceServlet {
     }
 
     private Response
-            handleCreationOfResource(HttpServletRequest req, CnxAtomService atomPubService,
-                    RepositoryResponse<CreateResourceResult> createdResource)
+    handleCreationOfResource(HttpServletRequest req, CnxAtomService atomPubService,
+            RepositoryResponse<CreateResourceResult> createdResource)
                     throws CnxBadRequestException, CnxException {
         if (createdResource.isOk()) {
             /*
@@ -186,8 +187,6 @@ public class CnxAtomResourceServlet {
     public Response getResource(@Context HttpServletResponse res,
             @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) {
         final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
-        RepositoryRequestContext repositoryContext = RepositoryUtils.getRepositoryContext();
-
         RepositoryResponse<ServeResourceResult> serveResourceResult =
                 repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
                         idWrapper.getId(), res);
@@ -199,20 +198,6 @@ public class CnxAtomResourceServlet {
 
             for (Map.Entry<String, String> header : repoResult.getAdditionalHeaders().entrySet()) {
                 responseBuilder.header(header.getKey(), header.getValue());
-            }
-
-            RepositoryResponse<GetResourceInfoResult> repositoryInfo =
-                    repositoryService.getResourceInfo(repositoryContext, idWrapper.getId());
-
-            // TODO(arjuns) : Repository should return this.
-            if (repositoryInfo.isOk()) {
-                String fileName =
-                        repositoryInfo.getResult().getContentInfo().getContentOriginalFileName();
-                FileContentTypeEnum contentType =
-                        FileContentTypeEnum.getFileContentTypeEnumFromFileName(fileName);
-                responseBuilder.header("Content-Type", contentType.getContentType());
-
-                responseBuilder.header("Content-Disposition", ("filename=\"" + fileName + "\""));
             }
 
             return responseBuilder.build();

@@ -16,6 +16,9 @@
 
 package org.cnx.repository.service.impl.operations;
 
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Blobstore related utils.
  * 
@@ -23,7 +26,9 @@ package org.cnx.repository.service.impl.operations;
  */
 public class BlobstoreUtil {
 
-    /*
+    /**
+     * Key header name to be set when serving a blob.
+     * 
      * When serving a blob, blobstore service sets a header with "BlobKey = <value>" and then App
      * Engine replaces the body of the response with the content of the blob. For technical reasons,
      * when using the AtomPub API, this setting need to be done outside of the repository service,
@@ -31,6 +36,25 @@ public class BlobstoreUtil {
      * 
      * NOTE(tal): this header name MUST match the header name used by blobstore.
      */
-    public static final String BLOB_KEY_HEADER_NAME = "BlobKey";
+    public static final String BLOB_KEY_HEADER = "BlobKey";
 
+    /**
+     * Content type header name to be set when serving a blob.
+     */
+    public static final String BLOB_CONTENT_TYPE_HEADER = "Content-Type";
+
+    /**
+     * Content disposition header name to be set when serving a blob.
+     */
+    public static final String BLOB_CONTENT_DISPOSITION_HEADER = "Content-Disposition";
+
+    /**
+     * Create required additional headers to return when serving a blob.
+     */
+    public static ImmutableMap<String, String> additionalHeaders(BlobKey blobKey,
+            String contentType, String fileName) {
+        final String contentDisposition = String.format("filename=\"%s\"", fileName);
+        return ImmutableMap.of(BLOB_KEY_HEADER, blobKey.toString(), BLOB_CONTENT_TYPE_HEADER,
+                contentType, BLOB_CONTENT_DISPOSITION_HEADER, contentDisposition);
+    }
 }

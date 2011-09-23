@@ -1,8 +1,7 @@
 Repository global todo items
 
+* Add content type guessing/override/rejection when a blob is uploaded.
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
-* Add file name header ("Content-Disposition") when serving resource or export blobs.
-* Add blob extra header to suppress the run time warning of the atompub library
 * Add support for exporters (feeds, urgent items, etc)
 * Solve the Eclipse java formatter issues.
 * Clean up all compilations and startup warnings

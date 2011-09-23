@@ -41,7 +41,6 @@ import org.cnx.repository.service.impl.persistence.OrmResourceEntity;
 import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
 import org.cnx.repository.service.impl.persistence.PersistenceTransaction;
 
-import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.repackaged.com.google.common.base.Pair;
@@ -89,13 +88,13 @@ public class ResourceOperations {
         }
 
         final String completionUrl =
-            UPLOAD_COMPLETION_SERVLET_PATH + "?"
-                + ResourceUtil.encodeUploadCompletionParameters(resourceId);
+                UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                        + ResourceUtil.encodeUploadCompletionParameters(resourceId);
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
 
         return ResponseUtil.loggedOk("Resource created: " + resourceId, new CreateResourceResult(
-            resourceId, uploadUrl), log);
+                resourceId, uploadUrl), log);
     }
 
     /**
@@ -143,8 +142,8 @@ public class ResourceOperations {
         }
 
         final String completionUrl =
-            UPLOAD_COMPLETION_SERVLET_PATH + "?"
-                + ResourceUtil.encodeUploadCompletionParameters(forcedId);
+                UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                        + ResourceUtil.encodeUploadCompletionParameters(forcedId);
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
 
@@ -171,7 +170,7 @@ public class ResourceOperations {
             entity = Services.persistence.read(OrmResourceEntity.class, resourceKey);
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
-                + resourceId + "]", log, e);
+                    + resourceId + "]", log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to retrieve resource: [" + resourceId + "]", log, e);
@@ -182,18 +181,18 @@ public class ResourceOperations {
         switch (entity.getState()) {
             case UPLOAD_PENDING:
                 result =
-                    GetResourceInfoResult
-                        .newPendingUploac(entity.getId(), entity.getCreationTime());
+                GetResourceInfoResult
+                .newPendingUploac(entity.getId(), entity.getCreationTime());
                 break;
             case UPLOAD_COMPLETE:
                 final OrmBlobInfo blobInfo = checkNotNull(entity.getBlobInfo());
                 final UploadedResourceContentInfo contentInfo =
-                    new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
-                        blobInfo.getCreationTime(), blobInfo.getFileName(), blobInfo.getSize(),
-                        blobInfo.getMd5Hash());
+                        new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
+                                blobInfo.getCreationTime(), blobInfo.getFileName(), blobInfo.getSize(),
+                                blobInfo.getMd5Hash());
                 result =
-                    GetResourceInfoResult.newUploaded(entity.getId(), entity.getCreationTime(),
-                            contentInfo);
+                        GetResourceInfoResult.newUploaded(entity.getId(), entity.getCreationTime(),
+                                contentInfo);
                 break;
             default:
                 return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
@@ -215,18 +214,18 @@ public class ResourceOperations {
                     "Resource id has bad format: " + resourceId, log);
         }
 
-        final BlobKey blobKey;
+        final OrmBlobInfo blobInfo;
         try {
             final OrmResourceEntity ormEntity =
-                Services.persistence.read(OrmResourceEntity.class, resourceKey);
+                    Services.persistence.read(OrmResourceEntity.class, resourceKey);
             if (ormEntity.getState() != OrmResourceEntity.State.UPLOAD_COMPLETE) {
                 return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                         "Resource content has not been uploaded yet: " + resourceId, log);
             }
-            blobKey = ormEntity.getBlobInfo().getBlobKey();
+            blobInfo = ormEntity.getBlobInfo();
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Resource not found: ["
-                + resourceId + "]", log, e);
+                    + resourceId + "]", log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error when trying to retrieve resource: " + resourceId, log, e);
@@ -234,7 +233,7 @@ public class ResourceOperations {
 
         // Serve the resource from Blobstore.
         try {
-            Services.blobstore.serve(blobKey, httpResponse);
+            Services.blobstore.serve(blobInfo.getBlobKey(), httpResponse);
         } catch (IOException e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error serving the resource content: " + resourceId, log, e);
@@ -246,8 +245,11 @@ public class ResourceOperations {
          * a header with "BlobKey = <value>" and then App Engine replaces the body of the response
          * with the content of the blob.
          */
+        // TODO(tal): consider return a file name that is based on resource id, rather than
+        // original file name.
         final ImmutableMap<String, String> additionalHeaders =
-            ImmutableMap.of(BlobstoreUtil.BLOB_KEY_HEADER_NAME, blobKey.toString());
+                BlobstoreUtil.additionalHeaders(blobInfo.getBlobKey(), blobInfo.getContentType(),
+                        blobInfo.getFileName());
         ServeResourceResult result = new ServeResourceResult(additionalHeaders);
         return ResponseUtil.loggedOk("Resource served: " + resourceId, result, log);
     }
@@ -265,17 +267,17 @@ public class ResourceOperations {
 
         if (maxResults > MAX_RESOURCE_PER_LIST_QUERY) {
             log.info("Reducing caller resource maxResults from " + maxResults + " to "
-                + MAX_RESOURCE_PER_LIST_QUERY);
+                    + MAX_RESOURCE_PER_LIST_QUERY);
             maxResults = MAX_RESOURCE_PER_LIST_QUERY;
         }
 
         Pair<List<Key>, String> results =
-            Services.persistence.entityKeyList(OrmResourceEntity.class, maxResults, startCursor);
+                Services.persistence.entityKeyList(OrmResourceEntity.class, maxResults, startCursor);
 
         final ImmutableList<String> resourceIds =
-            IdUtil.keysToIds(OrmResourceEntity.class, results.first);
+                IdUtil.keysToIds(OrmResourceEntity.class, results.first);
 
         return ResponseUtil.loggedOk("Retrieve resource list page with " + resourceIds.size()
-            + " module ids", new GetResourceListResult(resourceIds, results.second), log);
+                + " module ids", new GetResourceListResult(resourceIds, results.second), log);
     }
 }

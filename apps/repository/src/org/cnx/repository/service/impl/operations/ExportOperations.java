@@ -32,6 +32,7 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
 import org.cnx.repository.service.api.ServeExportResult;
+import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
 import org.cnx.repository.service.impl.persistence.OrmEntity;
 import org.cnx.repository.service.impl.persistence.OrmExportItemEntity;
 import org.cnx.repository.service.impl.persistence.PersistenceTransaction;
@@ -110,12 +111,12 @@ public class ExportOperations {
         }
 
         // Lookup the export entity and fetch the blob key.
-        final BlobKey blobKey;
+        final OrmBlobInfo blobInfo;
         try {
             final OrmExportItemEntity entity =
                     Services.persistence.read(OrmExportItemEntity.class,
                             validationResult.getExportKey());
-            blobKey = entity.getBlobInfo().getBlobKey();
+            blobInfo = entity.getBlobInfo();
         } catch (EntityNotFoundException e) {
             return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND, "Could not locate export: "
                     + exportReference, log, e);
@@ -126,14 +127,18 @@ public class ExportOperations {
 
         // Serve the export from Blobstore.
         try {
-            Services.blobstore.serve(blobKey, httpResponse);
+            Services.blobstore.serve(blobInfo.getBlobKey(), httpResponse);
         } catch (IOException e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error serving the resource content: " + exportReference, log, e);
         }
 
+        // TODO(tal): consider to return file name that is based on entity id and export type
+        // rather than on original file name.
         final ImmutableMap<String, String> additionalHeaders =
-                ImmutableMap.of(BlobstoreUtil.BLOB_KEY_HEADER_NAME, blobKey.toString());
+                BlobstoreUtil.additionalHeaders(blobInfo.getBlobKey(), blobInfo.getContentType(),
+                        blobInfo.getFileName());
+
         return ResponseUtil.loggedOk("Export served: " + exportReference.toString(),
                 new ServeExportResult(additionalHeaders), log);
     }

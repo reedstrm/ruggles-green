@@ -8,14 +8,13 @@ import com.google.appengine.tools.mapreduce.AppEngineMapper;
 import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
 
 /**
- * Mapreduce to delete all entities of given kind.
+ * Mapreduce to delete all blobstore blobs.
  * <p>
  * Use <host_and_port>/mapreduce/status dashboard to access.
  * 
  * @author Tal
  */
 public class DataWiperMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable> {
-
     @Override
     public void map(Key key, Entity value, Context context) {
 

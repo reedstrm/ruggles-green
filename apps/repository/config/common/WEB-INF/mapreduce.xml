@@ -26,7 +26,22 @@
     </property>
     <property>
       <name human="Entity kind to delete">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional"></value>
+      <value template="optional">???</value>
+    </property>
+  </configuration>
+
+   <configuration name="3. Blobstore Wiper">
+    <property>
+      <name>mapreduce.map.class</name>
+      <value>org.cnx.repository.facilities.datawipe.BlobstoreWiperMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>
+    <property>
+      <name>mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value>__BlobInfo__</value>
     </property>
   </configuration>
 

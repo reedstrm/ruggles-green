@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 /**
@@ -70,9 +71,9 @@ public class CounterSet {
                 maxNameLength = Math.max(maxNameLength, counterName.length());
             }
             // Generate counter lines
-            final String format = String.format("* %%-%ds [%%8d]\n", maxNameLength + 1);
             for (String counterName : counterNameList) {
-                builder.append(String.format(format, counterName + ":",
+                builder.append(String.format("%s [%8d]\n",
+                        Strings.padEnd(counterName, maxNameLength, ' '),
                         counters.get(counterName).value));
             }
         }

@@ -68,22 +68,22 @@ public class ExportUtil {
      *            {@link #exportReferenceToRequestParameters}
      */
     public static ExportReference exportReferenceFromRequestParameters(HttpServletRequest req) {
-        
+
         final ExportScopeType scopeType =
-            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter(ExportParams.SCOPE.name));
+                ServletUtil.paramToEnum(ExportScopeType.class, req.getParameter(ExportParams.SCOPE.name));
 
         final String objectId = req.getParameter(ExportParams.PARENT_ID.name);
 
         final String versionNumberParam = req.getParameter(ExportParams.PARENT_VERSION.name);
         final Integer versionNumber =
-            versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
+                versionNumberParam.equals("null") ? null : Integer.valueOf(versionNumberParam);
 
         final ExportType exportType =
-            Services.config.getExportTypes()
+                Services.config.getExportTypes()
                 .get(req.getParameter(ExportParams.EXPORT_TYPE_ID.name));
 
         final ExportReference exportReference =
-            new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
+                new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
         return exportReference;
     }
 
@@ -105,7 +105,7 @@ public class ExportUtil {
 
             final OrmBlobInfo blobInfo = exportEntity.getBlobInfo();
             exportInfos.add(new ExportInfo(exportType, exportEntity.getCreationTime(), blobInfo
-                .getSize(), blobInfo.getMd5Hash()));
+                    .getSize(), blobInfo.getMd5Hash()));
         }
         return exportInfos;
     }

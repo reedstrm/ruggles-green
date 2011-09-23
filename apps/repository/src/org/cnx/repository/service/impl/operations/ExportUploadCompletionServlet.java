@@ -128,8 +128,9 @@ public class ExportUploadCompletionServlet extends HttpServlet {
                                 + exportReference, null, log, Level.WARNING);
                 return;
             }
+            final String contentTypeToUse = BlobstoreUtil.guessBlobContentType(blobInfo);
             if (!validationResult.getExportType().getContentType()
-                    .equals(blobInfo.getContentType())) {
+                    .equals(contentTypeToUse)) {
                 ServletUtil.setServletError(resp, HttpServletResponse.SC_NOT_ACCEPTABLE,
                         "Expected content type "
                                 + validationResult.getExportType().getContentType() + ", found "
@@ -163,7 +164,7 @@ public class ExportUploadCompletionServlet extends HttpServlet {
             // Create a new entity
             final OrmExportItemEntity newExportItemEntity =
                     new OrmExportItemEntity(validationResult.getExportKey(), transactionTime,
-                            new OrmBlobInfo(blobInfo));
+                            new OrmBlobInfo(blobInfo, contentTypeToUse));
             Services.persistence.write(newExportItemEntity);
             tx.commit();
 

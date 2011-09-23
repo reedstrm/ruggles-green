@@ -33,7 +33,7 @@ import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-import org.cnx.repository.service.impl.operations.ParamUtil;
+import org.cnx.repository.service.impl.operations.ServletUtil;
 import org.cnx.repository.service.impl.operations.Services;
 
 /**
@@ -48,20 +48,20 @@ public class GetExportServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final ExportScopeType scopeType =
-            ParamUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
+                ServletUtil.paramToEnum(ExportScopeType.class, req.getParameter("scope"));
         final String objectId = req.getParameter("id");
         final ExportType exportType =
-            Services.config.getExportTypes().get(req.getParameter("type"));
+                Services.config.getExportTypes().get(req.getParameter("type"));
         final String versionNumberParam = req.getParameter("version");
         final Integer versionNumber =
-            (versionNumberParam == null || versionNumberParam.equals("null")) ? null : Integer
-                .valueOf(versionNumberParam);
+                (versionNumberParam == null || versionNumberParam.equals("null")) ? null : Integer
+                    .valueOf(versionNumberParam);
 
         final ExportReference exportReference =
-            new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
+                new ExportReference(scopeType, objectId, versionNumber, exportType.getId());
 
         final RepositoryResponse<ServeExportResult> repositoryResponse =
-            repository.serveExport(new RepositoryRequestContext(null), exportReference, resp);
+                repository.serveExport(new RepositoryRequestContext(null), exportReference, resp);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -83,7 +83,7 @@ public class GetExportServlet extends HttpServlet {
 
         checkState(repositoryResponse.isOk());
         for (Map.Entry<String, String> header : repositoryResponse.getResult()
-            .getAdditionalHeaders().entrySet()) {
+                .getAdditionalHeaders().entrySet()) {
             resp.addHeader(header.getKey(), header.getValue());
         }
         return;

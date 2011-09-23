@@ -52,4 +52,20 @@ public class ServletUtil {
         }
         resp.sendError(httpStatus, httpMessage);
     }
+
+    /**
+     * @param enumType an enum type class.
+     * @param param a string value, possible null.
+     * @return if param matches a value of enum type return this value otherwise return null.
+     */
+    public static <T extends Enum<T>> T paramToEnum(Class<T> enumType, String param) {
+        if (param == null) {
+            return null;
+        }
+        try {
+            return Enum.valueOf(enumType, param);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }

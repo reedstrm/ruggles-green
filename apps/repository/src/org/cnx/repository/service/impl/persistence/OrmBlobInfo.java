@@ -40,7 +40,10 @@ public class OrmBlobInfo {
 
     private final BlobKey blobKey;
 
-    /** A cached value of the blob content type. Copied from BlobInfo. */
+    /**
+     * The content type to use when serving this blob. This may or may not be the same
+     * as the content type reported by the blobstore service.
+     */
     private final String contentType;
 
     /** A cached value of the blob size in bytes. Copied from BlobInfo. */
@@ -57,7 +60,7 @@ public class OrmBlobInfo {
 
     /** Construct from individual properties. */
     private OrmBlobInfo(BlobKey blobKey, String contentType, long size, String md5Hash,
-        Date creationTime, String fileName) {
+            Date creationTime, String fileName) {
         this.blobKey = checkNotNull(blobKey);
         this.contentType = checkNotNull(contentType);
         this.size = size;
@@ -66,17 +69,22 @@ public class OrmBlobInfo {
         this.fileName = checkNotNull(fileName);
     }
 
-    /** Construct from blobstore blob info. */
-    public OrmBlobInfo(BlobInfo blobInfo) {
-        this(blobInfo.getBlobKey(), blobInfo.getContentType(), blobInfo.getSize(), blobInfo
-            .getMd5Hash(), blobInfo.getCreation(), blobInfo.getFilename());
+    /**
+     * Construct from blobstore blob info.
+     * 
+     * @param blobInfo the blob info as reported by the blobstore service.
+     * @param contentType the content type to use. This overrides the content type in blobInfo.
+     */
+    public OrmBlobInfo(BlobInfo blobInfo, String contentType) {
+        this(blobInfo.getBlobKey(), contentType, blobInfo.getSize(), blobInfo
+                .getMd5Hash(), blobInfo.getCreation(), blobInfo.getFilename());
     }
 
     /** Deserialize from a datastore entity. */
     public OrmBlobInfo(Entity entity) {
         this((BlobKey) entity.getProperty(BLOB_KEY_PROPERTY), (String) entity
-            .getProperty(BLOB_CONTENT_TYPE_PROPERTY),
-            (Long) entity.getProperty(BLOB_SIZE_PROPERTY), (String) entity
+                .getProperty(BLOB_CONTENT_TYPE_PROPERTY),
+                (Long) entity.getProperty(BLOB_SIZE_PROPERTY), (String) entity
                 .getProperty(BLOB_MD5_HASH_PROPERTY), (Date) entity
                 .getProperty(BLOB_CREATION_PROPERTY), (String) entity
                 .getProperty(BLOB_FILE_NAME_PROPERTY));

@@ -35,13 +35,13 @@ public class ShardedDirectory extends Directory {
         super(dir);
     }
 
-    public ImmutableList<Directory> getShards() {
+    public ImmutableList<Directory> getShards(int minShard, int maxShard) {
         final int n = getSubDirectories().size();
         checkArgument(n == SHARD_COUNT,
                 "Expecting %s shards, found %s entires in sharded directory: %s", SHARD_COUNT, n,
                 toString());
         ImmutableList.Builder<Directory> builder = new ImmutableList.Builder<Directory>();
-        for (int i = 0; i < SHARD_COUNT; i++) {
+        for (int i = minShard; i <= maxShard; i++) {
             final String name = String.format("%03d", i);
             builder.add(new Directory(new File(getUnderlyingDirectory(), name)));
         }

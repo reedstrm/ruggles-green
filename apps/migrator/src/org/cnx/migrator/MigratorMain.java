@@ -15,7 +15,7 @@
  */
 package org.cnx.migrator;
 
-import org.cnx.migrator.config.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorConfiguration;
 import org.cnx.migrator.util.Log;
 
 
@@ -30,7 +30,7 @@ public class MigratorMain {
             final MigratorConfiguration config = new MigratorConfiguration(args);
             final Migrator migrator = new Migrator(config);
             migrator.migrateAll();
-            Log.message("\nAll done OK");
+            Log.message("All done OK");
         } catch (Throwable e) {
             Log.message("Program failed", e);
         }

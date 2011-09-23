@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.migrator.config;
+package org.cnx.migrator.context;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -23,10 +23,15 @@ import org.kohsuke.args4j.Option;
 
 /**
  * Contains the configuration parameters of the migration session.
+ * <p>
+ * Thread safe.
  * 
  * @author tal
  */
 public class MigratorConfiguration {
+
+    private static final int MIN_SHARD = 0;
+    private static final int MAX_SHARD = 999;
 
     // e.g. "http://localhost:8888/atompub"
     // e.g. http://qa-cnx-repo.appspot.com/atompub
@@ -63,13 +68,19 @@ public class MigratorConfiguration {
     private boolean migrateCollections = false;
 
     @Option(name = "-resource_threads", usage = "Number of threads to use to migrate resources")
-    private int resourceThreads = 50;
+    private int resourceThreads = 500;
 
     @Option(name = "-module_threads", usage = "Number of threads to use to migrate modules")
-    private int moduleThreads = 250;
+    private int moduleThreads = 500;
 
     @Option(name = "-collection_threads", usage = "Number of threads to use to migrate collections")
-    private int collectionThreads = 250;
+    private int collectionThreads = 500;
+
+    @Option(name = "-min_shard", usage = "Min shard number to migrate.")
+    private int minShardToMigrate = 0;
+
+    @Option(name = "-max_shard", usage = "Max shard number to migrate.")
+    private int maxShardToMigrate = 999;
 
     public MigratorConfiguration(String args[]) {
         CmdLineParser parser = new CmdLineParser(this);
@@ -176,35 +187,52 @@ public class MigratorConfiguration {
         return maxThreads;
     }
 
+    public int getMinShardToMigrate() {
+        return minShardToMigrate;
+    }
+
+    public int getMaxShardToMigrate() {
+        return maxShardToMigrate;
+    }
+
+    /** Test if the configurtion specifies migration of all shards. Used to generate warning. */
+    public boolean isMigratingAllShards() {
+        return (minShardToMigrate == MIN_SHARD) && (maxShardToMigrate == MAX_SHARD);
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(String.format("data_root_dir ............ [%s]\n", dataRootDirectory));
-        sb.append(String.format("repository_atompub_url ... [%s]\n", repositoryAtomPubUrl));
+        sb.append(String.format("  data_root_dir ............ [%s]\n", dataRootDirectory));
+        sb.append(String.format("  repository_atompub_url ... [%s]\n", repositoryAtomPubUrl));
         sb.append('\n');
-        sb.append(String.format("migrate_all .............. [%s]\n", migrateAll));
-        sb.append(String.format("migrate_resources ........ [%s]\n", migrateResources));
-        sb.append(String.format("migrate_modules .......... [%s]\n", migrateModules));
-        sb.append(String.format("migrate_collections ...... [%s]\n", migrateCollections));
+        sb.append(String.format("  migrate_all .............. [%s]\n", migrateAll));
+        sb.append(String.format("  migrate_resources ........ [%s]\n", migrateResources));
+        sb.append(String.format("  migrate_modules .......... [%s]\n", migrateModules));
+        sb.append(String.format("  migrate_collections ...... [%s]\n", migrateCollections));
         sb.append('\n');
         if (isMigrateResources()) {
-            sb.append(String.format("resource_threads ......... [%s]\n", resourceThreads));
-            sb.append(String.format("resource_min_threads ..... [%s]\n", getResourceMinThreads()));
+            sb.append(String.format("  resource_threads ......... [%s]\n", resourceThreads));
+            sb.append(String.format("  resource_min_threads ..... [%s]\n", getResourceMinThreads()));
         }
         if (isMigrateModules()) {
-            sb.append(String.format("module_threads ........... [%s]\n", moduleThreads));
-            sb.append(String.format("module_min_threads ....... [%s]\n", getModuleMinThreads()));
+            sb.append(String.format("  module_threads ........... [%s]\n", moduleThreads));
+            sb.append(String.format("  module_min_threads ....... [%s]\n", getModuleMinThreads()));
         }
         if (isMigrateCollections()) {
-            sb.append(String.format("collection_threads ....... [%s]\n", collectionThreads));
-            sb.append(String.format("collection_min_threads ... [%s]\n", getCollectionMinThreads()));
+            sb.append(String.format("  collection_threads ....... [%s]\n", collectionThreads));
+            sb.append(String.format("  collection_min_threads ... [%s]\n", getCollectionMinThreads()));
         }
-        sb.append(String.format("max_threads .............. [%s]\n", getMaxThreads()));
+        sb.append(String.format("  max_threads .............. [%s]\n", getMaxThreads()));
         sb.append('\n');
-        sb.append(String.format("ramp_up_time_secs ........ [%d]\n", rampUpTimeSecs));
-        sb.append(String.format("max_attempts ............. [%s]\n", maxAttempts));
-        sb.append(String.format("transaction_delay_ms...... [%s]\n", transactionDelayMillis));
-        sb.append(String.format("failure_delay_ms.......... [%s]\n", failureDelayMillis));
+
+        sb.append(String.format("  min_shard ................ [%d]%s\n", minShardToMigrate, (minShardToMigrate == MIN_SHARD) ? "" : " (Partial!)"));
+        sb.append(String.format("  max_shard ................ [%s]%s\n", maxShardToMigrate, (maxShardToMigrate == MAX_SHARD) ? "" : " (Partial!)"));
+        sb.append('\n');
+        sb.append(String.format("  ramp_up_time_secs ........ [%d]\n", rampUpTimeSecs));
+        sb.append(String.format("  max_attempts ............. [%s]\n", maxAttempts));
+        sb.append(String.format("  transaction_delay_ms...... [%s]\n", transactionDelayMillis));
+        sb.append(String.format("  failure_delay_ms.......... [%s]\n", failureDelayMillis));
         return sb.toString();
     }
 }

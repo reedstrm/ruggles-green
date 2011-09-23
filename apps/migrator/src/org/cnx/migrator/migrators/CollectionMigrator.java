@@ -18,8 +18,7 @@ package org.cnx.migrator.migrators;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
 
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.migrator.config.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
@@ -47,14 +46,12 @@ public class CollectionMigrator extends ItemMigrator {
      * The constructor should not do any significant amount of work. This is done later by the
      * {@link #doWork()} method.
      * 
-     * @param config the configuration of this migration session.
-     * @param cnxClient repository client to use.
-     * @param collectionDirectory root data directory of the colleciton to migrate. Its base name
+     * @param context the context of this migration session.
+     * @param collectionDirectory root data directory of the collection to migrate. Its base name
      *            represent the numeric value of the collection id (e.g. "000012").
      */
-    public CollectionMigrator(MigratorConfiguration config, CnxAtomPubClient cnxClient,
-        Directory collectionDirectory) {
-        super(config, cnxClient);
+    public CollectionMigrator(MigratorContext context, Directory collectionDirectory) {
+        super(context);
         this.collectionDirectory = collectionDirectory;
         this.cnxCollectionId = collectionDirectoryToId(collectionDirectory);
     }
@@ -95,19 +92,24 @@ public class CollectionMigrator extends ItemMigrator {
      * @returns the atompub entry to use to upload the first collection version.
      */
     private ClientEntry createCollection() {
-        Log.message("***** Going to create collection: %s", cnxCollectionId);
+        getContext().incrementCounter("COLLECTIONS", 1);
+        Log.message("Going to migrate collection: %s", cnxCollectionId);
         int attempt;
         for (attempt = 1;; attempt++) {
             final ClientEntry atompubEntry;
             IdWrapper cnxCollectionIdWrapper =
-                new IdWrapper(cnxCollectionId, IdWrapper.Type.COLLECTION);
+                    new IdWrapper(cnxCollectionId, IdWrapper.Type.COLLECTION);
             try {
                 atompubEntry =
-                    getCnxClient().createNewCollectionForMigration(cnxCollectionIdWrapper);
+                        getCnxClient().createNewCollectionForMigration(cnxCollectionIdWrapper);
                 checkAtombuyEntryId(cnxCollectionId, 1, atompubEntry);
                 message("Added collection: %s", atompubEntry.getId());
                 return atompubEntry;
             } catch (Exception e) {
+                if (attempt == 1) {
+                    getContext().incrementCounter("COLLECTIONS_WITH_CREATION_RETRIES", 1);
+                }
+                getContext().incrementCounter("COLLECTION_CREATION_RETRIES", 1);
                 if (attempt >= getConfig().getMaxAttempts()) {
                     throw new RuntimeException(String.format("Failed after %d attempts: %s",
                             attempt, cnxCollectionId), e);
@@ -133,7 +135,7 @@ public class CollectionMigrator extends ItemMigrator {
      */
     private void migrateNextCollectionVersion(ClientEntry atompubEntry, int versionNum,
             Directory versionDirectory) {
-
+        getContext().incrementCounter("COLLECTION_VERSIONS", 1);
         int attempt;
         for (attempt = 1;; attempt++) {
             try {
@@ -148,6 +150,10 @@ public class CollectionMigrator extends ItemMigrator {
                 Log.message("Migrated collection version %s/%s", cnxCollectionId, versionNum);
                 return;
             } catch (Exception e) {
+                if (attempt == 1) {
+                    getContext().incrementCounter("COLLECTIONS_VERSIONS_WITH_UPLOAD_RETRIES", 1);
+                }
+                getContext().incrementCounter("COLLECTION_VERSTION_UPLOAD_RETRIES", 1);
                 if (attempt >= getConfig().getMaxAttempts()) {
                     throw new RuntimeException(String.format("Failed after %d attempts: %s/%s",
                             attempt, cnxCollectionId, versionNum), e);

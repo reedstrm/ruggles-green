@@ -24,5 +24,7 @@ time java  \
   org.cnx.migrator.MigratorMain \
   -data_root_dir ${DATA_ROOT_DIR} \
   -repository_atompub_url ${REPOSITORY_ATOMPUB_URL} \
-  -migrate_modules
+  -min_shard 0 \
+  -max_shard 999 \
+  -migrate_all
 

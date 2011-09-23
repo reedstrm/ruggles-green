@@ -15,13 +15,12 @@
  */
 package org.cnx.migrator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.File;
 import java.net.URL;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.migrator.config.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.DataRootDirectory;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.io.ShardedDirectory;
@@ -31,6 +30,7 @@ import org.cnx.migrator.migrators.ModuleMigrator;
 import org.cnx.migrator.migrators.ResourceMigrator;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
+import org.cnx.migrator.util.Timer;
 import org.cnx.migrator.workqueue.TimeRamp;
 import org.cnx.migrator.workqueue.WorkQueue;
 import org.cnx.migrator.workqueue.WorkQueueStats;
@@ -44,27 +44,26 @@ import org.cnx.migrator.workqueue.WorkQueueStats;
  * @author tal
  */
 public class Migrator {
-    /** Configuration that controls the operation of the migrator */
-    private final MigratorConfiguration config;
+    /** Context that is used across the migration session. */
+    private final MigratorContext context;
 
-    /** Root directory of input data to migrate */
+    /** Root directory of input data to migrate. */
     private final DataRootDirectory root;
 
     /** Client for accessing the new repository via its atompub API. Thread safe. */
-    private final CnxAtomPubClient cnxClient;
+    //private final CnxAtomPubClient cnxClient;
 
     private final WorkQueue workQueue;
 
     public Migrator(MigratorConfiguration config) {
-        this.config = checkNotNull(config);
-
         Log.message("\nCONFIG:\n%s", config);
         // Pause scrolling to allow reading the message
-        MigratorUtil.sleep(1000);
+        MigratorUtil.sleep(2000);
 
         try {
             final URL atomPubUrl = new URL(config.getRepositoryAtomPubUrl());
-            this.cnxClient = new CnxAtomPubClient(atomPubUrl);
+            final CnxAtomPubClient cnxClient = new CnxAtomPubClient(atomPubUrl);
+            this.context = new MigratorContext(config, cnxClient);
             this.root = new DataRootDirectory(new File(config.getDataRootDirectory()));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -76,84 +75,112 @@ public class Migrator {
 
     /** Migrate all data subject to the migrator configuration */
     public void migrateAll() {
+        final Timer timer = new Timer();
+        final MigratorConfiguration config = context.getConfig();
         final int rampUpTimeMillies = config.getRampUpTimeSecs() * 1000;
 
         if (config.isMigrateResources()) {
             workQueue.reset(new TimeRamp(config.getResourceMinThreads(), config
                     .getResourceThreads(), rampUpTimeMillies));
             migrateAllResources();
+        } else {
+            context.addSummaryMessage("Resource migration not requested. SKIPPING");
         }
 
         if (config.isMigrateModules()) {
             workQueue.reset(new TimeRamp(config.getModuleMinThreads(), config.getModuleThreads(),
                     rampUpTimeMillies));
             migrateAllModules();
+        } else {
+            context.addSummaryMessage("Modules migration not requested. SKIPPING");
         }
 
         if (config.isMigrateCollections()) {
             workQueue.reset(new TimeRamp(config.getCollectionMinThreads(), config
                     .getCollectionThreads(), rampUpTimeMillies));
             migrateAllCollections();
+        } else {
+            context.addSummaryMessage("Collections migration not requested. SKIPPING");
         }
 
-        Log.message("\nCONFIG:\n%s", config);
+        context.addSummaryMessage("Migration completed in %s", timer);
+        if (!context.getConfig().isMigratingAllShards()) {
+            context.addSummaryMessage("WARNING: some shards were excluded.");
+        }
+
+        Log.message("\n%s", context);
     }
 
     /** Migrate all resources */
     public void migrateAllResources() {
+        final Timer timer = new Timer();
+        int resourceCount = 0;
+        final MigratorConfiguration config = context.getConfig();
         final ShardedDirectory resources = root.getResourcesRoot();
-        Log.message("  Reosources directory: %s", resources);
+        Log.message("Reosources root directory: %s", resources);
         // Iterate resource shards
-        for (Directory shard : resources.getShards()) {
-            Log.message("    Shard directory: %s", shard);
+        for (Directory shard : resources.getShards(config.getMinShardToMigrate(), config.getMaxShardToMigrate())) {
+            Log.message("Processing resources in shard: %s", shard);
             // Iterated resources in current shard
             for (Directory resourceDirectory : shard.getSubDirectories()) {
                 final ItemMigrator migrator =
-                        new ResourceMigrator(config, cnxClient, resourceDirectory);
+                        new ResourceMigrator(context, resourceDirectory);
                 queueItemMigrator(migrator);
+                resourceCount++;
             }
         }
         waitForWorkQueueCompletion("Resources");
-    }
-
-    /** Migrate all collections */
-    public void migrateAllCollections() {
-        final ShardedDirectory collections = root.getCollectionsRoot();
-        Log.message("  Collections directory: %s", collections);
-        // Iterate collection shards
-        for (Directory shard : collections.getShards()) {
-            Log.message("    Shard directory: %s", shard);
-            // Iterated collections in current shard
-            for (Directory collectionDirectory : shard.getSubDirectories()) {
-                final ItemMigrator migrator =
-                        new CollectionMigrator(config, cnxClient, collectionDirectory);
-                queueItemMigrator(migrator);
-            }
-        }
-        waitForWorkQueueCompletion("Collections");
+        context.addSummaryMessage("Migrated %d resources in %s", resourceCount, timer);
     }
 
     /** Migrate all modules */
     public void migrateAllModules() {
+        final Timer timer = new Timer();
+        int moduleCount = 0;
+        final MigratorConfiguration config = context.getConfig();
         final ShardedDirectory modules = root.getModulesRoot();
-        Log.message("  Modules directory: %s", modules);
+        Log.message("Modules root directory: %s", modules);
         // Iterate module shards
-        for (Directory shard : modules.getShards()) {
-            Log.message("    Shard directory: %s", shard);
+        for (Directory shard : modules.getShards(config.getMinShardToMigrate(), config.getMaxShardToMigrate())) {
+            Log.message("Processing modules in shard: %s", shard);
             // Iterated modules in current shard
             for (Directory moduleDirectory : shard.getSubDirectories()) {
                 final ItemMigrator migrator =
-                        new ModuleMigrator(config, cnxClient, moduleDirectory);
+                        new ModuleMigrator(context, moduleDirectory);
                 queueItemMigrator(migrator);
+                moduleCount++;
             }
         }
         waitForWorkQueueCompletion("Modules");
+        context.addSummaryMessage("Migrated %d modules in %s", moduleCount, timer);
+    }
+
+    /** Migrate all collections */
+    public void migrateAllCollections() {
+        final Timer timer = new Timer();
+        int collectionCount = 0;
+        final MigratorConfiguration config = context.getConfig();
+        final ShardedDirectory collections = root.getCollectionsRoot();
+        Log.message("Collections root directory: %s", collections);
+        // Iterate collection shards
+        for (Directory shard : collections.getShards(config.getMinShardToMigrate(), config.getMaxShardToMigrate())) {
+            Log.message("Processing collections in shard: %s", shard);
+            // Iterated collections in current shard
+            for (Directory collectionDirectory : shard.getSubDirectories()) {
+                final ItemMigrator migrator =
+                        new CollectionMigrator(context, collectionDirectory);
+                queueItemMigrator(migrator);
+                collectionCount++;
+            }
+        }
+        waitForWorkQueueCompletion("Collections");
+        context.addSummaryMessage("Migrated %d collection in %s", collectionCount, timer);
     }
 
     /** Add a work unit to the work queue */
     private void queueItemMigrator(ItemMigrator itemMigrator) {
         while (!workQueue.tryToAddItem(itemMigrator)) {
-            Log.message("%s", workQueue.getStats());
+            Log.message("Work queue is full");
             MigratorUtil.sleep(5000);
         }
     }

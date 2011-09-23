@@ -18,7 +18,8 @@ package org.cnx.migrator.migrators;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.migrator.config.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.workqueue.WorkItem;
 
@@ -29,23 +30,23 @@ import org.cnx.migrator.workqueue.WorkItem;
  */
 public abstract class ItemMigrator implements WorkItem {
 
-    /** Migrator config in effect */
-    private final MigratorConfiguration config;
+    /** Context of this migration session. Shared by all migrators. */
+    private final MigratorContext context;
 
-    /** CNX client to use to write to repository */
-    private final CnxAtomPubClient cnxClient;
+    protected ItemMigrator(MigratorContext context) {
+        this.context = checkNotNull(context);
+    }
 
-    protected ItemMigrator(MigratorConfiguration config, CnxAtomPubClient cnxClient) {
-        this.config = checkNotNull(config);
-        this.cnxClient = checkNotNull(cnxClient);
+    protected MigratorContext getContext() {
+        return context;
     }
 
     protected MigratorConfiguration getConfig() {
-        return config;
+        return context.getConfig();
     }
 
     protected CnxAtomPubClient getCnxClient() {
-        return cnxClient;
+        return context.getCnxClient();
     }
 
     /** Print a diagnostic message */

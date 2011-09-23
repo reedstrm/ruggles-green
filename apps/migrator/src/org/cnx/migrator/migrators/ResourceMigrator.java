@@ -15,14 +15,18 @@
  */
 package org.cnx.migrator.migrators;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.File;
 import java.util.Properties;
 
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.migrator.config.MigratorConfiguration;
+import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
+import org.cnx.repository.atompub.IdWrapper;
+
+import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * A migrator for a resource item
@@ -34,9 +38,8 @@ public class ResourceMigrator extends ItemMigrator {
     /** The root directory of the resource to migrate */
     private final Directory resourceDirectory;
 
-    public ResourceMigrator(MigratorConfiguration config, CnxAtomPubClient cnxClient,
-            Directory resourceDirectory) {
-        super(config, cnxClient);
+    public ResourceMigrator(MigratorContext context, Directory resourceDirectory) {
+        super(context);
         this.resourceDirectory = resourceDirectory;
     }
 
@@ -50,27 +53,77 @@ public class ResourceMigrator extends ItemMigrator {
         final Properties properties =
         resourceDirectory.readPropertiesFile("resource_properties.txt");
 
-        // Upload resource file
+        final String resourceId = resourceDirectoryToId(resourceDirectory);
         final File resourceFile = resourceDirectory.subFile("resource_data");
+
+        final ClientEntry resourceUploadEntry = createResource(resourceId);
+        uploadResourceBlob(resourceId, resourceUploadEntry, resourceFile);
+    }
+
+    /** Create a resource entity of given id and return an entry to upload its blob */
+    private ClientEntry createResource(String resourceId) {
+        getContext().incrementCounter("RESOURCES", 1);
+        final IdWrapper idWrapper = new IdWrapper(resourceId, IdWrapper.Type.RESOURCE);
+
         int attempt;
         for (attempt = 1;; attempt++) {
             try {
-                // TODO(tal): force resource id
-                getCnxClient().uploadFileToBlobStore(resourceFile.getName(), resourceFile);
-                message("Resource uploaded: %s", resourceDirectory.getName());
+                final ClientEntry result = getCnxClient().createNewResourceForMigration(idWrapper);
+                checkArgument(resourceId.equals(result.getId()), "Expected: %s, found: %s",
+                        resourceId, result.getId());
+                message("Resource entity creaded: %s", resourceId);
+                return result;
+            } catch (Exception e) {
+                if (attempt == 1) {
+                    getContext().incrementCounter("RESOURCES_WITH_CREATION_RETRIES", 1);
+                }
+                getContext().incrementCounter("RESOURCE_CREATION_RETRIES", 1);
+                if (attempt >= getConfig().getMaxAttempts()) {
+                    throw new RuntimeException(
+                            "Failed to create resource entity resource file after "
+                                    + getConfig().getMaxAttempts() + " attempts: " + resourceId);
+                }
+                Log.message("Failed attemp %s to create resource %s", attempt, resourceId);
+                Log.printStackTrace(e);
+                MigratorUtil.sleep(getConfig().getFailureDelayMillis());
+            }
+        }
+    }
+
+    /** Upload a resource blob from a file */
+    private void uploadResourceBlob(String resourceId, ClientEntry blobEntry, File resourceFile) {
+        checkArgument(resourceId.equals(blobEntry.getId()), "Expected: %s, found: %s", resourceId,
+                blobEntry.getId());
+        int attempt;
+        for (attempt = 1;; attempt++) {
+            try {
+                getCnxClient().uploadFileToBlobStore(blobEntry, resourceFile);
+                message("Resource blob uploaded: %s", resourceId);
                 // TODO(tal): verify resource by comparing its size and md5
                 return;
             } catch (Exception e) {
+                if (attempt == 1) {
+                    getContext().incrementCounter("RESOURCES_WITH_BLOB_UPLOAD_RETRIES", 1);
+                }
+                getContext().incrementCounter("RESOURCE_BLOB_UPLOAD_RETRIES", 1);
                 if (attempt >= getConfig().getMaxAttempts()) {
-                    throw new RuntimeException("Failed to upload resource file after "
+                    throw new RuntimeException("Failed to upload resource blob after "
                             + getConfig().getMaxAttempts() + " attempts: "
                             + resourceFile.getAbsolutePath());
                 }
+                Log.message("Failed attemp %s to upload blob of resource %s", attempt, resourceId);
                 Log.printStackTrace(e);
-                // wait a little before next try
-                MigratorUtil.sleep(1000);
+                MigratorUtil.sleep(getConfig().getFailureDelayMillis());
             }
         }
+    }
+
+    /** Map resource data directory to CNX resource id in the repository. */
+    private static String resourceDirectoryToId(Directory resourceDirectory) {
+        final String directoryName = resourceDirectory.getName(); // e.g. "0000012"
+        final int directoryNumber = Integer.valueOf(directoryName); // e.g. 12
+        // MOTE(tal): This matches the repository collection key to id mapping
+        return String.format("r%04d", directoryNumber); // e.g. "m0012"
     }
 
 }

@@ -9,8 +9,8 @@
 ROOT="/aux/cnx/data"
 
 # Number of fake items to generate
-#RESOURCE_COUNT=100000
-RESOURCE_COUNT=1
+# NOTE(tal): can have at most 99999 since we currently reserve repo ids [1-99999]
+RESOURCE_COUNT=99999
 
 MODULE_COUNT=20000
 VERSIONS_PER_MODULE=5
@@ -175,8 +175,8 @@ function create_fake_collections {
 
 function main {
   create_fake_resources
-  #create_fake_modules
-  #create_fake_collections
+  create_fake_modules
+  create_fake_collections
 }
 
 main

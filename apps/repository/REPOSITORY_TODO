@@ -1,5 +1,6 @@
 Repository global todo items
 
+* Cleanup unused code in CnxMediaType and FileContentTypeEnum
 * Revisit the choice of returned file names when serving export and resource blobs
 * Revisit all the TODO's and address the ones that need to be addressed for the Pilot (if any)
 * Add support for exporters (feeds, urgent items, etc)

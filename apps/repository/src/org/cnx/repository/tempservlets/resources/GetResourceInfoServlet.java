@@ -59,7 +59,7 @@ public class GetResourceInfoServlet extends HttpServlet {
         final String resourceId = matcher.group(1);
 
         final RepositoryResponse<GetResourceInfoResult> repositoryResponse =
-            repository.getResourceInfo(new RepositoryRequestContext(null), resourceId);
+                repository.getResourceInfo(new RepositoryRequestContext(null), resourceId);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -98,7 +98,6 @@ public class GetResourceInfoServlet extends HttpServlet {
             out.println("  - file name: " + contentInfo.getContentOriginalFileName());
             out.println("  - size: " + contentInfo.getContentSize());
             out.println("  - upload time: " + contentInfo.getContentUploadTime());
-            out.println("  - size: " + contentInfo.getSize());
             out.println("  - md5 hash: " + contentInfo.getMd5Hash());
         }
     }

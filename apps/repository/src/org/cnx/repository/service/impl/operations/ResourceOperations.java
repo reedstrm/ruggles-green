@@ -188,7 +188,7 @@ public class ResourceOperations {
                 final OrmBlobInfo blobInfo = checkNotNull(entity.getBlobInfo());
                 final UploadedResourceContentInfo contentInfo =
                         new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
-                                blobInfo.getCreationTime(), blobInfo.getFileName(), blobInfo.getSize(),
+                                blobInfo.getCreationTime(), blobInfo.getFileName(),
                                 blobInfo.getMd5Hash());
                 result =
                         GetResourceInfoResult.newUploaded(entity.getId(), entity.getCreationTime(),

@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
@@ -188,8 +189,7 @@ public class ResourceOperations {
                 final OrmBlobInfo blobInfo = checkNotNull(entity.getBlobInfo());
                 final UploadedResourceContentInfo contentInfo =
                         new UploadedResourceContentInfo(blobInfo.getContentType(), blobInfo.getSize(),
-                                blobInfo.getCreationTime(), blobInfo.getFileName(),
-                                blobInfo.getMd5Hash());
+                                blobInfo.getCreationTime(), blobInfo.getFileName(), blobInfo.getMd5Hash());
                 result =
                         GetResourceInfoResult.newUploaded(entity.getId(), entity.getCreationTime(),
                                 contentInfo);
@@ -206,7 +206,8 @@ public class ResourceOperations {
      * See description in {@link CnxRepositoryService}
      */
     public static RepositoryResponse<ServeResourceResult> serveResource(
-            RepositoryRequestContext context, String resourceId, HttpServletResponse httpResponse) {
+            RepositoryRequestContext context, String resourceId, @Nullable String baseFileSaveName,
+            HttpServletResponse httpResponse) {
 
         final Key resourceKey = OrmResourceEntity.resourceIdToKey(resourceId);
         if (resourceKey == null) {
@@ -245,11 +246,13 @@ public class ResourceOperations {
          * a header with "BlobKey = <value>" and then App Engine replaces the body of the response
          * with the content of the blob.
          */
-        // TODO(tal): consider return a file name that is based on resource id, rather than
-        // original file name.
+        final String baseDispositionFileName =
+                (baseFileSaveName == null) ? resourceId : baseFileSaveName;
+        final String dispositionFileName =
+                baseDispositionFileName + blobInfo.getFileExtension(".bin");
         final ImmutableMap<String, String> additionalHeaders =
                 BlobstoreUtil.additionalHeaders(blobInfo.getBlobKey(), blobInfo.getContentType(),
-                        blobInfo.getFileName());
+                        dispositionFileName);
         ServeResourceResult result = new ServeResourceResult(additionalHeaders);
         return ResponseUtil.loggedOk("Resource served: " + resourceId, result, log);
     }

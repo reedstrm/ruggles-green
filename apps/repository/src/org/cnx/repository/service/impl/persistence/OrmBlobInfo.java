@@ -19,6 +19,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Date;
 
+import javax.annotation.Nullable;
+
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Entity;
@@ -41,8 +43,8 @@ public class OrmBlobInfo {
     private final BlobKey blobKey;
 
     /**
-     * The content type to use when serving this blob. This may or may not be the same
-     * as the content type reported by the blobstore service.
+     * The content type to use when serving this blob. This may or may not be the same as the
+     * content type reported by the blobstore service.
      */
     private final String contentType;
 
@@ -76,8 +78,8 @@ public class OrmBlobInfo {
      * @param contentType the content type to use. This overrides the content type in blobInfo.
      */
     public OrmBlobInfo(BlobInfo blobInfo, String contentType) {
-        this(blobInfo.getBlobKey(), contentType, blobInfo.getSize(), blobInfo
-                .getMd5Hash(), blobInfo.getCreation(), blobInfo.getFilename());
+        this(blobInfo.getBlobKey(), contentType, blobInfo.getSize(), blobInfo.getMd5Hash(),
+                blobInfo.getCreation(), blobInfo.getFilename());
     }
 
     /** Deserialize from a datastore entity. */
@@ -125,5 +127,19 @@ public class OrmBlobInfo {
 
     public String getFileName() {
         return fileName;
+    }
+
+    /**
+     * Return the file name extension of this blob.
+     * 
+     * @param defaultExtention default extension value.
+     * 
+     * @return the extension of the blob file name (e.g. ".png") or defaultExtension if file name
+     *         has no extension.
+     */
+    public String getFileExtension(@Nullable String defaultExtention) {
+        final int extensionStartIndex = fileName.lastIndexOf('.');
+        return (extensionStartIndex < 0) ? defaultExtention : fileName
+            .substring(extensionStartIndex);
     }
 }

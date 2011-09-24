@@ -186,9 +186,10 @@ public class CnxAtomResourceServlet {
     public Response getResource(@Context HttpServletResponse res,
             @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) {
         final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
+        // TODO(tal): allow callers to specify baseSaveFileName (using null for now).
         RepositoryResponse<ServeResourceResult> serveResourceResult =
                 repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), res);
+                        idWrapper.getId(), null, res);
 
         if (serveResourceResult.isOk()) {
 

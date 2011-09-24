@@ -133,8 +133,8 @@ public class ExportOperations {
                     "Error serving the resource content: " + exportReference, log, e);
         }
 
-        // TODO(tal): consider to return file name that is based on entity id and export type
-        // rather than on original file name.
+        // Using the export upload file name as the save name. Expecting exports to have
+        // meaningful file names.
         final ImmutableMap<String, String> additionalHeaders =
                 BlobstoreUtil.additionalHeaders(blobInfo.getBlobKey(), blobInfo.getContentType(),
                         blobInfo.getFileName());

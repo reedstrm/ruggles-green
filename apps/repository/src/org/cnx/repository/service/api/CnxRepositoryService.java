@@ -51,8 +51,8 @@ public interface CnxRepositoryService {
     /**
      * Create a new resource with enforced id.
      * 
-     * Temp method for migration. Accepts the id that should be assigned to the new resource.
-     * The id must be in the range of protected module ids. See
+     * Temp method for migration. Accepts the id that should be assigned to the new resource. The id
+     * must be in the range of protected module ids. See
      * {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil} for more
      * details.
      * 
@@ -79,11 +79,17 @@ public interface CnxRepositoryService {
      * 
      * @param context the query context
      * @param resourceId a valid id of the resource to serve.
+     * @param baseFileSaveName if not null, this value is used in the returned headers that control
+     *            the local file name to use when saving this resource from a browser. This allows
+     *            web viewers and applications to use a more user friendly name that is based on the
+     *            context in this resource is used (e.g. using a pretey name in a module). If null,
+     *            a default name is used. This parameter controls only the base name of the returned
+     *            headers, not the file extension.
      * @param httpResponse a HTTP servlet response in which the resource is served.
      * @return operation response.
      */
     RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
-            String resourceId, HttpServletResponse httpResponse);
+            String resourceId, @Nullable String baseFileSaveName, HttpServletResponse httpResponse);
 
     /**
      * Query resource id list with optional paging.

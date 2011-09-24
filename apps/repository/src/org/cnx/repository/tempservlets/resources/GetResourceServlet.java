@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,9 +57,14 @@ public class GetResourceServlet extends HttpServlet {
         }
         final String resourceId = matcher.group(1);
 
+        @Nullable
+        final String baseFileSaveName = req.getParameter("name");
+
         // TODO(arjuns) : This doesnt work.
+        // TODO(tal): describe in more details what does not work or delete these two TODOs.
         final RepositoryResponse<ServeResourceResult> repositoryResponse =
-            repository.serveResouce(new RepositoryRequestContext(null), resourceId, resp);
+                repository.serveResouce(new RepositoryRequestContext(null), resourceId,
+                        baseFileSaveName, resp);
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -80,7 +86,7 @@ public class GetResourceServlet extends HttpServlet {
 
         checkState(repositoryResponse.isOk());
         for (Map.Entry<String, String> header : repositoryResponse.getResult()
-            .getAdditionalHeaders().entrySet()) {
+                .getAdditionalHeaders().entrySet()) {
             resp.addHeader(header.getKey(), header.getValue());
         }
         return;

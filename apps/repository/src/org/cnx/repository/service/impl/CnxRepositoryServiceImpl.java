@@ -84,8 +84,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
-            String resourceId, HttpServletResponse httpResponse) {
-        return ResourceOperations.serveResource(context, resourceId, httpResponse);
+            String resourceId, @Nullable String baseFileSaveName, HttpServletResponse httpResponse) {
+        return ResourceOperations.serveResource(context, resourceId, baseFileSaveName, httpResponse);
     }
 
     @Override

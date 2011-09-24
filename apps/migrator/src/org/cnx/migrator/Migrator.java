@@ -180,7 +180,7 @@ public class Migrator {
     /** Add a work unit to the work queue */
     private void queueItemMigrator(ItemMigrator itemMigrator) {
         while (!workQueue.tryToAddItem(itemMigrator)) {
-            Log.message("Work queue is full");
+            Log.message("Work queue is full, waiting...");
             MigratorUtil.sleep(5000);
         }
     }

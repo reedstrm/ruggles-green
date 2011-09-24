@@ -72,7 +72,7 @@ public class CounterSet {
             }
             // Generate counter lines
             for (String counterName : counterNameList) {
-                builder.append(String.format("%s [%8d]\n",
+                builder.append(String.format("* %s [%8d]\n",
                         Strings.padEnd(counterName, maxNameLength, ' '),
                         counters.get(counterName).value));
             }

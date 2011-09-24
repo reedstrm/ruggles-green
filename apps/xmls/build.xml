@@ -39,7 +39,7 @@
 
                 <!-- Compiling xsd to java classes. -->
                 <mkdir dir="${gen.java.files}" />
-                <java jar="${basedir}/${third_party}/jaxb/jaxb-ri-20100511/lib/jaxb-xjc.jar"
+                <java jar="${basedir}/${third_party}/jaxb/jaxb-ri-20090708/lib/jaxb-xjc.jar"
                       fork="true"
                       failonerror="true">
                     <arg line="-verbose -d ${gen.java.files} -p 
@@ -60,7 +60,7 @@
 
                 <mkdir dir="${gen.java.files}" />
                 <!-- Compiling xsd to java classes. -->
-                <java jar="${basedir}/${third_party}/jaxb/jaxb-ri-20100511/lib/jaxb-xjc.jar"
+                <java jar="${basedir}/${third_party}/jaxb/jaxb-ri-20090708/lib/jaxb-xjc.jar"
                       fork="true"
                       failonerror="true">
                     <arg line="-verbose -d ${gen.java.files} -p 

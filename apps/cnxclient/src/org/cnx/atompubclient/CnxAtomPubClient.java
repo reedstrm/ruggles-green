@@ -48,6 +48,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.FilePartSource;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.exceptions.CnxConflictException;
@@ -204,9 +205,23 @@ public class CnxAtomPubClient {
      */
     public void uploadFileToBlobStore(ClientEntry resourceEntry, File file)
             throws HttpException, IOException {
+        uploadFileToBlobStore(resourceEntry, file, null /* fileName */, null /* contentType */);
+    }
+
+    /**
+     * Upload file to blobstore.
+     * 
+     * @param resourceEntry Entry of Resource, which contains link to Blobstore.
+     * @param file : File to be uploaded to CNX Repository.
+     * 
+     *            TODO(arjuns) : Replace file with InputStream so that it can work on AppEngine.
+     */
+    public void uploadFileToBlobStore(ClientEntry resourceEntry, File file, String fileName,
+            String contentType)
+            throws HttpException, IOException {
         Link blobstoreUrl = CnxClientUtils.getBlobstoreUri(resourceEntry);
         URL postUrl = new URL(blobstoreUrl.getHrefResolved());
-        postFileToBlobstore(postUrl, file);
+        postFileToBlobstore(postUrl, file, fileName, contentType);
     }
 
     /**
@@ -249,11 +264,17 @@ public class CnxAtomPubClient {
      * @param blobstoreUrl where file needs to be uploaded.
      * @param file File to be uploaded to Blobstore.
      */
-    private void postFileToBlobstore(URL blobstoreUrl, File file) throws IOException {
+    private void postFileToBlobstore(final URL blobstoreUrl, final File file, final String fileName,
+            final String contentType) throws IOException {
+        String uploadFileName = fileName == null ? file.getName() : fileName;
+        // TODO(arjuns) : Add test for this.
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
-        Part[] parts = { new FilePart(file.getName(), file), };
+        Part[] parts =
+            { new FilePart(uploadFileName, new FilePartSource(uploadFileName, file),
+                    contentType, null) };
+
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
-         int status = httpClient.executeMethod(postMethod);
+        int status = httpClient.executeMethod(postMethod);
         // TODO(arjuns) : Confirm it will be always 302.
         // Preconditions.checkState(status == 302);
     }

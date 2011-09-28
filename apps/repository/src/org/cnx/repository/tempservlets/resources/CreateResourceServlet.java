@@ -16,8 +16,11 @@
 
 package org.cnx.repository.tempservlets.resources;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
@@ -43,13 +46,24 @@ public class CreateResourceServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         @Nullable
-        String forcedId = req.getParameter("id");
+        final String forcedId = req.getParameter("id");
+
+        @Nullable
+        final String forcedTimeUnixSecondsStr = req.getParameter("time");
+
+        @Nullable
+        final Date forcedCreationTime =
+        (forcedTimeUnixSecondsStr == null) ? null : new Date(
+                Long.parseLong(forcedTimeUnixSecondsStr) * 1000);
+
+        checkArgument((forcedId == null) == (forcedCreationTime == null), "%s, %s", forcedId,
+                forcedCreationTime);
 
         // Query the repository service
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         final RepositoryResponse<CreateResourceResult> repositoryResponse =
-            ((forcedId == null) ? repository.createResource(context) : repository
-                .migrationCreateResourceWithId(context, forcedId));
+                ((forcedId == null) ? repository.createResource(context) : repository
+                    .migrationCreateResourceWithId(context, forcedId, forcedCreationTime));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {

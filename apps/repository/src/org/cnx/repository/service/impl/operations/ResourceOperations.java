@@ -104,9 +104,8 @@ public class ResourceOperations {
      * TODO(tal): remove this method after completing the data migration.
      */
     public static RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
-            RepositoryRequestContext context, String forcedId) {
+            RepositoryRequestContext context, String forcedId, Date forcedCreationTime) {
 
-        final Date transactionTime = new Date();
         final PersistenceTransaction tx = Services.persistence.beginTransaction();
         try {
             // Validate forced id
@@ -127,7 +126,7 @@ public class ResourceOperations {
                         "A resource with this forced id already exists: " + forcedId, log);
             }
 
-            final OrmResourceEntity entity = new OrmResourceEntity(transactionTime);
+            final OrmResourceEntity entity = new OrmResourceEntity(forcedCreationTime);
             entity.setKey(OrmResourceEntity.resourceIdToKey(forcedId));
             Services.persistence.write(entity);
             checkArgument(forcedId.equals(entity.getId()), "%s vs %s", forcedId, entity.getId());
@@ -150,7 +149,6 @@ public class ResourceOperations {
 
         return ResponseUtil.loggedOk("Resource created with forced id: " + forcedId,
                 new CreateResourceResult(forcedId, uploadUrl), log);
-
     }
 
     /**

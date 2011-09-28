@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
@@ -72,8 +74,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
 
     @Override
     public RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
-            RepositoryRequestContext context, String forcedId) {
-        return ResourceOperations.migrationCreateResourceWithId(context, forcedId);
+            RepositoryRequestContext context, String forcedId, Date forcedCreationTime) {
+        return ResourceOperations.migrationCreateResourceWithId(context, forcedId, forcedCreationTime);
     }
 
     @Override

@@ -113,9 +113,12 @@ public class CnxAtomResourceServlet {
         final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
+        // TODO(tal): get this from the request (required param).
+        final Date forcedCreationTime = new Date();
+
         RepositoryResponse<CreateResourceResult> createdResource =
-                repositoryService.migrationCreateResourceWithId(
-                        RepositoryUtils.getRepositoryContext(), idWrapper.getId());
+                repositoryService.migrationCreateResourceWithId(RepositoryUtils.getRepositoryContext(),
+                        idWrapper.getId(), forcedCreationTime);
 
         return handleCreationOfResource(req, atomPubService, createdResource);
     }

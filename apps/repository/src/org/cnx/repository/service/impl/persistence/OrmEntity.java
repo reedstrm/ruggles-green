@@ -64,8 +64,8 @@ public abstract class OrmEntity {
         this.entitySpec = checkNotNull(entitySpec);
         this.key = checkNotNull(entity.getKey());
         this.creationTime =
-            checkNotNull((Date) entity.getProperty(CREATION_TIME_PROPERTY),
-                    "Creation time property not found");
+                checkNotNull((Date) entity.getProperty(CREATION_TIME_PROPERTY),
+                        "Creation time property not found");
     }
 
     @Nullable
@@ -103,11 +103,11 @@ public abstract class OrmEntity {
 
     public Entity toEntity() {
         final Entity entity =
-            (getKey() == null) ? new Entity(entitySpec.getKeyKind()) : new Entity(key);
+                (getKey() == null) ? new Entity(entitySpec.getKeyKind()) : new Entity(key);
 
-        entity.setProperty(CREATION_TIME_PROPERTY, creationTime);
-        serializeToEntity(entity);
-        return entity;
+                entity.setProperty(CREATION_TIME_PROPERTY, creationTime);
+                serializeToEntity(entity);
+                return entity;
     }
 
     /**
@@ -118,7 +118,7 @@ public abstract class OrmEntity {
             return (OrmEntitySpec) entityClass.getDeclaredMethod("getSpec").invoke(null);
         } catch (Throwable e) {
             throw new RuntimeException("Error involing static method getSpec() of class "
-                + entityClass, e);
+                    + entityClass, e);
         }
     }
 

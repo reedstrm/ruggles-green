@@ -24,5 +24,5 @@ public class RepositoryConstants {
     /**
      * Collections, modules and resource auto ids are allocated starting from this value.
      */
-    public static final long MIN_NON_RESERVED_KEY_ID = 100000;
+    public static final long MIN_NON_RESERVED_KEY_ID = 300000;
 }

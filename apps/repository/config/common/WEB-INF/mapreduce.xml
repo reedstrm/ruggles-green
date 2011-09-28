@@ -13,9 +13,17 @@
       <name human="Entity kind to count">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
       <value template="optional">ModuleVer</value>
     </property>
+    <property>
+      <name>mapreduce.mapper.shardcount</name>
+      <value>10</value>
+    </property>
+    <property>
+      <name>mapreduce.mapper.inputprocessingrate</name>
+      <value>10000</value>
+    </property>
   </configuration>
-  
-   <configuration name="2. CNX Entity Wiper">
+
+  <configuration name="2. CNX Entity Wiper">
     <property>
       <name>mapreduce.map.class</name>
       <value>org.cnx.repository.facilities.datawipe.DataWiperMapper</value>
@@ -28,9 +36,17 @@
       <name human="Entity kind to delete">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
       <value template="optional">???</value>
     </property>
+    <property>
+      <name>mapreduce.mapper.shardcount</name>
+      <value>10</value>
+    </property>
+    <property>
+      <name>mapreduce.mapper.inputprocessingrate</name>
+      <value>10000</value>
+    </property>
   </configuration>
 
-   <configuration name="3. Blobstore Wiper">
+  <configuration name="3. Blobstore Wiper">
     <property>
       <name>mapreduce.map.class</name>
       <value>org.cnx.repository.facilities.datawipe.BlobstoreWiperMapper</value>
@@ -43,6 +59,13 @@
       <name>mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
       <value>__BlobInfo__</value>
     </property>
+    <property>
+      <name>mapreduce.mapper.shardcount</name>
+      <value>10</value>
+    </property>
+    <property>
+      <name>mapreduce.mapper.inputprocessingrate</name>
+      <value>10000</value>
+    </property>
   </configuration>
-
 </configurations>

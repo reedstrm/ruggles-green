@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.api;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,7 +61,7 @@ public interface CnxRepositoryService {
      * TODO(tal): remove this method after completing the migration.
      */
     RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
-            RepositoryRequestContext context, String forcedId);
+            RepositoryRequestContext context, String forcedId, Date forcedCreationTime);
 
     /**
      * Return general information about a resource.

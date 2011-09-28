@@ -108,7 +108,7 @@ public class BlobstoreUtil {
         final String lowerCaseFileName = blobInfo.getFilename();
         final int extensionStartIndex = lowerCaseFileName.lastIndexOf('.');
         if (extensionStartIndex < 0) {
-            blobInfo.getContentType();
+            return blobInfo.getContentType();
         }
         final String lowerCaseExtension = lowerCaseFileName.substring(extensionStartIndex);
         @Nullable

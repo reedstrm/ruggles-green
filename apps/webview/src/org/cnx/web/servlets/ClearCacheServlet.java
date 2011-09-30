@@ -16,20 +16,17 @@
 
 package org.cnx.web.servlets;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.cnx.repository.atompub.CnxMediaTypes;
-
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.common.io.ByteStreams;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
 
 @SuppressWarnings("serial")
 public class ClearCacheServlet extends HttpServlet {

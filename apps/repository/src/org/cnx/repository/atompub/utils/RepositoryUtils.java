@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import com.sun.syndication.feed.atom.Link;
 import java.net.URL;
 import java.util.List;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 
 /**

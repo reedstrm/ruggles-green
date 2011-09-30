@@ -13,9 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub;
+package org.cnx.common.repository.atompub;
 
 import static org.junit.Assert.assertEquals;
+
+import org.cnx.common.repository.atompub.ServletUris;
 
 import org.junit.Test;
 

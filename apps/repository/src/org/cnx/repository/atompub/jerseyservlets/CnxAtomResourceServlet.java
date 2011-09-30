@@ -15,18 +15,20 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
-import static org.cnx.repository.atompub.CommonUtils.getURI;
-import static org.cnx.repository.atompub.IdWrapper.Type.RESOURCE;
+import static org.cnx.common.repository.atompub.CommonUtils.getURI;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
 
+import org.cnx.common.repository.atompub.CommonUtils;
+
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -38,14 +40,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-
-import org.cnx.exceptions.CnxBadRequestException;
-import org.cnx.exceptions.CnxException;
-import org.cnx.repository.RepositoryConstants;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.ServletUris;
+import org.cnx.common.exceptions.CnxBadRequestException;
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.RepositoryConstants;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
@@ -54,9 +55,6 @@ import org.cnx.repository.service.api.CreateResourceResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
-
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
 
 /**
  * Jersey Servlet for CNX Resources.
@@ -110,7 +108,7 @@ public class CnxAtomResourceServlet {
     @Path(ServletUris.Resource.RESOURCE_POST_MIGRATION)
     public Response createNewResourceForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
-        final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
+        final IdWrapper idWrapper = new IdWrapper(resourceId, IdWrapper.Type.RESOURCE);
         CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         // TODO(tal): get this from the request (required param).
@@ -139,7 +137,7 @@ public class CnxAtomResourceServlet {
             // TODO(arjuns) : Create a function for this.
             // URL to fetch the Module published now.
 
-            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getResourceId(), RESOURCE);
+            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getResourceId(), IdWrapper.Type.RESOURCE);
 
             URL selfUrl = atomPubService.getConstants().getResourceAbsPath(repoIdWrapper);
             List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
@@ -188,7 +186,7 @@ public class CnxAtomResourceServlet {
     @Path(ServletUris.Resource.RESOURCE_PATH)
     public Response getResource(@Context HttpServletResponse res,
             @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) {
-        final IdWrapper idWrapper = new IdWrapper(resourceId, RESOURCE);
+        final IdWrapper idWrapper = new IdWrapper(resourceId, IdWrapper.Type.RESOURCE);
         // TODO(tal): allow callers to specify baseSaveFileName (using null for now).
         RepositoryResponse<ServeResourceResult> serveResourceResult =
                 repositoryService.serveResouce(RepositoryUtils.getRepositoryContext(),

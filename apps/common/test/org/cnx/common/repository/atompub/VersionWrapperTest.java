@@ -13,12 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub;
+package org.cnx.common.repository.atompub;
 
-import static org.cnx.repository.atompub.CnxAtomPubUtils.LATEST_VERSION_STRING;
+import static org.cnx.common.repository.atompub.CnxAtomPubUtils.LATEST_VERSION_STRING;
 import static org.junit.Assert.*;
 
-import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.VersionWrapper;
+
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+
 
 import java.util.List;
 

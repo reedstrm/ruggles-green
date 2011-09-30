@@ -16,15 +16,13 @@
 package org.cnx.web.jerseyservlets.exceptionhandlers;
 
 import com.google.inject.Injector;
-
-import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.exceptions.CnxRuntimeException;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+import org.cnx.common.exceptions.CnxRuntimeException;
 
 /**
  * Exception Handler fork CnxRuntimeExceptions for Jersey Servlets.

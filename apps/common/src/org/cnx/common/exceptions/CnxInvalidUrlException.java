@@ -13,18 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
+package org.cnx.common.exceptions;
 
 import javax.ws.rs.core.Response.Status;
 
 /**
- * CnxException to indicate a {@link Status#CONFLICT}.
- * 
+ * CNX Exception to represent NOT_FOUND (404).
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
-public class CnxConflictException extends CnxException {
-    public CnxConflictException(String message, Throwable throwable) {
-        super(Status.CONFLICT, message, throwable);
+public class CnxInvalidUrlException extends CnxRuntimeException {
+    public CnxInvalidUrlException(String message, Throwable throwable) {
+        super(Status.NOT_FOUND, message, throwable);
     }
 }

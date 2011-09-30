@@ -17,9 +17,9 @@ package org.cnx.web;
 
 import static org.junit.Assert.fail;
 
-import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.exceptions.CnxPossibleValidIdException;
-import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+import org.cnx.common.exceptions.CnxPossibleValidIdException;
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.junit.Test;
 
 /**

@@ -29,9 +29,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
-import org.cnx.exceptions.CnxBadRequestException;
-import org.cnx.exceptions.CnxException;
-import org.cnx.repository.PrettyXmlOutputter;
+import org.cnx.common.exceptions.CnxBadRequestException;
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.PrettyXmlOutputter;
 import org.jdom.JDOMException;
 
 /**

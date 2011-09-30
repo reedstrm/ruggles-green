@@ -17,16 +17,14 @@ package org.cnx.migrator.migrators;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.sun.syndication.propono.atom.client.ClientEntry;
 import java.io.File;
 import java.util.Properties;
-
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
-import org.cnx.repository.atompub.IdWrapper;
-
-import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * A migrator for a resource item

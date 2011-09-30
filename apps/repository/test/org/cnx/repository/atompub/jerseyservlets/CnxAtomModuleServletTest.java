@@ -18,8 +18,6 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.cnx.exceptions.CnxConflictException;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -34,10 +32,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.exceptions.CnxInvalidUrlException;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.common.exceptions.CnxConflictException;
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.VersionWrapper;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.jdom.JDOMException;
 import org.junit.Before;

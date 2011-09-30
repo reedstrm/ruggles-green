@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
+package org.cnx.common.exceptions;
 
-import org.cnx.repository.RepositoryConstants;
-import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.common.repository.RepositoryConstants;
+import org.cnx.common.repository.atompub.IdWrapper;
 
 import javax.ws.rs.core.Response.Status;
 

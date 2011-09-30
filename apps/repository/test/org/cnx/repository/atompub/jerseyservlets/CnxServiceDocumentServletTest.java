@@ -18,8 +18,6 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-
 import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.client.ClientWorkspace;
 import com.sun.syndication.propono.atom.common.Categories;
@@ -29,8 +27,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.ServletUris;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.ServletUris;
 import org.junit.Before;
 import org.junit.Test;
 

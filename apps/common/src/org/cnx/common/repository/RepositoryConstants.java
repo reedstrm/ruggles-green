@@ -13,18 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
-
-import javax.ws.rs.core.Response.Status;
+package org.cnx.common.repository;
 
 /**
- * CNX Exception to represent INTERNAL_SERVER_ERROR.
- *
+ * Constants used by Repository.
+ * 
  * @author Arjun Satyapal
  */
-@SuppressWarnings("serial")
-public class CnxInternalServerErrorException extends CnxException {
-    public CnxInternalServerErrorException(String message, Throwable throwable) {
-        super(Status.INTERNAL_SERVER_ERROR, message, throwable);
-    }
+public class RepositoryConstants {
+    /**
+     * Collections, modules and resource auto ids are allocated starting from this value.
+     */
+    public static final long MIN_NON_RESERVED_KEY_ID = 300000;
 }

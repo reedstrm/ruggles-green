@@ -13,16 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub;
+package org.cnx.common.repository.atompub;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.cnx.common.repository.atompub.IdWrapper;
+
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.cnx.exceptions.CnxInvalidUrlException;
 import org.junit.Test;
 
 /**

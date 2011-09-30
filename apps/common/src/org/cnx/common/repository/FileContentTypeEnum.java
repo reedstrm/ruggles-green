@@ -13,13 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository;
+package org.cnx.common.repository;
+
+import org.cnx.common.repository.atompub.CnxMediaTypes;
 
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 
-import org.cnx.repository.atompub.CnxMediaTypes;
 
 /**
  * This Enum maps file name to ContentType using file extensions.

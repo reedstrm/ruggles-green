@@ -13,17 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
+package org.cnx.common.exceptions;
 
 import javax.ws.rs.core.Response.Status;
 
 /**
- * CNX Exception to represent NOT_FOUND (404).
+ * CnxException to indicate a BAD_REQUEST.
+ * 
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
-public class CnxInvalidUrlException extends CnxRuntimeException {
-    public CnxInvalidUrlException(String message, Throwable throwable) {
-        super(Status.NOT_FOUND, message, throwable);
+public class CnxBadRequestException extends CnxException {
+    public CnxBadRequestException(String message, Throwable throwable) {
+        super(Status.BAD_REQUEST, message, throwable);
     }
 }

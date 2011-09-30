@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub;
+package org.cnx.common.repository.atompub;
 
 import com.sun.syndication.feed.atom.Entry;
 

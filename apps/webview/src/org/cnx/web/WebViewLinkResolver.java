@@ -27,8 +27,8 @@ import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Links;
 import org.cnx.cnxml.Module;
 import org.cnx.common.collxml.Collection;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.ServletUris;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.resourcemapping.Resource;
 import org.cnx.resourcemapping.Resources;
 

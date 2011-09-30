@@ -13,23 +13,28 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
-import javax.ws.rs.core.Response.Status;
+package org.cnx.common.repository.atompub;
+
+import org.cnx.common.exceptions.CnxBadRequestException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
- * A wrapper exception that will be used to throw Runtime exceptions for CNX.
+ * Some utilities for AtomPub.
  * 
- * @author (Arjun Satyapal)
+ * @author Arjun Satyapal
  */
-@SuppressWarnings("serial")
-public class CnxRuntimeException extends RuntimeException {
-    private Status jerseyStatus;
-    public CnxRuntimeException(Status jerseyStatus, String message, Throwable throwable) {
-        super(message, throwable);
-        this.jerseyStatus = jerseyStatus;
+public class CommonUtils {
+    // Utility class.
+    private CommonUtils() {
     }
     
-    public Status getJerseyStatus() {
-        return jerseyStatus;
+    public static URI getURI(String uriString) throws CnxBadRequestException {
+        try {
+            return new URI(uriString);
+        } catch (URISyntaxException e) {
+            throw new CnxBadRequestException("Invalid uri : " + uriString, e);
+        }
     }
 }

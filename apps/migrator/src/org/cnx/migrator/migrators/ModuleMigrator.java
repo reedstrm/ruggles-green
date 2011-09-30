@@ -18,25 +18,23 @@ package org.cnx.migrator.migrators;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
 
+import com.google.common.collect.ImmutableList;
+import com.sun.syndication.propono.atom.client.ClientEntry;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.resourcemapping.LocationInformation;
 import org.cnx.resourcemapping.ObjectFactory;
 import org.cnx.resourcemapping.Repository;
 import org.cnx.resourcemapping.Resource;
 import org.cnx.resourcemapping.Resources;
-
-import com.google.common.collect.ImmutableList;
-import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * A migrator for a module item, including all of its versions

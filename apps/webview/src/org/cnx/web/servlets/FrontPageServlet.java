@@ -16,22 +16,19 @@
 
 package org.cnx.web.servlets;
 
-import java.io.IOException;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.web.CommonHack;
-import org.cnx.web.WebViewConfiguration;
-import org.cnx.web.WebViewTemplate;
-
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
+import java.io.IOException;
+import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.web.CommonHack;
+import org.cnx.web.WebViewConfiguration;
+import org.cnx.web.WebViewTemplate;
 
 @SuppressWarnings("serial")
 public class FrontPageServlet extends HttpServlet {

@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import org.cnx.exceptions.CnxException;
-import org.cnx.repository.PrettyXmlOutputter;
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.PrettyXmlOutputter;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.RepositoryStatus;
 

@@ -21,8 +21,8 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxAtomPubConstants;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 
 /**
  * BaseTest for all tests for CNX AtomPub API.

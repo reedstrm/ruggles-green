@@ -33,10 +33,10 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.exceptions.CnxRuntimeException;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.VersionWrapper;
+import org.cnx.common.exceptions.CnxRuntimeException;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.VersionWrapper;
 import org.jdom.JDOMException;
 
 /**

@@ -59,7 +59,7 @@ function create_fake_resources {
     #local unit_size="1M"
     local unit_count="$[ ( $RANDOM % 400 )  + 1 ]"
     echo "    resource size = ${unit_count} x ${unit_size}"
-    local resource_file="${item_path}/resource_data"
+    local resource_file="${item_path}/resource"
     dd if=/dev/urandom of=${resource_file} bs=${unit_size} count=${unit_count} 2>&1 | sed 's/^/    /'
 
     # Create property file
@@ -67,7 +67,7 @@ function create_fake_resources {
     echo "  * Generating properties file:"
     local resource_size=$(stat -c%s ${resource_file})
     local resource_md5=$(md5sum ${resource_file} | cut -f1 -d' ')
-    local property_file="${item_path}/resource_properties.txt"
+    local property_file="${item_path}/properties"
     echo "# Resource propreties (Java property file format)" > "${property_file}"
     echo "file_name = fake.bin" >> "${property_file}"
     echo "content_type = application/fake" >> "${property_file}"

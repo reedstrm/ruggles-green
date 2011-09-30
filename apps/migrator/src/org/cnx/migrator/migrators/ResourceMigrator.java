@@ -51,10 +51,10 @@ public class ResourceMigrator extends ItemMigrator {
         // TODO(tal): read and use resource properties
         @SuppressWarnings("unused")
         final Properties properties =
-        resourceDirectory.readPropertiesFile("resource_properties.txt");
+        resourceDirectory.readPropertiesFile("properties");
 
         final String resourceId = resourceDirectoryToId(resourceDirectory);
-        final File resourceFile = resourceDirectory.subFile("resource_data");
+        final File resourceFile = resourceDirectory.subFile("data");
 
         final ClientEntry resourceUploadEntry = createResource(resourceId);
         uploadResourceBlob(resourceId, resourceUploadEntry, resourceFile);
@@ -97,6 +97,8 @@ public class ResourceMigrator extends ItemMigrator {
         int attempt;
         for (attempt = 1;; attempt++) {
             try {
+                // TODO(tal): send also content type from resource properties. Make sure
+                // repository does not overide it.
                 getCnxClient().uploadFileToBlobStore(blobEntry, resourceFile);
                 message("Resource blob uploaded: %s", resourceId);
                 // TODO(tal): verify resource by comparing its size and md5

@@ -86,9 +86,10 @@ public class ModuleMigrator extends ItemMigrator {
             final int directoryVersionNum = Integer.parseInt(versionDirectory.getName());
             checkArgument(directoryVersionNum >= nextVersionNum, "%s", versionDirectory);
 
-            // If needed create gap versions
+            // If needed, create gap versions
             while (directoryVersionNum > nextVersionNum) {
                 MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
+                getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", 1);
                 // TODO(tal): create gaps as explicit taken down version.
                 Log.message("** Creating gap module version: %s/%s", cnxModuleId, nextVersionNum);
                 migrateNextModuleVersion(atompubEntry, nextVersionNum, versionDirectory);
@@ -168,7 +169,7 @@ public class ModuleMigrator extends ItemMigrator {
             try {
                 // TODO(tal): *** implement module version mapping from major.minor to number
                 // in the xml file
-                final String cnxml = versionDirectory.readXmlFile("cnxml.xml");
+                final String cnxml = versionDirectory.readXmlFile("index.cnxml");
 
                 // TODO(tal): upload resource map from property file
                 getCnxClient().createNewModuleVersion(atompubEntry, cnxml, resourceMapXml);
@@ -203,7 +204,7 @@ public class ModuleMigrator extends ItemMigrator {
      * so it does not use atompub entires, etc and and share logic with this one.
      */
     private String readAndConstructResourceMapXML(Directory versionDirectory) {
-        final Properties resourceMap = versionDirectory.readPropertiesFile("resources.txt");
+        final Properties resourceMap = versionDirectory.readPropertiesFile("resources");
         try {
             ObjectFactory objectFactory = new ObjectFactory();
             Resources resources = objectFactory.createResources();

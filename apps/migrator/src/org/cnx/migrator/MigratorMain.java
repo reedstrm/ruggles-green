@@ -32,7 +32,8 @@ public class MigratorMain {
             migrator.migrateAll();
             Log.message("All done OK");
         } catch (Throwable e) {
-            Log.message("Program failed", e);
+            Log.printStackTrace(e);
+            Log.message("Program failed");
         }
     }
 }

@@ -16,7 +16,10 @@
 package org.cnx.migrator.context;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+
+import java.util.regex.Pattern;
 
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -29,9 +32,6 @@ import org.kohsuke.args4j.Option;
  * @author tal
  */
 public class MigratorConfiguration {
-
-    private static final int MIN_SHARD = 0;
-    private static final int MAX_SHARD = 999;
 
     // e.g. "http://localhost:8888/atompub"
     // e.g. http://qa-cnx-repo.appspot.com/atompub
@@ -76,11 +76,13 @@ public class MigratorConfiguration {
     @Option(name = "-collection_threads", usage = "Number of threads to use to migrate collections")
     private int collectionThreads = 500;
 
-    @Option(name = "-min_shard", usage = "Min shard number to migrate.")
-    private int minShardToMigrate = 0;
+    // TODO(tal): consider to add a seperate filter for user shards.
+    // e.g. "001", [0-3]??", "[a-d]?"
+    @Option(name = "-shard_filter", usage = "Filter for shard directory names to process")
+    private String shardFilter = ".*";
 
-    @Option(name = "-max_shard", usage = "Max shard number to migrate.")
-    private int maxShardToMigrate = 999;
+    /** Compiled from -shard_filter */
+    private Pattern shardFilterPattern;
 
     public MigratorConfiguration(String args[]) {
         CmdLineParser parser = new CmdLineParser(this);
@@ -93,6 +95,7 @@ public class MigratorConfiguration {
                     "Missing required command line arg: -repository_atompub_url");
             checkArgument(maxAttempts > 0, "-max_tries should be at least 1");
             // TODO(tal): add sanity checks for the rest of the args
+            shardFilterPattern = Pattern.compile(shardFilter);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -121,10 +124,6 @@ public class MigratorConfiguration {
 
     public int getRampUpTimeSecs() {
         return rampUpTimeSecs;
-    }
-
-    protected void setRampUpTimeSecs(int rampUpTimeSecs) {
-        this.rampUpTimeSecs = rampUpTimeSecs;
     }
 
     public boolean isMigrateResources() {
@@ -187,17 +186,8 @@ public class MigratorConfiguration {
         return maxThreads;
     }
 
-    public int getMinShardToMigrate() {
-        return minShardToMigrate;
-    }
-
-    public int getMaxShardToMigrate() {
-        return maxShardToMigrate;
-    }
-
-    /** Test if the configurtion specifies migration of all shards. Used to generate warning. */
-    public boolean isMigratingAllShards() {
-        return (minShardToMigrate == MIN_SHARD) && (maxShardToMigrate == MAX_SHARD);
+    public Pattern getShardFilterPattern() {
+        return checkNotNull(shardFilterPattern);
     }
 
     @Override
@@ -226,8 +216,8 @@ public class MigratorConfiguration {
         sb.append(String.format("  max_threads .............. [%s]\n", getMaxThreads()));
         sb.append('\n');
 
-        sb.append(String.format("  min_shard ................ [%d]%s\n", minShardToMigrate, (minShardToMigrate == MIN_SHARD) ? "" : " (Partial!)"));
-        sb.append(String.format("  max_shard ................ [%s]%s\n", maxShardToMigrate, (maxShardToMigrate == MAX_SHARD) ? "" : " (Partial!)"));
+        sb.append(String.format("  shard_filter ............. [%s]%s\n", 
+                shardFilter, shardFilter.equals(".*") ? "" : " (Partial!)"));
         sb.append('\n');
         sb.append(String.format("  ramp_up_time_secs ........ [%d]\n", rampUpTimeSecs));
         sb.append(String.format("  max_attempts ............. [%s]\n", maxAttempts));

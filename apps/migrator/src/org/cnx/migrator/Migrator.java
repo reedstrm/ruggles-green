@@ -23,7 +23,6 @@ import org.cnx.migrator.context.MigratorConfiguration;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.DataRootDirectory;
 import org.cnx.migrator.io.Directory;
-import org.cnx.migrator.io.ShardedDirectory;
 import org.cnx.migrator.migrators.CollectionMigrator;
 import org.cnx.migrator.migrators.ItemMigrator;
 import org.cnx.migrator.migrators.ModuleMigrator;
@@ -116,11 +115,17 @@ public class Migrator {
         final Timer timer = new Timer();
         int resourceCount = 0;
         final MigratorConfiguration config = context.getConfig();
-        final ShardedDirectory resources = root.getResourcesRoot();
-        Log.message("Reosources root directory: %s", resources);
+        final Directory resourcesDirectory = root.getResourcesRoot();
+        Log.message("Reosources root directory: %s", resourcesDirectory);
         // Iterate resource shards
-        for (Directory shard : resources.getShards(config.getMinShardToMigrate(), config.getMaxShardToMigrate())) {
+        for (Directory shard : resourcesDirectory.getSubDirectories()) {
+            if (!config.getShardFilterPattern().matcher(shard.getName()).matches()) {
+                Log.message("Resources shard excluded by shard filter: %s", shard);
+                context.incrementCounter("RESOURCE_SHARDS_IGNORED", 1);
+                continue;
+            }
             Log.message("Processing resources in shard: %s", shard);
+            context.incrementCounter("RESOURCE_SHARDS_PROCESSED", 1);
             // Iterated resources in current shard
             for (Directory resourceDirectory : shard.getSubDirectories()) {
                 final ItemMigrator migrator =
@@ -138,11 +143,17 @@ public class Migrator {
         final Timer timer = new Timer();
         int moduleCount = 0;
         final MigratorConfiguration config = context.getConfig();
-        final ShardedDirectory modules = root.getModulesRoot();
-        Log.message("Modules root directory: %s", modules);
+        final Directory modulesDirectory = root.getModulesRoot();
+        Log.message("Modules root directory: %s", modulesDirectory);
         // Iterate module shards
-        for (Directory shard : modules.getShards(config.getMinShardToMigrate(), config.getMaxShardToMigrate())) {
+        for (Directory shard : modulesDirectory.getSubDirectories()) {
+            if (!config.getShardFilterPattern().matcher(shard.getName()).matches()) {
+                Log.message("Module shard excluded by shard filter: %s", shard);
+                context.incrementCounter("SHARD_SHARDS_IGNORED", 1);
+                continue;
+            }
             Log.message("Processing modules in shard: %s", shard);
+            context.incrementCounter("MODULE_SHARDS_PROCESSED", 1);
             // Iterated modules in current shard
             for (Directory moduleDirectory : shard.getSubDirectories()) {
                 final ItemMigrator migrator =
@@ -160,11 +171,17 @@ public class Migrator {
         final Timer timer = new Timer();
         int collectionCount = 0;
         final MigratorConfiguration config = context.getConfig();
-        final ShardedDirectory collections = root.getCollectionsRoot();
-        Log.message("Collections root directory: %s", collections);
+        final Directory collectionsDirectory = root.getCollectionsRoot();
+        Log.message("Collections root directory: %s", collectionsDirectory);
         // Iterate collection shards
-        for (Directory shard : collections.getShards(config.getMinShardToMigrate(), config.getMaxShardToMigrate())) {
+        for (Directory shard : collectionsDirectory.getSubDirectories()) {
+            if (!config.getShardFilterPattern().matcher(shard.getName()).matches()) {
+                Log.message("Collection shard excluded by shard filter: %s", shard);
+                context.incrementCounter("COLLECTION_SHARDS_IGNORED", 1);
+                continue;
+            }
             Log.message("Processing collections in shard: %s", shard);
+            context.incrementCounter("COLLECTION_SHARDS_PROCESSED", 1);
             // Iterated collections in current shard
             for (Directory collectionDirectory : shard.getSubDirectories()) {
                 final ItemMigrator migrator =

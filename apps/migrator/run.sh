@@ -3,7 +3,8 @@
 # A temp shell script to run the migrator
 
 # TODO(tal): allow to override with command line flags
-DATA_ROOT_DIR="/aux/cnx/data"
+#DATA_ROOT_DIR="/aux/cnx/fake_data"
+DATA_ROOT_DIR="/aux/cnx/data_001"
 
 #REPOSITORY_ATOMPUB_URL="http://localhost:8888/atompub"
 REPOSITORY_ATOMPUB_URL="http://qa-cnx-repo.appspot.com/atompub"
@@ -18,13 +19,12 @@ done
 
 time java  \
   -Xms100m \
-  -Xmx1000m \
+  -Xmx4000m \
   -Xss128k \
   -cp ${cp} \
   org.cnx.migrator.MigratorMain \
   -data_root_dir ${DATA_ROOT_DIR} \
   -repository_atompub_url ${REPOSITORY_ATOMPUB_URL} \
-  -min_shard 0 \
-  -max_shard 999 \
+  -shard_filter ".*" \
   -migrate_all
 

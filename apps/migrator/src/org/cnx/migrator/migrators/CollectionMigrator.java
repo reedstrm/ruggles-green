@@ -62,19 +62,32 @@ public class CollectionMigrator extends ItemMigrator {
 
         ClientEntry atompubEntry = createCollection();
 
+        int nextVersionNum = 1;
+
         // NOTE(tal): Version directories have sequential numeric names starting from 1 and
         // their lexicographic order preserves the numeric order using zero padding.
         final ImmutableList<Directory> versionDirectories = collectionDirectory.getSubDirectories();
+        // TODO(tal): decide what we want to do with these collections, if any
+        checkArgument(versionDirectories.size() > 0, "Collection has no versions: %s", collectionDirectory);
 
-        for (int versionNum = 1; versionNum <= versionDirectories.size(); versionNum++) {
+        for (Directory versionDirectory : versionDirectories) {
+            final int directoryVersionNum = Integer.parseInt(versionDirectory.getName());
+            checkArgument(directoryVersionNum >= nextVersionNum, "%s", versionDirectory);
+
+            // If needed, create gap versions
+            while (directoryVersionNum > nextVersionNum) {
+                getContext().incrementCounter("COLLECTION_VERSION_TAKEDOWNS", 1);
+                MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
+                // TODO(tal): create gaps as explicit taken down version.
+                Log.message("** Creating gap collection version: %s/%s", cnxCollectionId, nextVersionNum);
+                migrateNextCollectionVersion(atompubEntry, nextVersionNum, versionDirectory);
+                nextVersionNum++;
+            }
+
+            // Create the actual version
             MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
-
-            final Directory versionDirectory = versionDirectories.get(versionNum - 1); // zero based
-            final int directoryAsNum = Integer.parseInt(versionDirectory.getName());
-            checkArgument(directoryAsNum == versionNum, "Version directory name mismatch: %s",
-                    versionDirectory);
-            // NOTE(tal): modifies atompubEntry to point to next version.
-            migrateNextCollectionVersion(atompubEntry, versionNum, versionDirectory);
+            migrateNextCollectionVersion(atompubEntry, nextVersionNum, versionDirectory);
+            nextVersionNum++;
         }
     }
 
@@ -114,6 +127,7 @@ public class CollectionMigrator extends ItemMigrator {
                     throw new RuntimeException(String.format("Failed after %d attempts: %s",
                             attempt, cnxCollectionId), e);
                 }
+                Log.printStackTrace(e);
                 Log.message("**** Attempt %d failed to write collection %s. Will retry", attempt,
                         cnxCollectionId);
                 MigratorUtil.sleep(getConfig().getFailureDelayMillis());
@@ -141,7 +155,7 @@ public class CollectionMigrator extends ItemMigrator {
             try {
                 // TODO(tal): *** implement module version mapping from major.minor to number
                 // in the xml file
-                final String colxml = versionDirectory.readXmlFile("colxml.xml");
+                final String colxml = versionDirectory.readXmlFile("collection.xml");
 
                 getCnxClient().createNewCollectionVersion(atompubEntry, colxml);
                 checkAtombuyEntryId(cnxCollectionId, versionNum, atompubEntry);

@@ -28,15 +28,15 @@ public class DataRootDirectory extends Directory {
         super(dir);
     }
 
-    public ShardedDirectory getResourcesRoot() {
-        return new ShardedDirectory(new File(getUnderlyingDirectory(), "resources"));
+    public Directory getResourcesRoot() {
+        return subDirectory("resources");
     }
 
-    public ShardedDirectory getModulesRoot() {
-        return new ShardedDirectory(new File(getUnderlyingDirectory(), "modules"));
+    public Directory getModulesRoot() {
+        return subDirectory("modules");
     }
 
-    public ShardedDirectory getCollectionsRoot() {
-        return new ShardedDirectory(new File(getUnderlyingDirectory(), "collections"));
+    public Directory getCollectionsRoot() {
+        return subDirectory("collections");
     }
 }

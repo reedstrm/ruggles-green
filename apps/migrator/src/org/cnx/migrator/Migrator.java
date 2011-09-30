@@ -103,9 +103,6 @@ public class Migrator {
         }
 
         context.addSummaryMessage("Migration completed in %s", timer);
-        if (!context.getConfig().isMigratingAllShards()) {
-            context.addSummaryMessage("WARNING: some shards were excluded.");
-        }
 
         Log.message("\n%s", context);
     }

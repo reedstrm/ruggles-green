@@ -92,15 +92,11 @@ public class VersionWrapper {
             return true;
         }
 
-        if (version.startsWith("0")) {
-            return false;
-        }
-
         try {
 
             long versionLong = Long.parseLong(version);
 
-            if (versionLong > 0) {
+            if (versionLong >= 0) {
                 return true;
             }
 

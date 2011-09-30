@@ -31,16 +31,29 @@ public class ServletUris {
     public static final String COLLECTION_ID_PATH_PARAM = "collectionId";
     public static final String COLLECTION_VERSION_PATH_PARAM = "collectionVersion";
 
+    public static final String INFORMATION = "info";
     public static final String MIGRATION = "migration";
     public static final String XML_DOC = "xml";
     public static final String RESOURCE_MAPPING_DOC = "resources";
 
     public static class ServiceDocument {
+        /** Name for CNX Workspace under ServiceDocument. */
+        public static final String CNX_WORKSPACE_TITLE = "CNXv2 Workspace";
+        
+        /**
+         * URI relative to for CnxAtomPub ServiceDocument Servlet relative to
+         * Jersey root package. It is defined in Application's web.xml file.
+         * 
+         * @deprecated use {@link #SERVICE_DOCUMENT_SERVLET2}
+         */
+        @Deprecated
+        public static final String SERVICE_DOCUMENT_SERVLET = "/service_document";
+        
         /**
          * URI relative to for CnxAtomPub ServiceDocument Servlet relative to
          * Jersey root package. It is defined in Application's web.xml file.
          */
-        public static final String SERVICE_DOCUMENT_SERVLET = "/service_document";
+        public static final String SERVICE_DOCUMENT_SERVLET2 = "/service_document2";
 
         /**
          * URI relative to : {@value #SERVICE_DOCUMENT_SERVLET}.
@@ -95,6 +108,13 @@ public class ServletUris {
          * In order to fetch the resource, clients should do HTTP Get on this URI.
          */
         public static final String RESOURCE_PATH = "/{" + RESOURCE_ID_PATH_PARAM + "}";
+        
+        /**
+         * URI relative to : {@link #RESOURCE_SERVLET}
+         * 
+         * In order to fetch resource-information, clients should to HTTP Get on this URI.
+         */
+        public static final String RESOURCE_INFO = RESOURCE_PATH + "/" + INFORMATION;
     }
 
     public static class Module {

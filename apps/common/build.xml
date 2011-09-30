@@ -43,6 +43,11 @@
              target="default"
              dir="${third_party}" />
 
+      <ant antfile="jaxb/build.xml"
+           inheritAll="true"
+           target="default"
+           dir="${third_party}" />
+
         <ant antfile="jersey/build.xml"
              inheritAll="true"
              target="default"

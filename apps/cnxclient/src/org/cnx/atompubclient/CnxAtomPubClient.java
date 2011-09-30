@@ -53,6 +53,7 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.common.exceptions.CnxConflictException;
 import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.atompub.CnxAtomPubCollectionEnum;
 import org.cnx.common.repository.atompub.CnxAtomPubConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
@@ -149,21 +150,21 @@ public class CnxAtomPubClient {
      * Get AtomPub collection for CNX Resources.
      */
     public ClientCollection getCollectionResource() {
-        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_RESOURCE_TITLE);
+        return getCollectionByTitle(CnxAtomPubCollectionEnum.APC_RESOURCES.getTitle());
     }
 
     /**
      * Get AtomPub collection for CNX Modules.
      */
     public ClientCollection getCollectionModule() {
-        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_MODULE_TITLE);
+        return getCollectionByTitle(CnxAtomPubCollectionEnum.APC_MODULE.getTitle());
     }
 
     /**
      * Get AtomPub collection for CNX Collections.
      */
     public ClientCollection getCollectionCnxCollection() {
-        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_CNX_COLLECTION_TITLE);
+        return getCollectionByTitle(CnxAtomPubCollectionEnum.APC_COLLECTION.getTitle());
     }
 
     /**

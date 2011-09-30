@@ -15,109 +15,133 @@
 -->
 
 <project name="xmls" default="jar">
-    <!-- TODO(arjuns) : Move this to a separate directory. -->
-    <description> Contains RelaxNG definitions for Connexions Repository. </description>
-    <property file="local.properties" />
-    <property file="build.properties" />
+  <!-- TODO(arjuns) : Move this to a separate directory. -->
+  <echo message="Basedir = ${basedir}" />
+  <description> Contains RelaxNG definitions for Connexions Repository. </description>
+  <property file="local.properties" />
+  <property file="build.properties" />
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
-    <property name="target_dir" value="${basedir}/${output.jars}" />
+  <property name="target_dir" value="${basedir}/${output.jars}" />
 
-    <target name="rng2xsd2java" description="This target compiles rng to xsd">
-        <mkdir dir="${gen.resources}" />
-        <!-- Convert rng to xsd. -->
-        <if>
-            <available file="${gen.resources}/resource-mapping.xsd" />
-            <then>
-                <echo message="WARNING : ${gen.resources}/resource-mapping.xsd already exists." />
-            </then>
-            <else>
-                <java jar="${trangjarpath}" fork="true" failonerror="true">
-                    <arg line="-I rng ${rngs.dir}/resource-mapping.rng.xml ${gen.resources}/resource-mapping.xsd" />
-                </java>
+  <target name="rng2xsd2java" description="This target compiles rng to xsd">
+    <mkdir dir="${gen.resources}" />
 
-                <!-- Compiling xsd to java classes. -->
-                <mkdir dir="${gen.java.files}" />
-                <java jar="${basedir}/${third_party}/jaxb/jaxb-ri-20090708/lib/jaxb-xjc.jar"
-                      fork="true"
-                      failonerror="true">
-                    <arg line="-verbose -d ${gen.java.files} -p 
-                        org.cnx.resourcemapping ${gen.resources}/resource-mapping.xsd" />
-                </java>
-            </else>
-        </if>
+    <echo message="Converting rng to xsd for resource-mapping." />
+    <if>
+      <available file="${gen.resources}/${resource.mapping.xsd}" />
+      <then>
+        <echo message="WARNING : ${gen.resources}/${resource.mapping.xsd} already exists." />
+      </then>
+      <else>
+        <java jar="${trang.jar.path}" fork="true" failonerror="true">
+          <arg line="-I rng ${rngs.dir}/${resource.mapping.rng} ${gen.resources}/${resource.mapping.xsd}" />
+        </java>
 
-        <if>
-            <available file="${gen.resources}/atompub-resource-entry.xsd" />
-            <then>
-                <echo message="WARNING : ${gen.resources}/atompub-resource-entry.xsd already exists." />
-            </then>
-            <else>
-                <java jar="${trangjarpath}" fork="true" failonerror="true">
-                    <arg line="-I rng ${rngs.dir}/atompub-resource-entry.rng.xml ${gen.resources}/atompub-resource-entry.xsd" />
-                </java>
+        <mkdir dir="${gen.java.files}" />
+        <java jar="${basedir}/${third_party}/${jaxb.jar.path}" fork="true" failonerror="true">
+          <arg line="-verbose -d ${gen.java.files} -p 
+                        org.cnx.resourcemapping ${gen.resources}/${resource.mapping.xsd}" />
+        </java>
+      </else>
+    </if>
 
-                <mkdir dir="${gen.java.files}" />
-                <!-- Compiling xsd to java classes. -->
-                <java jar="${basedir}/${third_party}/jaxb/jaxb-ri-20090708/lib/jaxb-xjc.jar"
-                      fork="true"
-                      failonerror="true">
-                    <arg line="-verbose -d ${gen.java.files} -p 
-                     org.cnx.resourceentry ${gen.resources}/atompub-resource-entry.xsd" />
-                </java>
-            </else>
-        </if>
-    </target>
+    <echo message="Converting rng to xsd for atompub-category-document." />
+    <if>
 
-    <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
-    <target name="compile"
-            description="Compile the application servlet code"
-            depends="rng2xsd2java">
-        <mkdir dir="${classdir}" />
-        <mkdir dir="${output.jars}" />
+      <available file="${gen.resources}/${category.document.xsd}" />
+      <then>
+        <echo message="WARNING : ${gen.resources}/${category.document.xsd} already exists." />
+      </then>
+      <else>
+        <java jar="${trang.jar.path}" fork="true" failonerror="true">
+          <arg line="-I rnc ${rngs.dir}/${category.document.rng} ${gen.resources}/${category.document.xsd}" />
+        </java>
 
-        <javac srcdir="${gen.java.files}"
-               destdir="${classdir}"
-               includeantruntime="false"
-               debug="on">
-            <compilerarg line="${javac.flags}" />
-            <classpath>
-                <resources refid="depend_lib" />
-            </classpath>
-        </javac>
-    </target>
+        <mkdir dir="${gen.java.files}" />
+        <java jar="${basedir}/${third_party}/${jaxb.jar.path}" fork="true" failonerror="true">
+          <arg line="-verbose -d ${gen.java.files} -p 
+                      org.cnx.categorydocument ${gen.resources}/${category.document.xsd}" />
+        </java>
+      </else>
+    </if>
 
-    <target name="clean" description="Force a clean slate to rebuild">
-        <delete dir="${buildir}" />
-    </target>
+    <echo message="Converting rng to xsd for atompub-service-document." />
+    <if>
 
-    <tstamp>
-        <format property="timenow" pattern="ddMMyyyyHHmm" />
-    </tstamp>
+      <available file="${gen.resources}/${service.document.xsd}" />
+      <then>
+        <echo message="WARNING : ${gen.resources}/${service.document.xsd} already exists." />
+      </then>
+      <else>
+        <java jar="${trang.jar.path}" fork="true" failonerror="true">
+          <arg line="-I rnc ${rngs.dir}/${service.document.rng} ${gen.resources}/${service.document.xsd}" />
+        </java>
 
-    <property name="client-jar-name" value="org.cnx.xmlschema" />
-    <property name="dest-client-jar"
-              value="${libdir}/${client-jar-name}.${timenow}.jar" />
+        <mkdir dir="${gen.java.files}" />
+        <java jar="${basedir}/${third_party}/${jaxb.jar.path}" fork="true" failonerror="true">
+          <arg line="-verbose -d ${gen.java.files} -p 
+                      org.cnx.servicedocument ${gen.resources}/${service.document.xsd}" />
+        </java>
+      </else>
+    </if>
 
-    <target name="jar"
-            description="Build jar for resourcemapping classes."
-            depends="compile">
-        <jar destfile="${dest-client-jar}">
-            <fileset dir="${classdir}" />
-            <fileset dir="${gen.java.files}" />
-        </jar>
-    </target>
+    <echo message="Converting rng to xsd for atompub-resource-entry." />
+    <if>
+      <available file="${gen.resources}/${resource.entry.xsd}" />
+      <then>
+        <echo message="WARNING : ${gen.resources}/${resource.entry.xsd} already exists." />
+      </then>
+      <else>
+        <java jar="${trang.jar.path}" fork="true" failonerror="true">
+          <arg line="-I rng ${rngs.dir}/${resource.entry.rng} ${gen.resources}/${resource.entry.xsd}" />
+        </java>
 
-    <!--TODO(arjuns) : Add timestamp inside Manifest for jars. -->
-    <target name="copyjar"
-            description="Copy jar to calling Build file."
-            depends="jar">
-        <copy file="${dest-client-jar}"
-              tofile="${target_dir}/${client-jar-name}.latest.jar" />
-    </target>
+        <mkdir dir="${gen.java.files}" />
+        <java jar="${basedir}/${third_party}/${jaxb.jar.path}" fork="true" failonerror="true">
+          <arg line="-verbose -d ${gen.java.files} -p 
+                     org.cnx.resourceentry ${gen.resources}/${resource.entry.xsd}" />
+        </java>
+      </else>
+    </if>
+  </target>
 
-    <target name="all"
-            description="Refers to all the targets in this file other then test."
-            depends="compile" />
+  <fileset id="depend_lib" dir="${output.jars}" includes="*.jar" />
+  <target name="compile" description="Compile the application servlet code" depends="rng2xsd2java">
+    <mkdir dir="${classdir}" />
+    <mkdir dir="${output.jars}" />
+
+    <javac srcdir="${gen.java.files}" destdir="${classdir}" includeantruntime="false" debug="on">
+      <compilerarg line="${javac.flags}" />
+      <classpath>
+        <resources refid="depend_lib" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="clean" description="Force a clean slate to rebuild">
+    <delete dir="${buildir}" />
+  </target>
+
+  <tstamp>
+    <format property="timenow" pattern="ddMMyyyyHHmm" />
+  </tstamp>
+
+  <property name="client-jar-name" value="org.cnx.xmlschema" />
+  <property name="dest-client-jar" value="${libdir}/${client-jar-name}.${timenow}.jar" />
+
+  <target name="jar" description="Build jar for resourcemapping classes." depends="compile">
+    <jar destfile="${dest-client-jar}">
+      <fileset dir="${classdir}" />
+      <fileset dir="${gen.java.files}" />
+    </jar>
+  </target>
+
+  <!--TODO(arjuns) : Add timestamp inside Manifest for jars. -->
+  <target name="copyjar" description="Copy jar to calling Build file." depends="jar">
+    <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar" />
+  </target>
+
+  <target name="all" description="Refers to all the targets in this file other then test." depends="compile" />
 </project>

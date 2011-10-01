@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
@@ -46,7 +46,7 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
     }
 
     @Before
-    public void initialize() throws MalformedURLException, ProponoException {
+    public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
     }
 
@@ -73,7 +73,7 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
 
         IdWrapper aerModuleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
 
-        VersionWrapper firstVersion = CnxAtomPubUtils.NEW_MODULE_DEFAULT_VERSION;
+        VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
         // Now publishing second version.
         ParallelModuleMigrator migrator2 =
             new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, null /* collXmlModuleId */,

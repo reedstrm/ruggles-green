@@ -21,9 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.atompubclient.CnxClientUtils;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
@@ -46,7 +46,7 @@ public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
     }
 
     @Before
-    public void initialize() throws MalformedURLException, ProponoException {
+    public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
     }
 
@@ -56,14 +56,13 @@ public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
                 new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
 
         ClientEntry createResourceEntry = resourceMigrator.migrateResource();
-        createResourceEntry.getEditURI();
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
         String expectedResourceUrl =
                 getConstants().getResourceAbsPath(
                         new IdWrapper(resourceId, IdWrapper.Type.RESOURCE)).toString();
-        assertEquals(expectedResourceUrl, CnxClientUtils.getSelfUri(createResourceEntry)
+        assertEquals(expectedResourceUrl, CnxAtomPubLinkRelations.getSelfUri(createResourceEntry)
                 .getHrefResolved());
     }
 }

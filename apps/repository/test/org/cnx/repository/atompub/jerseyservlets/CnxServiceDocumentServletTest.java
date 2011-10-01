@@ -27,8 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +36,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
+@Deprecated
 public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     private CnxAtomPubClient cnxClient;
 
@@ -54,8 +53,7 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     public void testCnxServiceDocument() {
         ClientWorkspace workspace = cnxClient.getWorkspace();
         assertEquals(3, workspace.getCollections().size());
-        assertEquals(CnxAtomPubUtils.CNX_WORKSPACE_TITLE, workspace.getTitle());
-        assertEquals(CnxMediaTypes.TEXT_XML_UTF8, workspace.getTitleType());
+        assertEquals(ServletUris.ServiceDocument.CNX_WORKSPACE_TITLE, workspace.getTitle());
 
         // Now validate each collection individually.
         validateCollection(cnxClient.getCollectionResource(),

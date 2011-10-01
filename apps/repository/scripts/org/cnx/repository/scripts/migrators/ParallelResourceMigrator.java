@@ -16,14 +16,11 @@
 package org.cnx.repository.scripts.migrators;
 
 import com.google.common.base.Throwables;
-
 import com.sun.syndication.propono.atom.client.ClientEntry;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.atompubclient.CnxClientUtils;
-
 import java.io.File;
 import java.util.logging.Logger;
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 
 /**
  * Migrator for a resource.
@@ -64,7 +61,7 @@ public class ParallelResourceMigrator implements Runnable {
                 resourceEntry = cnxClient.createNewResource();
                 cnxClient.uploadFileToBlobStore(resourceEntry, file);
                 success = true;
-                String resourceUrl = CnxClientUtils.getSelfUri(resourceEntry).getHrefResolved();
+                String resourceUrl = CnxAtomPubLinkRelations.getSelfUri(resourceEntry).getHrefResolved();
                 logger.info("Successfully uploaded : " + resourceLocation + " to : " + resourceUrl);
                 return resourceEntry;
             } catch (Exception e) {

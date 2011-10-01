@@ -23,12 +23,11 @@ import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.List;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.atompubclient.CnxClientUtils;
 import org.cnx.common.exceptions.CnxConflictException;
-import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,18 +37,19 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
+@Deprecated
 public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
     private CnxAtomPubClient cnxClient;
 
     // TODO(arjuns) : Create file dynamically.
-    private final File file = new File("/home/arjuns/test_file.txt");
+    private final File file = new File("/home/arjuns/testdata/resources/jsr173_1.0_api.jar");
 
     public CnxAtomResourceServletTest() throws Exception {
         super();
     }
 
     @Before
-    public void initialize() throws MalformedURLException, ProponoException {
+    public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
     }
 
@@ -63,7 +63,7 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
         String expectedResourceUrl =
                 getConstants().getResourceAbsPath(
                         new IdWrapper(resourceId, IdWrapper.Type.RESOURCE)).toString();
-        assertEquals(expectedResourceUrl, CnxClientUtils.getSelfUri(createResourceEntry)
+        assertEquals(expectedResourceUrl, CnxAtomPubLinkRelations.getSelfUri(createResourceEntry)
                 .getHrefResolved());
 
         /*
@@ -75,12 +75,12 @@ public class CnxAtomResourceServletTest extends CnxAtomPubBasetest {
         assertEquals(2, listOfLinks.size());
 
         Link selfLink = listOfLinks.get(0);
-        assertEquals(CnxAtomPubUtils.REL_TAG_FOR_SELF_URL, selfLink.getRel());
+        assertEquals(CnxAtomPubLinkRelations.SELF.getLinkRelation(), selfLink.getRel());
         assertEquals(expectedResourceUrl, selfLink.getHref());
 
-        Link blobStoreLink = listOfLinks.get(1);
-        assertEquals(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL, blobStoreLink.getRel());
-        assertNotNull(blobStoreLink.getHref());
+        Link uploadLink = listOfLinks.get(1);
+        assertEquals(CnxAtomPubLinkRelations.UPLOAD_URL.getLinkRelation(), uploadLink.getRel());
+        assertNotNull(uploadLink.getHref());
 
         // Now upload blob to AppEngine.
         cnxClient.uploadFileToBlobStore(createResourceEntry, file);

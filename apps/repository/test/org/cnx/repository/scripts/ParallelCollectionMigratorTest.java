@@ -18,10 +18,12 @@ package org.cnx.repository.scripts;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+import javax.xml.bind.JAXBException;
+
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-import java.net.MalformedURLException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
@@ -46,7 +48,7 @@ public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
     }
 
     @Before
-    public void initialize() throws MalformedURLException, ProponoException {
+    public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
     }
 
@@ -60,7 +62,7 @@ public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
         Entry collectionEntry = migrator.migrateCollectionVersion();
         assertNotNull(collectionEntry);
 
-        assertEquals(CnxAtomPubUtils.NEW_CNX_COLLECTION_DEFAULT_VERSION,
+        assertEquals(CnxAtomPubUtils.DEFAULT_EDIT_VERSION,
                 CnxAtomPubUtils.getVersionFromAtomPubId(collectionEntry.getId()));
     }
 
@@ -77,7 +79,7 @@ public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
         IdWrapper aerCollectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
 
         // TODO(arjuns) : Rename to NEW_COLLECTION_DEFAULT_VERSION
-        VersionWrapper firstVersion = CnxAtomPubUtils.NEW_CNX_COLLECTION_DEFAULT_VERSION;
+        VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
         // Now publishing second version.
         ParallelCollectionMigrator migrator2 =
                 new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION,

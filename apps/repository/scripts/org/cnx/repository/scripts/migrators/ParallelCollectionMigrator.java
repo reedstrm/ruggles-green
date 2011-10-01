@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.common.exceptions.CnxRuntimeException;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -84,7 +85,7 @@ public class ParallelCollectionMigrator implements Runnable {
         List<Link> otherLinks = entry.getOtherLinks();
 
         for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubUtils.REL_TAG_FOR_SELF_URL)) {
+            if (currLink.getRel().equals(CnxAtomPubLinkRelations.SELF.getLinkRelation())) {
                 return currLink;
             }
         }
@@ -158,8 +159,7 @@ public class ParallelCollectionMigrator implements Runnable {
 
             for (String cnxModuleId : mapOfModuleIdToNewModuleEntry.keySet()) {
                 Entry newModuleEntry = mapOfModuleIdToNewModuleEntry.get(cnxModuleId);
-                IdWrapper aerModuleId =
-                        CnxAtomPubUtils.getIdFromAtomPubId(newModuleEntry.getId());
+                IdWrapper aerModuleId = CnxAtomPubUtils.getIdFromAtomPubId(newModuleEntry.getId());
                 String oldString = "\"" + cnxModuleId + "\"";
                 String newString = "\"" + aerModuleId.getId() + "\"";
                 collXmlAsString = collXmlAsString.replaceAll(oldString, newString);
@@ -208,7 +208,7 @@ public class ParallelCollectionMigrator implements Runnable {
             collectionVersionEntry = publishNewVersion(entryToUpdate, collXmlAsString);
             success = true;
             logger.info("Successfully uploaded Collection : " + collectionLocation + " to : "
-                    + collectionVersionEntry.getEditURI());
+                    + CnxAtomPubLinkRelations.getEditUri(collectionVersionEntry).getHrefResolved());
             return collectionVersionEntry;
         } catch (Exception e) {
             throw new RuntimeException(e);

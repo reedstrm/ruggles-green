@@ -71,7 +71,7 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_POST_NEW}, then this
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_POST_NEW}, then this
      * method is invoked.
      * 
      * This method in turn sends request to {@link CnxRepositoryService#createCollection}.
@@ -94,7 +94,7 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_POST_MIGRATION}, then
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_POST_MIGRATION}, then
      * this method is invoked.
      * 
      * This is a special function provided in order to allow migration and retaining of old
@@ -132,14 +132,16 @@ public class CnxAtomCollectionServlet {
             CreateCollectionResult result = createdCollection.getResult();
             Entry entry = new Entry();
 
-            VersionWrapper firstVersion = CnxAtomPubUtils.NEW_CNX_COLLECTION_DEFAULT_VERSION;
 
+            
             IdWrapper repoIdWrapper = new IdWrapper(result.getCollectionId(), IdWrapper.Type.COLLECTION);
+            VersionWrapper version = CnxAtomPubUtils.DEFAULT_VERSION;
 
             String atomPubId =
-                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, firstVersion);
+                    CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, version);
             entry.setId(atomPubId);
 
+            VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
             URL editUrl =
                     atomPubService.getConstants().getCollectionVersionAbsPath(repoIdWrapper,
                             firstVersion);
@@ -155,7 +157,7 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-PUT on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
      * method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#addCollectionVersion}.
@@ -223,7 +225,7 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
      * method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#getCollectionVersion}.
@@ -285,7 +287,7 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML}, then
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML}, then
      * this method is invoked.
      * 
      * This method is used to fetch CNXML.

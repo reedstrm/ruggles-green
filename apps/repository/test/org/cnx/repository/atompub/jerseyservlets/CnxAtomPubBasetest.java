@@ -19,7 +19,7 @@ import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import org.cnx.common.repository.atompub.CnxAtomPubConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
@@ -29,9 +29,9 @@ import org.cnx.common.repository.atompub.CnxAtomPubUtils;
  *
  * @author Arjun Satyapal
  */
+@Deprecated
 public abstract class CnxAtomPubBasetest extends JerseyTest {
     // TODO(arjuns) : Move this to parent folder.
-
     private final static String PACKAGE = "org.cnx.repository.atompub.jerseyservlets";
 
     private CnxAtomPubConstants constants;
@@ -54,7 +54,7 @@ public abstract class CnxAtomPubBasetest extends JerseyTest {
      * Remember that Port is binded once the construction phase is over. So derived classes want to
      * access URI created for CNX Server, they should not rely on constructor.
      */
-    public CnxAtomPubBasetest() throws MalformedURLException {
+    public CnxAtomPubBasetest() throws IOException {
         super(new WebAppDescriptor.Builder(PACKAGE).contextPath(
                 CnxAtomPubUtils.ATOMPUB_URL_PREFIX).build());
 
@@ -63,7 +63,7 @@ public abstract class CnxAtomPubBasetest extends JerseyTest {
         // TODO(arjuns) : Fix warning : Aug 14, 2011 6:55:43 AM
         // com.sun.syndication.propono.atom.client.ClientEntry addToCollection
         // WARNING: WARNING added entry, but no location header returned
-        cnxServerAtomPubUrl = new URL("http://qa-cnx-repo.appspot.com/atompub");
+        cnxServerAtomPubUrl = new URL("http://100.qa-cnx-repo.appspot.com/atompub");
         cnxServerAtomPubUrl =
             new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
 

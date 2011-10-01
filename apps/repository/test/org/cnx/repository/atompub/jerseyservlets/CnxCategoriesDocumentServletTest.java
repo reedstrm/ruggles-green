@@ -16,8 +16,6 @@
 package org.cnx.repository.atompub.jerseyservlets;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -28,9 +26,10 @@ import org.junit.Test;
  *
  * @author Arjun Satyapal
  */
+@Deprecated
 public class CnxCategoriesDocumentServletTest extends CnxAtomPubBasetest {
 
-    public CnxCategoriesDocumentServletTest() throws MalformedURLException {
+    public CnxCategoriesDocumentServletTest() throws IOException {
         super();
     }
 

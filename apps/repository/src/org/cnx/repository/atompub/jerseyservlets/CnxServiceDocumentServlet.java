@@ -31,9 +31,12 @@ import org.cnx.repository.atompub.utils.ServerUtil;
 /**
  * REST Resource for fetching ServiceDocument.
  * 
+ * @deprecated Use {@link CnxServiceDocumentServlet2}
+ * 
  * @author Arjun Satyapal
  */
 @Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET)
+@Deprecated
 public class CnxServiceDocumentServlet {
 
     @GET

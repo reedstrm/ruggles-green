@@ -26,6 +26,7 @@ import java.net.URL;
 import org.cnx.common.repository.atompub.CnxAtomPubConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.ServletUris;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -60,7 +61,9 @@ public class CnxAtomService extends AtomService {
          * For CNX repository, there is only one workspace. Each workspace will have three
          * AtomPubcollections : 1. Resources 2. Modules 3. Collections.
          */
-        workspace = new Workspace(CnxAtomPubUtils.CNX_WORKSPACE_TITLE, CnxMediaTypes.TEXT_XML_UTF8);
+        workspace =
+                new Workspace(ServletUris.ServiceDocument.CNX_WORKSPACE_TITLE,
+                        CnxMediaTypes.TEXT_XML_UTF8);
         getWorkspaces().add(workspace);
 
         workspace.addCollection(getCollectionForCnxResource(constants.getAPCResourceScheme()));

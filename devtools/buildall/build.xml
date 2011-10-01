@@ -19,6 +19,7 @@
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${xmlsdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${appscommondir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${cnxclientdir}" />
+        <ant antfile="build.xml" inheritAll="false" target="all" dir="${cnxclient2dir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${repositorydir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${webviewdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${migratordir}" />
@@ -39,6 +40,7 @@
         <ant antfile="build.xml" target="clean" dir="${xmlsdir}" />
         <ant antfile="build.xml" target="clean" dir="${appscommondir}" />
         <ant antfile="build.xml" target="clean" dir="${cnxclientdir}" />
+        <ant antfile="build.xml" target="clean" dir="${cnxclient2dir}" />
         <ant antfile="build.xml" target="clean" dir="${webviewdir}" />
         <ant antfile="build.xml" target="clean" dir="${repositorydir}" />
         <ant antfile="build.xml" target="clean" dir="${migratordir}" />

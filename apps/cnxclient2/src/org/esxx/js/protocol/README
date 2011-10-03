@@ -1,0 +1,7 @@
+Both GAEClientConnection.java and GAEConnectionManager.java are required
+to make Apache HTTP Client work on AppEngine.
+
+These files were downloaded from : 
+http://svn.berlios.de/viewvc/esxx/trunk/jee/org/esxx/js/protocol/
+
+Revision : 1087.

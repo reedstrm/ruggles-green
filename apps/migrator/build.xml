@@ -38,6 +38,26 @@
              target="default"
              dir="${third_party}" />
 
+        <ant antfile="commons-httpclient/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="commons-lang/build.xml"
+             inheritAll="true"
+             target="legacy-2.6"
+             dir="${third_party}" />
+
+        <ant antfile="commons-collections/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
+        <ant antfile="commons-configuration/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <ant antfile="args4j/build.xml"
              inheritAll="true"
              target="default"

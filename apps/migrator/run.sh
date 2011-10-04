@@ -11,17 +11,17 @@ REPOSITORY_ATOMPUB_URL="http://qa-cnx-repo.appspot.com/atompub"
 
 cd ~/cnx/apps/migrator
 
-cp=build/classes
+classpath=build/classes
 for jar in build/jars/*.jar
 do
-  cp=${cp}:${jar}
+  classpath=${classpath}:${jar}
 done
 
 time java  \
   -Xms100m \
   -Xmx4000m \
   -Xss128k \
-  -cp ${cp} \
+  -cp ${classpath} \
   org.cnx.migrator.MigratorMain \
   -data_root_dir ${DATA_ROOT_DIR} \
   -repository_atompub_url ${REPOSITORY_ATOMPUB_URL} \

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
+import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.cnx.migrator.util.MigratorUtil;
 
 import com.google.common.base.Charsets;
@@ -101,6 +102,17 @@ public class Directory {
             throw new RuntimeException(e);
         } finally {
             MigratorUtil.safeClose(in);
+        }
+    }
+
+    /** Return the content of an ini file within this directory */
+    public HierarchicalINIConfiguration readIniFile(String fileName) {
+        try {
+            final File file = subFile(fileName);
+            final HierarchicalINIConfiguration config = new HierarchicalINIConfiguration(file);
+            return config;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

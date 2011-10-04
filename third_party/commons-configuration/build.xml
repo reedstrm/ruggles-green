@@ -14,13 +14,12 @@
     limitations under the License.
 -->
 
-<project name="commons-lang" default="default">
+<project name="commons-configuration" default="default">
     <description>
-        Copies commons-lang jar to ${target_dir}.
+        Copies commons-configuration jar to ${target_dir}.
     </description>
 
-    <fileset id="commons-lang-3.0.1" dir="commons-lang/commons-lang-3.0.1" includes="*.jar" />
-    <fileset id="commons-lang-2.6" dir="commons-lang/commons-lang-2.6" includes="*.jar" />
+    <fileset id="commons-configuration-1.7" dir="commons-configuration/commons-configuration-1.7" includes="*.jar" />
 
     <target name="default">
         <fail message="Target path for jars is not set.">
@@ -34,24 +33,7 @@
         </fail>
 
         <copy todir="${target_dir}">
-            <fileset refid="commons-lang-3.0.1" />
-        </copy>
-    </target>
-
-    <!-- Legacy, requires for commons-confguration 1.7 -->
-    <target name="legacy-2.6">
-        <fail message="Target path for jars is not set.">
-            <condition>
-                <not>
-                    <and>
-                        <isset property="target_dir" />
-                    </and>
-                </not>
-            </condition>
-        </fail>
-
-        <copy todir="${target_dir}">
-            <fileset refid="commons-lang-2.6" />
+            <fileset refid="commons-configuration-1.7" />
         </copy>
     </target>
 </project>

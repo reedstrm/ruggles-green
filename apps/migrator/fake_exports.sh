@@ -1,79 +1,80 @@
 #!/bin/bash
 
-# A script to generate fake CNX  data for testing the migrator.
+# A script to generate fake CNX exports for a given set of
+# modules and collections in CNX migration data export format.
 
 # Root directory for generated data
 # TODO(tal): allow to override with command line flags
-ROOT="/aux/cnx/data"
+ROOT="/aux/cnx/data_001"
 
 # Number of fake items to generate
 # NOTE(tal): can have at most 99999 since we currently reserve repo ids [1-99999]
-RESOURCE_COUNT=99999
+#RESOURCE_COUNT=99999
 
-MODULE_COUNT=20000
-VERSIONS_PER_MODULE=5
+#MODULE_COUNT=20000
+#VERSIONS_PER_MODULE=5
 
-COLLECTIONS=1000
-VERSIONS_PER_COLLECTION=10
+#COLLECTIONS=1000
+#VERSIONS_PER_COLLECTION=10
 
 # Root directories by entity types
-RESOURCES_ROOT="${ROOT}/resources"
+#RESOURCES_ROOT="${ROOT}/resources"
 MODULES_ROOT="${ROOT}/modules"
 COLLECTIONS_ROOT="${ROOT}/collections"
 
 # Create shard directories under given directory
 #
 # $1 = parent directory of shards
-function create_shards {
-  local parent=$1
-  for ((i = 0; i < 1000; i += 1))
-  do
-    local shard_id=`printf "%03d" $i`
-    local shard_path="${parent}/${shard_id}"
-    echo "Creating shard directory: ${shard_path}"
-    mkdir "${shard_path}"
+#function create_shards {
+#  local parent=$1
+#  for ((i = 0; i < 1000; i += 1))
+#  do
+#    local shard_id=`printf "%03d" $i`
+#    local shard_path="${parent}/${shard_id}"
+#    echo "Creating shard directory: ${shard_path}"
+#    mkdir "${shard_path}"
+#  done
+#}
+
+
+function create_fake_export {
+  local export_path="$1"
+  local unit_size="$2"
+  local max_units="$3"
+  echo "  * Generating export ${export_path} :"
+  #local unit_size="1k"
+  #local unit_size="1M"
+  local unit_count="$[ ( $RANDOM % ${max_units}) + 1 ]"
+  echo "    resource size = ${unit_count} x ${unit_size}"
+  dd if=/dev/urandom of=${export_path} bs=${unit_size} count=${unit_count} 2>&1 | sed 's/^/    /'
+}
+
+function create_entity_fake_exports {
+  local entity_dir="$1"
+  local exports_dir="${entity_dir}/exports"
+  mkdir -p ${exports_dir}
+  create_fake_export ${exports_dir}/std_pdf.pdf   1k  1000
+  create_fake_export ${exports_dir}/std_epub.epub 1k  1000
+  create_fake_export ${exports_dir}/std_zip.zip   1k  1000
+}
+
+# Create fake resources for all modules and versions
+function create_modules_fake_exports {
+  local shards=`ls -d ${MODULES_ROOT}/00*`
+  for shard in ${shards}; do
+    echo "shard: ${shard}"
+    local module=`ls -d ${shard}/*`
+    for module in ${module}; do
+      echo "  module: ${module}"
+      local versions=`ls -d ${module}/*`
+      for version in ${versions}; do
+        echo "    version: ${version}"
+        create_entity_fake_exports ${version}
+      done
+    done
   done
 }
 
-
-# Create fake resources
-function create_fake_resources {
-  mkdir -p ${RESOURCES_ROOT}
-  create_shards ${RESOURCES_ROOT}
-
-  for ((i = 1; i <= ${RESOURCE_COUNT}; i += 1))
-  do
-    echo
-    local shard_num=`expr $i % 1000`
-    local shard_id=`printf "%03d" ${shard_num}`
-    local item_id=`printf "%06d" $i`
-    local item_path=${RESOURCES_ROOT}/${shard_id}/${item_id}
-    echo "  location = ${item_path}"
-    mkdir -p ${item_path}
-
-    # Create resource file
-    echo "  * Generating resource file:"
-    local unit_size="1k"
-    #local unit_size="1M"
-    local unit_count="$[ ( $RANDOM % 400 )  + 1 ]"
-    echo "    resource size = ${unit_count} x ${unit_size}"
-    local resource_file="${item_path}/resource"
-    dd if=/dev/urandom of=${resource_file} bs=${unit_size} count=${unit_count} 2>&1 | sed 's/^/    /'
-
-    # Create property file
-    echo
-    echo "  * Generating properties file:"
-    local resource_size=$(stat -c%s ${resource_file})
-    local resource_md5=$(md5sum ${resource_file} | cut -f1 -d' ')
-    local property_file="${item_path}/properties"
-    echo "# Resource propreties (Java property file format)" > "${property_file}"
-    echo "file_name = fake.bin" >> "${property_file}"
-    echo "content_type = application/fake" >> "${property_file}"
-    echo "data_size = ${resource_size}" >> "${property_file}"
-    echo "data_md5 = ${resource_md5}" >> "${property_file}"
-    sed 's/^/    /' ${property_file}
-  done
-}
 
 # Create fake modules
 function create_fake_modules {
@@ -172,9 +173,10 @@ function create_fake_collections {
 }
 
 function main {
-  create_fake_resources
-  create_fake_modules
-  create_fake_collections
+  create_modules_fake_exports
+  #create_fake_resources
+  #create_fake_modules
+  #create_fake_collections
 }
 
 main

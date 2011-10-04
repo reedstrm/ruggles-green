@@ -20,9 +20,9 @@ import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
+import org.apache.commons.configuration.HierarchicalINIConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
@@ -198,13 +198,14 @@ public class ModuleMigrator extends ItemMigrator {
     /**
      * Read and construct resource map XML doc.
      * 
-     * @param versionDirectory the root data directory of this module version.
+     * @param vers      ionDirectory the root data directory of this module version.
      * 
-     * TODO(tal): simplify CnxAtomPubClient.getResourceMappingFromResourceEntries()
-     * so it does not use atompub entires, etc and and share logic with this one.
+     *            TODO(tal): simplify CnxAtomPubClient.getResourceMappingFromResourceEntries() so it
+     *            does not use atompub entires, etc and and share logic with this one.
      */
     private String readAndConstructResourceMapXML(Directory versionDirectory) {
-        final Properties resourceMap = versionDirectory.readPropertiesFile("resources");
+        final HierarchicalINIConfiguration resourcesInfo =
+                versionDirectory.readIniFile("resources");
         try {
             ObjectFactory objectFactory = new ObjectFactory();
             Resources resources = objectFactory.createResources();
@@ -213,17 +214,20 @@ public class ModuleMigrator extends ItemMigrator {
             resources.setVersion(RESOURCE_MAPPING_DOC_VERSION);
 
             List<Resource> list = resources.getResource();
-            for (Map.Entry<Object, Object> entry : resourceMap.entrySet()) {
+            for (Object sectionNameObject : resourcesInfo.getSections()) {
+                final String sectionName = (String) sectionNameObject;
+                checkArgument("resource".equals(sectionName), "[%s]", sectionName);
+                final SubnodeConfiguration section = resourcesInfo.getSection(sectionName);
                 final Resource resourceFromEntry = objectFactory.createResource();
                 list.add(resourceFromEntry);
 
-                resourceFromEntry.setName((String) entry.getKey());
+                resourceFromEntry.setName(section.getString("filename"));
 
                 final String REPOSITORY_ID = "cnx-repo";
                 Repository repository = objectFactory.createRepository();
                 repository.setRepositoryId(REPOSITORY_ID);
 
-                final int resourceIdNum = Integer.parseInt((String) entry.getValue());
+                final int resourceIdNum = section.getInt("fileid");
                 final String resourceId = String.format("r%04d", resourceIdNum);
                 repository.setResourceId(resourceId);
 

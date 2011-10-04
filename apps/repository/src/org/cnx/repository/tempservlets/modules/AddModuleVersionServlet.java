@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkState;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.annotation.Nullable;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,24 +45,37 @@ public class AddModuleVersionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String cnxmlDoc =
-            checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
+                checkNotNull(req.getParameter("cnxml"), "Missing post param \"cnxml\"");
         final String resourceMapDoc =
-            checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
+                checkNotNull(req.getParameter("manifest"), "Missing post param \"manifest\"");
         final String moduleId =
-            checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
+                checkNotNull(req.getParameter("module_id"), "Missing post param \"module_id\"");
         final String expectedVersionParam =
-            checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
-        @Nullable
-        final Integer expectedVersionNumber =
-            expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
+                checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+        final String migrationParam =
+                checkNotNull(req.getParameter("migration"), "Missing post param \"migration\"");
 
-        checkArgument(req.getParameterMap().size() == 4, "Expected 4 post parameters, found %s",
+        final Integer expectedVersionNumber =
+                expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
+
+        final boolean isMigration = migrationParam != null && migrationParam.equals("y");
+
+        checkArgument(req.getParameterMap().size() == 5, "Expected 5 post parameters, found %s",
                 req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<AddModuleVersionResult> repositoryResponse =
-            repository.addModuleVersion(context, moduleId, expectedVersionNumber, cnxmlDoc,
-                    resourceMapDoc);
+
+        final RepositoryResponse<AddModuleVersionResult> repositoryResponse;
+        if (isMigration) {
+            checkNotNull(expectedVersionNumber, "Missing param \"version\", required for migration.");
+            repositoryResponse =
+                    repository.migrationAddModuleVersion(context, moduleId, expectedVersionNumber,
+                            cnxmlDoc, resourceMapDoc);
+        } else {
+            repositoryResponse =
+                    repository.addModuleVersion(context, moduleId, expectedVersionNumber, cnxmlDoc,
+                            resourceMapDoc);
+        }
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {
@@ -90,6 +102,7 @@ public class AddModuleVersionServlet extends HttpServlet {
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 
+        out.println("is migration: " + isMigration);
         out.println("module id: " + result.getModuleId());
         out.println("new version number: " + result.getNewVersionNumber());
     }

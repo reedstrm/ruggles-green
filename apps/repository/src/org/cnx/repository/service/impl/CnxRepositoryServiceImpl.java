@@ -75,7 +75,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     @Override
     public RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
             RepositoryRequestContext context, String forcedId, Date forcedCreationTime) {
-        return ResourceOperations.migrationCreateResourceWithId(context, forcedId, forcedCreationTime);
+        return ResourceOperations.migrationCreateResourceWithId(context, forcedId,
+                forcedCreationTime);
     }
 
     @Override
@@ -87,7 +88,8 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     @Override
     public RepositoryResponse<ServeResourceResult> serveResouce(RepositoryRequestContext context,
             String resourceId, @Nullable String baseFileSaveName, HttpServletResponse httpResponse) {
-        return ResourceOperations.serveResource(context, resourceId, baseFileSaveName, httpResponse);
+        return ResourceOperations
+                .serveResource(context, resourceId, baseFileSaveName, httpResponse);
     }
 
     @Override
@@ -125,6 +127,14 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
             @Nullable Integer expectedVersionNumber, String cnxmlDoc, String resourceMapDoc) {
         return ModuleOperations.addModuleVersion(context, moduleId, expectedVersionNumber,
                 cnxmlDoc, resourceMapDoc);
+    }
+
+    @Override
+    public RepositoryResponse<AddModuleVersionResult> migrationAddModuleVersion(
+            RepositoryRequestContext context, String moduleId, int versionNumber, String cnxmlDoc,
+            String resourceMapDoc) {
+        return ModuleOperations.migrationAddModuleVersion(context, moduleId, versionNumber, cnxmlDoc,
+                resourceMapDoc);
     }
 
     @Override

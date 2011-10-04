@@ -120,16 +120,28 @@ public class ResourceOperations {
                 return ResponseUtil.loggedError(RepositoryStatus.OUT_OF_RANGE,
                         "Forced resource id is not out of protected id range " + forcedId, log);
             }
-            if (Services.persistence.hasObjectWithKey(forcedKey)) {
-                tx.rollback();
-                return ResponseUtil.loggedError(RepositoryStatus.ALREADY_EXISTS,
-                        "A resource with this forced id already exists: " + forcedId, log);
+
+            try {
+                // Entity already exists. To faciliate migrator error recovery we allow
+                // to recreate a reouruce that does not have yet a blob.
+                final OrmResourceEntity entity =
+                        Services.persistence.read(OrmResourceEntity.class, forcedKey);
+                if (entity.getState() != OrmResourceEntity.State.UPLOAD_PENDING) {
+                    tx.rollback();
+                    return ResponseUtil
+                            .loggedError(RepositoryStatus.ALREADY_EXISTS,
+                                    "A resource with this forced id has already been uploaded: "
+                                            + forcedId, log);
+                }
+                log.info("Allowing to recreate empty resources " + forcedId);
+            } catch (EntityNotFoundException e) {
+                // Entity does not exist, this is the normal case
+                final OrmResourceEntity entity = new OrmResourceEntity(forcedCreationTime);
+                entity.setKey(forcedKey);
+                Services.persistence.write(entity);
+                checkArgument(forcedId.equals(entity.getId()), "%s vs %s", forcedId, entity.getId());
             }
 
-            final OrmResourceEntity entity = new OrmResourceEntity(forcedCreationTime);
-            entity.setKey(OrmResourceEntity.resourceIdToKey(forcedId));
-            Services.persistence.write(entity);
-            checkArgument(forcedId.equals(entity.getId()), "%s vs %s", forcedId, entity.getId());
             tx.commit();
 
         } catch (Throwable e) {

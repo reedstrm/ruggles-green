@@ -201,6 +201,21 @@ public interface CnxRepositoryService {
             String moduleId, @Nullable Integer expectedVersionNumber, String cnxmlDoc,
             String resourceMapDoc);
 
+
+    /**
+     * Add module version for initial data migration.
+     * <p>
+     * Similar to {@link #addModuleVersion} except that it requires a specific version number,
+     * allow to skip modules version numbers (takedown gaps) and allow to overwrite the last
+     * module version to allow safe migrator retry.
+     * <p>
+     * TODO(tal): remove this method after completing the migration.
+     */
+    RepositoryResponse<AddModuleVersionResult> migrationAddModuleVersion(RepositoryRequestContext context,
+            String moduleId, int versionNumber, String cnxmlDoc,
+            String resourceMapDoc);
+
+
     /**
      * Get the content of a module version.
      * 

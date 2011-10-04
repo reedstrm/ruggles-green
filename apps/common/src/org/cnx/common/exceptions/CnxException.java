@@ -13,18 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
-
+package org.cnx.common.exceptions;
 import javax.ws.rs.core.Response.Status;
 
 /**
- * CnxException to indicate a BAD_REQUEST.
+ * A wrapper exception that will be used to send exception details back to client.
  * 
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
-public class CnxBadRequestException extends CnxException {
-    public CnxBadRequestException(String message, Throwable throwable) {
-        super(Status.BAD_REQUEST, message, throwable);
+public class CnxException extends Exception {
+    private Status jerseyStatus;
+    public CnxException(Status jerseyStatus, String message, Throwable throwable) {
+        super(message, throwable);
+        this.jerseyStatus = jerseyStatus;
+    }
+    
+    public Status getJerseyStatus() {
+        return jerseyStatus;
     }
 }

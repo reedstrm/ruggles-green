@@ -15,7 +15,7 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
-import static org.cnx.repository.PrettyXmlOutputter.prettyXmlOutputDocument;
+import static org.cnx.common.repository.PrettyXmlOutputter.prettyXmlOutputDocument;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -23,8 +23,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.ServletUris;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.ServerUtil;
 

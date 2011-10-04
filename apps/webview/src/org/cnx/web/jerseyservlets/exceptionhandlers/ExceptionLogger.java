@@ -22,11 +22,11 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import org.cnx.exceptions.CnxException;
-import org.cnx.exceptions.CnxPossibleValidIdException;
-import org.cnx.exceptions.CnxRuntimeException;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.exceptions.CnxPossibleValidIdException;
+import org.cnx.common.exceptions.CnxRuntimeException;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.web.ErrorPages;
 
 /**

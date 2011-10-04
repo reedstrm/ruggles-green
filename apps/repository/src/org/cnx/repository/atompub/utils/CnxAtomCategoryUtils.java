@@ -17,7 +17,7 @@ package org.cnx.repository.atompub.utils;
 
 import com.sun.syndication.feed.atom.Category;
 import java.net.URL;
-import org.cnx.repository.atompub.ServletUris;
+import org.cnx.common.repository.atompub.ServletUris;
 
 /**
  * Utility class for AtomCategories.

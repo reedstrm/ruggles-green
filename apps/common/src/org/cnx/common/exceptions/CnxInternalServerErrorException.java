@@ -13,23 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.exceptions;
+package org.cnx.common.exceptions;
+
 import javax.ws.rs.core.Response.Status;
 
 /**
- * A wrapper exception that will be used to send exception details back to client.
- * 
+ * CNX Exception to represent INTERNAL_SERVER_ERROR.
+ *
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
-public class CnxException extends Exception {
-    private Status jerseyStatus;
-    public CnxException(Status jerseyStatus, String message, Throwable throwable) {
-        super(message, throwable);
-        this.jerseyStatus = jerseyStatus;
-    }
-    
-    public Status getJerseyStatus() {
-        return jerseyStatus;
+public class CnxInternalServerErrorException extends CnxException {
+    public CnxInternalServerErrorException(String message, Throwable throwable) {
+        super(Status.INTERNAL_SERVER_ERROR, message, throwable);
     }
 }

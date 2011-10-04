@@ -13,16 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository;
+package org.cnx.common.exceptions;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
- * Constants used by Repository.
+ * CnxException to indicate a {@link Status#CONFLICT}.
  * 
  * @author Arjun Satyapal
  */
-public class RepositoryConstants {
-    /**
-     * Collections, modules and resource auto ids are allocated starting from this value.
-     */
-    public static final long MIN_NON_RESERVED_KEY_ID = 300000;
+@SuppressWarnings("serial")
+public class CnxConflictException extends CnxException {
+    public CnxConflictException(String message, Throwable throwable) {
+        super(Status.CONFLICT, message, throwable);
+    }
 }

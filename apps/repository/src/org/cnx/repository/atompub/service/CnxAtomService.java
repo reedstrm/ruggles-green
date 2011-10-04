@@ -19,18 +19,15 @@ import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollect
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxModule;
 import static org.cnx.repository.atompub.utils.CnxAtomCollectionUtils.getCollectionForCnxResource;
 
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.cnx.repository.atompub.CnxAtomPubConstants;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.jdom.Document;
-import org.jdom.Element;
-
 import com.sun.syndication.propono.atom.common.AtomService;
 import com.sun.syndication.propono.atom.common.Workspace;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.cnx.common.repository.atompub.CnxAtomPubConstants;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * CNX AtomPub Service.

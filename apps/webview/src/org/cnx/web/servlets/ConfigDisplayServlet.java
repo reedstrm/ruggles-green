@@ -17,18 +17,15 @@ package org.cnx.web.servlets;
 
 import static org.cnx.web.WebViewConfiguration.getPropertyHtmlString;
 
+import com.google.appengine.api.utils.SystemProperty;
+import com.google.inject.Injector;
 import java.io.IOException;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.cnx.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.web.WebViewConfiguration;
-
-import com.google.appengine.api.utils.SystemProperty;
-import com.google.inject.Injector;
 
 /**
  * Servlet to display configuration information for WebViewer.

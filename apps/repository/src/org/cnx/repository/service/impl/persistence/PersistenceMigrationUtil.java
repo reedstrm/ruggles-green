@@ -17,13 +17,12 @@
 package org.cnx.repository.service.impl.persistence;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.cnx.repository.RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
-
-import java.util.logging.Logger;
+import static org.cnx.common.repository.RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyRange;
+import java.util.logging.Logger;
 
 /**
  * Utilities related to the data migration from old CNX repository.

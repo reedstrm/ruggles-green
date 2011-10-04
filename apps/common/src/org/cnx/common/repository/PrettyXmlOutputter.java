@@ -13,13 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository;
+package org.cnx.common.repository;
+
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.exceptions.CnxInternalServerErrorException;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.cnx.exceptions.CnxException;
-import org.cnx.exceptions.CnxInternalServerErrorException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;

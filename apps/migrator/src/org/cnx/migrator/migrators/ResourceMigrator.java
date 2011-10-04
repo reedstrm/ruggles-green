@@ -23,14 +23,14 @@ import java.util.Properties;
 
 import javax.annotation.Nullable;
 
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
-import org.cnx.repository.atompub.IdWrapper;
 
-//import com.sun.istack.internal.Nullable;
 import com.sun.syndication.propono.atom.client.ClientEntry;
+
 
 /**
  * A migrator for a resource item

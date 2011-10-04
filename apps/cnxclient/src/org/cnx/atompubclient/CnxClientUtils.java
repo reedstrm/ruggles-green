@@ -18,7 +18,7 @@ package org.cnx.atompubclient;
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import java.util.List;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 
 /**
  * Utility class for CNX Clients.

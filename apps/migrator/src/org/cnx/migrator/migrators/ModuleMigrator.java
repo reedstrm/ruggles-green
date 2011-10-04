@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-import org.cnx.repository.atompub.IdWrapper;
 import org.cnx.resourcemapping.LocationInformation;
 import org.cnx.resourcemapping.ObjectFactory;
 import org.cnx.resourcemapping.Repository;

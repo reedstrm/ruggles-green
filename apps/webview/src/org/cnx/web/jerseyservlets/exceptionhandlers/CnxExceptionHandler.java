@@ -16,14 +16,12 @@
 package org.cnx.web.jerseyservlets.exceptionhandlers;
 
 import com.google.inject.Injector;
-
-import org.cnx.exceptions.CnxException;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.cnx.common.exceptions.CnxException;
 
 /**
  * Exception Handler for CnxException for Jersey Servlets.

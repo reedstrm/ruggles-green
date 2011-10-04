@@ -19,23 +19,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import org.cnx.exceptions.CnxConflictException;
-
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.atompubclient.CnxClientUtils;
-import org.cnx.repository.atompub.IdWrapper;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient.CnxClientUtils;
+import org.cnx.common.exceptions.CnxConflictException;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.IdWrapper;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test for {@link CnxAtomResourceServlet}

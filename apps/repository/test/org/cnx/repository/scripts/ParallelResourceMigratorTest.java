@@ -20,17 +20,15 @@ import static org.junit.Assert.assertNotNull;
 
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
-
+import java.io.File;
+import java.net.MalformedURLException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.atompubclient.CnxClientUtils;
-import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.net.MalformedURLException;
 
 /**
  * Test for {@link ParallelResourceMigrator}

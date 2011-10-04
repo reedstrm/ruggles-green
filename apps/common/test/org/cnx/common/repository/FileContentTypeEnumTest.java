@@ -13,10 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository;
+package org.cnx.common.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
+import org.cnx.common.repository.FileContentTypeEnum;
 
 import java.security.SecureRandom;
 

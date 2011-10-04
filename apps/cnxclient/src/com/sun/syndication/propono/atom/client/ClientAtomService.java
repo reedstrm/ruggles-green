@@ -20,20 +20,18 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.io.impl.Atom10Parser;
 import com.sun.syndication.propono.atom.common.AtomService;
 import com.sun.syndication.propono.utils.ProponoException;
-
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.List;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.common.exceptions.CnxInvalidUrlException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-
-import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.List;
 
 
 /**

@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub;
+package org.cnx.common.repository.atompub;
 
-import org.cnx.repository.RepositoryConstants;
+import org.cnx.common.repository.RepositoryConstants;
 
 /**
  * This class is used to track servlet URL patterns for Repository and Webviewer.

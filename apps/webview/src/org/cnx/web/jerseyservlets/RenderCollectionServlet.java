@@ -19,8 +19,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
-import org.cnx.repository.atompub.CnxAtomPubUtils;
-
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -58,13 +56,14 @@ import org.cnx.common.collxml.CollectionHtmlGenerator;
 import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
-import org.cnx.exceptions.CnxInvalidUrlException;
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.ServletUris;
+import org.cnx.common.repository.atompub.VersionWrapper;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
-import org.cnx.repository.atompub.CnxMediaTypes;
-import org.cnx.repository.atompub.IdWrapper;
-import org.cnx.repository.atompub.ServletUris;
-import org.cnx.repository.atompub.VersionWrapper;
 import org.cnx.util.RenderScope;
 import org.cnx.web.CommonHack;
 import org.cnx.web.Utils;

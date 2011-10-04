@@ -18,11 +18,11 @@ package org.cnx.migrator.migrators;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
 
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
-import org.cnx.repository.atompub.IdWrapper;
 
 import com.google.common.collect.ImmutableList;
 import com.sun.syndication.propono.atom.client.ClientEntry;

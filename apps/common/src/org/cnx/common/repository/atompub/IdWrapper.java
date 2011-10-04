@@ -13,15 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub;
+package org.cnx.common.repository.atompub;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.cnx.repository.RepositoryConstants;
+import org.cnx.common.repository.RepositoryConstants;
+
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.cnx.exceptions.CnxInvalidUrlException;
 
 /**
  * This will wrap Ids for Collections/Modules/Resources. TODO(arjuns) : move this to upper package.

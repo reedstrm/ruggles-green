@@ -16,17 +16,15 @@
 package org.cnx.repository.scripts.programs;
 
 import com.google.common.base.Preconditions;
-
+import java.net.URL;
+import java.util.logging.Logger;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.repository.scripts.migrators.ParallelCollectionMigrator;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-
-import java.net.URL;
-import java.util.logging.Logger;
 
 /**
  * Migrator for migrating Modules to CNX repository.

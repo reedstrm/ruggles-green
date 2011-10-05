@@ -16,6 +16,11 @@
 package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.cnx.repository.atompub.jerseyservlets.TestingUtils.validateAtomPubResource;
+import static org.junit.Assert.assertEquals;
+
+import org.cnx.common.repository.atompub.objects.CollectionVersionWrapper;
+
+import org.junit.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,23 +69,21 @@ public class CnxCollectionServletTest extends CnxAtomPubBasetest {
         validateAtomPubResource(collection, isMigration, IdWrapper.Type.COLLECTION,
                 CnxAtomPubUtils.DEFAULT_VERSION);
         String collectionXml = getCollectionXml(COLLECTION_LOCATION, isMigration);
-        // String collectionXml = getCollectionXml(COLLECTION_LOCATION);
-        // // String resourceMappingXml = getResourceMappingXml(MODULE_LOCATION);
-        // CollectionWrapper collectionWrapper =
-        // cnxClient.createCollectionVersion(collection.getEditUri(), collectionXml);
-        // assertEquals(CnxAtomPubUtils.DEFAULT_EDIT_VERSION, collectionWrapper.getVersion());
-        // //
-        // // First downloading using version=1.
-        // CollectionVersionWrapper collectionVersion_1 =
-        // cnxClient.getCollectionVersion(collection.getId(),
-        // CnxAtomPubUtils.DEFAULT_EDIT_VERSION);
-        // assertEquals(collectionXml, collectionVersion_1.getCollectionXml());
-        //
-        // // Now downloading using latest.
-        // CollectionVersionWrapper moduleVersionLatest =
-        // cnxClient.getCollectionVersion(collection.getId(),
-        // CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-        // assertEquals(collectionXml, moduleVersionLatest.getCollectionXml());
+        CollectionWrapper collectionWrapper =
+                cnxClient.createCollectionVersion(collection.getEditUri(), collectionXml);
+        assertEquals(CnxAtomPubUtils.DEFAULT_EDIT_VERSION, collectionWrapper.getVersion());
+
+        // First downloading using version=1.
+        CollectionVersionWrapper collectionVersion_1 =
+                cnxClient.getCollectionVersion(collection.getId(),
+                        CnxAtomPubUtils.DEFAULT_EDIT_VERSION);
+        assertEquals(collectionXml, collectionVersion_1.getCollectionXml());
+
+        // Now downloading using latest.
+        CollectionVersionWrapper moduleVersionLatest =
+                cnxClient.getCollectionVersion(collection.getId(),
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(collectionXml, moduleVersionLatest.getCollectionXml());
     }
 
     private String getCollectionXml(String collectionLocation, boolean isMigration)

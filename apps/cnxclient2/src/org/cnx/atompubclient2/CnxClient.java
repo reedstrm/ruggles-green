@@ -67,7 +67,7 @@ import org.jdom.JDOMException;
  * @author Arjun Satyapal
  */
 public class CnxClient {
-    // TODO(arjuns0 : Currently hardcoding these values.
+    // TODO(arjuns) : Currently hardcoding these values.
     private final String REPOSITORY_ID = "cnx-repo";
     private final BigDecimal RESOURCE_MAPPING_DOC_VERSION = new BigDecimal(1.0);
 
@@ -177,11 +177,6 @@ public class CnxClient {
         HttpEntity resEntity = response.getEntity();
 
         // TODO(arjuns) : Add more checks here.
-        if (resEntity != null) {
-            System.out.println("Response content length: " + resEntity.getContentLength());
-        }
-
-        System.out.println(response.getStatusLine());
     }
 
     /**

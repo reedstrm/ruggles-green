@@ -82,7 +82,6 @@ public class HttpClientWrapper {
         HttpResponse httpResponse = httpClient.execute(httpRequest);
         handleHttpResponse(httpRequest, httpResponse);
         return httpResponse;
-
     }
 
     protected void handleHttpResponse(HttpUriRequest httpRequest, HttpResponse httpResponse)

@@ -354,7 +354,7 @@ public class ModuleOperations {
 
             if (versionNumber < newVersionCount) {
                 tx.rollback();
-                return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
+                return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
                         "Trying to overwrite an old module version: [" + moduleId + "/" + versionNumber + "]", log);
             }
 

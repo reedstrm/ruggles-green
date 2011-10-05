@@ -23,7 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.ServerUtil;
@@ -40,7 +40,7 @@ import org.cnx.repository.atompub.utils.ServerUtil;
 public class CnxServiceDocumentServlet {
 
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_PATH)
     public Response getServiceDocument(@Context HttpServletRequest req) {
         CnxAtomService atomService = new CnxAtomService(ServerUtil.computeHostUrl(req));

@@ -21,12 +21,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.exceptions.CnxPossibleValidIdException;
 import org.cnx.common.exceptions.CnxRuntimeException;
+import org.cnx.common.http.HttpStatusEnum;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.web.ErrorPages;
 
 /**
@@ -53,9 +53,9 @@ public class ExceptionLogger {
     }
 
     // TODO(arjuns) : Add chrome around these exceptions.
-    private String getErrorMessageToDisplay(Status jerseyStatus, Throwable throwable) {
+    private String getErrorMessageToDisplay(HttpStatusEnum httpStatus, Throwable throwable) {
         StringBuilder builder = new StringBuilder();
-        switch (jerseyStatus) {
+        switch (httpStatus) {
             case NOT_FOUND:
                 builder.append(errorPages.render404());
                 break;
@@ -72,12 +72,12 @@ public class ExceptionLogger {
                 }
 
                 logger.severe("ExceptionType[" + throwable.getClass().getName()
-                        + " is having StatusCode = " + jerseyStatus);
+                        + " is having StatusCode = " + httpStatus);
 
                 //$FALL-THROUGH$
             default:
                 logException();
-                builder.append(errorPages.renderError(jerseyStatus.getStatusCode(),
+                builder.append(errorPages.renderError(httpStatus.getStatusCode(),
                         Long.toString(errorTrackingCode), throwable.getMessage(), throwable));
         }
 
@@ -86,20 +86,21 @@ public class ExceptionLogger {
 
     public Response getResponseForException() {
         // Defaulting to internal server error.
-        Status jerseyStatus = Status.INTERNAL_SERVER_ERROR;
+        HttpStatusEnum httpStatus = HttpStatusEnum.INTERNAL_SERVER_ERROR;
         if (throwable instanceof CnxException) {
             CnxException exception = (CnxException) throwable;
-            jerseyStatus = exception.getJerseyStatus();
+            httpStatus = exception.getHttpStatus();
         } else if (throwable instanceof CnxRuntimeException) {
             CnxRuntimeException exception = (CnxRuntimeException) throwable;
-            jerseyStatus = exception.getJerseyStatus();
+            httpStatus = exception.getHttpStatus();
         } else {
             logger.severe("Unknown exception type : " + Throwables.getStackTraceAsString(throwable));
         }
 
-        String errorMsg = getErrorMessageToDisplay(jerseyStatus, throwable);
-        ResponseBuilder responseBuilder = Response.status(jerseyStatus).entity(errorMsg);
-        responseBuilder.header("Content-Type", CnxMediaTypes.TEXT_HTML_UTF8);
+        String errorMsg = getErrorMessageToDisplay(httpStatus, throwable);
+        ResponseBuilder responseBuilder =
+                Response.status(httpStatus.getStatusCode()).entity(errorMsg);
+        responseBuilder.header("Content-Type", ContentType.TEXT_HTML_UTF8);
         return responseBuilder.build();
     }
 

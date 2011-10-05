@@ -15,6 +15,8 @@
  */
 package org.cnx.repository.scripts.migrators;
 
+import org.cnx.common.http.HttpStatusEnum;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -30,7 +32,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.common.exceptions.CnxRuntimeException;
@@ -181,7 +182,7 @@ public class ParallelCollectionMigrator implements Runnable {
                             cnxClient.getCollectionVersionEntry(cnxCollectionId,
                                     CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
                 } catch (CnxRuntimeException e) {
-                    if (e.getJerseyStatus() == Status.NOT_FOUND) {
+                    if (e.getHttpStatus() == HttpStatusEnum.NOT_FOUND) {
                         // Expected.
                         logger.info(e.getLocalizedMessage());
                     } else {

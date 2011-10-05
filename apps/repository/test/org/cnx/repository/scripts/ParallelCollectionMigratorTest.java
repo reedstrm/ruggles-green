@@ -19,8 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import javax.xml.bind.JAXBException;
-
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;

@@ -24,12 +24,12 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.ContentType;
 import org.cnx.web.WebViewConfiguration;
 
 /**
  * Servlet to display configuration information for WebViewer.
- *
+ * 
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
@@ -37,27 +37,30 @@ public class ConfigDisplayServlet extends HttpServlet {
     private Injector injector;
     private WebViewConfiguration configuration;
 
-    @Override public void init(final ServletConfig config) {
-        this.injector = (Injector)config.getServletContext().getAttribute(Injector.class.getName());
+    @Override
+    public void init(final ServletConfig config) {
+        this.injector =
+                (Injector) config.getServletContext().getAttribute(Injector.class.getName());
         configuration = injector.getInstance(WebViewConfiguration.class);
     }
 
-    @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         StringBuilder builder = new StringBuilder();
 
         builder.append(getPropertyHtmlString("application.id",
-            SystemProperty.Environment.applicationId.get()));
+                SystemProperty.Environment.applicationId.get()));
         builder.append(getPropertyHtmlString("application.version",
-            SystemProperty.applicationVersion.get()));
+                SystemProperty.applicationVersion.get()));
         builder.append(getPropertyHtmlString("appengine.environment", SystemProperty.environment
-            .get()));
+                .get()));
         builder
-            .append(getPropertyHtmlString("appengine.sdk.version", SystemProperty.version.get()));
+                .append(getPropertyHtmlString("appengine.sdk.version", SystemProperty.version.get()));
 
         builder.append(configuration.getConfiguration());
 
-        resp.setContentType(CnxMediaTypes.TEXT_HTML_UTF8);
+        resp.setContentType(ContentType.TEXT_HTML_UTF8);
         resp.getWriter().print(builder.toString());
     }
 }

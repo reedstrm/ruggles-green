@@ -40,9 +40,9 @@ import javax.xml.bind.JAXBException;
 import org.cnx.common.exceptions.CnxBadRequestException;
 import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.exceptions.CnxInternalServerErrorException;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.RepositoryConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -71,8 +71,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_POST_NEW}, then this
-     * method is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_POST_NEW}, then
+     * this method is invoked.
      * 
      * This method in turn sends request to {@link CnxRepositoryService#createCollection}.
      * 
@@ -81,7 +81,7 @@ public class CnxAtomCollectionServlet {
      * @param req HttpServletRequest.
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Collection.COLLECTION_POST_NEW)
     public Response createNewCnxCollection(@Context HttpServletRequest req) throws CnxException {
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
@@ -94,8 +94,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_POST_MIGRATION}, then
-     * this method is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_POST_MIGRATION},
+     * then this method is invoked.
      * 
      * This is a special function provided in order to allow migration and retaining of old
      * CollectionIds from CNX. Once migration is complete, this method will be removed.
@@ -107,7 +107,7 @@ public class CnxAtomCollectionServlet {
      *            {@link RepositoryConstants#MIN_NON_RESERVED_KEY_ID}.
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Collection.COLLECTION_POST_MIGRATION)
     public Response createNewCnxCollectionForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId)
@@ -132,14 +132,15 @@ public class CnxAtomCollectionServlet {
             CreateCollectionResult result = createdCollection.getResult();
             Entry entry = new Entry();
 
-
-            
-            IdWrapper repoIdWrapper = new IdWrapper(result.getCollectionId(), IdWrapper.Type.COLLECTION);
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(result.getCollectionId(), IdWrapper.Type.COLLECTION);
             VersionWrapper version = CnxAtomPubUtils.DEFAULT_VERSION;
 
             String atomPubId =
                     CnxAtomPubUtils.getAtomPubIdFromCnxIdAndVersion(repoIdWrapper, version);
             entry.setId(atomPubId);
+            // TODO(arjuns) : repository should return this.
+            entry.setPublished(new Date());
 
             VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
             URL editUrl =
@@ -157,8 +158,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-PUT on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
-     * method is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH},
+     * then this method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#addCollectionVersion}.
      * 
@@ -172,7 +173,7 @@ public class CnxAtomCollectionServlet {
      *         publish versions in future.
      */
     @PUT
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Collection.COLLECTION_VERSION_PATH)
     public Response createNewCnxCollectionVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -204,7 +205,8 @@ public class CnxAtomCollectionServlet {
             entry.setId(repoResult.getCollectionId());
 
             // TODO(arjuns) : Move this to repository.
-            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getCollectionId(), IdWrapper.Type.COLLECTION);
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(repoResult.getCollectionId(), IdWrapper.Type.COLLECTION);
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getNewVersionNumber());
 
             String atomPubId =
@@ -225,8 +227,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
-     * method is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH},
+     * then this method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#getCollectionVersion}.
      * 
@@ -240,7 +242,7 @@ public class CnxAtomCollectionServlet {
      *         publish versions in future.
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Collection.COLLECTION_VERSION_PATH)
     public Response getCnxCollectionVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -258,7 +260,8 @@ public class CnxAtomCollectionServlet {
             GetCollectionVersionResult repoResult = collectionVersionResult.getResult();
             String collXmlDoc = repoResult.getColxmlDoc();
 
-            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getCollectionId(), IdWrapper.Type.COLLECTION);
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(repoResult.getCollectionId(), IdWrapper.Type.COLLECTION);
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
 
             Entry entry = new Entry();
@@ -287,8 +290,8 @@ public class CnxAtomCollectionServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML}, then
-     * this method is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML},
+     * then this method is invoked.
      * 
      * This method is used to fetch CNXML.
      * 
@@ -297,7 +300,7 @@ public class CnxAtomCollectionServlet {
      * @return CNXML
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Collection.COLLECTION_VERSION_COLLXML)
     public Response getCnxCollectionVersionXml(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,

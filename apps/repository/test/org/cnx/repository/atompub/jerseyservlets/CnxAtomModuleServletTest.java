@@ -65,18 +65,16 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
                 ParallelModuleMigrator.getListOfResourcesToBeUploaded(MODULE_LOCATION);
 
         List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
-//        for (File currFile : listOfResourcesToUpload) {
-//            break;
-//            ClientEntry resourceEntry = cnxClient.createNewResource();
-//            logger.info("Attempting to upload : " + currFile.getAbsolutePath());
-//            cnxClient.uploadFileToBlobStore(resourceEntry, currFile);
-//            listOfEntryForUploadedResources.add(resourceEntry);
-//            logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
-//                    + resourceEntry.getId() + "], and can be found here ["
-//                    + CnxAtomPubLinkRelations.getUploadUri(resourceEntry).getHrefResolved() + "].");
-//            // TODO(arjuns) : Add validations here.
-//
-//        }
+        for (File currFile : listOfResourcesToUpload) {
+            ClientEntry resourceEntry = cnxClient.createNewResource();
+            logger.info("Attempting to upload : " + currFile.getAbsolutePath());
+            cnxClient.uploadFileToBlobStore(resourceEntry, currFile);
+            listOfEntryForUploadedResources.add(resourceEntry);
+            logger.info("Successuflly uploaded [" + currFile.getName() + "] as resourceId["
+                    + resourceEntry.getId() + "], and can be found here ["
+                    + CnxAtomPubLinkRelations.getUploadUri(resourceEntry).getHrefResolved() + "].");
+            // TODO(arjuns) : Add validations here.
+        }
 
         String resourceMappingDocXml =
                 cnxClient.getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);

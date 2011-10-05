@@ -44,9 +44,9 @@ import javax.xml.stream.XMLStreamException;
 import org.cnx.common.exceptions.CnxBadRequestException;
 import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.exceptions.CnxInternalServerErrorException;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.RepositoryConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -84,7 +84,7 @@ public class CnxAtomModuleServlet {
      * @param req HttpServletRequest.
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Module.MODULE_POST_NEW)
     public Response createNewModule(@Context HttpServletRequest req) throws CnxException {
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
@@ -110,7 +110,7 @@ public class CnxAtomModuleServlet {
      *            {@link RepositoryConstants#MIN_NON_RESERVED_KEY_ID}.
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Module.MODULE_POST_MIGRATION)
     public Response createNewModuleForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId) throws CnxException {
@@ -173,7 +173,7 @@ public class CnxAtomModuleServlet {
      *         publish versions in future.
      */
     @PUT
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Module.MODULE_VERSION_PATH)
     public Response createNewModuleVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -260,7 +260,7 @@ public class CnxAtomModuleServlet {
      * @throws XMLStreamException 
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_PATH)
     public Response getModuleVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -319,7 +319,7 @@ public class CnxAtomModuleServlet {
      * @return CNXML
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_CNXML)
     public Response getModuleVersionXml(
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -350,7 +350,7 @@ public class CnxAtomModuleServlet {
      * @return ResourceMappingXml
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_RESOURCE_MAPPING)
     public Response getModuleVersionResourcesXml(
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,

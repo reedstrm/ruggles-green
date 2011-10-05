@@ -41,10 +41,10 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import org.cnx.common.exceptions.CnxBadRequestException;
 import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.PrettyXmlOutputter;
 import org.cnx.common.repository.RepositoryConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.objects.ResourceInfoWrapper;
@@ -82,7 +82,7 @@ public class CnxAtomResourceServlet {
      * @param req HttpServletRequest
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Resource.RESOURCE_POST_NEW)
     public Response createNewResource(@Context HttpServletRequest req) throws CnxException {
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
@@ -108,7 +108,7 @@ public class CnxAtomResourceServlet {
      *            {@link RepositoryConstants#MIN_NON_RESERVED_KEY_ID}.
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Resource.RESOURCE_POST_MIGRATION)
     public Response createNewResourceForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
@@ -212,7 +212,7 @@ public class CnxAtomResourceServlet {
     }
     
   @GET
-  @Produces(CnxMediaTypes.APPLICATION_XML)
+  @Produces(ContentType.APPLICATION_XML)
   @Path(ServletUris.Resource.RESOURCE_INFO)
   public Response getResourceInfo(@Context HttpServletRequest req,
           @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {

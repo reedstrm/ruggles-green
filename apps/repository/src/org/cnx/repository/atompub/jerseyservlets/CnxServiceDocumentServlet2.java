@@ -26,11 +26,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.atompub.CnxAtomPubCollectionEnum;
 import org.cnx.common.repository.atompub.CnxAtomPubConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.servicedocument.AtomTextConstruct;
@@ -49,10 +48,10 @@ import org.cnx.servicedocument.Workspace;
 @Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET2)
 public class CnxServiceDocumentServlet2 {
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_PATH)
     public Response getNewServiceDocument(@Context HttpServletRequest req) throws JAXBException,
-            XMLStreamException, FactoryConfigurationError {
+            FactoryConfigurationError {
         URL atomPubUrl = null;
         try {
             atomPubUrl =
@@ -105,7 +104,7 @@ public class CnxServiceDocumentServlet2 {
 
     private Collection getAPCForCollections(ObjectFactory objectFactory,
             CnxAtomPubConstants constants) {
-        return getAtomPubCollection(objectFactory, constants.getAPCModulesAbsPath(),
+        return getAtomPubCollection(objectFactory, constants.getAPCCollectionsAbsPath(),
                 constants.getAPCCollectionScheme(),
                 CnxAtomPubCollectionEnum.APC_COLLECTION.getTitle(),
                 ServletUris.Collection.COLLECTION_SERVLET);

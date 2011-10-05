@@ -19,6 +19,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
+import org.cnx.common.repository.ContentType;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -58,7 +60,6 @@ import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
 import org.cnx.common.exceptions.CnxInvalidUrlException;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -164,7 +165,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(ContentType.TEXT_HTML_UTF8)
     @Path(ServletUris.Collection.COLLECTION_VERSION_PATH)
     public Response getCollectionVersion(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -272,7 +273,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Collection.COLLECTION_VERSION_COLLXML)
     public Response getCollectionVersionXml(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -305,7 +306,7 @@ public class RenderCollectionServlet {
      * @throws JDOMException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(ContentType.TEXT_HTML_UTF8)
     @Path(COLLECTION_VERSION_MODULE_VERSION_URI)
     public Response getModuleVersionUnderCollectionVersion(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -448,7 +449,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_MODULE_VERSION_XML_URI)
     public Response getModuleVersionXmlUnderCollectionVersion(@Context ServletContext context,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -474,7 +475,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_MODULE_VERSION_RESOURCE_MAPPING_URL)
     public Response getModuleVersionResourcesXmlUnderCollectionVersion(
             @Context ServletContext context,

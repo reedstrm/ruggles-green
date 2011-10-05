@@ -18,6 +18,8 @@ package org.cnx.web.jerseyservlets;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
+import org.cnx.common.repository.ContentType;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.template.soy.data.SoyMapData;
@@ -42,7 +44,6 @@ import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
 import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.common.exceptions.CnxInvalidUrlException;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -100,7 +101,7 @@ public class RenderModuleServlet {
      * @throws SAXException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(ContentType.TEXT_HTML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_PATH)
     public Response getModuleVersion(@PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
@@ -183,7 +184,7 @@ public class RenderModuleServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_CNXML)
     public Response getModuleVersionXml(
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -211,7 +212,7 @@ public class RenderModuleServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_RESOURCE_MAPPING)
     public Response getModuleVersionResourcesXml(
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,

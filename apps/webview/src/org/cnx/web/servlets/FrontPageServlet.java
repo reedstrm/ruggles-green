@@ -25,7 +25,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.ContentType;
 import org.cnx.web.CommonHack;
 import org.cnx.web.WebViewConfiguration;
 import org.cnx.web.WebViewTemplate;
@@ -34,15 +34,18 @@ import org.cnx.web.WebViewTemplate;
 public class FrontPageServlet extends HttpServlet {
     private Injector injector;
 
-    @Override public void init(final ServletConfig config) {
-        this.injector = (Injector)config.getServletContext().getAttribute(Injector.class.getName());
+    @Override
+    public void init(final ServletConfig config) {
+        this.injector =
+                (Injector) config.getServletContext().getAttribute(Injector.class.getName());
     }
 
-    @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         final SoyTofu tofu = injector.getInstance(Key.get(SoyTofu.class, WebViewTemplate.class));
         final WebViewConfiguration configuration = injector.getInstance(WebViewConfiguration.class);
-        resp.setContentType(CnxMediaTypes.TEXT_HTML_UTF8);
+        resp.setContentType(ContentType.TEXT_HTML_UTF8);
         resp.getWriter().print(tofu.render(CommonHack.FRONT_PAGE_TEMPLATE_NAME, new SoyMapData(
                 "collectionUri", configuration.getRichsCollectionUrl()), null));
     }

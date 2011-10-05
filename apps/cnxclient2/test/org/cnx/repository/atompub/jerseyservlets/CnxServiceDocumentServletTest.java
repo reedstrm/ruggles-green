@@ -18,14 +18,14 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static org.cnx.repository.atompub.jerseyservlets.TestingUtils.validateTitle;
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import javax.xml.bind.JAXBException;
-import org.cnx.atompubclient.CnxClient;
+import org.cnx.atompubclient2.CnxClient;
 import org.cnx.common.repository.atompub.CnxAtomPubCollectionEnum;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CommonUtils;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.servicedocument.Category;
 import org.cnx.servicedocument.Collection;
@@ -48,7 +48,7 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     }
 
     @Before
-    public void initialize() throws IOException, JAXBException, URISyntaxException {
+    public void initialize() throws Exception {
         cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
@@ -73,23 +73,28 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
     }
 
     //
-    private void validateAPCForResources(Collection collection) {
+    private void validateAPCForResources(Collection collection) throws URISyntaxException {
         validateTitle(collection.getTitle(), CnxAtomPubCollectionEnum.APC_RESOURCES.getTitle());
 
+        validateUrl(ServletUris.Resource.RESOURCE_SERVLET, collection.getHref());
         validateCategories(collection.getCategories(), ServletUris.Resource.RESOURCE_SERVLET,
                 cnxClient.getConstants().getAPCResourceScheme());
     }
 
-    private void validateAPCForModules(Collection collection) {
+   
+
+    private void validateAPCForModules(Collection collection) throws URISyntaxException {
         validateTitle(collection.getTitle(), CnxAtomPubCollectionEnum.APC_MODULE.getTitle());
 
+        validateUrl(ServletUris.Module.MODULE_SERVLET, collection.getHref());
         validateCategories(collection.getCategories(), ServletUris.Module.MODULE_SERVLET, cnxClient
                 .getConstants().getAPCModuleScheme());
     }
 
-    private void validateAPCForCollections(Collection collection) {
+    private void validateAPCForCollections(Collection collection) throws URISyntaxException {
         validateTitle(collection.getTitle(), CnxAtomPubCollectionEnum.APC_COLLECTION.getTitle());
 
+        validateUrl(ServletUris.Collection.COLLECTION_SERVLET, collection.getHref());
         validateCategories(collection.getCategories(), ServletUris.Collection.COLLECTION_SERVLET,
                 cnxClient.getConstants().getAPCCollectionScheme());
     }
@@ -102,5 +107,11 @@ public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
         Category category = listOfCategory.get(0);
         assertEquals(term, category.getTerm());
         assertEquals(scheme.toString(), category.getScheme());
+    }
+    
+    private void validateUrl(String suffix, String receivedUri) throws URISyntaxException {
+        URI tail = new URI(suffix);
+        URI expectedUri =  CommonUtils.appendUri(getCnxServerAtomPubUrl().toURI(), tail);
+        assertEquals(expectedUri.toString(), receivedUri);
     }
 }

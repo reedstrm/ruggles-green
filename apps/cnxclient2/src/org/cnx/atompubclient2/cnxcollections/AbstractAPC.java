@@ -13,10 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.atompubclient.cnxcollections;
+package org.cnx.atompubclient2.cnxcollections;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -76,20 +77,36 @@ public abstract class AbstractAPC extends Collection {
         URI tail = new URI(ServletUris.MIGRATION + "/" + id.getId());
         return CommonUtils.appendUri(getAPCUri(), tail);
     }
-    
+
+    /**
+     * Get AtomPubResource URI for a Version.
+     * 
+     * @param id id for AtomPub Resource
+     * @param version version for AtomPub Resource.
+     * @return URI Uri for AtomPubResource Version.
+     * 
+     * @throws URISyntaxException
+     */
+    protected URI getAPRUriForMigration(IdWrapper id, VersionWrapper version)
+            throws URISyntaxException {
+        Preconditions.checkArgument(id.getType() != IdWrapper.Type.RESOURCE);
+        URI tail = new URI(id.getId() + "/" + version.toString());
+        return CommonUtils.appendUri(getAPCUri(), tail);
+    }
+
     /**
      * URI for downloading AtomPubResource.
      * 
      * @param id id for AtomPubResource.
      * @return URI where client should do GET to download the AtomPubResource.
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      */
     protected URI getAPRUri(IdWrapper id) throws URISyntaxException {
         URI tail = new URI(id.toString());
         return CommonUtils.appendUri(getAPCUri(), tail);
     }
-    
-    /** 
+
+    /**
      * Get URI to fetch information for AtomPubResource.
      * 
      * @param id for AtomPubResource
@@ -100,21 +117,22 @@ public abstract class AbstractAPC extends Collection {
         URI tail = new URI(id.toString() + "/" + ServletUris.INFORMATION);
         return CommonUtils.appendUri(getAPCUri(), tail);
     }
-    
-    /** 
-     * Get URI to fetch information for AtomPubResourceVersion.
-     * This is not applicable for CNX Resources.
+
+    /**
+     * Get URI to fetch AtomPubResourceVersion. This is not applicable for CNX Resources.
      * 
      * @param id for AtomPubResource
      * @param version for AtomPubResource
      * @return URI from where client can fetch Information.
      * @throws URISyntaxException
      */
-    protected URI getAPRVUriForInformation(IdWrapper id, VersionWrapper version) throws URISyntaxException {
+    protected URI getAPRVUri(IdWrapper id, VersionWrapper version)
+            throws URISyntaxException {
         if (id.getType() == IdWrapper.Type.RESOURCE) {
             throw new RuntimeException("getAPRUriForInformation is not defined for Resources.");
         }
-        URI tail = new URI(id.toString() + "/" + version.toString() + "/" + ServletUris.INFORMATION);
+        URI tail =
+                new URI(id.toString() + "/" + version.toString());
         return CommonUtils.appendUri(getAPCUri(), tail);
     }
 

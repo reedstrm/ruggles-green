@@ -1,0 +1,215 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE module PUBLIC "-//CNX//DTD CNXML 0.3.5 plus MathML//EN" 
+              "http://cnx.rice.edu/cnxml/0.3.5/DTD/cnxml_mathml.dtd">
+
+<module 
+id="m2102" 
+levelmask="0"
+created="2000-12-29" 
+revised="2001-10-09"
+version='2.3'>
+<name>Properties of Systems</name>
+	
+<metadata> 
+ <authorlist>
+    <author id="aca">
+    <firstname>Thanos</firstname> 
+    <surname>Antoulas</surname>
+    </author>
+    <author id="jps">
+    <firstname>JP</firstname> 
+    <surname>Slavinsky</surname>
+    </author>
+  </authorlist>
+ 
+  <maintainerlist>
+    <maintainer id="lizychan">
+    <firstname>Elizabeth</firstname>
+    <surname>Chan</surname>
+    <email>lizychan@rice.edu</email>
+    </maintainer>
+  </maintainerlist>
+
+  <keywordlist>
+    <keyword>linear</keyword>
+    <keyword>time-invariant</keyword>
+    <keyword>causal</keyword>
+		<keyword>superposition</keyword>
+		<keyword>cascade</keyword>
+		<keyword>parallel</keyword>
+  </keywordlist>
+
+  <abstract>Properties of different types of systems</abstract>
+</metadata>
+
+<content>
+
+<section name="Linear Systems" id="linear_sys">
+
+    <para id="p0">
+    If a system is linear, this means that when an input to a given system is scaled by a value, the output of the
+    system is scaled by the same amount.
+	</para>
+
+<figure id="linear_scaling" orient="horizontal">
+   <name>Linear Scaling</name>
+   <media type="image/gif" src="linear_scaling.gif"/>
+</figure>
+
+<para id="p1">In part (a) of the figure above, an input
+<math xmlns="&mmlns;"><ci>x</ci></math>
+to the linear system
+<math xmlns="&mmlns;"><ci>L</ci></math>
+gives the output
+<math xmlns="&mmlns;"><ci>y</ci></math>.
+If
+<math xmlns="&mmlns;"><ci>x</ci></math>
+is scaled by a value
+<math xmlns="&mmlns;" mode="inline"><ci>&alpha;</ci></math>
+and passed through this same
+system, as in part (b), the output will also be scaled by
+<math xmlns="&mmlns;" mode="inline"><ci>&alpha;</ci></math>.
+</para>
+
+<para id="p2">A linear system also obeys the principle of superposition.  This means that if two inputs are added
+ together and passed through a linear system, the output will be the sum of the individual inputs' outputs.</para>
+
+<figure id="superposition" orient="horizontal">
+   <name>Superposition Principle</name>
+   <media type="image/gif" src="superposn.gif"/>
+   <caption>If (a) is true, then the principle of superposition says that (b) is true as well.  This holds for
+   linear systems.</caption>
+</figure>
+
+<para id="p3">That is, if (a) is true, then (b) is also true for a linear system.  The scaling property mentioned
+ above still holds in conjunction with the superposition principle.  Therefore, if the inputs
+ <math xmlns="&mmlns;" mode="inline"><ci>x</ci></math> and <math xmlns="&mmlns;" mode="inline"><ci>y</ci></math>
+ are scaled by factors <math xmlns="&mmlns;" mode="inline"><ci>&alpha;</ci></math> and <math xmlns="&mmlns;"
+ mode="inline"><ci>&beta;</ci></math>, respectively, then the sum of these scaled inputs will give the sum of the
+ individual scaled outputs:</para>
+
+<figure id="superposition_and_linearity" orient="horizontal">
+   <name>Superposition Principle with Linear Scaling</name>
+   <media type="image/gif" src="superposn_with_linearity.gif"/>
+   <caption>Given (a) for a linear system, (b) holds as well.</caption>
+</figure>
+
+</section>
+
+<section name="Time-Invariant Systems" id="ti_sys">
+
+<para id="p4">A time-invariant system has the property that a certain input will always give the same output,
+without regard to when the input was applied to the system.</para>
+
+<figure id="time-invariance" orient="horizontal">
+   <name>Time-Invariant Systems</name>
+   <media type="image/gif" src="ti.gif"/>
+   <caption>(a) shows an input at time <math xmlns="&mmlns;" mode="inline"><ci>t</ci></math> while (b) shows
+   the same input <math xmlns="&mmlns;" mode="inline"><ci><msub><mi>t</mi><mi>0</mi></msub></ci></math> seconds
+   later.  In a time-invariant system both outputs would be identical except that the one in (b) would be
+   delayed by <math xmlns="&mmlns;" mode="inline"><ci><msub><mi>t</mi><mi>0</mi></msub></ci></math>.
+</caption>
+</figure>
+
+<para id="p5">In this figure,
+<math xmlns="&mmlns;"><apply><ci type="function">x</ci><ci>t</ci></apply></math>
+and
+<math xmlns="&mmlns;">
+	<apply><ci type="function">x</ci><apply><minus/><ci>t</ci><ci><msub><mi>t</mi><mi>0</mi></msub></ci></apply></apply>
+</math>
+are passed through the system
+<math xmlns="&mmlns;"><ci>TI</ci></math>.
+Because the system
+<math xmlns="&mmlns;"><ci>TI</ci></math>
+is time-invariant, the inputs
+<math xmlns="&mmlns;"><apply><ci type="function">x</ci><ci>t</ci></apply></math>
+and
+<math xmlns="&mmlns;">
+	<apply><ci type="function">x</ci><apply><minus/><ci>t</ci><ci><msub><mi>t</mi><mi>0</mi></msub></ci></apply></apply>
+</math>
+produce the same output.  The only difference is that the output due to
+<math xmlns="&mmlns;">
+	<apply><ci type="function">x</ci><apply><minus/><ci>t</ci><ci><msub><mi>t</mi><mi>0</mi></msub></ci></apply></apply>
+</math>
+is shifted by a time
+<math xmlns="&mmlns;"><ci><msub><mi>t</mi><mi>0</mi></msub></ci></math>.</para>
+
+<para id="p6">Whether a system is time-invariant or time-varying can be seen in the <!--CNXN--> differential
+equation (or difference equation) describing it.  <emphasis>Time-invariant systems are modeled with constant coefficient
+equations</emphasis>.  A constant coefficient differential (or difference) equation means that the parameters of the
+system are <emphasis>not</emphasis> changing over time and an input now will give the same result as the same input later.</para>
+
+</section>
+
+<section name="Linear Time-Invariant (LTI) Systems" id="lti_sys">
+
+<para id="p7">Certain systems are both linear and time-invariant, and are thus referred to as LTI systems.</para>
+
+<figure id="lti_fig" orient="horizontal">
+   <name>Linear Time-Invariant Systems</name>
+   <media type="image/gif" src="lti.gif"/>
+   <caption>This is a combination of the two cases above.  Since the input to (b) is a scaled, time-shifted
+   version of the input in (a), so is the output.</caption>
+</figure>
+
+<para id="p8">As LTI systems are a subset of linear systems, they obey the principle of superposition.  In the
+figure below, we see the effect of applying time-invariance to the superposition definition in the linear
+systems section above.</para>
+
+<figure id="lti_superposn_fig" orient="horizontal">
+   <name>Superposition in Linear Time-Invariant Systems</name>
+   <media type="image/gif" src="lti_superposn.gif"/>
+   <caption>The principle of superposition applied to LTI systems</caption>
+</figure>
+
+
+<section name="LTI Systems in Series" id="lti_sys_series">
+
+<para id="p9">If two or more LTI systems are in series with each other, their order can be interchanged without
+affecting the overall output of the system.  Systems in series are also called cascaded systems.</para>
+
+<figure id="lti_sys_series_fig" orient="horizontal">
+   <name>Cascaded LTI Systems</name>
+   <media type="image/gif" src="cascaded_sys.gif"/>
+   <caption>The order of cascaded LTI systems can be interchanged without changing the overall effect.</caption>
+</figure>
+
+</section>
+
+<section name="LTI Systems in Parallel" id="lti_sys_parallel">
+
+<para id="p10">If two or more LTI systems are in parallel with one another, an equivalent system is one
+that is defined as the sum of these individual systems.</para>
+
+<figure id="lti_sys_parallel_fig" orient="horizontal">
+   <name>Parallel LTI Systems</name>
+   <media type="image/gif" src="parallel_sys.gif"/>
+   <caption>Parallel systems can be condensed into the sum of systems.</caption>
+</figure>
+
+</section>
+
+</section>
+
+<section name="Causality" id="causality">
+
+<para id="p11"><emphasis>A system is causal if it does not depend on future values of the input to determine the output.</emphasis>
+This means that if the first input to a system comes at time <math xmlns="&mmlns;" mode="inline"><ci><msub><mi>t</mi>
+<mi>0</mi></msub></ci></math>, then the system should not give any output until that time.  An example of a non-causal
+system would be one that "sensed" an input coming and gave an output before the input arrived:</para>
+
+<figure id="noncausal_sys" orient="horizontal">
+   <name>Non-causal System</name>
+   <media type="image/gif" src="noncausal.gif"/>
+   <caption>In this non-causal system, an output is produced due to an input that occurs later in time.</caption>
+</figure>
+
+<para id="p12">A causal system is also characterized by an <!--CNXN--> impulse response
+<math xmlns="&mmlns;"><apply><ci type="function">h</ci><ci>t</ci></apply></math>
+that is zero for
+<math xmlns="&mmlns;" mode="inline"><apply><lt/><ci>t</ci><cn>0</cn></apply></math>.</para>
+
+</section>
+</content>
+
+</module>

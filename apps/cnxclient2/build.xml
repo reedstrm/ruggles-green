@@ -7,138 +7,161 @@
   governing permissions and limitations under the License. -->
 
 <project name="cnxclient" default="all">
-  <description>
+    <description>
     A Java client for CNX-V2 which is based on rome-1.0 and
   </description>
-  <property file="local.properties" />
-  <property file="build.properties" />
+    <property file="local.properties" />
+    <property file="build.properties" />
 
-  <property name="target_dir" value="${basedir}/${output.jars}" />
+    <property name="target_dir" value="${basedir}/${output.jars}" />
 
-  <target name="compile" description="Compile the classes">
-    <mkdir dir="${classdir}" />
-    <mkdir dir="${libdir}" />
-    <mkdir dir="${output.jars}" />
+    <target name="compile" description="Compile the classes">
+        <mkdir dir="${classdir}" />
+        <mkdir dir="${libdir}" />
+        <mkdir dir="${output.jars}" />
 
-    <!-- Third party dependencies. -->
-    <ant antfile="appengine/build.xml"
-      inheritAll="true" 
-      target="default"
-      dir="${third.party.jars}" />
+        <!-- Third party dependencies. -->
+        <ant antfile="appengine/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
-    <ant antfile="commons-codec/build.xml"
-      inheritAll="true" 
-      target="default"
-      dir="${third.party.jars}" />
+        <ant antfile="commons-codec/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
-    <ant antfile="commons-logging/build.xml"
-      inheritAll="true"
-      target="default"
-      dir="${third.party.jars}" />
+        <ant antfile="commons-logging/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
 
-    <ant antfile="httpcomponents-client/build.xml"
-      inheritAll="true"
-      target="default"
-      dir="${third.party.jars}" />
+        <ant antfile="httpcomponents-client/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third.party.jars}" />
 
-    <!-- Non-third-party dependencies. -->
-    <ant antfile="build.xml" inheritall="false" target="copyjar"
-      dir="${basedir}/${commondir}">
-      <property name="target_dir" value="${target_dir}" />
-    </ant>
+        <!-- Non-third-party dependencies. -->
+        <ant antfile="build.xml"
+             inheritall="false"
+             target="copyjar"
+             dir="${basedir}/${commondir}">
+            <property name="target_dir" value="${target_dir}" />
+        </ant>
 
-    <ant antfile="build.xml" inheritall="false" target="copyjar"
-      dir="${basedir}/${xmls.dir}">
-      <property name="target_dir" value="${target_dir}" />
-    </ant>
+        <ant antfile="build.xml"
+             inheritall="false"
+             target="copyjar"
+             dir="${basedir}/${xmls.dir}">
+            <property name="target_dir" value="${target_dir}" />
+        </ant>
 
-    <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
-    <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
+        <fileset id="depend_lib" dir="${target_dir}" includes="*.jar" />
+        <fileset id="depend_test_lib" dir="${test.lib}" includes="*.jar" />
 
-    <javac srcdir="${srcdir}" destdir="${classdir}" includeantruntime="false"
-      debug="true" failonerror="true">
-      <compilerarg line="${javac.flags}" />
-      <classpath>
-        <resources refid="depend_lib" />
-      </classpath>
-    </javac>
-  </target>
+        <javac srcdir="${srcdir}"
+               destdir="${classdir}"
+               includeantruntime="false"
+               debug="true"
+               failonerror="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+            </classpath>
+        </javac>
+    </target>
 
-  <target name="prepare-for-test-compile">
-    <mkdir dir="${test.outdir}" />
-    <mkdir dir="${test.classes}" />
+    <target name="prepare-for-test-compile">
+        <mkdir dir="${test.outdir}" />
+        <mkdir dir="${test.classes}" />
 
-    <property name="test_lib_dir" value="${basedir}/${test.lib}" />
-    <ant antfile="junit/build.xml" inheritAll="true" target="test"
-      dir="${third.party.jars}" />
-  </target>
+        <property name="test_lib_dir" value="${basedir}/${test.lib}" />
+        <ant antfile="junit/build.xml"
+             inheritAll="true"
+             target="test"
+             dir="${third.party.jars}" />
+    </target>
 
-  <target name="test-compile" description="Compile Unit Tests."
-    depends="prepare-for-test-compile, compile">
+    <target name="test-compile"
+            description="Compile Unit Tests."
+            depends="prepare-for-test-compile, compile">
 
-    <!-- TODO(arjuns) : Optimize classpaths. -->
-    <javac srcdir="${test.src}" destdir="${test.classes}"
-      includeantruntime="false" failonerror="true" debug="true">
-      <compilerarg line="${javac.flags}" />
-      <classpath>
-        <resources refid="depend_lib" />
-        <resources refid="depend_test_lib" />
-        <pathelement location="${classdir}" />
-      </classpath>
-    </javac>
-  </target>
+        <copy todir="${test.classes}">
+            <fileset dir="${test.data.dir}" includes="**/**" />
+        </copy>
 
-  <target name="test" description="Run unit tests" depends="test-compile">
-    <junit fork="yes" printsummary="yes" failureproperty="test.failed">
-      <jvmarg value="-enableassertions" />
-      <classpath>
-        <resources refid="depend_lib" />
-        <resources refid="depend_test_lib" />
-        <pathelement location="${classdir}" />
-        <pathelement location="${test.classes}" />
-      </classpath>
-      <formatter type="plain" />
-      <batchtest todir="${test.outdir}">
-        <fileset dir="${test.src}">
-          <include name="**/*Test.java" />
-        </fileset>
-      </batchtest>
-    </junit>
+        <!-- TODO(arjuns) : Optimize classpaths. -->
+        <javac srcdir="${test.src}"
+               destdir="${test.classes}"
+               includeantruntime="false"
+               failonerror="true"
+               debug="true">
+            <compilerarg line="${javac.flags}" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="${classdir}" />
+            </classpath>
+        </javac>
+    </target>
 
-    <fail message="Tests failed!">
-      <condition>
-        <isset property="test.failed" />
-      </condition>
-    </fail>
-  </target>
+    <target name="test" description="Run unit tests" depends="test-compile">
+        <junit fork="yes" printsummary="yes" failureproperty="test.failed">
+            <jvmarg value="-enableassertions" />
+            <classpath>
+                <resources refid="depend_lib" />
+                <resources refid="depend_test_lib" />
+                <pathelement location="${classdir}" />
+                <pathelement location="${test.classes}" />
+            </classpath>
+            <formatter type="plain" />
+            <batchtest todir="${test.outdir}">
+                <fileset dir="${test.src}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
 
-  <target name="clean" description="Remove built files">
-    <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
-    <ant antfile="build.xml" target="clean" dir="${basedir}/${xmls.dir}" />
+        <fail message="Tests failed!">
+            <condition>
+                <isset property="test.failed" />
+            </condition>
+        </fail>
+    </target>
 
-    <delete dir="${builddir}" />
-  </target>
+    <target name="clean" description="Remove built files">
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
+        <ant antfile="build.xml" target="clean" dir="${basedir}/${xmls.dir}" />
 
-  <tstamp>
-    <format property="timenow" pattern="ddMMyyyyHHmm" />
-  </tstamp>
+        <delete dir="${builddir}" />
+    </target>
 
-  <property name="client-jar-name" value="org.cnx.cnxclient" />
-  <property name="dest-client-jar" value="${libdir}/${client-jar-name}.${timenow}.jar" />
+    <tstamp>
+        <format property="timenow" pattern="ddMMyyyyHHmm" />
+    </tstamp>
 
-  <target name="jar" description="Build a JAR of the classes" depends="compile">
-    <jar destfile="${dest-client-jar}">
-      <fileset dir="${classdir}" />
-      <fileset dir="${srcdir}" />
-    </jar>
-  </target>
+    <property name="client-jar-name" value="org.cnx.cnxclient" />
+    <property name="dest-client-jar"
+              value="${libdir}/${client-jar-name}.${timenow}.jar" />
 
-  <target name="copyjar" description="Copy jar to calling Build file."
-    depends="jar">
-    <copy file="${dest-client-jar}" tofile="${target_dir}/${client-jar-name}.latest.jar" />
-  </target>
+    <target name="jar"
+            description="Build a JAR of the classes"
+            depends="compile">
+        <jar destfile="${dest-client-jar}">
+            <fileset dir="${classdir}" />
+            <fileset dir="${srcdir}" />
+        </jar>
+    </target>
 
-  <target name="all" description="Refers to all the targets in this file other then test."
-    depends="test-compile, compile, jar" />
+    <target name="copyjar"
+            description="Copy jar to calling Build file."
+            depends="jar">
+        <copy file="${dest-client-jar}"
+              tofile="${target_dir}/${client-jar-name}.latest.jar" />
+    </target>
+
+    <target name="all"
+            description="Refers to all the targets in this file other then test."
+            depends="test-compile, compile, jar" />
 </project>

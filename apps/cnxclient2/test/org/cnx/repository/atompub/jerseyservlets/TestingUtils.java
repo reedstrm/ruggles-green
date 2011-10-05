@@ -20,23 +20,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
-import com.google.common.base.Objects;
-
 import com.google.cloud.sql.jdbc.internal.Charsets;
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-
 import java.io.File;
-
-import org.cnx.servicedocument.AtomTextConstruct;
-
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
 import javax.annotation.Nullable;
-import org.cnx.common.repository.RepositoryConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
 import org.cnx.common.repository.atompub.objects.AtomPubResource;
+import org.cnx.servicedocument.AtomTextConstruct;
 
 /**
  * 
@@ -64,8 +63,8 @@ public class TestingUtils {
     private static void
             validateId(IdWrapper id, IdWrapper.Type expectedIdType, boolean isMigration) {
         assertEquals(expectedIdType, id.getType());
-        boolean isReservedId =
-                Long.parseLong(id.getId().substring(1)) < RepositoryConstants.MIN_NON_RESERVED_KEY_ID;
+
+        boolean isReservedId = id.isIdUnderForcedRange();
         if (isMigration) {
             assertTrue(isReservedId);
         } else {
@@ -82,35 +81,43 @@ public class TestingUtils {
         }
 
         if (expectedVersion.equals(CnxAtomPubUtils.DEFAULT_VERSION)) {
-            // For Modules and Collections, for default_version, it should be absent.
+            // For default_version of Modules and Collections, selfUri should be absent.
             assertNull(apResource.getSelfUri());
         } else {
             // For Modules and Collections, for non-default versions, selfUri should be present.
             assertNotNull(apResource.getSelfUri());
         }
     }
-    
+
     public static void validateTitle(AtomTextConstruct textConstruct, String title) {
         assertEquals(1, textConstruct.getContent().size());
         assertEquals(title, textConstruct.getContent().get(0));
     }
-    
+
     public static File createTempFile(@Nullable String fileName, @Nullable String content)
             throws IOException {
         String tmpDir = System.getProperty("java.io.tmpdir");
-        
+
         String tempFileName = fileName;
         if (tempFileName == null) {
             tempFileName = Long.toString(System.currentTimeMillis());
         }
         String filePath = tmpDir + "/" + tempFileName;
         File tmpFile = new File(filePath);
-        
+
         if (content != null) {
             Files.write(Objects.firstNonNull(content, "Hello Wrold"), tmpFile, Charsets.UTF_8);
         }
-        
+
         tmpFile.delete();
         return tmpFile;
+    }
+
+    // From a given module, extract list of files that need to be uploaded to Repository.
+    public static String getFileSystemPath(ClassLoader cl, String location)
+            throws IOException {
+        Enumeration<URL> enumOfResources = cl.getResources(location);
+        URL urlToParentFolder = enumOfResources.nextElement();
+        return urlToParentFolder.toString().replaceFirst("file:", "");
     }
 }

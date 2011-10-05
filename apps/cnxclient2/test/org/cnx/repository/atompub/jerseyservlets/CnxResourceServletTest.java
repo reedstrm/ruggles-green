@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import javax.xml.bind.JAXBException;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.cnx.atompubclient.CnxClient;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.FileContentType;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.objects.ResourceInfoWrapper;
 import org.cnx.common.repository.atompub.objects.ResourceWrapper;
@@ -40,30 +40,27 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * Test for {@link CnxAtomResourceServlet}
  * 
  * @author Arjun Satyapal
  */
 public class CnxResourceServletTest extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
 
-    public CnxResourceServletTest() throws Exception {
-        super();
-    }
-
     @Before
-    public void initialize() throws IOException, JAXBException, URISyntaxException {
+    public void initialize() throws Exception {
         cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
     @Test
-    public void test_new_createResource() throws Exception {
-        ResourceWrapper resource = cnxClient.createNewResource();
+    public void test_createResource() throws Exception {
+        ResourceWrapper resource = cnxClient.createResource();
         doTestForCreateResource(resource, false /* isMigaration */);
     }
 
     // TODO(arjuns) : Enable this test once we can have things done locally.
     // @Test
-    // public void test_new_createResourceForMigration() throws Exception {
+    // public void test_createResourceForMigration() throws Exception {
     // ResourceWrapper resource = client2.createNewResourceForMigration(new IdWrapper("r0001",
     // IdWrapper.Type.RESOURCE));
     // validateResource(resource, true /* isMigaration */);
@@ -80,7 +77,7 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
         File file = TestingUtils.createTempFile("abc.ext", null /* content */);
         Files.write("Hello Wrold", file, Charsets.UTF_8);
         
-        String expectedContentType = CnxMediaTypes.APPLICATION_CDF;
+        String expectedContentType = FileContentType.CDF.getContentType();
         cnxClient.uploadResource(resource.getUploadUri(), expectedContentType,
                 randomFileName, file);
 
@@ -132,14 +129,14 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
 
     @Test
     public void testCreateResource_NO_FILE_EXT() throws IllegalArgumentException,
-            URISyntaxException, IOException, JDOMException, FeedException {
-        ResourceWrapper resource = cnxClient.createNewResource();
+            URISyntaxException, IOException, JDOMException, FeedException, CnxException {
+        ResourceWrapper resource = cnxClient.createResource();
         String fileName = "noext";
 
         File file = TestingUtils.createTempFile(fileName, null /* content */);
-        Files.write("Hello Wrold", file, Charsets.UTF_8);
+        Files.write("Hello World", file, Charsets.UTF_8);
         
-        String expectedContentType = CnxMediaTypes.APPLICATION_OCTET_STREAM;
+        String expectedContentType = FileContentType.DEFAULT.getContentType();
         cnxClient.uploadResource(resource.getUploadUri(), expectedContentType, fileName, file);
 
         // Now validating ResourceInformation.
@@ -155,13 +152,13 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
     @Test
     public void testCreateResource_NO_FILE_NAME() throws
             IllegalArgumentException,
-            URISyntaxException, IOException, JDOMException, FeedException {
-        ResourceWrapper resource = cnxClient.createNewResource();
+            URISyntaxException, IOException, JDOMException, FeedException, CnxException {
+        ResourceWrapper resource = cnxClient.createResource();
 
         File file = TestingUtils.createTempFile(null/* fileName */, null /* content */);
         Files.write("Hello Wrold", file, Charsets.UTF_8);
 
-        String expectedContentType = CnxMediaTypes.APPLICATION_OCTET_STREAM;
+        String expectedContentType = FileContentType.DEFAULT.getContentType();
         cnxClient.uploadResource(resource.getUploadUri(), expectedContentType, null /* fileName */,
                 file);
 

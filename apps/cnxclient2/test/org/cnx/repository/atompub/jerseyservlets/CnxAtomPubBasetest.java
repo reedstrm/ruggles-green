@@ -45,12 +45,16 @@ public abstract class CnxAtomPubBasetest {
      * Remember that Port is binded once the construction phase is over. So derived classes want to
      * access URI created for CNX Server, they should not rely on constructor.
      */
-    public CnxAtomPubBasetest() throws IOException {
-        cnxServerAtomPubUrl = new URL("http://100.qa-cnx-repo.appspot.com/atompub");
-        cnxServerAtomPubUrl =
-            new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
-
-        // Initializing CnxAtomPub Service.
-        constants = new CnxAtomPubConstants(cnxServerAtomPubUrl);
+    public CnxAtomPubBasetest() {
+        try {
+            cnxServerAtomPubUrl = new URL("http://100.qa-cnx-repo.appspot.com/atompub");
+            cnxServerAtomPubUrl =
+                new URL("http://127.0.0.1:" + CnxAtomPubConstants.LOCAL_SERVER_PORT + "/atompub");
+    
+            // Initializing CnxAtomPub Service.
+            constants = new CnxAtomPubConstants(cnxServerAtomPubUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

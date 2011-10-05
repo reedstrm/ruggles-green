@@ -22,14 +22,11 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.cloud.sql.jdbc.internal.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;

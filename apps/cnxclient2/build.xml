@@ -143,7 +143,7 @@
 
     <property name="client-jar-name" value="org.cnx.cnxclient" />
     <property name="dest-client-jar"
-              value="${libdir}/${client-jar-name}.${timenow}.jar" />
+              value="${libdir}/2.${client-jar-name}.${timenow}.jar" />
 
     <target name="jar"
             description="Build a JAR of the classes"

@@ -23,12 +23,14 @@
 	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar" sourcepath="/home/arjuns/Downloads/openlogic-commons-httpclient-3.1-all-src-1.zip"/>
 	<classpathentry kind="lib" path="build/jars/servlet-api.jar"/>
 	<classpathentry kind="lib" path="build/jars/xercesImpl.jar" sourcepath="/home/arjuns/Downloads/xerces-2_11_0"/>
-	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/test/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="output" path="build/eclipse"/>
+	<classpathentry kind="lib" path="build/jars/httpclient-4.1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpclient-cache-4.1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpcore-4.1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpmime-4.1.2.jar"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

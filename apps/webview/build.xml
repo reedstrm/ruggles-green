@@ -106,7 +106,7 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="commons-httpclient/build.xml"
+        <ant antfile="httpcomponents-client/build.xml"
              inheritAll="true"
              target="default"
              dir="${third_party}" />
@@ -165,7 +165,7 @@
         <ant antfile="build.xml"
              inheritall="true"
              target="copyjar"
-             dir="${basedir}/${cnxclientdir}" />
+             dir="${basedir}/${cnxclient2.dir}" />
 
         <ant antfile="build.xml"
              inheritAll="true"

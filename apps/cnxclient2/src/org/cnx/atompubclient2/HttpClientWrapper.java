@@ -47,7 +47,8 @@ public class HttpClientWrapper {
         HttpParams httpParams = new BasicHttpParams();
         httpParams.setParameter("http.protocol.handle-redirects", true);
 
-        if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
+        // If running from UnitTest, then SystemProperty is null.
+        if (SystemProperty.environment.value() != null) {
             httpClient = new DefaultHttpClient(new GAEConnectionManager(), httpParams);
         } else {
             httpClient = new DefaultHttpClient();

@@ -96,7 +96,14 @@ public class ModuleMigrator extends ItemMigrator {
                 nextVersionNum++;
             }
 
-            // Create the actual version
+            // TODO(tal): switch to this version to have actual gaps for takedowns
+            // if (directoryVersionNum > nextVersionNum) {
+            //     getContext().incrementCounter("MODULE_VERSION_GAPS", 1);
+            //     getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", (directoryVersionNum - nextVersionNum));
+            //     nextVersionNum = directoryVersionNum;
+            // }
+
+            // Add the version
             MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
             migrateNextModuleVersion(atompubEntry, nextVersionNum, versionDirectory);
             nextVersionNum++;

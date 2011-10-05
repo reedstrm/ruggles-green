@@ -265,8 +265,8 @@ public class ModuleOperations {
             if (expectedVersionNumber != null && !expectedVersionNumber.equals(newVersionNumber)) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
-                        "Version conflict in module " + moduleId + ", expected: "
-                                + expectedVersionNumber + ", actual: " + newVersionNumber, log);
+                        "Version conflict in module " + moduleId + ", requested: "
+                                + expectedVersionNumber + ", expected: " + newVersionNumber, log);
             }
 
             // Create new version entity
@@ -279,7 +279,7 @@ public class ModuleOperations {
             if (Services.persistence.hasObjectWithKey(versionEntity.getKey())) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
-                        "Server module data inconsistency. Key: " + versionEntity.getKey(), log);
+                        "Server module data inconsistency. Module migration key: " + versionEntity.getKey(), log);
             }
             // Update the persistence
             Services.persistence.write(moduleEntity, versionEntity);

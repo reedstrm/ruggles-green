@@ -48,7 +48,7 @@ import org.jdom.JDOMException;
  * Client implementation of Atom media-link entry, an Atom entry that provides
  * meta-data for a media file (e.g. uploaded image or audio file).
  */
-@SuppressWarnings({ "rawtypes", "rawtypes", "unchecked", "deprecation", "unused" })
+@SuppressWarnings({ "rawtypes", "rawtypes", "unchecked", "deprecation", "unused", "serial" })
 public class ClientMediaEntry extends ClientEntry {
     private static final Log  logger = LogFactory.getLog(ClientMediaEntry.class);
 

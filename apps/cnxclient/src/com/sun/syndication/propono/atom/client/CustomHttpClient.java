@@ -15,8 +15,6 @@
  */
 package com.sun.syndication.propono.atom.client;
 
-import org.apache.commons.httpclient.URI;
-
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +25,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import javax.ws.rs.core.Response.Status;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -35,6 +32,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.StatusLine;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -42,6 +40,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
  * Rome-propono uses commons-httpclient which does not work on AppEngine. So creating a custom HTTP
@@ -178,8 +177,8 @@ public class CustomHttpClient extends HttpClient {
         updateStatusLineInResponseBody(method, responseCode);
 
         String response = "";
-        if (responseCode == Status.OK.getStatusCode()
-                || responseCode == Status.CREATED.getStatusCode()) {
+        if (responseCode == HttpStatusEnum.OK.getStatusCode()
+                || responseCode == HttpStatusEnum.CREATED.getStatusCode()) {
             response = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
         }
         return response;

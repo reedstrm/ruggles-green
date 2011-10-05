@@ -47,6 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * Client implementation of Atom entry, extends ROME Entry to add methods for
  * easily getting/setting content, updating and removing the entry from the server.
  */
+@SuppressWarnings("serial")
 public class ClientEntry extends Entry {
     private static final Log  logger = LogFactory.getLog(ClientEntry.class);
 

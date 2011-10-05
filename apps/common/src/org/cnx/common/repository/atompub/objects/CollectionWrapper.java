@@ -27,8 +27,8 @@ import org.cnx.common.repository.atompub.VersionWrapper;
  * 
  * @author Arjun Satyapal
  */
-public class ModuleWrapper extends AtomPubResource {
-    public ModuleWrapper(IdWrapper id, VersionWrapper version) {
+public class CollectionWrapper extends AtomPubResource {
+    public CollectionWrapper(IdWrapper id, VersionWrapper version) {
         super(id, version);
     }
     
@@ -43,17 +43,17 @@ public class ModuleWrapper extends AtomPubResource {
     }
 
     /**
-     * Function to create {@link ModuleWrapper} from Atom Entry returned by CNX Repository.
+     * Function to create {@link CollectionWrapper} from Atom Entry returned by CNX Repository.
      * 
      * @param entry AtomEntry returned by Server.
      * 
      * @return ModuleWrapper representation for the Entry.
      * @throws URISyntaxException
      */
-    public static ModuleWrapper fromEntry(Entry entry) throws URISyntaxException {
+    public static CollectionWrapper fromEntry(Entry entry) throws URISyntaxException {
         IdWrapper id = CnxAtomPubUtils.getIdFromAtomPubId(entry.getId());
         VersionWrapper version = CnxAtomPubUtils.getVersionFromAtomPubId(entry.getId());
-        ModuleWrapper module = new ModuleWrapper(id, version);
+        CollectionWrapper module = new CollectionWrapper(id, version);
         
         if (version.getVersionInt() != 0) {
             module.setSelfUri(CnxAtomPubLinkRelations.getSelfUri(entry));

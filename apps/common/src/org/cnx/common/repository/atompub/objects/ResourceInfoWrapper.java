@@ -26,7 +26,8 @@ import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
 
 /**
- * Wrapper object for CNX Resource.
+ * Wrapper object for CNX ResourceInfo.
+ * 
  * @author Arjun Satyapal
  */
 public class ResourceInfoWrapper extends AtomPubResource {

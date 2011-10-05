@@ -37,8 +37,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.apache.commons.codec.binary.Base64;
-import org.cnx.common.exceptions.CnxException;
-import org.cnx.common.repository.PrettyXmlOutputter;
 import org.cnx.resourceentry.ResourceEntryValue;
 import org.cnx.resourcemapping.LocationInformation;
 import org.cnx.resourcemapping.Repository;
@@ -144,30 +142,10 @@ public class CnxAtomPubUtils {
      * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
      *            moduleEntryXml is already decoded.
      * @return CNXML (response is already decoded).
-     * 
-     * @deprecated use {@link #getCnxmlFromModuleVersionEntry(Entry)}
      */
-    @Deprecated
     public static String getCnxmlFromModuleEntryXml(String moduleEntryXml) throws JDOMException,
             IOException {
         return getDecodedChild("cnxml-doc", moduleEntryXml);
-    }
-
-    /**
-     * Get CNXML-doc from ModuleEntry.
-     * 
-     * @param moduleVersionEntry ModuleEntry returned as part of the response. This method expects
-     *            that moduleEntryXml is already decoded.
-     * @return CNXML (response is already decoded).
-     * @throws CnxException
-     * 
-     * TODO(arjuns) : Optimize this method.
-     */
-    public static String getCnxmlFromModuleVersionEntry(Entry moduleVersionEntry)
-            throws JDOMException,
-            IOException, CnxException {
-        return getDecodedChild("cnxml-doc",
-                PrettyXmlOutputter.prettyXmlOutputEntry(moduleVersionEntry));
     }
 
     /**
@@ -176,29 +154,10 @@ public class CnxAtomPubUtils {
      * @param moduleEntryXml ModuleEntry returned as part of the response. This method expects that
      *            moduleEntryXml is already decoded.
      * @return ResourceMapping XML (response is already decoded).
-     * @deprecated use {@link #getResourceMappingDocFromModuleEntry(Entry)}
-     * 
      */
-    @Deprecated
     public static String getResourceMappingDocFromModuleEntryXml(String moduleEntryXml)
             throws JDOMException, IOException {
         return getDecodedChild("resource-mapping-doc", moduleEntryXml);
-    }
-
-    /**
-     * Get ResourceMapping doc from ModuleEntry.
-     * 
-     * @param moduleEntry ModuleEntry returned as part of the response. This method expects that
-     *            moduleEntryXml is already decoded.
-     * @return ResourceMapping XML (response is already decoded).
-     * @throws CnxException
-     * 
-     * TODO(arjuns) : Optimize this method.
-     */
-    public static String getResourceMappingDocFromModuleEntry(Entry moduleEntry)
-            throws JDOMException, IOException, CnxException {
-        return getDecodedChild("resource-mapping-doc",
-                PrettyXmlOutputter.prettyXmlOutputEntry(moduleEntry));
     }
 
     private static String getDecodedChild(String childElement, String moduleEntryXml)
@@ -379,5 +338,18 @@ public class CnxAtomPubUtils {
         }
 
         return jaxbObjectToString(Resources.class, resources);
+    }
+    
+    /**
+     * Convenience method to get first content object in content collection.
+     * Atom 1.0 allows only one content element per entry.
+     */
+    public static String getContentAsString(@SuppressWarnings("rawtypes") List listOfContent) {
+        if (listOfContent != null && listOfContent.size() > 0) {
+            Content content = (Content) listOfContent.get(0);
+            return content.getValue();
+        }
+        
+        return null;
     }
 }

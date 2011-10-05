@@ -16,6 +16,7 @@
 package org.cnx.common.repository.atompub.objects;
 
 import com.sun.syndication.feed.atom.Entry;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
@@ -23,46 +24,47 @@ import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
 
 /**
- * Wrapper object for CNX Module.
+ * Wrapper object for CNX Collection Version.
  * 
  * @author Arjun Satyapal
  */
-public class ModuleWrapper extends AtomPubResource {
-    public ModuleWrapper(IdWrapper id, VersionWrapper version) {
+public class CollectionVersionWrapper extends AtomPubResource {
+    private final String collectionXml;
+
+    public CollectionVersionWrapper(IdWrapper id, VersionWrapper version, String collectionXml) {
         super(id, version);
+        this.collectionXml = collectionXml;
     }
-    
+
     @Override
     protected StringBuilder getStringBuilder() {
-        return super.getStringBuilder();
+        return super.getStringBuilder()
+                .append("collectionXml=").append(collectionXml);
     }
-    
+
     @Override
     public String toString() {
         return this.getStringBuilder().toString();
     }
 
-    /**
-     * Function to create {@link ModuleWrapper} from Atom Entry returned by CNX Repository.
-     * 
-     * @param entry AtomEntry returned by Server.
-     * 
-     * @return ModuleWrapper representation for the Entry.
-     * @throws URISyntaxException
-     */
-    public static ModuleWrapper fromEntry(Entry entry) throws URISyntaxException {
+    public static CollectionVersionWrapper fromEntry(Entry entry) throws URISyntaxException,
+            IOException {
         IdWrapper id = CnxAtomPubUtils.getIdFromAtomPubId(entry.getId());
         VersionWrapper version = CnxAtomPubUtils.getVersionFromAtomPubId(entry.getId());
-        ModuleWrapper module = new ModuleWrapper(id, version);
-        
-        if (version.getVersionInt() != 0) {
-            module.setSelfUri(CnxAtomPubLinkRelations.getSelfUri(entry));
-        }
-        
-        module.setEditUri(CnxAtomPubLinkRelations.getEditUri(entry));
-        
-        module.setPublished(entry.getPublished());
-        
-        return module;
+
+        String encodedCollectionXml = CnxAtomPubUtils.getContentAsString(entry.getContents());
+        String decodedCollectionXml = CnxAtomPubUtils.decodeFromBase64EncodedString(encodedCollectionXml);
+
+        CollectionVersionWrapper collection =
+                new CollectionVersionWrapper(id, version, decodedCollectionXml);
+
+        collection.setSelfUri(CnxAtomPubLinkRelations.getSelfUri(entry));
+        collection.setPublished(entry.getPublished());
+
+        return collection;
+    }
+
+    public String getCollectionXml() {
+        return collectionXml;
     }
 }

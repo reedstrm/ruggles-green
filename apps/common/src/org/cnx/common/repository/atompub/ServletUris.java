@@ -39,19 +39,19 @@ public class ServletUris {
     public static class ServiceDocument {
         /** Name for CNX Workspace under ServiceDocument. */
         public static final String CNX_WORKSPACE_TITLE = "CNXv2 Workspace";
-        
+
         /**
-         * URI relative to for CnxAtomPub ServiceDocument Servlet relative to
-         * Jersey root package. It is defined in Application's web.xml file.
+         * URI relative to for CnxAtomPub ServiceDocument Servlet relative to Jersey root package.
+         * It is defined in Application's web.xml file.
          * 
          * @deprecated use {@link #SERVICE_DOCUMENT_SERVLET2}
          */
         @Deprecated
         public static final String SERVICE_DOCUMENT_SERVLET = "/service_document";
-        
+
         /**
-         * URI relative to for CnxAtomPub ServiceDocument Servlet relative to
-         * Jersey root package. It is defined in Application's web.xml file.
+         * URI relative to for CnxAtomPub ServiceDocument Servlet relative to Jersey root package.
+         * It is defined in Application's web.xml file.
          */
         public static final String SERVICE_DOCUMENT_SERVLET2 = "/service_document2";
 
@@ -65,8 +65,8 @@ public class ServletUris {
 
     public static class CategoryDocument {
         /**
-         * URI for CnxAtomPub CategoryDocument Servlet relative to
-         * Jersey root package. It is defined in Application's web.xml file.
+         * URI for CnxAtomPub CategoryDocument Servlet relative to Jersey root package. It is
+         * defined in Application's web.xml file.
          */
         public static final String CATEGORY_DOCUMENT_SERVLET = "/category_document";
 
@@ -81,8 +81,7 @@ public class ServletUris {
     public static class Resource {
         /**
          * URI for CnxAtomPub ResourceServlet relative to Jersey root package. It is defined in
-         * Application's web.xml file.
-         * .
+         * Application's web.xml file. .
          */
         public static final String RESOURCE_SERVLET = "/resource";
 
@@ -108,7 +107,7 @@ public class ServletUris {
          * In order to fetch the resource, clients should do HTTP Get on this URI.
          */
         public static final String RESOURCE_PATH = "/{" + RESOURCE_ID_PATH_PARAM + "}";
-        
+
         /**
          * URI relative to : {@link #RESOURCE_SERVLET}
          * 
@@ -139,6 +138,14 @@ public class ServletUris {
          */
         public static final String MODULE_POST_MIGRATION = "/" + MIGRATION + "/{"
                 + MODULE_ID_PATH_PARAM + "}";
+
+        /**
+         * URI relative to : {@link #MODULE_POST_MIGRATION}
+         * 
+         * Path to a Module-Version.
+         */
+        public static final String MODULE_PUT_MIGRATION_VERSION = MODULE_POST_MIGRATION + "/{"
+                + MODULE_VERSION_PATH_PARAM + "}";
 
         /**
          * URI relative to : {@link #MODULE_SERVLET}
@@ -191,6 +198,15 @@ public class ServletUris {
          */
         public static final String COLLECTION_POST_MIGRATION = "/" + MIGRATION + "/{"
                 + COLLECTION_ID_PATH_PARAM + "}";
+
+        /**
+         * URI relative to : {@link #COLLECTION_POST_MIGRATION}
+         * 
+         * Path to PUT a new Version for Collection during migration.
+         */
+        public static final String COLLECTION_PUT_MIGRATION_VERSION = COLLECTION_POST_MIGRATION
+                + "/{"
+                + COLLECTION_VERSION_PATH_PARAM + "}";
 
         /**
          * URI relative to : {@link #COLLECTION_SERVLET}

@@ -15,16 +15,16 @@
  */
 package org.cnx.common.exceptions;
 
-import javax.ws.rs.core.Response.Status;
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
- * CnxException to indicate a {@link Status#CONFLICT}.
+ * CnxException to indicate a {@link HttpStatusEnum#CONFLICT}.
  * 
  * @author Arjun Satyapal
  */
 @SuppressWarnings("serial")
 public class CnxConflictException extends CnxException {
     public CnxConflictException(String message, Throwable throwable) {
-        super(Status.CONFLICT, message, throwable);
+        super(HttpStatusEnum.CONFLICT, message, throwable);
     }
 }

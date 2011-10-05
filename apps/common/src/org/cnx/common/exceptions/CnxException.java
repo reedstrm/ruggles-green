@@ -14,7 +14,7 @@
  * the License.
  */
 package org.cnx.common.exceptions;
-import javax.ws.rs.core.Response.Status;
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
  * A wrapper exception that will be used to send exception details back to client.
@@ -23,13 +23,13 @@ import javax.ws.rs.core.Response.Status;
  */
 @SuppressWarnings("serial")
 public class CnxException extends Exception {
-    private Status jerseyStatus;
-    public CnxException(Status jerseyStatus, String message, Throwable throwable) {
+    private HttpStatusEnum httpStatus;
+    public CnxException(HttpStatusEnum httpStatus, String message, Throwable throwable) {
         super(message, throwable);
-        this.jerseyStatus = jerseyStatus;
+        this.httpStatus = httpStatus;
     }
     
-    public Status getJerseyStatus() {
-        return jerseyStatus;
+    public HttpStatusEnum getHttpStatus() {
+        return httpStatus;
     }
 }

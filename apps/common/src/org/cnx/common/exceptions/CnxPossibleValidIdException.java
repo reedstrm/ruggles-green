@@ -15,10 +15,9 @@
  */
 package org.cnx.common.exceptions;
 
+import org.cnx.common.http.HttpStatusEnum;
 import org.cnx.common.repository.RepositoryConstants;
 import org.cnx.common.repository.atompub.IdWrapper;
-
-import javax.ws.rs.core.Response.Status;
 
 /**
  * This is a special exception which is thrown when module/collection ids are valid, but fall under
@@ -37,7 +36,7 @@ public class CnxPossibleValidIdException extends CnxRuntimeException {
 
     public CnxPossibleValidIdException(IdWrapper id, String message,
             Throwable throwable) {
-        super(Status.SEE_OTHER, message, throwable);
+        super(HttpStatusEnum.SEE_OTHER, message, throwable);
         this.id = id;
     }
 

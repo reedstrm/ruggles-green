@@ -15,7 +15,7 @@
  */
 package org.cnx.common.exceptions;
 
-import javax.ws.rs.core.Response.Status;
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
  * CNX Exception to represent INTERNAL_SERVER_ERROR.
@@ -25,6 +25,6 @@ import javax.ws.rs.core.Response.Status;
 @SuppressWarnings("serial")
 public class CnxInternalServerErrorException extends CnxException {
     public CnxInternalServerErrorException(String message, Throwable throwable) {
-        super(Status.INTERNAL_SERVER_ERROR, message, throwable);
+        super(HttpStatusEnum.INTERNAL_SERVER_ERROR, message, throwable);
     }
 }

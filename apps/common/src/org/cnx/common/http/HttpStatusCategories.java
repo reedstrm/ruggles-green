@@ -13,23 +13,27 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.common.exceptions;
-import org.cnx.common.http.HttpStatusEnum;
+package org.cnx.common.http;
 
 /**
- * A wrapper exception that will be used to throw Runtime exceptions for CNX.
+ * See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
  * 
- * @author (Arjun Satyapal)
+ * @author Arjun Satyapal
  */
-@SuppressWarnings("serial")
-public class CnxRuntimeException extends RuntimeException {
-    private HttpStatusEnum httpStatus;
-    public CnxRuntimeException(HttpStatusEnum httpStatus, String message, Throwable throwable) {
-        super(message, throwable);
-        this.httpStatus = httpStatus;
+public enum HttpStatusCategories {
+    INFORMATIONAL(1),
+    SUCCESSFUL(2),
+    REDIRECTION(3),
+    CLIENT_ERROR(4),
+    SERVER_ERROR(5);
+    
+    private int startingDigit;
+    
+    private HttpStatusCategories(int startingDigit) {
+        this.startingDigit = startingDigit;
     }
     
-    public HttpStatusEnum getHttpStatus() {
-        return httpStatus;
+    public int getStartingDigit() {
+        return startingDigit;
     }
 }

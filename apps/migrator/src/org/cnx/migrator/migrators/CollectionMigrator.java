@@ -18,13 +18,14 @@ package org.cnx.migrator.migrators;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
 
-import com.google.common.collect.ImmutableList;
-import com.sun.syndication.propono.atom.client.ClientEntry;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
+
+import com.google.common.collect.ImmutableList;
+import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * A migrator for a collection item, including all of its versions

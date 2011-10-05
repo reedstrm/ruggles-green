@@ -47,7 +47,7 @@ public class MigratorConfiguration {
 
     // TODO(tal): setup the java formatter to wrap these lines correctly
     @Option(name = "-failure_delay_ms", usage = "Millis delay before retrying a failing attemp")
-    private int failureDelayMillis = 10;
+    private int failureDelayMillis = 5000;
 
     @Option(name = "-transaction_delay_ms", usage = "Millis delay between submission to the same transaction lock")
     private int transactionDelayMillis = 1000;
@@ -216,7 +216,7 @@ public class MigratorConfiguration {
         sb.append(String.format("  max_threads .............. [%s]\n", getMaxThreads()));
         sb.append('\n');
 
-        sb.append(String.format("  shard_filter ............. [%s]%s\n", 
+        sb.append(String.format("  shard_filter ............. [%s]%s\n",
                 shardFilter, shardFilter.equals(".*") ? "" : " (Partial!)"));
         sb.append('\n');
         sb.append(String.format("  ramp_up_time_secs ........ [%d]\n", rampUpTimeSecs));

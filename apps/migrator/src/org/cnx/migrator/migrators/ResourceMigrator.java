@@ -16,15 +16,21 @@
 package org.cnx.migrator.migrators;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sun.syndication.propono.atom.client.ClientEntry;
 import java.io.File;
 import java.util.Properties;
+
+import javax.annotation.Nullable;
+
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
+
+import com.sun.syndication.propono.atom.client.ClientEntry;
+
 
 /**
  * A migrator for a resource item
@@ -46,16 +52,18 @@ public class ResourceMigrator extends ItemMigrator {
      */
     @Override
     public void doWork() {
-        // TODO(tal): read and use resource properties
-        @SuppressWarnings("unused")
-        final Properties properties =
-        resourceDirectory.readPropertiesFile("properties");
+        final Properties properties = resourceDirectory.readPropertiesFile("properties");
+        final String contentTypeProperty =
+                checkNotNull(properties.getProperty("mimetype"), "Resource: %s", resourceDirectory);
+
+        // An empty content type is mapped to null to represent 'unknown'.
+        @Nullable String contentType = contentTypeProperty.isEmpty() ? null : contentTypeProperty;
 
         final String resourceId = resourceDirectoryToId(resourceDirectory);
         final File resourceFile = resourceDirectory.subFile("data");
 
         final ClientEntry resourceUploadEntry = createResource(resourceId);
-        uploadResourceBlob(resourceId, resourceUploadEntry, resourceFile);
+        uploadResourceBlob(resourceId, resourceUploadEntry, resourceFile, resourceId, contentType);
     }
 
     /** Create a resource entity of given id and return an entry to upload its blob */
@@ -89,7 +97,8 @@ public class ResourceMigrator extends ItemMigrator {
     }
 
     /** Upload a resource blob from a file */
-    private void uploadResourceBlob(String resourceId, ClientEntry blobEntry, File resourceFile) {
+    private void uploadResourceBlob(String resourceId, ClientEntry blobEntry, File resourceFile,
+            String uploadFileName, @Nullable String contentType) {
         checkArgument(resourceId.equals(blobEntry.getId()), "Expected: %s, found: %s", resourceId,
                 blobEntry.getId());
         int attempt;
@@ -97,7 +106,10 @@ public class ResourceMigrator extends ItemMigrator {
             try {
                 // TODO(tal): send also content type from resource properties. Make sure
                 // repository does not overide it.
-                getCnxClient().uploadFileToBlobStore(blobEntry, resourceFile);
+                // TODO(tal): can we have a real upload file id from CNX exported data?
+                getCnxClient().uploadFileToBlobStore(blobEntry, resourceFile, uploadFileName,
+                        contentType);
+                getContext().incrementCounter("RESOURCE_TYPE_[" + (contentType == null ? "(null)" : contentType) + "]", 1);
                 message("Resource blob uploaded: %s", resourceId);
                 // TODO(tal): verify resource by comparing its size and md5
                 return;

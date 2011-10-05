@@ -178,7 +178,7 @@ public class CnxAtomModuleServlet {
     public Response createNewModuleVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String versionString)
-            throws CnxException {
+                    throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
@@ -201,7 +201,7 @@ public class CnxAtomModuleServlet {
             cnxmlDoc = CnxAtomPubUtils.getCnxmlFromModuleEntryXml(decodedModuleEntryValue);
             resourceMappingDoc =
                     CnxAtomPubUtils
-                            .getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
+                    .getResourceMappingDocFromModuleEntryXml(decodedModuleEntryValue);
         } catch (UnsupportedEncodingException e) {
             throw new CnxBadRequestException("Invalid Encoding", e);
         } catch (JDOMException e) {

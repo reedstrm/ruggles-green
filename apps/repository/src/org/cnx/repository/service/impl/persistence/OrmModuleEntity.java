@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl.persistence;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Date;
 
 import javax.annotation.Nullable;
@@ -66,6 +68,11 @@ public class OrmModuleEntity extends OrmEntity {
     public int incrementVersionCount() {
         versionCount++;
         return versionCount;
+    }
+
+    public void setVersionCount(int value) {
+        checkArgument(value >= 0, "Invalid version count: %s", value);
+        this.versionCount = value;
     }
 
     public static String moduleKeyToId(Key moduleKey) {

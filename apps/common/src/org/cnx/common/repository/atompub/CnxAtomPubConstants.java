@@ -22,14 +22,15 @@ import java.util.logging.Logger;
 
 /**
  * TODO(arjuns) : Add javadoc.
- * 
+ * TODO(arjuns) : Add tests for methods. 
  * @author Arjun Satyapal
+ *
  */
 public class CnxAtomPubConstants {
     private final Logger logger = Logger.getLogger(CnxAtomPubConstants.class.getName());
 
     /** Path for REST URL for ATOMPUB API */
-    public final URL atomPubRestUrl;
+    private final URL atomPubRestUrl;
 
     // TODO(arjuns) : Fix this.
     public final static int LOCAL_SERVER_PORT = 8888;
@@ -43,12 +44,24 @@ public class CnxAtomPubConstants {
         return atomPubRestUrl;
     }
 
-    /** Get URI for CategoryDocument. */
+    /** 
+     * Get URI for CategoryDocument.
+     * @deprecated use {@link #getServiceDocumentAbsPath2()}
+     */
+    // TODO(arjuns) : Rename this to getAPServiceDocumentAbsPath()
+    @Deprecated
     public String getServiceDocumentAbsPath() {
         return atomPubRestUrl + ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET;
     }
 
     /** Get URI for CategoryDocument. */
+    // TODO(arjuns) : Rename this to getAPServiceDocumentAbsPath()
+    public String getServiceDocumentAbsPath2() {
+        return atomPubRestUrl + ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET2;
+    }
+    
+    /** Get URI for CategoryDocument. */
+    // TODO(arjuns) : Rename this to getAPCategoryDocumentAbsPath()
     public String getCategoryDocumentAbsPath() {
         return atomPubRestUrl + ServletUris.CategoryDocument.CATEGORY_DOCUMENT_SERVLET;
     }
@@ -95,7 +108,6 @@ public class CnxAtomPubConstants {
     /*
      * Methods for handling CNX Schemes.
      */
-
     /** Scheme for AtomPub-Collection for Resources. */
     public final URL getAPCResourceScheme() {
         return getAPCResourcesAbsPath();

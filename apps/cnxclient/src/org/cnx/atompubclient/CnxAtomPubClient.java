@@ -39,7 +39,6 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -53,6 +52,8 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.cnx.common.exceptions.CnxConflictException;
 import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.http.HttpStatusEnum;
+import org.cnx.common.repository.atompub.CnxAtomPubCollectionEnum;
 import org.cnx.common.repository.atompub.CnxAtomPubConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
@@ -149,21 +150,21 @@ public class CnxAtomPubClient {
      * Get AtomPub collection for CNX Resources.
      */
     public ClientCollection getCollectionResource() {
-        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_RESOURCE_TITLE);
+        return getCollectionByTitle(CnxAtomPubCollectionEnum.APC_RESOURCES.getTitle());
     }
 
     /**
      * Get AtomPub collection for CNX Modules.
      */
     public ClientCollection getCollectionModule() {
-        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_MODULE_TITLE);
+        return getCollectionByTitle(CnxAtomPubCollectionEnum.APC_MODULE.getTitle());
     }
 
     /**
      * Get AtomPub collection for CNX Collections.
      */
     public ClientCollection getCollectionCnxCollection() {
-        return getCollectionByTitle(CnxAtomPubUtils.COLLECTION_CNX_COLLECTION_TITLE);
+        return getCollectionByTitle(CnxAtomPubCollectionEnum.APC_COLLECTION.getTitle());
     }
 
     /**
@@ -264,14 +265,15 @@ public class CnxAtomPubClient {
      * @param blobstoreUrl where file needs to be uploaded.
      * @param file File to be uploaded to Blobstore.
      */
-    private void postFileToBlobstore(final URL blobstoreUrl, final File file, final String fileName,
+    private void postFileToBlobstore(final URL blobstoreUrl, final File file,
+            final String fileName,
             final String contentType) throws IOException {
         String uploadFileName = fileName == null ? file.getName() : fileName;
         // TODO(arjuns) : Add test for this.
         PostMethod postMethod = new PostMethod(blobstoreUrl.toString());
         Part[] parts =
-            { new FilePart(uploadFileName, new FilePartSource(uploadFileName, file),
-                    contentType, null) };
+        { new FilePart(uploadFileName, new FilePartSource(uploadFileName, file),
+                contentType, null) };
 
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
         int status = httpClient.executeMethod(postMethod);
@@ -475,7 +477,7 @@ public class CnxAtomPubClient {
         InputStream is = postMethod.getResponseBodyAsStream();
         code = postMethod.getStatusCode();
 
-        if (code == Status.CONFLICT.getStatusCode()) {
+        if (code == HttpStatusEnum.CONFLICT.getStatusCode()) {
             throw new CnxConflictException("ServerSide conflict for URL : " + migrationUrl, null /* throwable */);
         }
         if (code != 200 && code != 201) {

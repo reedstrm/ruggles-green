@@ -15,6 +15,8 @@
  */
 package org.cnx.repository.scripts.migrators;
 
+import org.cnx.common.http.HttpStatusEnum;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -30,10 +32,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
 import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.common.exceptions.CnxRuntimeException;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -99,7 +103,7 @@ public class ParallelModuleMigrator implements Runnable {
 
         return listOfResources;
     }
-
+    
     public static class ResourceFilter implements FilenameFilter {
         // List of File Extensions that will not be uploaded to repository.
         private Set<String> ignoreExtensions = Sets.newHashSet(".xml", ".cnxml");
@@ -188,7 +192,7 @@ public class ParallelModuleMigrator implements Runnable {
                                 cnxClient.getModuleVersionEntry(cnxModuleId,
                                         CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
                     } catch (CnxRuntimeException e) {
-                        if (e.getJerseyStatus() == Status.NOT_FOUND) {
+                        if (e.getHttpStatus() == HttpStatusEnum.NOT_FOUND) {
                             // Expected.
                             logger.info(e.getLocalizedMessage());
                         } else {
@@ -215,7 +219,7 @@ public class ParallelModuleMigrator implements Runnable {
                 success = true;
 
                 logger.info("Successfully uploaded : " + moduleLocation + " to : "
-                        + moduleVersionEntry.getEditURI());
+                        + CnxAtomPubLinkRelations.getEditUri(moduleVersionEntry).getHrefResolved());
                 return moduleVersionEntry;
             } catch (Exception e) {
                 logger.severe(Throwables.getStackTraceAsString(e));
@@ -237,7 +241,7 @@ public class ParallelModuleMigrator implements Runnable {
 
     private ClientEntry publishNewVersion(ClientEntry entryToUpdate, String cnxmlAsString,
             String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
-            IOException {
+            IOException, XMLStreamException, FactoryConfigurationError {
         cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
 
         return entryToUpdate;

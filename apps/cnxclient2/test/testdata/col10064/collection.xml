@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:cnx="http://cnx.rice.edu/cnxml"
+  xmlns:cnxorg="http://cnx.rice.edu/system-info" xmlns:md="http://cnx.rice.edu/mdml"
+  xmlns:col="http://cnx.rice.edu/collxml" xmlns:cnxml="http://cnx.rice.edu/cnxml"
+  xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:bib="http://bibtexml.sf.net/"
+  xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xml:lang="en" type="Course">
+  <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+    <!-- WARNING! The 'metadata' section is read only. Do not edit below. Changes 
+      to the metadata section in the source will not be saved. -->
+
+    <md:repository>http://cnx.org/content</md:repository>
+    <md:content-url>http://cnx.org/content/col10064/1.13</md:content-url>
+    <md:content-id>col10064</md:content-id>
+    <md:title>Signals and Systems</md:title>
+
+
+    <md:version>1.13</md:version>
+    <md:created>2001/06/21</md:created>
+    <md:revised>2011/09/02 11:37:03.512 GMT-5</md:revised>
+
+    <md:actors>
+
+
+      <md:person userid="skruzick">
+        <md:firstname>Stephen</md:firstname>
+        <md:surname>Kruzick</md:surname>
+        <md:fullname>Stephen Kruzick</md:fullname>
+        <md:email>skruzick@andrew.cmu.edu</md:email>
+      </md:person>
+
+
+
+      <md:person userid="slycaldron">
+        <md:firstname>Dan</md:firstname>
+        <md:surname>Calderon</md:surname>
+        <md:fullname>Dan Calderon</md:fullname>
+        <md:email>slycaldron@netscape.net</md:email>
+      </md:person>
+
+
+
+      <md:person userid="mhutch">
+        <md:firstname>Matthew</md:firstname>
+        <md:surname>Hutchinson</md:surname>
+        <md:fullname>Matthew Hutchinson</md:fullname>
+        <md:email>mhutch85@gmail.com</md:email>
+      </md:person>
+
+
+
+      <md:person userid="richb">
+        <md:firstname>Richard</md:firstname>
+        <md:surname>Baraniuk</md:surname>
+        <md:fullname>Richard Baraniuk</md:fullname>
+        <md:email>richb@rice.edu</md:email>
+      </md:person>
+
+
+
+      <md:person userid="Markpanzee">
+        <md:firstname>Mark</md:firstname>
+        <md:surname>Davenport</md:surname>
+        <md:fullname>Mark Davenport</md:fullname>
+        <md:email>md@rice.edu</md:email>
+      </md:person>
+
+
+
+      <md:person userid="mariyah">
+        <md:firstname>Mariyah</md:firstname>
+        <md:surname>Poonawala</md:surname>
+        <md:fullname>Mariyah Poonawala</md:fullname>
+        <md:email>mariyah@rice.edu</md:email>
+      </md:person>
+
+
+
+      <md:person userid="prash">
+        <md:firstname>Prashant</md:firstname>
+        <md:surname>Singh</md:surname>
+        <md:fullname>Prashant Singh</md:fullname>
+        <md:email>prash@ece.rice.edu</md:email>
+      </md:person>
+
+    </md:actors>
+    <md:roles>
+      <md:role type="author">richb</md:role>
+      <md:role type="maintainer">richb prash mariyah mhutch Markpanzee skruzick
+        slycaldron
+      </md:role>
+      <md:role type="licensor">richb</md:role>
+
+
+    </md:roles>
+
+    <md:license url="http://creativecommons.org/licenses/by/3.0/" />
+    <!-- For information on license requirements for use or modification, see license 
+      url in the above <md:license> element. For information on formatting required attribution, 
+      see the URL: CONTENT_URL/content_info#cnx_cite_header where CONTENT_URL is the value 
+      provided above in the <md:content-url> element. -->
+
+
+
+
+
+
+
+    <md:keywordlist>
+      <md:keyword>continuous time</md:keyword>
+      <md:keyword>convolution</md:keyword>
+      <md:keyword>discrete time</md:keyword>
+      <md:keyword>elec 301</md:keyword>
+      <md:keyword>fast fourier transform</md:keyword>
+      <md:keyword>FFT</md:keyword>
+      <md:keyword>fourier series</md:keyword>
+      <md:keyword>fourier transform</md:keyword>
+      <md:keyword>frequency domain</md:keyword>
+      <md:keyword>impulse response</md:keyword>
+      <md:keyword>labview</md:keyword>
+      <md:keyword>laplace transform</md:keyword>
+      <md:keyword>linear algebra</md:keyword>
+      <md:keyword>reconstruction</md:keyword>
+      <md:keyword>rice university</md:keyword>
+      <md:keyword>sampling</md:keyword>
+      <md:keyword>signal</md:keyword>
+      <md:keyword>signal processing</md:keyword>
+      <md:keyword>system</md:keyword>
+      <md:keyword>time domain</md:keyword>
+      <md:keyword>transform</md:keyword>
+      <md:keyword>z-transform</md:keyword>
+    </md:keywordlist>
+
+    <md:subjectlist>
+      <md:subject>Science and Technology</md:subject>
+    </md:subjectlist>
+
+    <md:abstract>This course deals with signals, systems, and transforms, from
+      their theoretical mathematical foundations to practical implementation in
+      circuits and computer algorithms. At the conclusion of ELEC 301, you
+      should have a deep understanding of the mathematics and practical issues
+      of signals in continuous and discrete time, linear time invariant systems,
+      convolution, and Fourier transforms.
+    </md:abstract>
+
+    <md:language>en</md:language>
+
+
+
+
+
+    <md:institution>Rice University</md:institution>
+    <md:course-code>Elec 301</md:course-code>
+    <md:instructor>Richard Baraniuk</md:instructor>
+
+    <!-- WARNING! The 'metadata' section is read only. Do not edit above. Changes 
+      to the metadata section in the source will not be saved. -->
+  </metadata>
+
+  <col:parameters>
+    <col:param name="real-imaginary-notation" value="text" />
+    <col:param name="and-or-notation" value="text" />
+    <col:param name="gradient-notation" value="symbolic" />
+    <col:param name="mean-notation" value="bar" />
+    <col:param name="remainder-notation" value="text" />
+    <col:param name="conjugate-notation" value="star" />
+    <col:param name="imaginary-i-notation" value="j" />
+    <col:param name="scalar-product-notation" value="angle-bracket" />
+    <col:param name="print-font-size" value="10pt" />
+    <col:param name="curl-notation" value="symbolic" />
+    <col:param name="for-all-equation-layout" value="text" />
+    <col:param name="vector-notation" value="bold" />
+    <col:param name="print-paper-size" value="8.5x11" />
+    <col:param name="print-font" value="computer-modern" />
+    <col:param name="print-paragraph-spacing" value="compact" />
+  </col:parameters>
+
+  <col:content>
+    <col:subcollection>
+      <col:module document="m0504" version="latest" repository="http://cnx.org/content"
+        cnxorg:version-at-this-collection-version="2.8">
+        <md:title>DFT: Fast Fourier Transform</md:title>
+      </col:module>
+
+      <col:module document="m0528" version="latest" repository="http://cnx.org/content"
+        cnxorg:version-at-this-collection-version="2.7">
+        <md:title>Deriving the Fast Fourier Transform</md:title>
+      </col:module>
+
+      <md:title>Introduction to Signals</md:title>
+
+      <col:content>
+        <col:module document="m10057" version="latest"
+          repository="http://cnx.org/content"
+          cnxorg:version-at-this-collection-version="2.21">
+          <md:title>Signal Classifications and Properties</md:title>
+        </col:module>
+
+        <col:module document="m10111" version="latest"
+          repository="http://cnx.org/content"
+          cnxorg:version-at-this-collection-version="2.13">
+          <md:title>Common Laplace Transforms</md:title>
+        </col:module>
+
+      </col:content>
+    </col:subcollection>
+
+    <col:subcollection>
+      <md:title>Introduction to Systems</md:title>
+      <col:content>
+        <col:module document="m2102" version="latest" repository="http://cnx.org/content"
+          cnxorg:version-at-this-collection-version="2.23">
+          <md:title>Linear Time Invariant Systems</md:title>
+
+
+
+        </col:module>
+      </col:content>
+    </col:subcollection>
+  </col:content>
+</col:collection>

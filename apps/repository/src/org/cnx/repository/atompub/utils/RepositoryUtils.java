@@ -15,6 +15,8 @@
  */
 package org.cnx.repository.atompub.utils;
 
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
+
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.atom.Link;
 import java.net.URL;
@@ -47,7 +49,7 @@ public class RepositoryUtils {
 
         if (editUrl != null) {
             Link editLink = new Link();
-            editLink.setRel(CnxAtomPubUtils.LINK_RELATION_EDIT_TAG);
+            editLink.setRel(CnxAtomPubLinkRelations.EDIT.getLinkRelation());
             editLink.setHref(editUrl.toString());
             listOfLinks.add(editLink);
         }

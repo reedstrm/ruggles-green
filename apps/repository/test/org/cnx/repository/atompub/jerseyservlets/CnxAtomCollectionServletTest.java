@@ -26,13 +26,13 @@ import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.propono.atom.client.ClientEntry;
 import com.sun.syndication.propono.utils.ProponoException;
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.atompubclient.CnxClientUtils;
 import org.cnx.common.exceptions.CnxConflictException;
 import org.cnx.common.exceptions.CnxInvalidUrlException;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -44,6 +44,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
+@Deprecated
 public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     Logger logger = Logger.getLogger(CnxAtomCollectionServletTest.class.getName());
     private CnxAtomPubClient cnxClient;
@@ -56,7 +57,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     }
 
     @Before
-    public void initialize() throws MalformedURLException, ProponoException {
+    public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
     }
 
@@ -72,11 +73,12 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         String expectedCollectionUrl =
                 cnxClient.getConstants().getAtomPubRestUrl() + "/collection/"
                         + collectionId.getId() + "/1";
-        assertEquals(expectedCollectionUrl, collectionEntry.getEditURI().toString());
+        assertEquals(expectedCollectionUrl, CnxAtomPubLinkRelations.getEditUri(collectionEntry)
+                .getHrefResolved());
 
         cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
 
-        Link selfLink = CnxClientUtils.getSelfUri(collectionEntry);
+        Link selfLink = CnxAtomPubLinkRelations.getSelfUri(collectionEntry);
         assertEquals(expectedCollectionUrl, selfLink.getHrefResolved());
 
         logger.info("New location for collection = \n" + expectedCollectionUrl);
@@ -166,7 +168,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     }
 
     @Test
-    public void test_cretateNewResourceForMigration() throws Exception {
+    public void test_cretateNewCollectionForMigration() throws Exception {
         // TODO(arjuns) : ensure that resource does not exist earlier.Current hack.
 
         try {

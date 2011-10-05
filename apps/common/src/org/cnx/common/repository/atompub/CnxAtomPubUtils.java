@@ -15,23 +15,34 @@
  */
 package org.cnx.common.repository.atompub;
 
-import com.sun.syndication.feed.atom.Entry;
-
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.impl.Atom10Parser;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.apache.commons.codec.binary.Base64;
-import org.cnx.resourceentry.ObjectFactory;
 import org.cnx.resourceentry.ResourceEntryValue;
+import org.cnx.resourcemapping.LocationInformation;
+import org.cnx.resourcemapping.Repository;
+import org.cnx.resourcemapping.Resource;
+import org.cnx.resourcemapping.Resources;
+import org.cnx.servicedocument.AtomTextConstruct;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -47,50 +58,31 @@ public class CnxAtomPubUtils {
     private CnxAtomPubUtils() {
     }
 
+    public static final String YES = "yes";
+    public static final String NO = "no";
+
     // TODO(arjuns) : Fix URL to URI.
     /** Sub-domain for AtomPub relative to host. */
     public static final String ATOMPUB_URL_PREFIX = "atompub";
 
-    /** Name for AtomPub collection for CnxResources. */
-    public static final String COLLECTION_RESOURCE_TITLE = "AtomPub Collection for CNX Resources.";
-
     /** String representation for latest version. */
     public static String LATEST_VERSION_STRING = "latest";
 
-    /** Relation tag for BlobstoreUrl under Other Link. */
-    public static final String REL_TAG_FOR_BLOBSTORE_URL = "blobstore";
+    /** Default new Version. */
+    public static final VersionWrapper DEFAULT_VERSION = new VersionWrapper(0);
 
-    /** Relation tag for Resource under Other Link. */
-    public static final String REL_TAG_FOR_SELF_URL = "self";
-
-    /** Name for AtomPub collection for CnxModules. */
-    public static final String COLLECTION_MODULE_TITLE = "AtomPub Collection for CNX Modules.";
-
-    /** Default new Version for any module. */
-    public static final VersionWrapper NEW_CNX_COLLECTION_DEFAULT_VERSION = new VersionWrapper("1");
+    /** Default Edit Version. */
+    public static final VersionWrapper DEFAULT_EDIT_VERSION = new VersionWrapper(1);
 
     /** Latest version for any Module/collection. */
     public static final VersionWrapper LATEST_VERSION_WRAPPER = new VersionWrapper(
             LATEST_VERSION_STRING);
 
-    /** Name for AtomPub collection for CnxCollections.. */
-    public static final String COLLECTION_CNX_COLLECTION_TITLE =
-            "AtomPub Collection for CNX Collections.";
-
-    /** Name for CNX Workspace. */
-    public static final String CNX_WORKSPACE_TITLE = "CNXv2 Workspace";
-
     /** Relation tag for Self links for CNX Resources/Modules/Collections. */
     public static final String LINK_RELATION_SELF_TAG = "self";
 
-    /** Relation tag for Edit links for CNX Resources/Modules/Collections. */
-    public static final String LINK_RELATION_EDIT_TAG = "edit";
-
     /** Delimiter to connect Ids and Versions. */
     public static final String DELIMITER_ID_VERSION = ":";
-
-    /** Default new Version for any module. */
-    public static final VersionWrapper NEW_MODULE_DEFAULT_VERSION = new VersionWrapper(1);
 
     /**
      * Get AtomPubId from moduleId/collectionId and version.
@@ -99,12 +91,18 @@ public class CnxAtomPubUtils {
         return cnxId.getId() + CnxAtomPubUtils.DELIMITER_ID_VERSION + version.toString();
     }
 
+    // TODO(arjuns) : Make this config params.
+    private static final BigDecimal RESOURCE_MAPPING_DOC_VERSION = new BigDecimal(1.0);
+    private static final String REPOSITORY_ID = "cnx-repo";
+
     /**
      * Get AtomPub List of Contents from CNXMl and ResourceMappingDoc.
      * 
      * @throws JAXBException
      * @throws IOException
      * @throws JDOMException
+     * 
+     *             TODO(arjuns) : Rename this function.
      */
     public static List<Content> getAtomPubListOfContent(String cnxmlDoc, String resourceMappingDoc)
             throws JAXBException, JDOMException, IOException {
@@ -235,7 +233,8 @@ public class CnxAtomPubUtils {
      */
     public static String getModuleEntryValue(String cnxml, String resourceMappingXml)
             throws JAXBException {
-        ObjectFactory objectFactory = new ObjectFactory();
+        org.cnx.resourceentry.ObjectFactory objectFactory =
+                new org.cnx.resourceentry.ObjectFactory();
         JAXBElement<byte[]> encodedCnxmlDoc;
         JAXBElement<byte[]> encodedResourceMappingDoc;
         encodedCnxmlDoc = objectFactory.createCnxmlDoc(cnxml.getBytes(Charsets.UTF_8));
@@ -260,17 +259,18 @@ public class CnxAtomPubUtils {
      * @param rootClass Class annotated with RootElement for JAXB objects.
      * 
      * @return XML representation for JAXB Object.
+     * @throws JAXBException
      */
     // TODO(arjuns) : Move this to XmlPrinter.
     @SuppressWarnings("rawtypes")
-    public static String jaxbObjectToString(Class rootClass, Object jaxbObject)
+    public static String jaxbObjectToString(Class rootClass, Object jaxbObject) 
             throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(rootClass);
+        StringWriter stringWriter = new StringWriter();
+        JAXBContext jaxbContext = JAXBContext.newInstance(jaxbObject.getClass());
+
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_ENCODING, Charsets.UTF_8.displayName());
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-        StringWriter stringWriter = new StringWriter();
         marshaller.marshal(jaxbObject, stringWriter);
 
         return stringWriter.toString();
@@ -283,5 +283,73 @@ public class CnxAtomPubUtils {
             throws UnsupportedEncodingException {
         Content content = (Content) apCollectionEntry.getContents().get(0);
         return CnxAtomPubUtils.decodeFromBase64EncodedString(content.getValue());
+    }
+
+    /**
+     * Converts a given XML to Atom Entry.
+     * 
+     * @param xml Input XML.
+     * @return AtomEntry.
+     * 
+     * @throws IllegalArgumentException
+     * @throws JDOMException
+     * @throws IOException
+     * @throws FeedException
+     */
+    public static Entry parseXmlToEntry(String xml) throws IllegalArgumentException,
+            JDOMException, IOException, FeedException {
+        InputStream is = new ByteArrayInputStream(xml.getBytes(Charsets.UTF_8.displayName()));
+        return Atom10Parser.parseEntry(new InputStreamReader(is), null/* baseUri */);
+    }
+
+    /**
+     * Get title from TextConstruct
+     */
+    public static String getTitleString(AtomTextConstruct titleTextConstruct) {
+        Preconditions.checkArgument(titleTextConstruct.getContent().size() == 1);
+        return (String) titleTextConstruct.getContent().get(0);
+    }
+
+    public static String getResourceMappingXmlFromResources(
+            Map<String, IdWrapper> mapPrettyNameToResourceId) throws JAXBException {
+        org.cnx.resourcemapping.ObjectFactory objectFactory =
+                new org.cnx.resourcemapping.ObjectFactory();
+
+        Resources resources = objectFactory.createResources();
+        resources.setVersion(RESOURCE_MAPPING_DOC_VERSION);
+
+        List<Resource> list = resources.getResource();
+
+        for (String currPrettyName : mapPrettyNameToResourceId.keySet()) {
+            Resource resourceFromEntry = objectFactory.createResource();
+            list.add(resourceFromEntry);
+
+            resourceFromEntry.setName(currPrettyName);
+
+            Repository repository = objectFactory.createRepository();
+            repository.setRepositoryId(REPOSITORY_ID);
+
+            IdWrapper repoId = mapPrettyNameToResourceId.get(currPrettyName);
+            repository.setResourceId(repoId.getId());
+
+            LocationInformation locationInformation = objectFactory.createLocationInformation();
+            locationInformation.setRepository(repository);
+            resourceFromEntry.setLocationInformation(locationInformation);
+        }
+
+        return jaxbObjectToString(Resources.class, resources);
+    }
+    
+    /**
+     * Convenience method to get first content object in content collection.
+     * Atom 1.0 allows only one content element per entry.
+     */
+    public static String getContentAsString(@SuppressWarnings("rawtypes") List listOfContent) {
+        if (listOfContent != null && listOfContent.size() > 0) {
+            Content content = (Content) listOfContent.get(0);
+            return content.getValue();
+        }
+        
+        return null;
     }
 }

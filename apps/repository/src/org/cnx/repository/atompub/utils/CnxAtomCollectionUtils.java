@@ -19,7 +19,7 @@ import com.sun.syndication.feed.atom.Category;
 import com.sun.syndication.propono.atom.common.Categories;
 import com.sun.syndication.propono.atom.common.Collection;
 import java.net.URL;
-import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CnxAtomPubCollectionEnum;
 
 /**
  * Utility class for CNX AtomCollections.
@@ -32,24 +32,24 @@ public class CnxAtomCollectionUtils {
     }
 
     public static Collection getCollectionForCnxResource(URL resourceScheme) {
-        return getCnxCollection(CnxAtomPubUtils.COLLECTION_RESOURCE_TITLE, resourceScheme,
+        return getCnxCollection(CnxAtomPubCollectionEnum.APC_RESOURCES, resourceScheme,
                 CnxAtomCategoryUtils.getCnxResourceCategoryEle(resourceScheme));
     }
 
     public static Collection getCollectionForCnxModule(URL moduleScheme) {
-        return getCnxCollection(CnxAtomPubUtils.COLLECTION_MODULE_TITLE, moduleScheme,
+        return getCnxCollection(CnxAtomPubCollectionEnum.APC_MODULE, moduleScheme,
                 CnxAtomCategoryUtils.getCnxModuleCategoryEle(moduleScheme));
     }
 
     public static Collection getCollectionForCnxCollection(URL cnxCollectionScheme) {
-        return getCnxCollection(CnxAtomPubUtils.COLLECTION_CNX_COLLECTION_TITLE,
-                cnxCollectionScheme,
+        return getCnxCollection(CnxAtomPubCollectionEnum.APC_COLLECTION, cnxCollectionScheme,
                 CnxAtomCategoryUtils.getCnxCollectionCategoryEle(cnxCollectionScheme));
     }
 
-    private static Collection getCnxCollection(String collectionName, URL collectionPath,
-            Category category) {
-        Collection collection = new Collection(collectionName, null, collectionPath.toString());
+    private static Collection getCnxCollection(CnxAtomPubCollectionEnum collectionEnum,
+            URL collectionPath, Category category) {
+        Collection collection =
+                new Collection(collectionEnum.getTitle(), null, collectionPath.toString());
 
         Categories categories = new Categories();
         categories.addCategory(category);

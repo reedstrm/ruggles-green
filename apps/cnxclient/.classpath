@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="build/jars/rome-1.0.jar" />
-	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar" />
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

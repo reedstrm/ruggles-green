@@ -15,7 +15,7 @@
  */
 package org.cnx.common.exceptions;
 
-import javax.ws.rs.core.Response.Status;
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
  * CnxException to indicate a BAD_REQUEST.
@@ -25,6 +25,6 @@ import javax.ws.rs.core.Response.Status;
 @SuppressWarnings("serial")
 public class CnxBadRequestException extends CnxException {
     public CnxBadRequestException(String message, Throwable throwable) {
-        super(Status.BAD_REQUEST, message, throwable);
+        super(HttpStatusEnum.BAD_REQUEST, message, throwable);
     }
 }

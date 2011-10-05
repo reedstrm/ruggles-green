@@ -15,10 +15,10 @@
  */
 package org.cnx.migrator;
 
+import org.cnx.atompubclient.CnxAtomPubClient;
+
 import java.io.File;
 import java.net.URL;
-
-import org.cnx.atompubclient.CnxAtomPubClient;
 import org.cnx.migrator.context.MigratorConfiguration;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.DataRootDirectory;

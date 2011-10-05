@@ -19,7 +19,6 @@
     <description>
         Build file for CNX Repository.
     </description>
-    <property file="local.properties" />
     <property file="build.properties" />
 
     <!-- Pick up the Ant macros and taskdefs for App Engine -->
@@ -28,7 +27,7 @@
     <target name="war_common"
             depends="compile"
             description="Assemble the application directory">
-        <delete dir="${war.dir}" />
+        <!--delete dir="${war.dir}" /-->
         <mkdir dir="${war.dir}/WEB-INF" />
         <mkdir dir="${war.dir}/WEB-INF/classes" />
         <mkdir dir="${war.dir}/WEB-INF/lib" />
@@ -88,6 +87,11 @@
              target="default"
              dir="${third_party}" />
 
+        <ant antfile="appengine/mapreduce/build.xml"
+             inheritAll="true"
+             target="default"
+             dir="${third_party}" />
+
         <ant antfile="asm/build.xml"
              inheritall="true"
              target="default"
@@ -103,10 +107,11 @@
              target="default"
              dir="${third_party}" />
 
-        <ant antfile="appengine/mapreduce/build.xml"
-             inheritAll="true"
-             target="default"
-             dir="${third_party}" />
+      <ant antfile="jaxb/build.xml"
+           inheritAll="true"
+           target="default"
+           dir="${third_party}" />
+        	
 
         <ant antfile="jdom/build.xml"
              inheritAll="true"
@@ -221,7 +226,7 @@
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <include name="**/*Test*.java" />
+                    <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
         </junit>

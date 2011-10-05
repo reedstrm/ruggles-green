@@ -6,10 +6,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/guava-r09.jar"/>
 	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
-	<classpathentry kind="lib" path="build/jars/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="build/jars/rome-1.0.jar" sourcepath="/usr/local/google/cnxclients/ruggles-green/third_party/rome/rome-1.0/rome-src.jar.zip"/>
 	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
+	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar" sourcepath="/usr/local/google/cnxclients/ruggles-green/third_party/jersey/jersey-1.8/jersey-core-1.8-sources.jar.zip"/>
 	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
@@ -35,5 +35,6 @@
 	<classpathentry kind="lib" path="build/test/lib/args4j-tools-2.0.12.jar"/>
 	<classpathentry kind="lib" path="build/test/lib/scripts.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/jars/jaxb-impl.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

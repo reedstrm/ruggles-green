@@ -19,6 +19,9 @@ import static org.cnx.common.repository.atompub.CommonUtils.getURI;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.fromRepositoryError;
 import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn;
 
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
@@ -40,18 +43,22 @@ import javax.ws.rs.core.Response.Status;
 
 import org.cnx.common.exceptions.CnxBadRequestException;
 import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.repository.ContentType;
+import org.cnx.common.repository.PrettyXmlOutputter;
 import org.cnx.common.repository.RepositoryConstants;
-import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
+import org.cnx.common.repository.atompub.objects.ResourceInfoWrapper;
 import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.CnxRepositoryService;
 import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.api.ServeResourceResult;
+import org.cnx.repository.service.api.UploadedResourceContentInfo;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
 
 import com.sun.syndication.feed.atom.Entry;
@@ -66,10 +73,11 @@ import com.sun.syndication.feed.atom.Link;
 public class CnxAtomResourceServlet {
     private final Logger logger = Logger.getLogger(CnxAtomResourceServlet.class.getName());
     private CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
-
+    private CnxAtomService atomPubService; 
+    
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_NEW}, then this method
+     * {@link org.cnx.common.repository.atompub.ServletUris.Resource#RESOURCE_POST_NEW}, then this method
      * is invoked.
      * 
      * This method in turn sends request to {@link CnxRepositoryService#createResource}.
@@ -79,10 +87,10 @@ public class CnxAtomResourceServlet {
      * @param req HttpServletRequest
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Resource.RESOURCE_POST_NEW)
     public Response createNewResource(@Context HttpServletRequest req) throws CnxException {
-        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         RepositoryResponse<CreateResourceResult> createdResource =
                 repositoryService.createResource(RepositoryUtils.getRepositoryContext());
@@ -92,7 +100,7 @@ public class CnxAtomResourceServlet {
 
     /**
      * When Clients does HTTP-POST on
-     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_POST_MIGRATION}, then this
+     * {@link org.cnx.common.repository.atompub.ServletUris.Resource#RESOURCE_POST_MIGRATION}, then this
      * method is invoked.
      * 
      * This is a special function provided in order to allow migration and retaining old ResourceIds
@@ -105,12 +113,12 @@ public class CnxAtomResourceServlet {
      *            {@link RepositoryConstants#MIN_NON_RESERVED_KEY_ID}.
      */
     @POST
-    @Produces(CnxMediaTypes.APPLICATION_ATOM_XML)
+    @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Resource.RESOURCE_POST_MIGRATION)
     public Response createNewResourceForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(resourceId, IdWrapper.Type.RESOURCE);
-        CnxAtomService atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
         // TODO(tal): get this from the request (required param).
         final Date forcedCreationTime = new Date();
@@ -152,7 +160,7 @@ public class CnxAtomResourceServlet {
 
             URI editUrl = getURI(uploadUrl);
             Link blobstoreLink = new Link();
-            blobstoreLink.setRel(CnxAtomPubUtils.REL_TAG_FOR_BLOBSTORE_URL);
+            blobstoreLink.setRel(CnxAtomPubLinkRelations.UPLOAD_URL.getLinkRelation());
             blobstoreLink.setHref(editUrl.toString());
 
             listOfLinks.add(blobstoreLink);
@@ -170,7 +178,7 @@ public class CnxAtomResourceServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Resource#RESOURCE_PATH}, then this method is
+     * {@link org.cnx.common.repository.atompub.ServletUris.Resource#RESOURCE_PATH}, then this method is
      * invoked.
      * 
      * This method in turn contacts {@link CnxRepositoryService#serveResouce}.
@@ -207,4 +215,53 @@ public class CnxAtomResourceServlet {
 
         return fromRepositoryError(logger, serveResourceResult);
     }
+    
+  @GET
+  @Produces(ContentType.APPLICATION_XML)
+  @Path(ServletUris.Resource.RESOURCE_INFO)
+  public Response getResourceInfo(@Context HttpServletRequest req,
+          @PathParam(ServletUris.RESOURCE_ID_PATH_PARAM) String resourceId) throws CnxException {
+      final IdWrapper idWrapper = new IdWrapper(resourceId, IdWrapper.Type.RESOURCE);
+      atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+
+      RepositoryResponse<GetResourceInfoResult> repoResult =
+              repositoryService.getResourceInfo(RepositoryUtils.getRepositoryContext(),
+                      idWrapper.getId());
+      if (repoResult.isOk()) {
+          GetResourceInfoResult resourceInfoResult = repoResult.getResult();
+          Entry entry = new Entry();
+          entry.setId(resourceInfoResult.getResourceId());
+          entry.setPublished(resourceInfoResult.getCreationTime());
+
+          if (resourceInfoResult.hasContent()) {
+              UploadedResourceContentInfo contentInfo = resourceInfoResult.getContentInfo();
+              StringBuilder stringBuilder = new StringBuilder();
+              appendNameValuePair(stringBuilder, ResourceInfoWrapper.CONTENT_SIZE,
+                      Long.toString(contentInfo.getContentSize()));
+              appendNameValuePair(stringBuilder, ResourceInfoWrapper.MD5HASH,
+                      contentInfo.getMd5Hash());
+
+              Content summary = new Content();
+              summary.setValue(stringBuilder.toString());
+              entry.setSummary(summary);
+
+              Content title = new Content();
+              title.setType(contentInfo.getContentType());
+              title.setValue(contentInfo.getContentOriginalFileName());
+              entry.setTitleEx(title);
+
+              URL selfUrl = atomPubService.getConstants().getResourceAbsPath(idWrapper);
+              List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
+              entry.setOtherLinks(listOfLinks);
+          }
+
+          System.out.println(PrettyXmlOutputter.prettyXmlOutputEntry(entry));
+          return logAndReturn(logger, Status.OK, entry, null /* locationUri */);
+      }
+      return fromRepositoryError(logger, repoResult);
+  }
+
+  private void appendNameValuePair(StringBuilder stringBuilder, String key, String value) {
+      stringBuilder.append("{" + key + "=" + value + "}\n");
+  }
 }

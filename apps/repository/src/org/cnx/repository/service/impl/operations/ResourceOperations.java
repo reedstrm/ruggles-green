@@ -193,7 +193,7 @@ public class ResourceOperations {
             case UPLOAD_PENDING:
                 result =
                 GetResourceInfoResult
-                .newPendingUploac(entity.getId(), entity.getCreationTime());
+                .newPendingUploacd(entity.getId(), entity.getCreationTime());
                 break;
             case UPLOAD_COMPLETE:
                 final OrmBlobInfo blobInfo = checkNotNull(entity.getBlobInfo());

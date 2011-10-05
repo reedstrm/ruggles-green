@@ -1,0 +1,5 @@
+apache-httpclient is required by cnx-client.
+
+It cannot be used directly on AppEngine. It needs some extra modifications.
+See : http://code.google.com/p/googleappengine/wiki/WillItPlayInJava
+Section : Apache HTTP Client.

@@ -84,7 +84,7 @@ public class GetResourceInfoResult {
     public boolean hasContent() {
         return resourceState.hasContent();
     }
-
+    
     /**
      * Asserts that {@link #hasContent()} is true.
      */
@@ -93,7 +93,7 @@ public class GetResourceInfoResult {
         return contentInfo;
     }
 
-    public static GetResourceInfoResult newPendingUploac(String resourceId, Date creationTime) {
+    public static GetResourceInfoResult newPendingUploacd(String resourceId, Date creationTime) {
         return new GetResourceInfoResult(resourceId, creationTime, ResourceState.PENDING_UPLOAD,
             null);
     }

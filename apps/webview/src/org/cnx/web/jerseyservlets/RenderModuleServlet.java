@@ -18,12 +18,16 @@ package org.cnx.web.jerseyservlets;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
+import com.sun.syndication.io.FeedException;
+import java.net.URISyntaxException;
+import org.cnx.common.exceptions.CnxException;
+
+import org.cnx.common.repository.atompub.objects.ModuleVersionWrapper;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -37,12 +41,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.parsers.SAXParser;
-import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient2.CnxClient;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
 import org.cnx.cnxml.ModuleHtmlGenerator;
 import org.cnx.common.exceptions.CnxInvalidUrlException;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
@@ -65,7 +69,7 @@ public class RenderModuleServlet {
     private final Injector injector;
     private final SAXParser saxParser;
     // TODO(arjuns) : Move this to a better place.
-    private final CnxAtomPubClient cnxClient;
+    private final CnxClient cnxClient;
     private final WebViewConfiguration configuration;
 
     public RenderModuleServlet(@Context ServletContext context) {
@@ -75,7 +79,7 @@ public class RenderModuleServlet {
             configuration = injector.getInstance(WebViewConfiguration.class);
             saxParser = injector.getInstance(SAXParser.class);
             url = new URL(configuration.getRepositoryAtomPubUrl());
-            cnxClient = new CnxAtomPubClient(url);
+            cnxClient = new CnxClient(url);
 
         } catch (Exception e) {
             // TODO(arjuns): Auto-generated catch block
@@ -85,8 +89,8 @@ public class RenderModuleServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this method
-     * is triggered.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this
+     * method is triggered.
      * 
      * Purpose of this method is to fetch CNXML and ResourceMapping Doc from Repository, then create
      * a HTML and then serve it back to client.
@@ -94,17 +98,22 @@ public class RenderModuleServlet {
      * @param moduleId Id of desired Module.
      * @param moduleVersionString Version of desiredModule.
      * @return Response which contains HTML representation of the desired module.
-     * @throws ProponoException
      * @throws IOException
      * @throws JDOMException
      * @throws SAXException
+     * @throws CnxException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(ContentType.TEXT_HTML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_PATH)
     public Response getModuleVersion(@PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
-            throws ProponoException, JDOMException, IOException, SAXException {
+            throws JDOMException, IOException, SAXException, IllegalStateException,
+            IllegalArgumentException, URISyntaxException, FeedException, CnxException {
         // TODO(arjuns) : Handle exception.
         StringBuilder builder = new StringBuilder();
 
@@ -116,20 +125,20 @@ public class RenderModuleServlet {
         if (finalHtml == null) {
             // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
 
-            ClientEntry moduleVersionEntry = null;
+            ModuleVersionWrapper moduleVersionWrapper = null;
             try {
-                moduleVersionEntry = cnxClient.getModuleVersionEntry(idWrapper, versionWrapper);
+                moduleVersionWrapper = cnxClient.getModuleVersion(idWrapper, versionWrapper);
             } catch (CnxInvalidUrlException e) {
                 handleCnxInvalidUrlException(idWrapper, e);
             }
 
-            String cnxml = cnxClient.getCnxml(moduleVersionEntry);
-            String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
-
             final Module module =
-                    injector.getInstance(ModuleFactory.class).create(moduleId, moduleVersionString,
-                            CommonHack.parseXmlString(saxParser, cnxml),
-                            CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+                    injector.getInstance(ModuleFactory.class).create(
+                            moduleId,
+                            moduleVersionString,
+                            CommonHack.parseXmlString(saxParser, moduleVersionWrapper.getCnxml()),
+                            CommonHack.getResourcesFromResourceMappingDoc(moduleVersionWrapper
+                                    .getResourceMappingXml()));
 
             RenderScope renderScope = injector.getInstance(RenderScope.class);
 
@@ -172,8 +181,8 @@ public class RenderModuleServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_CNXML}, then this method
-     * is triggered.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_CNXML}, then this
+     * method is triggered.
      * 
      * This is a helper method which is used for providing CNXML of desired module to client.
      * 
@@ -183,7 +192,7 @@ public class RenderModuleServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_CNXML)
     public Response getModuleVersionXml(
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -199,8 +208,8 @@ public class RenderModuleServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Module#MODULE_VERSION_RESOURCE_MAPPING}, then
-     * this method is triggered.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_RESOURCE_MAPPING},
+     * then this method is triggered.
      * 
      * This is a helper method which is used for providing ResourceMappingXml of desired module to
      * client.
@@ -211,7 +220,7 @@ public class RenderModuleServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Module.MODULE_VERSION_RESOURCE_MAPPING)
     public Response getModuleVersionResourcesXml(
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,

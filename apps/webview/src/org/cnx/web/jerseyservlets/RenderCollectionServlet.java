@@ -19,15 +19,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cnx.web.CommonHack.fetchFromRepositoryAndReturn;
 import static org.cnx.web.CommonHack.handleCnxInvalidUrlException;
 
+import com.sun.syndication.io.FeedException;
+import java.net.URISyntaxException;
+import org.cnx.common.exceptions.CnxException;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -45,7 +46,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.parsers.SAXParser;
-import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient2.CnxClient;
 import org.cnx.cnxml.LinkResolver;
 import org.cnx.cnxml.Module;
 import org.cnx.cnxml.ModuleFactory;
@@ -57,11 +58,12 @@ import org.cnx.common.collxml.CollectionItem;
 import org.cnx.common.collxml.ModuleLink;
 import org.cnx.common.collxml.Subcollection;
 import org.cnx.common.exceptions.CnxInvalidUrlException;
-import org.cnx.common.repository.atompub.CnxAtomPubUtils;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionVersionWrapper;
+import org.cnx.common.repository.atompub.objects.ModuleVersionWrapper;
 import org.cnx.mdml.Actor;
 import org.cnx.mdml.Metadata;
 import org.cnx.util.RenderScope;
@@ -82,7 +84,7 @@ public class RenderCollectionServlet {
     private final Logger logger = Logger.getLogger(RenderCollectionServlet.class.getName());
     /**
      * URI relative to :
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}
      * 
      * In order to fetch Module under context of a collection.
      * 
@@ -131,7 +133,7 @@ public class RenderCollectionServlet {
     private final Provider<LinkResolver> linkResolverProvider;
     private final SAXParser saxParser;
     // TODO(arjuns) : Move this to a better place.
-    private final CnxAtomPubClient cnxClient;
+    private final CnxClient cnxClient;
 
     public RenderCollectionServlet(@Context ServletContext context) {
         URL url = null;
@@ -141,7 +143,7 @@ public class RenderCollectionServlet {
             configuration = injector.getInstance(WebViewConfiguration.class);
             saxParser = injector.getInstance(SAXParser.class);
             url = new URL(configuration.getRepositoryAtomPubUrl());
-            cnxClient = new CnxAtomPubClient(url);
+            cnxClient = new CnxClient(url);
         } catch (Exception e) {
             // TODO(arjuns): Auto-generated catch block
             throw new RuntimeException(e);
@@ -150,8 +152,8 @@ public class RenderCollectionServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH}, then this
-     * method is triggered.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_PATH},
+     * then this method is triggered.
      * 
      * Purpose of this method is to fetch CollXml from Repository, then create a HTML and then serve
      * it back to client.
@@ -159,17 +161,23 @@ public class RenderCollectionServlet {
      * @param collectionId Id of desired Collection.
      * @param collectionVersionString Version of desiredModule.
      * @return Response which contains HTML representation of the desired module.
-     * @throws ProponoException
      * @throws SAXException
      * @throws IOException
+     * @throws CnxException
+     * @throws FeedException
+     * @throws JDOMException
+     * @throws URISyntaxException
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(ContentType.TEXT_HTML_UTF8)
     @Path(ServletUris.Collection.COLLECTION_VERSION_PATH)
     public Response getCollectionVersion(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String collectionVersionString)
-            throws ProponoException, SAXException, IOException {
+            throws SAXException, IOException, IllegalStateException, IllegalArgumentException,
+            URISyntaxException, JDOMException, FeedException, CnxException {
         // TODO(arjuns) : Handle exception.
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         final VersionWrapper versionWrapper = new VersionWrapper(collectionVersionString);
@@ -177,20 +185,20 @@ public class RenderCollectionServlet {
         StringBuilder builder = new StringBuilder();
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-        Entry collectionVersionEntry = null;
+        CollectionVersionWrapper collectionVersionWrapper = null;
 
         try {
-            collectionVersionEntry = cnxClient.getCollectionVersionEntry(idWrapper, versionWrapper);
+            collectionVersionWrapper = cnxClient.getCollectionVersion(idWrapper, versionWrapper);
         } catch (CnxInvalidUrlException e) {
             handleCnxInvalidUrlException(idWrapper, e);
         }
 
-        String collXml =
-                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
-
         final Collection collection =
-                injector.getInstance(CollectionFactory.class).create(collectionId,
-                        collectionVersionString, CommonHack.parseXmlString(saxParser, collXml));
+                injector.getInstance(CollectionFactory.class).create(
+                        collectionId,
+                        collectionVersionString,
+                        CommonHack.parseXmlString(saxParser,
+                                collectionVersionWrapper.getCollectionXml()));
         // Get metadata
         String title = "", abstractText = null;
         List<Actor> authors = null;
@@ -261,8 +269,8 @@ public class RenderCollectionServlet {
 
     /**
      * When client does HTTP-GET on
-     * {@link org.cnx.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML}, then
-     * this method is triggered.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_VERSION_COLLXML},
+     * then this method is triggered.
      * 
      * This is a helper method which is used for providing CollXml for desired Collection.
      * 
@@ -272,7 +280,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(ServletUris.Collection.COLLECTION_VERSION_COLLXML)
     public Response getCollectionVersionXml(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
@@ -299,20 +307,25 @@ public class RenderCollectionServlet {
      * @param moduleId Id of desired Module.
      * @param moduleVersionString Version of desired Module.
      * @return Response which contains HTML representation of the desired module.
-     * @throws ProponoException
      * @throws SAXException
      * @throws IOException
      * @throws JDOMException
+     * @throws CnxException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_HTML_UTF8)
+    @Produces(ContentType.TEXT_HTML_UTF8)
     @Path(COLLECTION_VERSION_MODULE_VERSION_URI)
     public Response getModuleVersionUnderCollectionVersion(
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String collectionVersionString,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String moduleVersionString)
-            throws ProponoException, SAXException, IOException, JDOMException {
+            throws SAXException, IOException, JDOMException, IllegalStateException,
+            IllegalArgumentException, URISyntaxException, FeedException, CnxException {
         // TODO(arjuns) : handle exceptions.
         final IdWrapper collectionIdWrapper =
                 new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
@@ -322,20 +335,20 @@ public class RenderCollectionServlet {
         final VersionWrapper moduleVersion = new VersionWrapper(moduleVersionString);
 
         // TODO(arjuns) : Add a URL for accessing resources with HTTP redirect.
-        Entry collectionVersionEntry = null;
+        CollectionVersionWrapper collectionVersionWrapper = null;
         try {
-            collectionVersionEntry =
-                    cnxClient.getCollectionVersionEntry(collectionIdWrapper, collectionVersion);
+            collectionVersionWrapper =
+                    cnxClient.getCollectionVersion(collectionIdWrapper, collectionVersion);
         } catch (CnxInvalidUrlException e) {
             handleCnxInvalidUrlException(collectionIdWrapper, e);
         }
 
-        String collXml =
-                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(collectionVersionEntry);
-
         final Collection collection =
-                injector.getInstance(CollectionFactory.class).create(collectionId,
-                        collectionVersionString, CommonHack.parseXmlString(saxParser, collXml));
+                injector.getInstance(CollectionFactory.class).create(
+                        collectionId,
+                        collectionVersionString,
+                        CommonHack.parseXmlString(saxParser,
+                                collectionVersionWrapper.getCollectionXml()));
 
         // Ensure module is part of the collection
         final ModuleLink currentModuleLink = collection.getModuleLink(moduleId);
@@ -346,20 +359,20 @@ public class RenderCollectionServlet {
             return Response.serverError().build();
         }
 
-        ClientEntry moduleVersionEntry = null;
+        ModuleVersionWrapper moduleVersionWrapper = null;
         try {
-            moduleVersionEntry = cnxClient.getModuleVersionEntry(moduleIdWrapper, moduleVersion);
+            moduleVersionWrapper = cnxClient.getModuleVersion(moduleIdWrapper, moduleVersion);
         } catch (CnxInvalidUrlException e) {
             handleCnxInvalidUrlException(moduleIdWrapper, e);
         }
 
-        String cnxml = cnxClient.getCnxml(moduleVersionEntry);
-        String resourceMappingXml = cnxClient.getResourceMappingXml(moduleVersionEntry);
-
         final Module module =
-                injector.getInstance(ModuleFactory.class).create(moduleId, moduleVersionString,
-                        CommonHack.parseXmlString(saxParser, cnxml),
-                        CommonHack.getResourcesFromResourceMappingDoc(resourceMappingXml));
+                injector.getInstance(ModuleFactory.class).create(
+                        moduleId,
+                        moduleVersionString,
+                        CommonHack.parseXmlString(saxParser, moduleVersionWrapper.getCnxml()),
+                        CommonHack.getResourcesFromResourceMappingDoc(moduleVersionWrapper
+                                .getResourceMappingXml()));
 
         final ModuleLink[] links = collection.getPreviousNext(moduleId);
         SoyData prevLink, nextLink;
@@ -448,7 +461,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_MODULE_VERSION_XML_URI)
     public Response getModuleVersionXmlUnderCollectionVersion(@Context ServletContext context,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
@@ -474,7 +487,7 @@ public class RenderCollectionServlet {
      * @throws IOException
      */
     @GET
-    @Produces(CnxMediaTypes.TEXT_XML_UTF8)
+    @Produces(ContentType.TEXT_XML_UTF8)
     @Path(COLLECTION_VERSION_MODULE_VERSION_RESOURCE_MAPPING_URL)
     public Response getModuleVersionResourcesXmlUnderCollectionVersion(
             @Context ServletContext context,

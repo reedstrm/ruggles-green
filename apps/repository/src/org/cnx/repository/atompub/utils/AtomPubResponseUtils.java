@@ -16,6 +16,8 @@
 
 package org.cnx.repository.atompub.utils;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -75,7 +77,7 @@ public class AtomPubResponseUtils {
     }
 
     public static Response logAndReturn(Logger logger, Status jerseyStatus, Entry entry,
-            URI location) throws CnxException {
+            @Nullable URI location) throws CnxException {
         String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
         return logAndReturn(logger, jerseyStatus, stringEntry, location);
     }

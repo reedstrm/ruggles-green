@@ -15,11 +15,7 @@
  */
 package org.cnx.common.repository;
 
-import org.cnx.common.repository.atompub.CnxMediaTypes;
-
 import java.util.logging.Logger;
-
-import javax.ws.rs.core.MediaType;
 
 
 /**
@@ -27,55 +23,56 @@ import javax.ws.rs.core.MediaType;
  * 
  * @author Arjun Satyapal
  */
-public enum FileContentTypeEnum {
+public enum FileContentType {
     // Wolfram
-    CDF(".cdf", CnxMediaTypes.APPLICATION_CDF_TYPE),
+    CDF(".cdf", ContentType.CDF),
     
     // Cad.
-    DWG(".dwg", CnxMediaTypes.IMAGE_DWG_TYPE),
+    DWG(".dwg", ContentType.DWG),
     
     // Postscript
-    EPS(".eps", CnxMediaTypes.APPLICATION_POST_SCRIPT_TYPE),
+    EPS(".eps", ContentType.EPS),
     
     // Image
-    JPG(".jpg", CnxMediaTypes.IMAGE_JPG_TYPE),
+    JPG(".jpg", ContentType.JPG),
     
+    // Labview .llb Reference : http://www.filesuffix.com/extension/llb.html
     // Labview : Texas Instruments.
-    LLB(".llb", CnxMediaTypes.APPLICATION_LLB_TYPE),
+    LLB(".llb", ContentType.LLB),
     
-    // Wolfram.
-    NBP(".nbp", CnxMediaTypes.APPLICATION_NBP_TYPE),
+    // Wolfram : NBP : Wolfram format. Reference : http://www.wolfram.com/technology/nb/
+    NBP(".nbp", ContentType.NBP),
     
     // Image
-    PNG(".png", CnxMediaTypes.IMAGE_PNG_TYPE),
+    PNG(".png", ContentType.PNG),
     
     // Postscript
-    PS(".ps", CnxMediaTypes.APPLICATION_POST_SCRIPT_TYPE),
+    PS(".ps", ContentType.PS),
     
     // Tex / Latex
-    TEX(".tex", CnxMediaTypes.APPLICATION_TEX_TYPE),
+    TEX(".tex", ContentType.TEX),
     
-    // Labview
-    VI(".vi", CnxMediaTypes.APPLICATION_VI_TYPE),
+    // Labview : VI Reference : http://cnx.org/eip-help/labview
+    VI(".vi", ContentType.VI),
 
     // Labview
-    VIINFO(".viinfo", CnxMediaTypes.APPLICATION_VI_TYPE),
+    VIINFO(".viinfo", ContentType.VIINFO),
     
     // Zip.
-    ZIP(".zip", CnxMediaTypes.APPLICATION_ZIP_TYPE),
+    ZIP(".zip", ContentType.ZIP),
     
     // Default value.
-    DEFAULT("", CnxMediaTypes.APPLICATION_OCTET_STREAM_TYPE);
+    DEFAULT("", ContentType.OCTET_STREAM);
 
-    private static Logger logger = Logger.getLogger(FileContentTypeEnum.class.getName());
+    private static Logger logger = Logger.getLogger(FileContentType.class.getName());
     
     /* File Extension. e.g. If file name is abc.txt, then extension is txt */
     private String extension;
-    private MediaType mediaType;
+    private String contentType;
 
-    FileContentTypeEnum(String extension, MediaType mediaType) {
+    private FileContentType(String extension, String contentType) {
         this.extension = extension;
-        this.mediaType = mediaType;
+        this.contentType = contentType;
     }
 
     /**
@@ -88,8 +85,8 @@ public enum FileContentTypeEnum {
     /**
      * Returns ContentType expected for this FileContentType.
      */
-    public MediaType getContentType() {
-        return mediaType;
+    public String getContentType() {
+        return contentType;
     }
     
     /**
@@ -100,8 +97,8 @@ public enum FileContentTypeEnum {
      * @param fileName File Extension.
      * @return FileContentType.
      */
-    public static FileContentTypeEnum getFileContentTypeEnumFromFileName(String fileName) { 
-        for (FileContentTypeEnum curr : FileContentTypeEnum.values()) {
+    public static FileContentType getFileContentTypeEnumFromFileName(String fileName) { 
+        for (FileContentType curr : FileContentType.values()) {
             if (fileName.endsWith(curr.getExtension())) {
                 return curr;
             }

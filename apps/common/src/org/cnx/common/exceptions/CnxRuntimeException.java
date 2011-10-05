@@ -14,7 +14,7 @@
  * the License.
  */
 package org.cnx.common.exceptions;
-import javax.ws.rs.core.Response.Status;
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
  * A wrapper exception that will be used to throw Runtime exceptions for CNX.
@@ -23,13 +23,13 @@ import javax.ws.rs.core.Response.Status;
  */
 @SuppressWarnings("serial")
 public class CnxRuntimeException extends RuntimeException {
-    private Status jerseyStatus;
-    public CnxRuntimeException(Status jerseyStatus, String message, Throwable throwable) {
+    private HttpStatusEnum httpStatus;
+    public CnxRuntimeException(HttpStatusEnum httpStatus, String message, Throwable throwable) {
         super(message, throwable);
-        this.jerseyStatus = jerseyStatus;
+        this.httpStatus = httpStatus;
     }
     
-    public Status getJerseyStatus() {
-        return jerseyStatus;
+    public HttpStatusEnum getHttpStatus() {
+        return httpStatus;
     }
 }

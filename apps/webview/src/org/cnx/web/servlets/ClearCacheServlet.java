@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.cnx.common.repository.atompub.CnxMediaTypes;
+import org.cnx.common.repository.ContentType;
 
 @SuppressWarnings("serial")
 public class ClearCacheServlet extends HttpServlet {
@@ -35,13 +35,15 @@ public class ClearCacheServlet extends HttpServlet {
     private static final Logger log =
             Logger.getLogger(ClearCacheServlet.class.getName());
 
-    @Override public void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        resp.setContentType(CnxMediaTypes.TEXT_HTML_UTF8);
+        resp.setContentType(ContentType.TEXT_HTML_UTF8);
         ByteStreams.copy(new FileInputStream(new File(TEMPLATE_FILE)), resp.getOutputStream());
     }
 
-    @Override public void doPost(HttpServletRequest req, HttpServletResponse resp)
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         log.warning("Clearing the site cache!");
         final MemcacheService cache = MemcacheServiceFactory.getMemcacheService();

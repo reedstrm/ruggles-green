@@ -18,22 +18,22 @@ package org.cnx.common.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import org.cnx.common.repository.FileContentTypeEnum;
+import org.cnx.common.repository.FileContentType;
 
 import java.security.SecureRandom;
 
 import org.junit.Test;
 
 /**
- * Test for {@link FileContentTypeEnum}
+ * Test for {@link FileContentType}
  * 
  * @author Arjun Satyapal
  */
 public class FileContentTypeEnumTest {
     @Test
     public void testUniqExtensions() {
-        for (FileContentTypeEnum curr : FileContentTypeEnum.values()) {
-            for (FileContentTypeEnum compareTo : FileContentTypeEnum.values()) {
+        for (FileContentType curr : FileContentType.values()) {
+            for (FileContentType compareTo : FileContentType.values()) {
                 if (curr == compareTo) {
                     continue;
                 }
@@ -46,16 +46,16 @@ public class FileContentTypeEnumTest {
     @Test
     public void test_getFileContentTypeEnumFromExtension() {
         SecureRandom random = new SecureRandom();
-        int randomIndex = Math.abs(random.nextInt()) % FileContentTypeEnum.values().length;
+        int randomIndex = Math.abs(random.nextInt()) % FileContentType.values().length;
 
-        FileContentTypeEnum expectedEnum = FileContentTypeEnum.values()[randomIndex];
+        FileContentType expectedEnum = FileContentType.values()[randomIndex];
 
-        FileContentTypeEnum actualEnum =
-                FileContentTypeEnum.getFileContentTypeEnumFromFileName("random"
+        FileContentType actualEnum =
+                FileContentType.getFileContentTypeEnumFromFileName("random"
                         + expectedEnum.getExtension());
         assertEquals(expectedEnum, actualEnum);
 
-        assertEquals(FileContentTypeEnum.DEFAULT,
-                FileContentTypeEnum.getFileContentTypeEnumFromFileName("random"));
+        assertEquals(FileContentType.DEFAULT,
+                FileContentType.getFileContentTypeEnumFromFileName("random"));
     }
 }

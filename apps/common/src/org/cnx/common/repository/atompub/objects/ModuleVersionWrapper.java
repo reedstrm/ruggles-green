@@ -72,6 +72,7 @@ public class ModuleVersionWrapper extends AtomPubResource {
                 new ModuleVersionWrapper(id, version, cnxml, resourceMappingXml);
 
         module.setSelfUri(CnxAtomPubLinkRelations.getSelfUri(entry));
+        module.setEditUri(CnxAtomPubLinkRelations.getEditUri(entry));
         module.setPublished(entry.getPublished());
 
         return module;

@@ -59,6 +59,7 @@ public class CollectionVersionWrapper extends AtomPubResource {
                 new CollectionVersionWrapper(id, version, decodedCollectionXml);
 
         collection.setSelfUri(CnxAtomPubLinkRelations.getSelfUri(entry));
+        collection.setEditUri(CnxAtomPubLinkRelations.getEditUri(entry));
         collection.setPublished(entry.getPublished());
 
         return collection;

@@ -79,7 +79,6 @@ public class AtomPubResponseUtils {
     public static Response logAndReturn(Logger logger, Status jerseyStatus, Entry entry,
             @Nullable URI location) throws CnxException {
         String stringEntry = PrettyXmlOutputter.prettyXmlOutputEntry(entry);
-        System.out.println("Server : StringEntry = " + stringEntry);
         return logAndReturn(logger, jerseyStatus, stringEntry, location);
     }
 

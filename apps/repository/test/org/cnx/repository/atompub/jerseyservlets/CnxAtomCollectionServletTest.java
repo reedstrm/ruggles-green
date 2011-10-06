@@ -18,6 +18,11 @@ package org.cnx.repository.atompub.jerseyservlets;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import com.sun.syndication.io.FeedException;
+import org.jdom.JDOMException;
+
+import org.cnx.common.exceptions.CnxConflictException;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import java.io.File;
@@ -79,7 +84,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
 
     private void doTestForCreateCollection(final CollectionWrapper collectionWrapper,
             boolean isMigration)
-                    throws Exception {
+            throws Exception {
         TestingUtils.validateAtomPubResource(collectionWrapper, isMigration,
                 IdWrapper.Type.COLLECTION,
                 CnxAtomPubUtils.DEFAULT_VERSION);
@@ -115,35 +120,59 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         return collectionMigrator;
     }
 
-    // @Test
-    // public void test_createModuleForMigration_MultipleTimes() throws Exception {
-    // MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
-    // // When used for migration, we can create same module many times.
-    // cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
-    // cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
-    //
-    // // This should pass successfully.
-    // // TODO(arjuns) : ONce module info is implemented, update this test.
-    // }
+    @Test
+    public void test_createCollectionForMigration_MultipleTimes() throws Exception {
+        MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
+        // When used for migration, we can create same module many times.
+        cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
+        cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
 
-    // @Test
-    // public void test_createModuleVersion_WithGaps_ForMigration() throws Exception {
-    // MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
-    //
-    // CollectionWrapper collectionWrapper =
-    // cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
-    // publishVersionForModule(collectionWrapper, FIRST_VERSION);
-    //
-    // // Now publishing THIRD_VERSION
-    // publishVersionForModule(collectionWrapper, THIRD_VERSION);
-    // // Now trying to publish SECOND_VERSION. This should result in conflict.
-    // try {
-    // publishVersionForModule(collectionWrapper, SECOND_VERSION);
-    // fail("should have failed.");
-    // } catch (CnxConflictException e) {
-    // // expected.
-    // }
-    // }
+        // This should pass successfully.
+        // TODO(arjuns) : ONce module info is implemented, update this test.
+    }
+
+    @Test
+    public void test_createModuleVersion_withGaps() throws Exception {
+        CollectionWrapper collectionWrapper =                 cnxClient.createCollection();
+
+        dotTest_createModuleVersion_withGaps(collectionWrapper, true /* isMigration */);
+    }
+    
+    @Test
+    public void test_createModuleVersionForMigration_WithGaps() throws Exception {
+        MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
+        CollectionWrapper collectionWrapper =
+                cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
+
+        dotTest_createModuleVersion_withGaps(collectionWrapper, true /* isMigration */);
+    }
+
+    private void dotTest_createModuleVersion_withGaps(CollectionWrapper collectionWrapper,
+            boolean isMigration) throws IOException, JDOMException,
+            FeedException, URISyntaxException, CnxException, Exception {
+        publishVersionForCollection(collectionWrapper, FIRST_VERSION);
+
+        // Now publishing THIRD_VERSION
+        if (isMigration) {
+            publishVersionForCollection(collectionWrapper, THIRD_VERSION);
+        } else {
+            try {
+                publishVersionForCollection(collectionWrapper, THIRD_VERSION);
+                fail("should have failed.");
+            } catch (CnxConflictException e) {
+                // expected
+                return;
+            }
+        }
+        
+        // Now trying to publish SECOND_VERSION. This should result in conflict.
+        try {
+            publishVersionForCollection(collectionWrapper, SECOND_VERSION);
+            fail("should have failed.");
+        } catch (CnxConflictException e) {
+            // expected.
+        }
+    }
 
     /*
      * Purpose of this test is to test the state after creating a moduleId but not publishing any
@@ -201,7 +230,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
         String collxmlAsString = Files.toString(collxmlFile, Charsets.UTF_8);
 
         // Publishing FIRST_VERSION.
-        return cnxClient.createCollectionVersion(collectionWrapper.getId(), version,
+        return cnxClient.createCollectionVersionForMigration(collectionWrapper.getId(), version,
                 collxmlAsString);
     }
 }

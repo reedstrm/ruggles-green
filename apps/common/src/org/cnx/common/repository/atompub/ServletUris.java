@@ -43,20 +43,11 @@ public class ServletUris {
         /**
          * URI relative to for CnxAtomPub ServiceDocument Servlet relative to Jersey root package.
          * It is defined in Application's web.xml file.
-         * 
-         * @deprecated use {@link #SERVICE_DOCUMENT_SERVLET2}
-         */
-        @Deprecated
-        public static final String SERVICE_DOCUMENT_SERVLET = "/service_document";
-
-        /**
-         * URI relative to for CnxAtomPub ServiceDocument Servlet relative to Jersey root package.
-         * It is defined in Application's web.xml file.
          */
         public static final String SERVICE_DOCUMENT_SERVLET2 = "/service_document2";
 
         /**
-         * URI relative to : {@value #SERVICE_DOCUMENT_SERVLET}.
+         * URI relative to : {@value #SERVICE_DOCUMENT_SERVLET2}.
          * 
          * To fetch AtomPub ServiceDocument, clients should do HTTP Get on this URI.
          */
@@ -142,7 +133,8 @@ public class ServletUris {
         /**
          * URI relative to : {@link #MODULE_POST_MIGRATION}
          * 
-         * Path to a Module-Version.
+         * In order to publish a version for Module below Restricted range, 
+         * without restrictions on Repository side, clients should do HTTP-PUT on this URI.
          */
         public static final String MODULE_PUT_MIGRATION_VERSION = MODULE_POST_MIGRATION + "/{"
                 + MODULE_VERSION_PATH_PARAM + "}";
@@ -198,11 +190,12 @@ public class ServletUris {
          */
         public static final String COLLECTION_POST_MIGRATION = "/" + MIGRATION + "/{"
                 + COLLECTION_ID_PATH_PARAM + "}";
-
+        
         /**
          * URI relative to : {@link #COLLECTION_POST_MIGRATION}
          * 
-         * Path to PUT a new Version for Collection during migration.
+         * In order to publish a version for Collections below Restricted range, 
+         * without restrictions on Repository side, clients should do HTTP-PUT on this URI.
          */
         public static final String COLLECTION_PUT_MIGRATION_VERSION = COLLECTION_POST_MIGRATION
                 + "/{"

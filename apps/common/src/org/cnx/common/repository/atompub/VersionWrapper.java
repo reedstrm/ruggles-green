@@ -99,7 +99,6 @@ public class VersionWrapper {
         }
 
         try {
-
             long versionLong = Long.parseLong(version);
 
             if (versionLong >= 0) {

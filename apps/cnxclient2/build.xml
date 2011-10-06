@@ -83,53 +83,6 @@
              dir="${third.party.jars}" />
     </target>
 
-    <target name="test-compile"
-            description="Compile Unit Tests."
-            depends="prepare-for-test-compile, compile">
-
-        <copy todir="${test.classes}">
-            <fileset dir="${test.data.dir}" includes="**/**" />
-        </copy>
-
-        <!-- TODO(arjuns) : Optimize classpaths. -->
-        <javac srcdir="${test.src}"
-               destdir="${test.classes}"
-               includeantruntime="false"
-               failonerror="true"
-               debug="true">
-            <compilerarg line="${javac.flags}" />
-            <classpath>
-                <resources refid="depend_lib" />
-                <resources refid="depend_test_lib" />
-                <pathelement location="${classdir}" />
-            </classpath>
-        </javac>
-    </target>
-
-    <target name="test" description="Run unit tests" depends="test-compile">
-        <junit fork="yes" printsummary="yes" failureproperty="test.failed">
-            <jvmarg value="-enableassertions" />
-            <classpath>
-                <resources refid="depend_lib" />
-                <resources refid="depend_test_lib" />
-                <pathelement location="${classdir}" />
-                <pathelement location="${test.classes}" />
-            </classpath>
-            <formatter type="plain" />
-            <batchtest todir="${test.outdir}">
-                <fileset dir="${test.src}">
-                    <include name="**/*Test.java" />
-                </fileset>
-            </batchtest>
-        </junit>
-
-        <fail message="Tests failed!">
-            <condition>
-                <isset property="test.failed" />
-            </condition>
-        </fail>
-    </target>
-
     <target name="clean" description="Remove built files">
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
         <ant antfile="build.xml" target="clean" dir="${basedir}/${xmls.dir}" />
@@ -163,5 +116,5 @@
 
     <target name="all"
             description="Refers to all the targets in this file other then test."
-            depends="test-compile, compile, jar" />
+            depends="compile, jar" />
 </project>

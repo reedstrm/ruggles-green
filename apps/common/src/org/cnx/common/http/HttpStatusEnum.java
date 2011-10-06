@@ -23,9 +23,11 @@ package org.cnx.common.http;
 public enum HttpStatusEnum {
     OK(200, "OK", HttpStatusCategories.SUCCESSFUL),
     CREATED(201, "Created", HttpStatusCategories.SUCCESSFUL),
+    
     MOVED_PERMANENTLY(301, "Moved Permanently", HttpStatusCategories.REDIRECTION),
     FOUND(302, "Found", HttpStatusCategories.REDIRECTION),
     SEE_OTHER(303, "See Other", HttpStatusCategories.SUCCESSFUL),
+    
     BAD_REQUEST(400, "Bad Request", HttpStatusCategories.CLIENT_ERROR),
     UNAUTHORIZED(401, "Unauthorized", HttpStatusCategories.CLIENT_ERROR),
     FORBIDDEN(403, "Forbidden", HttpStatusCategories.CLIENT_ERROR),
@@ -35,6 +37,7 @@ public enum HttpStatusEnum {
     GONE(410, "Gone", HttpStatusCategories.CLIENT_ERROR),
     PRECONDITION_FAILED(412, "Precondition Failed", HttpStatusCategories.CLIENT_ERROR),
     UNSUPPORTED_MEDIA_TYPE(415, "Unsupported Media Type", HttpStatusCategories.CLIENT_ERROR),
+    
     INTERNAL_SERVER_ERROR(500, "Internal Server Error", HttpStatusCategories.SERVER_ERROR);
     
     private int statusCode;

@@ -39,7 +39,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
+public class ParallelModuleMigratorTests extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
     private VersionWrapper FIRST_VERSION = new VersionWrapper(1);
     private VersionWrapper SECOND_VERSION = new VersionWrapper(2);
@@ -48,7 +48,7 @@ public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
     private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/"
             + MODULE_ID;
 
-    public ParallelModuleMigratorTest() throws Exception {
+    public ParallelModuleMigratorTests() throws Exception {
         super();
     }
 

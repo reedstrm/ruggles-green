@@ -126,8 +126,7 @@
             <formatter type="plain" />
             <batchtest todir="${test.outdir}">
                 <fileset dir="${test.src}">
-                    <!-- TODO(arjuns): Rename test -> tests. -->
-                    <include name="**/*Test*.java" />
+                    <include name="**/*Tests.java" />
                 </fileset>
             </batchtest>
         </junit>

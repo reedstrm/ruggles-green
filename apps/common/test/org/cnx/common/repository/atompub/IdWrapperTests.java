@@ -33,7 +33,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class IdWrapperTest {
+public class IdWrapperTests {
 
     @Test
     public void testIdsForUnrestrictedIds() {

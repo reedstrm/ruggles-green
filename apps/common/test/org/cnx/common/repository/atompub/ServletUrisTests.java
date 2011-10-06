@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class ServletUrisTest {
+public class ServletUrisTests {
 
     @Test
     public void test_ServletUris_Fields() {

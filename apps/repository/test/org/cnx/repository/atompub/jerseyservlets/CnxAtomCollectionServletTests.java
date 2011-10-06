@@ -49,7 +49,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
+public class CnxAtomCollectionServletTests extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
     private VersionWrapper FIRST_VERSION = new VersionWrapper(1);
     @SuppressWarnings("unused")
@@ -59,7 +59,7 @@ public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
     private IdWrapper COLLECTION_ID_WRAPPER = new IdWrapper("col10064", IdWrapper.Type.COLLECTION);
     private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/testdata/col10064/";
 
-    public CnxAtomCollectionServletTest() throws Exception {
+    public CnxAtomCollectionServletTests() throws Exception {
         super();
     }
 

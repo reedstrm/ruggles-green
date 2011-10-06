@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response.Status;
  * 
  * @author Arjun Satyapal
  */
-public class AtomPubResponseUtilsTest {
+public class AtomPubResponseUtilsTests {
     // This test ensures that for each RespositoryStatus there is a corresponding
     // value in Map.
     @Test

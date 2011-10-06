@@ -32,5 +32,5 @@
 	<classpathentry kind="lib" path="build/jars/httpclient-cache-4.1.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/httpcore-4.1.2.jar"/>
 	<classpathentry kind="lib" path="build/jars/httpmime-4.1.2.jar"/>
-	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

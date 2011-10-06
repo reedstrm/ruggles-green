@@ -34,7 +34,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class VersionWrapperTest {
+public class VersionWrapperTests {
 
     @Test
     public void testVersionWrapperConstructor_long() {
@@ -106,5 +106,12 @@ public class VersionWrapperTest {
         } catch (IllegalStateException e) {
             // expected.
         }
+    }
+    
+    @Test
+    public void testEquals() {
+        assertEquals(new VersionWrapper(1), new VersionWrapper("1"));
+        
+        assertEquals(CnxAtomPubUtils.LATEST_VERSION_WRAPPER, new VersionWrapper("latest"));
     }
 }

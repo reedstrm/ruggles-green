@@ -40,10 +40,10 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
+public class CnxServiceDocumentServletTests extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
 
-    public CnxServiceDocumentServletTest() throws Exception {
+    public CnxServiceDocumentServletTests() throws Exception {
         super();
     }
 

@@ -35,7 +35,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
  * @author Tal Dayan
  */
 
-public class IdUtilTest {
+public class IdUtilTests {
 
     private final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(

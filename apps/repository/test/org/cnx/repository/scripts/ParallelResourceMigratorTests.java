@@ -38,13 +38,13 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
+public class ParallelResourceMigratorTests extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
 
     // TODO(arjuns) : Create file dynamically.
     private final File file = new File("/home/arjuns/test_file.txt");
 
-    public ParallelResourceMigratorTest() throws Exception {
+    public ParallelResourceMigratorTests() throws Exception {
         super();
     }
 

@@ -39,6 +39,7 @@ public class OrmCollectionVersionEntity extends OrmEntity {
 
     private static final String VERSION_NUMBER = "version";
     private static final String COLXML_DOC = "colxml";
+    private static final String COLLECTION_ID = "collection";
 
     /**
      * Version number. First version is 1, second is 2, etc.
@@ -53,7 +54,7 @@ public class OrmCollectionVersionEntity extends OrmEntity {
      * @param colxmlDoc the COLXML doc of this version.
      */
     public OrmCollectionVersionEntity(Key collectionKey, Date creationTime, int versionNumber,
-        String colxmlDoc) {
+            String colxmlDoc) {
         super(ENTITY_SPEC, collectionVersionKey(collectionKey, versionNumber), creationTime);
         this.versionNumber = versionNumber;
         this.colxmlDoc = checkNotNull(colxmlDoc);
@@ -95,6 +96,10 @@ public class OrmCollectionVersionEntity extends OrmEntity {
     protected void serializeToEntity(Entity entity) {
         entity.setProperty(VERSION_NUMBER, versionNumber); // serialized as Long
         entity.setProperty(COLXML_DOC, new Text(colxmlDoc));
+
+        // We serialize also a human readable copy of the collection id so it can be seen and
+        // used in the datastore view.
+        entity.setProperty(COLLECTION_ID, OrmCollectionEntity.collectionKeyToId(getKey().getParent()));
     }
 
     public static OrmEntitySpec getSpec() {

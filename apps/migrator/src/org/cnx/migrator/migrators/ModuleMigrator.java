@@ -50,7 +50,7 @@ public class ModuleMigrator extends ItemMigrator {
     private final Directory moduleDirectory;
 
     /** Module id in the repository. E.g. "m0012". */
-    private final String cnxModuleId;
+    private final String moduleId;
 
     /**
      * Construct a single module migrator.
@@ -65,14 +65,14 @@ public class ModuleMigrator extends ItemMigrator {
     public ModuleMigrator(MigratorContext context, Directory moduleDirectory) {
         super(context);
         this.moduleDirectory = moduleDirectory;
-        this.cnxModuleId = moduleDirectoryToId(moduleDirectory);
+        this.moduleId = moduleDirectoryToId(moduleDirectory);
     }
 
     /** This is called by a worker thread to do the migration */
     @Override
     public void doWork() {
 
-        createModule(cnxModuleId);
+        createModule(moduleId);
 
         int nextVersionNum = 1;
 
@@ -87,28 +87,17 @@ public class ModuleMigrator extends ItemMigrator {
             final int directoryVersionNum = Integer.parseInt(versionDirectory.getName());
             checkArgument(directoryVersionNum >= nextVersionNum, "%s", versionDirectory);
 
-            // If needed, create gap versions
-            while (directoryVersionNum > nextVersionNum) {
-                MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
-                getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", 1);
-                // TODO(tal): create gaps as explicit taken down version.
-                Log.message("Creating gap module version: %s/%s", cnxModuleId, nextVersionNum);
-                migrateNextModuleVersion(cnxModuleId, nextVersionNum, versionDirectory);
-                nextVersionNum++;
+            // Track version gap is needed.
+            if (directoryVersionNum > nextVersionNum) {
+                getContext().incrementCounter("MODULE_VERSION_GAPS", 1);
+                getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS",
+                        (directoryVersionNum - nextVersionNum));
+                nextVersionNum = directoryVersionNum;
             }
-
-            // TODO(tal): switch to this version to have actual gaps for takedowns, and force
-            // post gap version id on the module wrapper.
-            // if (directoryVersionNum > nextVersionNum) {
-            // getContext().incrementCounter("MODULE_VERSION_GAPS", 1);
-            // getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", (directoryVersionNum -
-            // nextVersionNum));
-            // nextVersionNum = directoryVersionNum;
-            // }
 
             // Add the version
             MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
-            migrateNextModuleVersion(cnxModuleId, nextVersionNum, versionDirectory);
+            migrateNextModuleVersion(moduleId, nextVersionNum, versionDirectory);
             nextVersionNum++;
         }
     }
@@ -185,10 +174,10 @@ public class ModuleMigrator extends ItemMigrator {
         for (attempt = 1;; attempt++) {
             try {
                 final ModuleWrapper moduleWrapper =
-                        getCnxClient().createModuleVersion(idWrapper, versionWrapper, cnxml,
-                                resourceMapXml);
+                        getCnxClient().createModuleVersionForMigration(idWrapper, versionWrapper,
+                                cnxml, resourceMapXml);
                 checkResourceId(moduleId, versionNum, moduleWrapper);
-                Log.message("Migrated module version %s/%s", moduleId, versionNum);
+                Log.message("Added module version %s/%s", moduleId, versionNum);
                 return;
             } catch (Exception e) {
                 if (attempt == 1) {

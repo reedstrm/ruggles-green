@@ -23,8 +23,12 @@ time java  \
   -Xss128k \
   -cp ${classpath} \
   org.cnx.migrator.MigratorMain \
+  -max_attempts 10 \
   -data_root_dir ${DATA_ROOT_DIR} \
   -repository_atompub_url ${REPOSITORY_ATOMPUB_URL} \
   -shard_filter ".*" \
+  -resource_threads 250 \
+  -module_threads 250 \
+  -collection_threads 250 \
   -migrate_all
 

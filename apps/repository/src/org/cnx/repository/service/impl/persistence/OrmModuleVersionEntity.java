@@ -42,6 +42,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
     private static final String VERSION_NUMBER = "version";
     private static final String CNXML_DOC = "cnxml";
     private static final String RESOURCE_MAP_DOC = "resource_map";
+    private static final String MODULE_ID = "module";
 
     /**
      * Version number. First version is 1, second is 2, etc.
@@ -59,7 +60,7 @@ public class OrmModuleVersionEntity extends OrmEntity {
      * @param resourceMapDoc the resource mapping XML doc of this version.
      */
     public OrmModuleVersionEntity(Key moduleKey, Date creationDate, int versionNumber,
-        String cnxmlDoc, String resourceMapDoc) {
+            String cnxmlDoc, String resourceMapDoc) {
         super(ENTITY_SPEC, moduleVersionKey(moduleKey, versionNumber), creationDate);
         this.versionNumber = versionNumber;
         this.cnxmlDoc = checkNotNull(cnxmlDoc);
@@ -108,6 +109,10 @@ public class OrmModuleVersionEntity extends OrmEntity {
         entity.setProperty(VERSION_NUMBER, versionNumber); // serialized as Long
         entity.setProperty(CNXML_DOC, new Text(cnxmlDoc));
         entity.setProperty(RESOURCE_MAP_DOC, new Text(resourceMapDoc));
+
+        // We serialize also a human readable copy of the module id so it can be seen and
+        // used in the datastore view.
+        entity.setProperty(MODULE_ID, OrmModuleEntity.moduleKeyToId(getKey().getParent()));
     }
 
     public static OrmEntitySpec getSpec() {

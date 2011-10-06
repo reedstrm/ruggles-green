@@ -33,7 +33,6 @@ import javax.annotation.Nullable;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -107,6 +106,11 @@ public class CnxClient {
         apcForCollection = new APCForCollection(getServiceDocumentObject());
     }
 
+    /**
+     * Getter for CnxAtomPubConstants.
+     * 
+     * @return constants.
+     */
     public CnxAtomPubConstants getConstants() {
         return constants;
     }
@@ -136,12 +140,36 @@ public class CnxClient {
         return serviceDocumentXml;
     }
 
+    /**
+     * Create a new Resource on CNX Repository.
+     * 
+     * @return ResourceWrapper which wraps details for newly created Resource.
+     * @throws URISyntaxException
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws CnxException
+     */
     public ResourceWrapper createResource() throws URISyntaxException,
             IllegalArgumentException,
             IOException, JDOMException, FeedException, CnxException {
         return apcForResources.createResource();
     }
 
+    /**
+     * Create a resource on CNX Repository for migration.
+     * 
+     * @param id Id under restricted range that will be used for migration.
+     * @return ResourceWrapper which wraps details for newly created Resource.
+     * 
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws CnxException
+     */
     public ResourceWrapper createResourceForMigration(IdWrapper id)
             throws IllegalArgumentException, IOException, JDOMException, FeedException,
             URISyntaxException, CnxException {
@@ -173,10 +201,7 @@ public class CnxClient {
 
         httpPost.setEntity(reqEntity);
 
-        HttpResponse response = HttpClientWrapper.getHttpClient().execute(httpPost);
-        HttpEntity resEntity = response.getEntity();
-
-        // TODO(arjuns) : Add more checks here.
+        HttpClientWrapper.getHttpClient().execute(httpPost);
     }
 
     /**
@@ -241,11 +266,35 @@ public class CnxClient {
      * Methods related to Module.
      */
 
+    /**
+     * Create Module on CNX Repository.
+     * 
+     * @return ModuleWrapper which wraps Module Details for newly created module.
+     * 
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws CnxException
+     */
     public ModuleWrapper createModule() throws IllegalArgumentException, IOException,
             JDOMException, FeedException, URISyntaxException, CnxException {
         return apcForModules.createModule();
     }
 
+    /**
+     * Create Module for migration on CNX Repository.
+     * 
+     * @param id Id under restricted range that will be used for migration.
+     * @return ModuleWrapper which wraps Module details for newly created module.
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws CnxException
+     */
     public ModuleWrapper createModuleForMigration(IdWrapper id) throws
             IllegalArgumentException,
             IOException,
@@ -253,6 +302,23 @@ public class CnxClient {
         return apcForModules.createModuleForMigration(id);
     }
 
+    /**
+     * Create a new Module Version on CNX Repository.
+     * 
+     * @param id Id for Module whose new Version needs to be published.
+     * @param newVersion Version that needs to be published.
+     * @param cnxml CNXML representation for a Module.
+     * @param resourceMappingXml Resource Mapping Document.
+     * @return ModuleWrapper which wraps details for the module.
+     * 
+     * @throws IllegalArgumentException
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws CnxException
+     * @throws JAXBException
+     * @throws JDOMException
+     * @throws FeedException
+     */
     public ModuleWrapper createModuleVersion(IdWrapper id, VersionWrapper newVersion,
             String cnxml, String resourceMappingXml) throws IllegalArgumentException,
             URISyntaxException, IOException, CnxException, JAXBException,
@@ -261,12 +327,68 @@ public class CnxClient {
         return createModuleVersion(editUrl.toURI(), cnxml, resourceMappingXml);
     }
 
+    /**
+     * Create a Module Version on CNX Repository for Migration.
+     * 
+     * @param id Id for Module whose new Version needs to be published.
+     * @param newVersion Version that needs to be published.
+     * @param cnxml CNXML representation for a Module.
+     * @param resourceMappingXml Resource Mapping Document.
+     * @return ModuleWrapper which wraps details for the module.
+     * 
+     * @throws IllegalArgumentException
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws CnxException
+     * @throws JAXBException
+     * @throws JDOMException
+     * @throws FeedException
+     */
+    public ModuleWrapper createModuleVersionForMigration(IdWrapper id, VersionWrapper newVersion,
+            String cnxml, String resourceMappingXml) throws IllegalArgumentException,
+            URISyntaxException, IOException, CnxException, JAXBException,
+            JDOMException, FeedException {
+        return apcForModules.createModuleVersionForMigration(id, newVersion, cnxml,
+                resourceMappingXml);
+    }
+
+    /**
+     * Create a new Module Version on CNX Repository.
+     * 
+     * @param editUri EditUri that was returned by the Repository to publish future changes.
+     * @param cnxml CNXML representation for a Module.
+     * @param resourceMappingXml Resource Mapping Document.
+     * @return ModuleWrapper which wraps details for the Module.
+     * 
+     * @throws IllegalArgumentException
+     * @throws JDOMException
+     * @throws IOException
+     * @throws CnxException
+     * @throws JAXBException
+     * @throws FeedException
+     * @throws URISyntaxException
+     */
     public ModuleWrapper createModuleVersion(URI editUri, String cnxml, String resourceMappingXml)
             throws IllegalArgumentException, JDOMException, IOException, CnxException,
             JAXBException, FeedException, URISyntaxException {
         return apcForModules.createModuleVersion(editUri, cnxml, resourceMappingXml);
     }
 
+    /**
+     * Fetch a Module Version from CNX Repository.
+     * 
+     * @param id Id of desired Module.
+     * @param version Version of desired Module.
+     * @return ModuleVersionWrapper which wraps details for a ModuleVersion.
+     * 
+     * @throws IllegalStateException
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws CnxException
+     */
     public ModuleVersionWrapper getModuleVersion(IdWrapper id, VersionWrapper version)
             throws IllegalStateException, IllegalArgumentException, IOException,
             URISyntaxException, JDOMException, FeedException, CnxException {
@@ -276,11 +398,34 @@ public class CnxClient {
     /*
      * Methods related to Collection.
      */
+    /**
+     * Create Collection on CNX Repository.
+     * 
+     * @return CollectionWrapper which wraps Collection Details for newly created module.
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws CnxException
+     */
     public CollectionWrapper createCollection() throws IllegalArgumentException, IOException,
             JDOMException, FeedException, URISyntaxException, CnxException {
         return apcForCollection.createCollection();
     }
 
+    /**
+     * Create Collection for migration on CNX Repository.
+     * 
+     * @param id Id under restricted range that will be used for migration.
+     * @return CollectionWrapper which wraps Collection details for newly created collection.
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws URISyntaxException
+     * @throws CnxException
+     */
     public CollectionWrapper createCollectionForMigration(IdWrapper id) throws
             IllegalArgumentException,
             IOException,
@@ -288,20 +433,63 @@ public class CnxClient {
         return apcForCollection.createCollectionForMigration(id);
     }
 
+    /**
+     * Create a new Collection Version on CNX Repository.
+     * 
+     * @param id Id for Collection whose new Version needs to be published.
+     * @param newVersion Version that needs to be published.
+     * @param collectionXml CollectionXml representation for collection.
+     * @return CollectionWrapper which wraps details for the Collection.
+     * @throws IllegalArgumentException
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws CnxException
+     * @throws JAXBException
+     * @throws JDOMException
+     * @throws FeedException
+     */
     public CollectionWrapper createCollectionVersion(IdWrapper id, VersionWrapper newVersion,
             String collectionXml) throws IllegalArgumentException,
             URISyntaxException, IOException, CnxException, JAXBException,
             JDOMException, FeedException {
-        URL editUrl = getConstants().getModuleVersionAbsPath(id, newVersion);
+        URL editUrl = getConstants().getCollectionVersionAbsPath(id, newVersion);
         return createCollectionVersion(editUrl.toURI(), collectionXml);
     }
 
+    /**
+     * Create a new Collection Version on CNX Repository.
+     * 
+     * @param editUri EditUri that was returned by the Repository to publish future changes.
+     * @param collectionXml CollectionXml representation for Collection.
+     * @return CollectionWrapper which wraps details for the Collection.
+     * @throws IllegalArgumentException
+     * @throws JDOMException
+     * @throws IOException
+     * @throws CnxException
+     * @throws JAXBException
+     * @throws FeedException
+     * @throws URISyntaxException
+     */
     public CollectionWrapper createCollectionVersion(URI editUri, String collectionXml)
             throws IllegalArgumentException, JDOMException, IOException, CnxException,
             JAXBException, FeedException, URISyntaxException {
         return apcForCollection.createCollectionVersion(editUri, collectionXml);
     }
 
+    /**
+     * Fetch a Collection Version from CNX Repository.
+     * 
+     * @param id Id of desired Collection.
+     * @param version Version of desired Module.
+     * @return CollectionVersionWrapper which wraps details for a CollectionVersion.
+     * @throws IllegalStateException
+     * @throws IllegalArgumentException
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JDOMException
+     * @throws FeedException
+     * @throws CnxException
+     */
     public CollectionVersionWrapper getCollectionVersion(IdWrapper id, VersionWrapper version)
             throws IllegalStateException, IllegalArgumentException, IOException,
             URISyntaxException, JDOMException, FeedException, CnxException {

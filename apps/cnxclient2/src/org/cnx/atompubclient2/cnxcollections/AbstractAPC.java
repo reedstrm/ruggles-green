@@ -17,7 +17,6 @@ package org.cnx.atompubclient2.cnxcollections;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -79,22 +78,6 @@ public abstract class AbstractAPC extends Collection {
     }
 
     /**
-     * Get AtomPubResource URI for a Version.
-     * 
-     * @param id id for AtomPub Resource
-     * @param version version for AtomPub Resource.
-     * @return URI Uri for AtomPubResource Version.
-     * 
-     * @throws URISyntaxException
-     */
-    protected URI getAPRUriForMigration(IdWrapper id, VersionWrapper version)
-            throws URISyntaxException {
-        Preconditions.checkArgument(id.getType() != IdWrapper.Type.RESOURCE);
-        URI tail = new URI(id.getId() + "/" + version.toString());
-        return CommonUtils.appendUri(getAPCUri(), tail);
-    }
-
-    /**
      * URI for downloading AtomPubResource.
      * 
      * @param id id for AtomPubResource.
@@ -129,11 +112,29 @@ public abstract class AbstractAPC extends Collection {
     protected URI getAPRVUri(IdWrapper id, VersionWrapper version)
             throws URISyntaxException {
         if (id.getType() == IdWrapper.Type.RESOURCE) {
-            throw new RuntimeException("getAPRUriForInformation is not defined for Resources.");
+            throw new RuntimeException("getAPRVUri is not defined for Resources.");
         }
         URI tail =
                 new URI(id.toString() + "/" + version.toString());
         return CommonUtils.appendUri(getAPCUri(), tail);
+    }
+
+    /**
+     * Get URI to fetch AtomPubResourceVersion for Migration. This is not applicable for CNX
+     * Resources.
+     * 
+     * @param id for AtomPubResource
+     * @param version for AtomPubResource
+     * @return URI from where client can fetch Information.
+     * @throws URISyntaxException
+     */
+    protected URI getAPRVUriForMigration(IdWrapper id, VersionWrapper version)
+            throws URISyntaxException {
+        if (id.getType() == IdWrapper.Type.RESOURCE) {
+            throw new RuntimeException("getAPRVUriForMigration is not defined for Resources.");
+        }
+        URI tail = new URI("/" + version.toString());
+        return CommonUtils.appendUri(getAPRUriForMigration(id), tail);
     }
 
     // TODO(arjuns) : Add test for this.

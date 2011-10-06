@@ -15,6 +15,14 @@
  */
 package org.cnx.atompubclient2;
 
+import org.cnx.common.exceptions.CnxPreconditionFailedException;
+
+import org.cnx.common.exceptions.CnxConflictException;
+
+import org.cnx.common.exceptions.CnxInvalidUrlException;
+
+import org.cnx.common.exceptions.CnxBadRequestException;
+
 import com.google.appengine.api.utils.SystemProperty;
 import java.io.IOException;
 import org.apache.http.HttpRequest;
@@ -95,19 +103,58 @@ public class HttpClientWrapper {
                 new StringBuilder("HttpStatus = ").append(status.getStatusCode()).append(", ");
         switch (status.getStatusCategories()) {
             case SUCCESSFUL:
+                return;
+
+            case CLIENT_ERROR:
+                handleClientError(status, httpRequest, httpResponse, errorStringBuilder);
                 break;
 
             case REDIRECTION:
-                errorStringBuilder.append("Redirection should have been handled automatically ")
-                        .append("but did not happen for URI[")
-                        .append(httpRequest.getURI())
-                        .append("].");
-                throw new CnxException(status, errorStringBuilder.toString(), null /* throwable */);
+                handleRedirection(status, httpRequest, httpResponse, errorStringBuilder);
+                break;
 
             default:
-                errorStringBuilder.append("Failed for ")
-                        .append(httpRequest.getMethod()).append(" : ").append(httpRequest.getURI());
-                throw new CnxException(status, errorStringBuilder.toString(), null);
+                handleDefaultException(status, httpRequest, httpResponse, errorStringBuilder);
         }
+
+        throw new RuntimeException("Code should not reach here. Current ErrorString : "
+                + errorStringBuilder.toString());
+    }
+
+    private void handleDefaultException(HttpStatusEnum status, HttpUriRequest httpRequest,
+            HttpResponse httpResponse, StringBuilder errorStringBuilder) throws CnxException {
+        errorStringBuilder.append("Failed for ")
+                .append(httpRequest.getMethod()).append(" : ").append(httpRequest.getURI());
+        throw new CnxException(status, errorStringBuilder.toString(), null);
+    }
+
+    private void handleClientError(HttpStatusEnum status, HttpUriRequest httpRequest,
+            HttpResponse httpResponse, StringBuilder errorStringBuilder) throws CnxException {
+        switch (status) {
+            case BAD_REQUEST: /* 400 */
+                throw new CnxBadRequestException(errorStringBuilder.toString(), null /* throwable */);
+
+            case NOT_FOUND: /* 404 */
+                throw new CnxInvalidUrlException(errorStringBuilder.toString(), null /* throwable */);
+
+            case CONFLICT: /* 409 */
+                throw new CnxConflictException(errorStringBuilder.toString(), null /* throwable */);
+
+            case PRECONDITION_FAILED: /* 412 */
+                throw new CnxPreconditionFailedException(errorStringBuilder.toString(), null /* throwable */);
+
+            default:
+                handleDefaultException(status, httpRequest, httpResponse, errorStringBuilder);
+        }
+    }
+
+    private void handleRedirection(HttpStatusEnum status, HttpUriRequest httpRequest,
+            HttpResponse httpResponse,
+            StringBuilder errorStringBuilder) throws CnxException {
+        errorStringBuilder.append("Redirection should have been handled automatically ")
+                .append("but did not happen for URI[")
+                .append(httpRequest.getURI())
+                .append("].");
+        throw new CnxException(status, errorStringBuilder.toString(), null /* throwable */);
     }
 }

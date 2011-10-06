@@ -37,7 +37,7 @@ public class OrmModuleEntity extends OrmEntity {
     private static final String VERSION_COUNT_PROPERTY = "versions";
 
     /**
-     * Number of versions of this module. Value >= 0. If > 0, this is also the version of the last
+     * Number of versions ever added to this module. Value >= 0. If > 0, this is also the version of the last
      * version of this module (version numbering is 1, 2, ...). Zero when the module was created but
      * no version was added.
      */

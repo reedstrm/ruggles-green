@@ -16,7 +16,6 @@
 
 package org.cnx.repository.service.impl.operations;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.AddResourceResult;
 import org.cnx.repository.service.api.GetResourceInfoResult;
 import org.cnx.repository.service.api.GetResourceListResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
@@ -39,8 +38,6 @@ import org.cnx.repository.service.api.UploadedResourceContentInfo;
 import org.cnx.repository.service.impl.persistence.IdUtil;
 import org.cnx.repository.service.impl.persistence.OrmBlobInfo;
 import org.cnx.repository.service.impl.persistence.OrmResourceEntity;
-import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
-import org.cnx.repository.service.impl.persistence.PersistenceTransaction;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -64,15 +61,17 @@ public class ResourceOperations {
     /**
      * Base path of the resource upload completion servlet. Should match servlet mapping in web.xml.
      * Servlet mapping should be this value with the suffix "/*".
+     * <p>
+     * TODO(tal): make private after deleting MigrationOperations.
      */
-    private static final String UPLOAD_COMPLETION_SERVLET_PATH = "/_repo/resource_uploaded";
+    static final String RESOURCE_UPLOAD_COMPLETION_SERVLET_PATH = "/_repo/resource_uploaded";
 
     private static final Logger log = Logger.getLogger(ResourceOperations.class.getName());
 
     /**
      * See description in {@link CnxRepositoryService}
      */
-    public static RepositoryResponse<CreateResourceResult> createResource(
+    public static RepositoryResponse<AddResourceResult> addResource(
             RepositoryRequestContext context) {
 
         final Date transactionTime = new Date();
@@ -89,78 +88,13 @@ public class ResourceOperations {
         }
 
         final String completionUrl =
-                UPLOAD_COMPLETION_SERVLET_PATH + "?"
+                RESOURCE_UPLOAD_COMPLETION_SERVLET_PATH + "?"
                         + ResourceUtil.encodeUploadCompletionParameters(resourceId);
 
         String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
 
-        return ResponseUtil.loggedOk("Resource created: " + resourceId, new CreateResourceResult(
+        return ResponseUtil.loggedOk("Resource created: " + resourceId, new AddResourceResult(
                 resourceId, uploadUrl), log);
-    }
-
-    /**
-     * See description in {@link CnxRepositoryService}
-     * 
-     * TODO(tal): remove this method after completing the data migration.
-     */
-    public static RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
-            RepositoryRequestContext context, String forcedId, Date forcedCreationTime) {
-
-        final PersistenceTransaction tx = Services.persistence.beginTransaction();
-        try {
-            // Validate forced id
-            final Key forcedKey = OrmResourceEntity.resourceIdToKey(forcedId);
-            if (forcedKey == null) {
-                tx.rollback();
-                return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
-                        "Invalid forced resource id format " + forcedId, log);
-            }
-            if (!PersistenceMigrationUtil.isResourceKeyProtected(forcedKey)) {
-                tx.rollback();
-                return ResponseUtil.loggedError(RepositoryStatus.OUT_OF_RANGE,
-                        "Forced resource id is not out of protected id range " + forcedId, log);
-            }
-
-            try {
-                // Entity already exists. To faciliate migrator error recovery we allow
-                // to recreate a reouruce that does not have yet a blob.
-                final OrmResourceEntity entity =
-                        Services.persistence.read(OrmResourceEntity.class, forcedKey);
-                if (entity.getState() != OrmResourceEntity.State.UPLOAD_PENDING) {
-                    tx.rollback();
-                    return ResponseUtil
-                            .loggedError(RepositoryStatus.ALREADY_EXISTS,
-                                    "A resource with this forced id has already been uploaded: "
-                                            + forcedId, log);
-                }
-                log.info("Allowing to recreate empty resources " + forcedId);
-            } catch (EntityNotFoundException e) {
-                // Entity does not exist, this is the normal case
-                final OrmResourceEntity entity = new OrmResourceEntity(forcedCreationTime);
-                entity.setKey(forcedKey);
-                Services.persistence.write(entity);
-                checkArgument(forcedId.equals(entity.getId()), "%s vs %s", forcedId, entity.getId());
-            }
-
-            tx.commit();
-
-        } catch (Throwable e) {
-            tx.safeRollback();
-            return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
-                    "Error when trying to create a new resource with forced id: " + forcedId, log,
-                    e);
-        } finally {
-            checkArgument(!tx.isActive(), "Transaction left active");
-        }
-
-        final String completionUrl =
-                UPLOAD_COMPLETION_SERVLET_PATH + "?"
-                        + ResourceUtil.encodeUploadCompletionParameters(forcedId);
-
-        String uploadUrl = Services.blobstore.createUploadUrl(completionUrl);
-
-        return ResponseUtil.loggedOk("Resource created with forced id: " + forcedId,
-                new CreateResourceResult(forcedId, uploadUrl), log);
     }
 
     /**

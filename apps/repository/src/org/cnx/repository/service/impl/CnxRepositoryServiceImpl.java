@@ -25,9 +25,9 @@ import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryConfiguration;
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateCollectionResult;
-import org.cnx.repository.service.api.CreateModuleResult;
-import org.cnx.repository.service.api.CreateResourceResult;
+import org.cnx.repository.service.api.AddCollectionResult;
+import org.cnx.repository.service.api.AddModuleResult;
+import org.cnx.repository.service.api.AddResourceResult;
 import org.cnx.repository.service.api.DeleteExportResult;
 import org.cnx.repository.service.api.ExportReference;
 import org.cnx.repository.service.api.GetCollectionInfoResult;
@@ -47,6 +47,7 @@ import org.cnx.repository.service.api.ServeExportResult;
 import org.cnx.repository.service.api.ServeResourceResult;
 import org.cnx.repository.service.impl.operations.CollectionOperations;
 import org.cnx.repository.service.impl.operations.ExportOperations;
+import org.cnx.repository.service.impl.operations.MigrationOperations;
 import org.cnx.repository.service.impl.operations.ModuleOperations;
 import org.cnx.repository.service.impl.operations.ResourceOperations;
 import org.cnx.repository.service.impl.operations.Services;
@@ -67,15 +68,15 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<CreateResourceResult>
-    createResource(RepositoryRequestContext context) {
-        return ResourceOperations.createResource(context);
+    public RepositoryResponse<AddResourceResult>
+    addResource(RepositoryRequestContext context) {
+        return ResourceOperations.addResource(context);
     }
 
     @Override
-    public RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
+    public RepositoryResponse<AddResourceResult> addResourceForMigration(
             RepositoryRequestContext context, String forcedId, Date forcedCreationTime) {
-        return ResourceOperations.migrationCreateResourceWithId(context, forcedId,
+        return MigrationOperations.addResourceForMigration(context, forcedId,
                 forcedCreationTime);
     }
 
@@ -99,14 +100,14 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context) {
-        return ModuleOperations.createModule(context);
+    public RepositoryResponse<AddModuleResult> addModule(RepositoryRequestContext context) {
+        return ModuleOperations.addModule(context);
     }
 
     @Override
-    public RepositoryResponse<CreateModuleResult> migrationCreateModuleWithId(
+    public RepositoryResponse<AddModuleResult> addModuleForMigration(
             RepositoryRequestContext context, String forcedId) {
-        return ModuleOperations.migrationCreateModuleWithId(context, forcedId);
+        return MigrationOperations.addModuleForMigration(context, forcedId);
     }
 
     @Override
@@ -130,10 +131,10 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<AddModuleVersionResult> migrationAddModuleVersion(
+    public RepositoryResponse<AddModuleVersionResult> addModuleVersionForMigration(
             RepositoryRequestContext context, String moduleId, int versionNumber, String cnxmlDoc,
             String resourceMapDoc) {
-        return ModuleOperations.migrationAddModuleVersion(context, moduleId, versionNumber, cnxmlDoc,
+        return MigrationOperations.addModuleVersionForMigration(context, moduleId, versionNumber, cnxmlDoc,
                 resourceMapDoc);
     }
 
@@ -150,15 +151,15 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
     }
 
     @Override
-    public RepositoryResponse<CreateCollectionResult> createCollection(
+    public RepositoryResponse<AddCollectionResult> addCollection(
             RepositoryRequestContext context) {
-        return CollectionOperations.createCollection(context);
+        return CollectionOperations.addCollection(context);
     }
 
     @Override
-    public RepositoryResponse<CreateCollectionResult> migrationCreateCollectionWithId(
+    public RepositoryResponse<AddCollectionResult> addCollectionForMigration(
             RepositoryRequestContext context, String forcedId) {
-        return CollectionOperations.migrationCreateCollectionWithId(context, forcedId);
+        return MigrationOperations.addCollectionForMigration(context, forcedId);
     }
 
     @Override
@@ -180,6 +181,14 @@ public class CnxRepositoryServiceImpl implements CnxRepositoryService {
             @Nullable Integer expectedVersionNumber, String colxmlDoc) {
         return CollectionOperations.addCollectionVersion(context, collectionId,
                 expectedVersionNumber, colxmlDoc);
+    }
+
+    @Override
+    public RepositoryResponse<AddCollectionVersionResult> addCollectionVersionForMigration(
+            RepositoryRequestContext context, String collectionId,
+            int versionNumber, String colxmlDoc) {
+        return MigrationOperations.addCollectionVersionForMigration(context, collectionId,
+                versionNumber, colxmlDoc);
     }
 
     @Override

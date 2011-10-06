@@ -16,6 +16,8 @@
 
 package org.cnx.repository.service.impl.persistence;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Date;
 
 import javax.annotation.Nullable;
@@ -35,9 +37,9 @@ public class OrmCollectionEntity extends OrmEntity {
     private static final String VERSION_COUNT_PROPERTY = "versions";
 
     /**
-     * Number of versions of this collection. Value >= 0. If > 0, this is also the version of the
-     * latest version of this collection (version numbering is 1, 2, ...). Zero when the collection
-     * was created but no version has been added.
+     * Number of versions ever added to this collection. Value >= 0. If > 0, this is also the
+     * version of the latest version of this collection (version numbering is 1, 2, ...). Zero when
+     * the collection was created but no version has been added.
      */
     private int versionCount = 0;
 
@@ -66,6 +68,11 @@ public class OrmCollectionEntity extends OrmEntity {
     public int incrementVersionCount() {
         versionCount++;
         return versionCount;
+    }
+
+    public void setVersionCount(int value) {
+        checkArgument(value >= 0, "Invalid version count: %s", value);
+        this.versionCount = value;
     }
 
     public static String collectionKeyToId(Key collectionKey) {

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateModuleResult;
+import org.cnx.repository.service.api.AddModuleResult;
 import org.cnx.repository.service.api.RepositoryRequestContext;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
@@ -36,7 +36,7 @@ import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
  * @author Tal Dayan
  */
 @SuppressWarnings("serial")
-public class CreateModuleServlet extends HttpServlet {
+public class AddModuleServlet extends HttpServlet {
     private final CnxRepositoryService repository = CnxRepositoryServiceImpl.getService();
 
     @Override
@@ -47,9 +47,9 @@ public class CreateModuleServlet extends HttpServlet {
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
         // TODO(tal): why does the Eclipse auto formatter require here extra parenthesis?
-        final RepositoryResponse<CreateModuleResult> repositoryResponse =
-            ((forcedId == null) ? repository.createModule(context) : repository
-                .migrationCreateModuleWithId(context, forcedId));
+        final RepositoryResponse<AddModuleResult> repositoryResponse =
+            ((forcedId == null) ? repository.addModule(context) : repository
+                .addModuleForMigration(context, forcedId));
 
         // Map repository error to API error
         if (repositoryResponse.isError()) {
@@ -59,7 +59,7 @@ public class CreateModuleServlet extends HttpServlet {
         }
 
         // Map repository OK to API OK
-        final CreateModuleResult result = repositoryResponse.getResult();
+        final AddModuleResult result = repositoryResponse.getResult();
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
 

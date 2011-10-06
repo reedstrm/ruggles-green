@@ -69,7 +69,7 @@ public class AddModuleVersionServlet extends HttpServlet {
         if (isMigration) {
             checkNotNull(expectedVersionNumber, "Missing param \"version\", required for migration.");
             repositoryResponse =
-                    repository.migrationAddModuleVersion(context, moduleId, expectedVersionNumber,
+                    repository.addModuleVersionForMigration(context, moduleId, expectedVersionNumber,
                             cnxmlDoc, resourceMapDoc);
         } else {
             repositoryResponse =

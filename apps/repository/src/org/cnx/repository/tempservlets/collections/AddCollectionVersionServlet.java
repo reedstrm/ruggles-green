@@ -46,21 +46,37 @@ public class AddCollectionVersionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String colxmlDoc =
-            checkNotNull(req.getParameter("colxml"), "Missing post param \"colxml\"");
+                checkNotNull(req.getParameter("colxml"), "Missing post param \"colxml\"");
         final String moduleId =
-            checkNotNull(req.getParameter("collection_id"), "Missing post param \"collection_id\"");
+                checkNotNull(req.getParameter("collection_id"), "Missing post param \"collection_id\"");
         final String expectedVersionParam =
-            checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+                checkNotNull(req.getParameter("version"), "Missing post param \"version\"");
+        final String migrationParam =
+                checkNotNull(req.getParameter("migration"), "Missing post param \"migration\"");
+
         @Nullable
         final Integer expectedVersionNumber =
-            expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
+        expectedVersionParam.equals("null") ? null : Integer.parseInt(expectedVersionParam);
 
-        checkArgument(req.getParameterMap().size() == 3, "Expected 3 post parameters, found %s",
+        final boolean isMigration = migrationParam != null && migrationParam.equals("y");
+
+        checkArgument(req.getParameterMap().size() == 4, "Expected 4 post parameters, found %s",
                 req.getParameterMap().size());
 
         final RepositoryRequestContext context = new RepositoryRequestContext(null);
-        final RepositoryResponse<AddCollectionVersionResult> repositoryResponse =
-            repository.addCollectionVersion(context, moduleId, expectedVersionNumber, colxmlDoc);
+        final RepositoryResponse<AddCollectionVersionResult> repositoryResponse;
+
+        if (isMigration) {
+            checkNotNull(expectedVersionNumber,
+                    "Missing param \"version\", required for migration.");
+            repositoryResponse =
+                    repository.addCollectionVersionForMigration(context, moduleId,
+                            expectedVersionNumber, colxmlDoc);
+        } else {
+            repositoryResponse =
+                    repository
+                    .addCollectionVersion(context, moduleId, expectedVersionNumber, colxmlDoc);
+        }
 
         // Map repository error to API error.
         if (repositoryResponse.isError()) {

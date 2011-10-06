@@ -16,22 +16,15 @@
 
 package org.cnx.repository.service.api;
 
-import java.util.Date;
-
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
-
-import org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil;
 
 /**
  * Java interface for a CNX repository. Implementations of this interface should be
  * 
  * TODO(tal): add support for search
- * 
- * TODO(tal): add methods to enumerate resources and modules.
- * 
  */
-public interface CnxRepositoryService {
+public interface CnxRepositoryService extends CnxRepositoryServiceMigrationExtensions {
 
     /**
      * Return the externally visible configuration of the repository instance.
@@ -48,20 +41,20 @@ public interface CnxRepositoryService {
      * @param context the query context
      * @return operation response.
      */
-    RepositoryResponse<CreateResourceResult> createResource(RepositoryRequestContext context);
+    RepositoryResponse<AddResourceResult> addResource(RepositoryRequestContext context);
 
-    /**
-     * Create a new resource with enforced id.
-     * 
-     * Temp method for migration. Accepts the id that should be assigned to the new resource. The id
-     * must be in the range of protected module ids. See
-     * {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil} for more
-     * details.
-     * 
-     * TODO(tal): remove this method after completing the migration.
-     */
-    RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
-            RepositoryRequestContext context, String forcedId, Date forcedCreationTime);
+    //    /**
+    //     * Create a new resource with enforced id.
+    //     *
+    //     * Temp method for migration. Accepts the id that should be assigned to the new resource. The id
+    //     * must be in the range of protected module ids. See
+    //     * {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil} for more
+    //     * details.
+    //     *
+    //     * TODO(tal): remove this method after completing the migration.
+    //     */
+    //    RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
+    //            RepositoryRequestContext context, String forcedId, Date forcedCreationTime);
 
     /**
      * Return general information about a resource.
@@ -114,21 +107,7 @@ public interface CnxRepositoryService {
      * @param context the query context
      * @return operation response.
      */
-    RepositoryResponse<CreateModuleResult> createModule(RepositoryRequestContext context);
-
-    /**
-     * Create a new module with enforced id.
-     * 
-     * Temp method for migration. Accepts the id that should be assigned to the new module. The id
-     * must be in the range of protected module ids. See
-     * {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil} for more
-     * details.
-     * 
-     * TODO(tal): remove this method after completing the migration.
-     */
-    RepositoryResponse<CreateModuleResult> migrationCreateModuleWithId(
-            RepositoryRequestContext context, String forcedId);
-
+    RepositoryResponse<AddModuleResult> addModule(RepositoryRequestContext context);
     /**
      * Get general module information.
      * 
@@ -203,20 +182,6 @@ public interface CnxRepositoryService {
 
 
     /**
-     * Add module version for initial data migration.
-     * <p>
-     * Similar to {@link #addModuleVersion} except that it requires a specific version number,
-     * allow to skip modules version numbers (takedown gaps) and allow to overwrite the last
-     * module version to allow safe migrator retry.
-     * <p>
-     * TODO(tal): remove this method after completing the migration.
-     */
-    RepositoryResponse<AddModuleVersionResult> migrationAddModuleVersion(RepositoryRequestContext context,
-            String moduleId, int versionNumber, String cnxmlDoc,
-            String resourceMapDoc);
-
-
-    /**
      * Get the content of a module version.
      * 
      * @param context the request context.
@@ -248,19 +213,7 @@ public interface CnxRepositoryService {
      * @param context the query context
      * @return operation response.
      */
-    RepositoryResponse<CreateCollectionResult> createCollection(RepositoryRequestContext context);
-
-    /**
-     * Create a new collected with enforced id.
-     * 
-     * Temp method for migration. Accepts the id that should be assigned to the new collection. The
-     * id must be in the range of protected collection ids. See {@link PersistenceMigrationUtil} for
-     * more details.
-     * 
-     * TODO(tal): remove this method after completing the migration.
-     */
-    RepositoryResponse<CreateCollectionResult> migrationCreateCollectionWithId(
-            RepositoryRequestContext context, String forcedId);
+    RepositoryResponse<AddCollectionResult> addCollection(RepositoryRequestContext context);
 
     /**
      * Get general collection information.

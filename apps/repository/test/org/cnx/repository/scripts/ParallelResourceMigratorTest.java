@@ -41,10 +41,12 @@ public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
     // TODO(arjuns) : Create file dynamically.
     private final File file = new File("/home/arjuns/test_file.txt");
 
+    @SuppressWarnings("deprecation")
     public ParallelResourceMigratorTest() throws Exception {
         super();
     }
 
+    @SuppressWarnings("deprecation")
     @Before
     public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
@@ -59,9 +61,10 @@ public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
         assertNotNull(createResourceEntry);
         assertNotNull(createResourceEntry.getId());
         String resourceId = createResourceEntry.getId();
+        @SuppressWarnings("deprecation")
         String expectedResourceUrl =
-                getConstants().getResourceAbsPath(
-                        new IdWrapper(resourceId, IdWrapper.Type.RESOURCE)).toString();
+        getConstants().getResourceAbsPath(
+                new IdWrapper(resourceId, IdWrapper.Type.RESOURCE)).toString();
         assertEquals(expectedResourceUrl, CnxAtomPubLinkRelations.getSelfUri(createResourceEntry)
                 .getHrefResolved());
     }

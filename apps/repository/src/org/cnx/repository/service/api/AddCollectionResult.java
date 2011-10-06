@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * 
  * @author Tal Dayan
  */
-public class CreateCollectionResult {
+public class AddCollectionResult {
 
     private final String collectionId;
 
@@ -31,7 +31,7 @@ public class CreateCollectionResult {
      * @param collectionId the id of the new collection. This is a web safe string that is unique
      *            among all the collection IDs.
      */
-    public CreateCollectionResult(String collectionId) {
+    public AddCollectionResult(String collectionId) {
         this.collectionId = checkNotNull(collectionId);
     }
 

@@ -55,7 +55,7 @@ import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.AddModuleVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateModuleResult;
+import org.cnx.repository.service.api.AddModuleResult;
 import org.cnx.repository.service.api.GetModuleVersionResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
@@ -89,8 +89,8 @@ public class CnxAtomModuleServlet {
     public Response createNewModule(@Context HttpServletRequest req) throws CnxException {
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        RepositoryResponse<CreateModuleResult> createdModule =
-                repositoryService.createModule(RepositoryUtils.getRepositoryContext());
+        RepositoryResponse<AddModuleResult> createdModule =
+                repositoryService.addModule(RepositoryUtils.getRepositoryContext());
 
         return handleCreationOfModule(atomPubService, createdModule);
     }
@@ -117,16 +117,16 @@ public class CnxAtomModuleServlet {
         final IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        RepositoryResponse<CreateModuleResult> createdModule =
-                repositoryService.migrationCreateModuleWithId(
+        RepositoryResponse<AddModuleResult> createdModule =
+                repositoryService.addModuleForMigration(
                         RepositoryUtils.getRepositoryContext(), idWrapper.getId());
         return handleCreationOfModule(atomPubService, createdModule);
     }
 
     private Response handleCreationOfModule(CnxAtomService atomPubService,
-            RepositoryResponse<CreateModuleResult> createdModule) throws CnxException {
+            RepositoryResponse<AddModuleResult> createdModule) throws CnxException {
         if (createdModule.isOk()) {
-            CreateModuleResult repoResult = createdModule.getResult();
+            AddModuleResult repoResult = createdModule.getResult();
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */

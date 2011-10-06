@@ -51,7 +51,7 @@ import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.CreateCollectionResult;
+import org.cnx.repository.service.api.AddCollectionResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
@@ -86,8 +86,8 @@ public class CnxAtomCollectionServlet {
     public Response createNewCnxCollection(@Context HttpServletRequest req) throws CnxException {
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        RepositoryResponse<CreateCollectionResult> createdCollection =
-                repositoryService.createCollection(RepositoryUtils.getRepositoryContext());
+        RepositoryResponse<AddCollectionResult> createdCollection =
+                repositoryService.addCollection(RepositoryUtils.getRepositoryContext());
 
         return handleCreateCollection(atomPubService, createdCollection);
     }
@@ -115,21 +115,21 @@ public class CnxAtomCollectionServlet {
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
 
-        RepositoryResponse<CreateCollectionResult> createdCollection =
-                repositoryService.migrationCreateCollectionWithId(
+        RepositoryResponse<AddCollectionResult> createdCollection =
+                repositoryService.addCollectionForMigration(
                         RepositoryUtils.getRepositoryContext(), idWrapper.getId());
 
         return handleCreateCollection(atomPubService, createdCollection);
     }
 
     private Response handleCreateCollection(CnxAtomService atomPubService,
-            RepositoryResponse<CreateCollectionResult> createdCollection) throws CnxException,
+            RepositoryResponse<AddCollectionResult> createdCollection) throws CnxException,
             CnxBadRequestException {
         if (createdCollection.isOk()) {
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */
-            CreateCollectionResult result = createdCollection.getResult();
+            AddCollectionResult result = createdCollection.getResult();
             Entry entry = new Entry();
 
             IdWrapper repoIdWrapper =

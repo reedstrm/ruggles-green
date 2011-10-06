@@ -41,10 +41,12 @@ public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
 
     private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/";
 
+    @SuppressWarnings("deprecation")
     public ParallelCollectionMigratorTest() throws Exception {
         super();
     }
 
+    @SuppressWarnings("deprecation")
     @Before
     public void initialize() throws ProponoException, IOException {
         cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());

@@ -49,12 +49,12 @@
   <!-- CNX RESOURCE API (TEMP) -->
 
   <servlet>
-    <servlet-name>CreateResourceServlet</servlet-name>
-    <servlet-class>org.cnx.repository.tempservlets.resources.CreateResourceServlet</servlet-class>
+    <servlet-name>AddResourceServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.resources.AddResourceServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>CreateResourceServlet</servlet-name>
+    <servlet-name>AddResourceServlet</servlet-name>
     <url-pattern>/resource_factory/create</url-pattern>
   </servlet-mapping>
 
@@ -81,12 +81,12 @@
   <!-- CNX MODULES API (TEMP) -->
 
   <servlet>
-    <servlet-name>CreateModuleServlet</servlet-name>
-    <servlet-class>org.cnx.repository.tempservlets.modules.CreateModuleServlet</servlet-class>
+    <servlet-name>AddModuleServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.modules.AddModuleServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>CreateModuleServlet</servlet-name>
+    <servlet-name>AddModuleServlet</servlet-name>
     <url-pattern>/module_factory/create</url-pattern>
   </servlet-mapping>
 
@@ -143,12 +143,12 @@
   <!--  CNX COLLECTIONS API (TEMP) -->
 
   <servlet>
-    <servlet-name>CreateCollectionServlet</servlet-name>
-    <servlet-class>org.cnx.repository.tempservlets.collections.CreateCollectionServlet</servlet-class>
+    <servlet-name>AddCollectionServlet</servlet-name>
+    <servlet-class>org.cnx.repository.tempservlets.collections.AddCollectionServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>CreateCollectionServlet</servlet-name>
+    <servlet-name>AddCollectionServlet</servlet-name>
     <url-pattern>/collection_factory/create</url-pattern>
   </servlet-mapping>  
   

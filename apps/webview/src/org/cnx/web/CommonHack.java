@@ -48,7 +48,7 @@ public class CommonHack {
     public static final String COLLECTION_TEMPLATE_NAME = "org.cnx.web.collection";
     public static final String COLLECTION_MODULE_TEMPLATE_NAME = "org.cnx.web.collectionModule";
 
-    public static final String CONTENT_NAME_SPACE = "/content";
+    public static final String WEBVIEW_URL_PREFIX = "/content";
     public static final String CONFIG = "/config";
 
     public static Document parseXmlString(final SAXParser parser, final String source)

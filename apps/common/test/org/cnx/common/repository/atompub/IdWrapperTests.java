@@ -34,7 +34,6 @@ import org.junit.Test;
  * @author Arjun Satyapal
  */
 public class IdWrapperTests {
-
     @Test
     public void testIdsForUnrestrictedIds() {
         List<String> listOfValidIds = Lists.newArrayList("m100000","col100000", "r100000");
@@ -94,9 +93,10 @@ public class IdWrapperTests {
         }
     }
 
+    @Test
     public void test_isIdUnderForcedRange() {
         List<String> listOfForcedIds =
-                Lists.newArrayList("m0001", "m99999", "col0001", "col99999", "r0001", "r99999");
+                Lists.newArrayList("m0001", "m299999", "col0001", "col299999", "r0001", "r299999");
         
         for (String currId : listOfForcedIds) {
             IdWrapper idWrapper = IdWrapper.getIdWrapper(currId);
@@ -106,8 +106,8 @@ public class IdWrapperTests {
         String maxLong = Long.toString(Long.MAX_VALUE);
         
         List<String> listOfIds =
-                Lists.newArrayList("m100000", "m" + maxLong, "col100000", "col" + maxLong,
-                        "r100000", "r" + maxLong);
+                Lists.newArrayList("m300000", "m" + maxLong, "col300000", "col" + maxLong,
+                        "r300000", "r" + maxLong);
         for (String currId : listOfIds) {
             IdWrapper idWrapper = IdWrapper.getIdWrapper(currId);
             assertFalse(idWrapper.isIdUnderForcedRange());
@@ -115,9 +115,10 @@ public class IdWrapperTests {
         
     }
     
+    @Test
     public void test_equals() {
-        IdWrapper one = IdWrapper.getIdWrapper("m1");
-        IdWrapper another = new IdWrapper("m1", IdWrapper.Type.MODULE);
+        IdWrapper one = IdWrapper.getIdWrapper("m0001");
+        IdWrapper another = new IdWrapper("m0001", IdWrapper.Type.MODULE);
         
         assertEquals(one, another);
     }

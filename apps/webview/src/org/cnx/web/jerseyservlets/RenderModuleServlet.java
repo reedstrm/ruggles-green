@@ -60,7 +60,7 @@ import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
 
 /**
- * Servlet to Handle CNX Resources.
+ * Servlet to Handle CNX Modules.
  * 
  * @author Arjun Satyapal
  */

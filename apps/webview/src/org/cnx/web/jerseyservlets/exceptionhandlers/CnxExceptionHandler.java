@@ -24,7 +24,7 @@ import javax.ws.rs.ext.Provider;
 import org.cnx.common.exceptions.CnxException;
 
 /**
- * Exception Handler for CnxException for Jersey Servlets.
+ * Exception Handler for {@link CnxException} for Jersey Servlets.
  * 
  * @author Arjun Satyapal
  */
@@ -34,7 +34,6 @@ public class CnxExceptionHandler implements ExceptionMapper<CnxException> {
     
     public CnxExceptionHandler(@Context ServletContext context) {
         injector = (Injector) context.getAttribute(Injector.class.getName());
-        
     }
 
     /**

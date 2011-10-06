@@ -31,7 +31,7 @@ import org.cnx.web.WebViewConfiguration;
 import org.cnx.web.WebViewTemplate;
 
 @SuppressWarnings("serial")
-public class FrontPageServlet extends HttpServlet {
+public class HomePageServlet extends HttpServlet {
     private Injector injector;
 
     @Override

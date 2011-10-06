@@ -35,8 +35,6 @@
   <!-- Configure java.util.logging -->
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties" />
-    <property name="com.sun.syndication.propono.atom.server.AtomHandlerFactory"
-      value="org.cnx.repository.atompub.service.CnxAtomHandlerFactory" />
   </system-properties>
 
 </appengine-web-app>

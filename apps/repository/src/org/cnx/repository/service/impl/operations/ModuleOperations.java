@@ -162,7 +162,7 @@ public class ModuleOperations {
         if (expectedVersionNumber != null && expectedVersionNumber < 1) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Invalid expected version number: " + expectedVersionNumber
-                    + ", should be >= 1", log);
+                            + ", should be >= 1", log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
@@ -277,7 +277,7 @@ public class ModuleOperations {
                 }
                 // If module has no versions than there is not latest version.
                 if (moduleEntity.getVersionCount() < 1) {
-                    ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                    return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                             "Module has no versions: " + moduleId, log);
                 }
                 versionToServe = moduleEntity.getVersionCount();
@@ -295,6 +295,10 @@ public class ModuleOperations {
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
+        } catch (EntityNotFoundException e) {
+            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                    "Could not located module[" + moduleId + "], version[" + moduleVersion + "].",
+                    log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while looking module version " + moduleId + "/" + moduleVersion, log, e);

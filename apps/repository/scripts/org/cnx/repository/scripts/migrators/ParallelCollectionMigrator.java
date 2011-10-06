@@ -15,31 +15,27 @@
  */
 package org.cnx.repository.scripts.migrators;
 
-import org.cnx.common.http.HttpStatusEnum;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.common.exceptions.CnxRuntimeException;
-import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
+import javax.annotation.Nullable;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.exceptions.CnxPreconditionFailedException;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
-import org.jdom.JDOMException;
+import org.cnx.common.repository.atompub.objects.CollectionVersionWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionWrapper;
+import org.cnx.common.repository.atompub.objects.ModuleWrapper;
 
 /**
  * Migrator for a Collection.
@@ -49,52 +45,49 @@ import org.jdom.JDOMException;
 public class ParallelCollectionMigrator implements Runnable {
     private Logger logger = Logger.getLogger(ParallelCollectionMigrator.class.getName());
 
-    private Map<String, Entry> mapOfModuleIdToNewModuleEntry;
-    private final CnxAtomPubClient cnxClient;
-    private final IdWrapper cnxCollectionId;
-    private final IdWrapper aerCollectionId;
+    private Map<IdWrapper, IdWrapper> mapOfModuleIdToNewModuleEntry;
+    private final CnxClient cnxClient;
+    private CollectionWrapper collectionWrapper;
     private final String collectionLocation;
-    private final VersionWrapper currentVersion;
-    private final boolean preserveModuleIds;
+    private final VersionWrapper newVersion;
+    private final boolean isMigration;
+    private String collectionXml;
 
     private boolean success = false;
-    private ClientEntry collectionVersionEntry;
 
-    public ParallelCollectionMigrator(CnxAtomPubClient cnxClient, String collectionLocation,
-            IdWrapper cnxCollectionId, IdWrapper aerCollectionId, VersionWrapper currentVersion,
-            boolean preserveModuleIds) {
-        this.cnxClient = cnxClient;
-        this.collectionLocation = collectionLocation;
-        this.aerCollectionId = aerCollectionId;
-        this.cnxCollectionId = cnxCollectionId;
-        this.currentVersion = currentVersion;
-        this.preserveModuleIds = preserveModuleIds;
+    public ParallelCollectionMigrator(CnxClient cnxClient, String collectionLocation,
+            @Nullable CollectionWrapper collectionWrapper, @Nullable VersionWrapper newVersion,
+            boolean isMigration) {
+        this.cnxClient = checkNotNull(cnxClient);
+        this.collectionLocation = checkNotNull(collectionLocation);
+        this.collectionWrapper = collectionWrapper;
+        this.newVersion = newVersion;
+
+        if (isMigration || newVersion != null) {
+            checkNotNull(collectionWrapper);
+        }
+
+        if (collectionWrapper != null) {
+            checkNotNull(newVersion);
+        }
+
+        this.isMigration = isMigration;
         mapOfModuleIdToNewModuleEntry = Maps.newHashMap();
-    }
-
-    public ClientEntry getCollectionVersionEntry() {
-        return collectionVersionEntry;
     }
 
     public boolean isSuccess() {
         return success;
     }
 
-    // TODO(arjuns) : Move this to common.
-    public Link getSelfLinkFromEntry(Entry entry) {
-        @SuppressWarnings("unchecked")
-        List<Link> otherLinks = entry.getOtherLinks();
-
-        for (Link currLink : otherLinks) {
-            if (currLink.getRel().equals(CnxAtomPubLinkRelations.SELF.getLinkRelation())) {
-                return currLink;
-            }
-        }
-
-        return null;
+    public String getCollectionXml() {
+        return collectionXml;
+    }
+    
+    public CollectionWrapper getCollectionWrapper() {
+        return collectionWrapper;
     }
 
-    public ClientEntry migrateCollectionVersion() {
+    public void migrateCollection() throws IllegalArgumentException {
         try {
             List<File> listOfModulesToUpload = getListOfModulesToBeUploaded(collectionLocation);
 
@@ -104,28 +97,24 @@ public class ParallelCollectionMigrator implements Runnable {
             int counter = 1;
             for (File currModule : listOfModulesToUpload) {
                 // TODO(arjuns) : Need to handle only specific exception. Else test will never die.
+                IdWrapper moduleId = new IdWrapper(currModule.getName(), IdWrapper.Type.MODULE);
+                ModuleWrapper moduleWrapper = null;
 
-                String cnxModuleId = currModule.getName();
-                logger.info("Starting to migrate : " + cnxModuleId);
-
-                IdWrapper requiredCnxModuleId = null;
-                IdWrapper requiredAerModuleId = null;
-                VersionWrapper requiredVersion = null;
-
-                if (cnxCollectionId != null && preserveModuleIds) {
-                    // Publish version in restricted range.
-                    requiredCnxModuleId = new IdWrapper(cnxModuleId, IdWrapper.Type.MODULE);
-                    requiredVersion = CnxAtomPubUtils.LATEST_VERSION_WRAPPER;
+                if (isMigration && moduleWrapper == null) {
+                    // TODO(arjuns) : Fix this hack. No way to create ModuleWrapper.
+                    MigratorUtils.cleanUp(cnxClient, moduleId);
+                    moduleWrapper = cnxClient.createModuleForMigration(moduleId);
+                } else {
+                    moduleWrapper = cnxClient.createModule();
                 }
 
-                if (aerCollectionId != null && preserveModuleIds) {
-                    requiredAerModuleId = new IdWrapper(cnxModuleId, IdWrapper.Type.MODULE);
-                }
+                mapOfModuleIdToNewModuleEntry.put(moduleId, moduleWrapper.getId());
 
                 ParallelModuleMigrator moduleMigrator =
-                        new ParallelModuleMigrator(cnxClient, currModule.getAbsolutePath(),
-                                currModule.getName(), requiredCnxModuleId, requiredAerModuleId,
-                                requiredVersion);
+                        new ParallelModuleMigrator(cnxClient,
+                                currModule.getAbsolutePath(), moduleWrapper,
+                                CnxAtomPubUtils.LATEST_VERSION_WRAPPER,
+                                isMigration);
                 listOfModuleMigrators.add(moduleMigrator);
 
                 Thread thread = new Thread(moduleMigrator);
@@ -145,82 +134,69 @@ public class ParallelCollectionMigrator implements Runnable {
                 if (!currModuleMigrtor.isSuccess()) {
                     throw new RuntimeException("Failed to migrate module.");
                 }
-
-                ClientEntry migratedModuleEntry = currModuleMigrtor.getModuleVersionEntry();
-                // TODO(arjuns) : This will always create a new module.
-                mapOfModuleIdToNewModuleEntry.put(currModuleMigrtor.getCollXmlModuleId(),
-                        migratedModuleEntry);
             }
 
             // Successfully uploaded all the modules. Now attempting to upload collection.xml
 
             // Updating references for modules to new moduleId.
             File collXml = new File(collectionLocation + "/collection.xml");
-            String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
+            collectionXml = Files.toString(collXml, Charsets.UTF_8);
 
-            for (String cnxModuleId : mapOfModuleIdToNewModuleEntry.keySet()) {
-                Entry newModuleEntry = mapOfModuleIdToNewModuleEntry.get(cnxModuleId);
+            for (IdWrapper cnxModuleId : mapOfModuleIdToNewModuleEntry.keySet()) {
+                IdWrapper newModuleEntry = mapOfModuleIdToNewModuleEntry.get(cnxModuleId);
                 IdWrapper aerModuleId = CnxAtomPubUtils.getIdFromAtomPubId(newModuleEntry.getId());
                 String oldString = "\"" + cnxModuleId + "\"";
                 String newString = "\"" + aerModuleId.getId() + "\"";
-                collXmlAsString = collXmlAsString.replaceAll(oldString, newString);
+                collectionXml = collectionXml.replaceAll(oldString, newString);
                 logger.info("Old ModuleId = " + cnxModuleId + " New ModuleId = "
                         + aerModuleId.getId());
             }
 
-            ClientEntry entryToUpdate = null;
-
-            if (cnxCollectionId != null) {
-                /*
-                 * This means that we are trying to migrate a cnx collection and want to retain its
-                 * original Id. So first check if it exists and if not, then create one.
-                 */
-                ClientEntry existingEntry = null;
-
-                try {
-                    existingEntry =
-                            cnxClient.getCollectionVersionEntry(cnxCollectionId,
-                                    CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-                } catch (CnxRuntimeException e) {
-                    if (e.getHttpStatus() == HttpStatusEnum.NOT_FOUND) {
-                        // Expected.
-                        logger.info(e.getLocalizedMessage());
-                    } else {
-                        throw e;
-                    }
-                }
-
-                if (existingEntry != null) {
-                    entryToUpdate = existingEntry;
-                } else {
-                    entryToUpdate = cnxClient.createNewCollectionForMigration(cnxCollectionId);
-                }
-            } else if (aerCollectionId == null) {
-                entryToUpdate = cnxClient.createNewCollection();
+            VersionWrapper publishVersion = null;
+            if (collectionWrapper == null) {
+                collectionWrapper = cnxClient.createCollection();
+                publishVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
             } else {
-                /*
-                 * Collection already exists. Try to get the entry and then update it.
-                 */
-                Preconditions.checkNotNull(currentVersion);
-                entryToUpdate =
-                        cnxClient.getCollectionVersionEntry(aerCollectionId, currentVersion);
+                if (newVersion != null) {
+                    if (newVersion.equals(CnxAtomPubUtils.LATEST_VERSION_WRAPPER)) {
+                        try {
+                            CollectionVersionWrapper tempModuleWrapper =
+                                    cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                                            newVersion);
+                            publishVersion = tempModuleWrapper.getVersion().getNextVersion();
+                        } catch (CnxPreconditionFailedException e) {
+                            publishVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
+                        }
+                    } else if (newVersion.getVersionInt() == 0) {
+                        publishVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
+                    } else {
+                        publishVersion = newVersion;
+                    }
+                } else {
+                    throw new RuntimeException("Code should not reach here.");
+                }
             }
 
-            collectionVersionEntry = publishNewVersion(entryToUpdate, collXmlAsString);
+            // TODO(arjuns) : Modify this to return collectionVersion.
+            collectionWrapper =
+                    cnxClient.createCollectionVersion(collectionWrapper.getId(), publishVersion,
+                            collectionXml);
             success = true;
-            logger.info("Successfully uploaded Collection : " + collectionLocation + " to : "
-                    + CnxAtomPubLinkRelations.getEditUri(collectionVersionEntry).getHrefResolved());
-            return collectionVersionEntry;
+
+            logger.info("Successfully uploaded : "
+                    + collectionWrapper.getId()
+                    + " to : " + collectionWrapper.getSelfUri());
+            return;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            // If control reaches here, that means there was some exception on server side.
+            // Wait for some time and then retry.
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                logger.severe(Throwables.getStackTraceAsString(e1));
+            }
         }
-    }
-
-    private ClientEntry publishNewVersion(ClientEntry entryToUpdate, String collXmlAsString)
-            throws ProponoException, JAXBException, JDOMException, IOException {
-        cnxClient.createNewCollectionVersion(entryToUpdate, collXmlAsString);
-
-        return entryToUpdate;
     }
 
     // From a given collection, extract list of modules that need to be uploaded to Repository.
@@ -252,6 +228,6 @@ public class ParallelCollectionMigrator implements Runnable {
 
     @Override
     public void run() {
-        migrateCollectionVersion();
+        migrateCollection();
     }
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="build/jars/guava-r09.jar" sourcepath="/usr/local/google/cnxclients/ruggles-green/third_party/guava/guava-r09/guava-src-r09.zip"/>
 	<classpathentry kind="lib" path="build/jars/xercesImpl.jar"/>

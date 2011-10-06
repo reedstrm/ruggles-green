@@ -18,13 +18,16 @@ package org.cnx.repository.scripts;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
+import org.cnx.repository.atompub.jerseyservlets.TestingUtils;
+
 import java.io.File;
 import java.io.IOException;
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
+import java.net.URISyntaxException;
+import javax.xml.bind.JAXBException;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.objects.ResourceWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelResourceMigrator;
 import org.junit.Before;
@@ -36,36 +39,47 @@ import org.junit.Test;
  * @author Arjun Satyapal
  */
 public class ParallelResourceMigratorTest extends CnxAtomPubBasetest {
-    private CnxAtomPubClient cnxClient;
+    private CnxClient cnxClient;
 
     // TODO(arjuns) : Create file dynamically.
     private final File file = new File("/home/arjuns/test_file.txt");
 
-    @SuppressWarnings("deprecation")
     public ParallelResourceMigratorTest() throws Exception {
         super();
     }
 
-    @SuppressWarnings("deprecation")
     @Before
-    public void initialize() throws ProponoException, IOException {
-        cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
+    public void initialize() throws IOException, URISyntaxException, JAXBException, CnxException {
+        cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
     @Test
-    public void testResourceMigrator() {
-        ParallelResourceMigrator resourceMigrator =
-                new ParallelResourceMigrator(cnxClient, file.getAbsolutePath());
+    public void testResourceMigrator_reservedId() throws Exception {
+        IdWrapper resourceIdWrapper = new IdWrapper("r1234", IdWrapper.Type.RESOURCE);
+        MigratorUtils.cleanUp(cnxClient, resourceIdWrapper);
+        ResourceWrapper resourceWrapper = cnxClient.createResourceForMigration(resourceIdWrapper);
 
-        ClientEntry createResourceEntry = resourceMigrator.migrateResource();
-        assertNotNull(createResourceEntry);
-        assertNotNull(createResourceEntry.getId());
-        String resourceId = createResourceEntry.getId();
-        @SuppressWarnings("deprecation")
+        ParallelResourceMigrator resourceMigrator =
+                new ParallelResourceMigrator(cnxClient, file, resourceWrapper, true /* isMigration */);
+
+        resourceMigrator.migrateResource();
         String expectedResourceUrl =
-        getConstants().getResourceAbsPath(
-                new IdWrapper(resourceId, IdWrapper.Type.RESOURCE)).toString();
-        assertEquals(expectedResourceUrl, CnxAtomPubLinkRelations.getSelfUri(createResourceEntry)
-                .getHrefResolved());
+                getConstants().getResourceAbsPath(resourceWrapper.getId()).toString();
+        assertEquals(expectedResourceUrl, resourceWrapper.getSelfUri().toString());
+    }
+
+    @Test
+    public void testResourceMigrator_newId() throws Exception {
+        ParallelResourceMigrator resourceMigrator =
+                new ParallelResourceMigrator(cnxClient, file, null /* resourceWrapper */,
+                        false /* isMigration */);
+
+        ResourceWrapper resourceWrapper = resourceMigrator.migrateResource();
+        assertNotNull(resourceWrapper);
+        TestingUtils.validateAtomPubResource(resourceWrapper, false, IdWrapper.Type.RESOURCE, null);
+
+        String expectedResourceUrl =
+                getConstants().getResourceAbsPath(resourceWrapper.getId()).toString();
+        assertEquals(expectedResourceUrl, resourceWrapper.getSelfUri().toString());
     }
 }

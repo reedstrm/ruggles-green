@@ -15,75 +15,103 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
+import static org.cnx.repository.atompub.jerseyservlets.TestingUtils.validateTitle;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-import com.sun.syndication.feed.atom.Category;
-import com.sun.syndication.propono.atom.client.ClientWorkspace;
-import com.sun.syndication.propono.atom.common.Categories;
-import com.sun.syndication.propono.atom.common.Collection;
-import com.sun.syndication.propono.utils.ProponoException;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.repository.atompub.CnxAtomPubCollectionEnum;
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+import org.cnx.common.repository.atompub.CommonUtils;
 import org.cnx.common.repository.atompub.ServletUris;
+import org.cnx.servicedocument.Category;
+import org.cnx.servicedocument.Collection;
+import org.cnx.servicedocument.Collection.Categories;
+import org.cnx.servicedocument.Service;
+import org.cnx.servicedocument.Workspace;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test for {@link CnxServiceDocumentServlet}
+ * Test for {@link CnxServiceDocumentServlet2}
  * 
  * @author Arjun Satyapal
  */
-@Deprecated
 public class CnxServiceDocumentServletTest extends CnxAtomPubBasetest {
-    private CnxAtomPubClient cnxClient;
+    private CnxClient cnxClient;
 
     public CnxServiceDocumentServletTest() throws Exception {
         super();
     }
 
     @Before
-    public void initialize() throws MalformedURLException, ProponoException {
-        cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
+    public void initialize() throws Exception {
+        cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
     @Test
-    public void testCnxServiceDocument() {
-        ClientWorkspace workspace = cnxClient.getWorkspace();
-        assertEquals(3, workspace.getCollections().size());
-        assertEquals(ServletUris.ServiceDocument.CNX_WORKSPACE_TITLE, workspace.getTitle());
+    public void testServiceDocument() throws Exception {
+        Service serviceDocumentObject = cnxClient.getServiceDocumentObject();
+        List<Workspace> workspaces = serviceDocumentObject.getWorkspace();
+        assertEquals(1, workspaces.size());
 
-        // Now validate each collection individually.
-        validateCollection(cnxClient.getCollectionResource(),
-                ServletUris.Resource.RESOURCE_SERVLET, getConstants().getAPCResourceScheme());
+        Workspace workspace = workspaces.get(0);
+        validateTitle(workspace.getTitle(), ServletUris.ServiceDocument.CNX_WORKSPACE_TITLE);
 
-        validateCollection(cnxClient.getCollectionModule(), ServletUris.Module.MODULE_SERVLET,
-                getConstants().getAPCModuleScheme());
+        List<org.cnx.servicedocument.Collection> collections = workspace.getCollection();
+        assertEquals(3, collections.size());
 
-        validateCollection(cnxClient.getCollectionCnxCollection(),
-                ServletUris.Collection.COLLECTION_SERVLET, getConstants().getAPCCollectionScheme());
+        // Now validating collections.
+        // Ordering of collections is not required but assuming order helps in writing tests.
+        // Assuming first collection is AtomPub Collection for Resources.
+        validateAPCForResources(collections.get(0));
+        validateAPCForModules(collections.get(1));
+        validateAPCForCollections(collections.get(2));
     }
 
-    private void
-            validateCollection(Collection collection, String collectionTermAndLabel, URL scheme) {
-        assertNotNull(collection);
+    //
+    private void validateAPCForResources(Collection collection) throws URISyntaxException {
+        validateTitle(collection.getTitle(), CnxAtomPubCollectionEnum.APC_RESOURCES.getTitle());
 
-        @SuppressWarnings("unchecked")
-        List<Categories> listOfCategories = collection.getCategories();
-        assertEquals(1, listOfCategories.size());
-        Categories categories = listOfCategories.get(0);
+        validateUrl(ServletUris.Resource.RESOURCE_SERVLET, collection.getHref());
+        validateCategories(collection.getCategories(), ServletUris.Resource.RESOURCE_SERVLET,
+                cnxClient.getConstants().getAPCResourceScheme());
+    }
 
-        @SuppressWarnings("unchecked")
-        List<Category> listOfCategory = categories.getCategories();
+   
+
+    private void validateAPCForModules(Collection collection) throws URISyntaxException {
+        validateTitle(collection.getTitle(), CnxAtomPubCollectionEnum.APC_MODULE.getTitle());
+
+        validateUrl(ServletUris.Module.MODULE_SERVLET, collection.getHref());
+        validateCategories(collection.getCategories(), ServletUris.Module.MODULE_SERVLET, cnxClient
+                .getConstants().getAPCModuleScheme());
+    }
+
+    private void validateAPCForCollections(Collection collection) throws URISyntaxException {
+        validateTitle(collection.getTitle(), CnxAtomPubCollectionEnum.APC_COLLECTION.getTitle());
+
+        validateUrl(ServletUris.Collection.COLLECTION_SERVLET, collection.getHref());
+        validateCategories(collection.getCategories(), ServletUris.Collection.COLLECTION_SERVLET,
+                cnxClient.getConstants().getAPCCollectionScheme());
+    }
+
+    private void validateCategories(Categories categories, String term, URL scheme) {
+        List<org.cnx.servicedocument.Category> listOfCategory = categories.getCategory();
         assertEquals(1, listOfCategory.size());
+        assertEquals(CnxAtomPubUtils.YES, categories.getFixed());
 
         Category category = listOfCategory.get(0);
-        assertEquals(collectionTermAndLabel, category.getTerm());
-        assertEquals(collectionTermAndLabel, category.getLabel());
-
-        // TODO(arjuns) : Change scheme to use rel.
-        assertEquals(scheme.toString(), category.getScheme().toString());
+        assertEquals(term, category.getTerm());
+        assertEquals(scheme.toString(), category.getScheme());
+    }
+    
+    private void validateUrl(String suffix, String receivedUri) throws URISyntaxException {
+        URI tail = new URI(suffix);
+        URI expectedUri =  CommonUtils.appendUri(getCnxServerAtomPubUrl().toURI(), tail);
+        assertEquals(expectedUri.toString(), receivedUri);
     }
 }

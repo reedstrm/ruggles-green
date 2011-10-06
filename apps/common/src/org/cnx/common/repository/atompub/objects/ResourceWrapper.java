@@ -15,13 +15,12 @@
  */
 package org.cnx.common.repository.atompub.objects;
 
-import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
-
 import com.google.common.base.Preconditions;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;

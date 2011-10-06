@@ -15,7 +15,6 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -52,17 +51,7 @@ public class CnxServiceDocumentServlet2 {
     @Path(ServletUris.ServiceDocument.SERVICE_DOCUMENT_PATH)
     public Response getNewServiceDocument(@Context HttpServletRequest req) throws JAXBException,
             FactoryConfigurationError {
-        URL atomPubUrl = null;
-        try {
-            atomPubUrl =
-                    new URL(ServerUtil.computeHostUrl(req) + "/"
-                            + CnxAtomPubUtils.ATOMPUB_URL_PREFIX);
-        } catch (MalformedURLException e) {
-            // TODO(arjuns) : Handle exception properly.
-            throw new RuntimeException(e);
-        }
-
-        CnxAtomPubConstants constants = new CnxAtomPubConstants(atomPubUrl);
+        CnxAtomPubConstants constants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));
 
         // TODO(arjuns) : Handle exception.
         // Creating ObjectFactor to create objects for Service Document.

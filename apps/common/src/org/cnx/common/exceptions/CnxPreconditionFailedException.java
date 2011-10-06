@@ -13,23 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cnx.repository.atompub.service;
+package org.cnx.common.exceptions;
+
+import org.cnx.common.http.HttpStatusEnum;
 
 /**
- * Enum to encapsulate types of Handlers provied by CNX AtomPub API.
+ * CNX Exception to represent NOT_FOUND (404).
  * 
  * @author Arjun Satyapal
  */
-public enum CnxAtomHandlerEnum {
-    /** This will handle requests related to Resource. */
-    RESOURCE,
-
-    /** This will handle requests related to Module. */
-    MODULE,
-
-    /** This will handle requests related to CNX Collections. */
-    COLLECTION,
-
-    /** This will handle all other requests. */
-    SERVICE;
+@SuppressWarnings("serial")
+public class CnxPreconditionFailedException extends CnxRuntimeException {
+    public CnxPreconditionFailedException(String message, Throwable throwable) {
+        super(HttpStatusEnum.PRECONDITION_FAILED, message, throwable);
+    }
 }

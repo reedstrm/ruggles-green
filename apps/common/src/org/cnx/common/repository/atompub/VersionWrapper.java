@@ -43,6 +43,12 @@ public class VersionWrapper {
     public boolean equals(Object object) {
         if (object instanceof VersionWrapper) {
             VersionWrapper other = (VersionWrapper) object;
+            
+            // TODO(arjuns) : Add test for this.
+            if (version == null && other.version == null) {
+                return true;
+            }
+            
             return version.equals(other.version);
         }
 

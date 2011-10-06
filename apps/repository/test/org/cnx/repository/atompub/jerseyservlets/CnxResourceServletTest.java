@@ -17,6 +17,8 @@ package org.cnx.repository.atompub.jerseyservlets;
 
 import static org.junit.Assert.assertEquals;
 
+import org.cnx.repository.scripts.MigratorUtils;
+
 import com.google.cloud.sql.jdbc.internal.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
@@ -58,13 +60,14 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
         doTestForCreateResource(resource, false /* isMigaration */);
     }
 
-    // TODO(arjuns) : Enable this test once we can have things done locally.
-    // @Test
-    // public void test_createResourceForMigration() throws Exception {
-    // ResourceWrapper resource = client2.createNewResourceForMigration(new IdWrapper("r0001",
-    // IdWrapper.Type.RESOURCE));
-    // validateResource(resource, true /* isMigaration */);
-    // }
+    @Test
+    public void test_createResourceForMigration() throws Exception {
+        IdWrapper resourceIdWrapper = new IdWrapper("r0001", IdWrapper.Type.RESOURCE);
+        MigratorUtils.cleanUp(cnxClient, resourceIdWrapper);
+
+        ResourceWrapper resource = cnxClient.createResourceForMigration(resourceIdWrapper);
+        doTestForCreateResource(resource, true /* isMigaration */);
+    }
 
     private void doTestForCreateResource(ResourceWrapper resource, boolean isMigration)
             throws Exception {
@@ -76,7 +79,7 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
 
         File file = TestingUtils.createTempFile("abc.ext", null /* content */);
         Files.write("Hello Wrold", file, Charsets.UTF_8);
-        
+
         String expectedContentType = FileContentType.CDF.getContentType();
         cnxClient.uploadResource(resource.getUploadUri(), expectedContentType,
                 randomFileName, file);
@@ -106,7 +109,7 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
         assertEquals(expectedFileLength, resourceInformation.getContentSize());
 
         // TODO(arjuns) : Fix this according to internal appengine bug b/5375118.
-//         assertEquals(expectedMd5Hash, resourceInformation.getMd5hash());
+        // assertEquals(expectedMd5Hash, resourceInformation.getMd5hash());
     }
 
     private File getFileFromInputStream(InputStream inputStream) throws IOException {
@@ -135,7 +138,7 @@ public class CnxResourceServletTest extends CnxAtomPubBasetest {
 
         File file = TestingUtils.createTempFile(fileName, null /* content */);
         Files.write("Hello World", file, Charsets.UTF_8);
-        
+
         String expectedContentType = FileContentType.DEFAULT.getContentType();
         cnxClient.uploadResource(resource.getUploadUri(), expectedContentType, fileName, file);
 

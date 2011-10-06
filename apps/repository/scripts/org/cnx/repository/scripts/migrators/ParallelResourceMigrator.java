@@ -15,12 +15,20 @@
  */
 package org.cnx.repository.scripts.migrators;
 
+import static com.googlecode.charts4j.collect.Preconditions.checkNotNull;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Throwables;
-import com.sun.syndication.propono.atom.client.ClientEntry;
+import com.google.common.collect.Maps;
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.repository.FileContentType;
+import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.objects.ResourceWrapper;
 
 /**
  * Migrator for a resource.
@@ -29,41 +37,53 @@ import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
  */
 public class ParallelResourceMigrator implements Runnable {
     private final Logger logger = Logger.getLogger(ParallelResourceMigrator.class.getName());
-    private final CnxAtomPubClient cnxClient;
-    private final String resourceLocation;
-    private ClientEntry resourceEntry;
+    private final CnxClient cnxClient;
+    private final File localResource;
+    private ResourceWrapper resourceWrapper;
     private boolean success = false;
 
-    public String getResourceLocation() {
-        return resourceLocation;
+    public File getLocalResource() {
+        return localResource;
     }
 
-    public ClientEntry getResourceEntry() {
-        return resourceEntry;
+    public ResourceWrapper getResourceWrapper() {
+        return resourceWrapper;
     }
 
     public boolean isSuccess() {
         return success;
     }
 
-    public ParallelResourceMigrator(CnxAtomPubClient cnxClient, String resourceLocation) {
-        this.cnxClient = cnxClient;
-        this.resourceLocation = resourceLocation;
+    public ParallelResourceMigrator(CnxClient cnxClient, File localResourceLocation, 
+            @Nullable ResourceWrapper resourceWrapper, boolean isMigration) {
+        this.cnxClient = checkNotNull(cnxClient);
+        this.resourceWrapper  = resourceWrapper;
+        
+        // For migration, values should be provided externally.
+        if (isMigration) {
+            checkNotNull(resourceWrapper);
+        }
+        this.localResource = checkNotNull(localResourceLocation);
     }
 
     // TODO(arjuns) : Replace probably with InputStream.
-    public ClientEntry migrateResource() {
-        File file = new File(resourceLocation);
-
+    public ResourceWrapper migrateResource() {
         for (int i = 0; i < 10; i++) {
             try {
-                logger.info("Trying to upload : " + resourceLocation);
-                resourceEntry = cnxClient.createNewResource();
-                cnxClient.uploadFileToBlobStore(resourceEntry, file);
+                logger.info("Trying to upload : " + localResource.getAbsolutePath());
+                String contentType =
+                        FileContentType.getFileContentTypeEnumFromFileName(
+                                localResource.getName())
+                                .toString();
+                if (resourceWrapper == null) {
+                    resourceWrapper = cnxClient.createResource();
+                }
+                cnxClient.uploadResource(resourceWrapper.getUploadUri(), contentType,
+                        localResource.getName(), localResource);
                 success = true;
-                String resourceUrl = CnxAtomPubLinkRelations.getSelfUri(resourceEntry).getHrefResolved();
-                logger.info("Successfully uploaded : " + resourceLocation + " to : " + resourceUrl);
-                return resourceEntry;
+                logger.info("Successfully uploaded : " + localResource.getName() + " to : "
+                        + resourceWrapper.getSelfUri());
+                return resourceWrapper;
             } catch (Exception e) {
                 // TODO(arjuns): Auto-generated catch block
                 logger.severe(Throwables.getStackTraceAsString(e));
@@ -76,9 +96,25 @@ public class ParallelResourceMigrator implements Runnable {
             }
         }
 
-        logger.severe("Failed to upload Resource after 10 attempts : " + resourceLocation);
+        logger.severe("Failed to upload Resource after 10 attempts : " + localResource);
         System.exit(1);
         return null;
+    }
+
+    public static Map<String, IdWrapper> getMapOfPrettyNameToResourceIdFromList(
+            List<ParallelResourceMigrator> listOfMigrators) {
+        Map<String, IdWrapper> mapOfPrettyNameToResourceIds = Maps.newHashMap();
+        for (ParallelResourceMigrator currMigrator : listOfMigrators) {
+            if (currMigrator.isSuccess()) {
+                mapOfPrettyNameToResourceIds.put(currMigrator.getLocalResource().getName(),
+                        currMigrator.getResourceWrapper().getId());
+            } else {
+                throw new RuntimeException("Failed to migrate : "
+                        + currMigrator.getLocalResource().getAbsolutePath());
+            }
+        }
+        
+        return mapOfPrettyNameToResourceIds;
     }
 
     @Override

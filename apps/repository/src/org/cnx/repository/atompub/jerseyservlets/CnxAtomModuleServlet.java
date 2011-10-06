@@ -46,11 +46,11 @@ import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.exceptions.CnxInternalServerErrorException;
 import org.cnx.common.repository.ContentType;
 import org.cnx.common.repository.RepositoryConstants;
+import org.cnx.common.repository.atompub.CnxAtomPubConstants;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
-import org.cnx.repository.atompub.service.CnxAtomService;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
 import org.cnx.repository.service.api.AddModuleVersionResult;
@@ -69,13 +69,13 @@ import org.jdom.JDOMException;
 @Path(ServletUris.Module.MODULE_SERVLET)
 public class CnxAtomModuleServlet {
     private final Logger logger = Logger.getLogger(CnxAtomModuleServlet.class.getName());
-    private CnxAtomService atomPubService;
+    private CnxAtomPubConstants cnxConstants;
     private final CnxRepositoryService repositoryService = CnxRepositoryServiceImpl.getService();
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_POST_NEW}, then this method is
-     * invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_POST_NEW}, then this
+     * method is invoked.
      * 
      * This method in turn sends request to {@link CnxRepositoryService#createModule}.
      * 
@@ -87,18 +87,18 @@ public class CnxAtomModuleServlet {
     @Produces(ContentType.APPLICATION_ATOM_XML)
     @Path(ServletUris.Module.MODULE_POST_NEW)
     public Response createNewModule(@Context HttpServletRequest req) throws CnxException {
-        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+        cnxConstants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));
 
         RepositoryResponse<AddModuleResult> createdModule =
                 repositoryService.addModule(RepositoryUtils.getRepositoryContext());
 
-        return handleCreationOfModule(atomPubService, createdModule);
+        return handleCreationOfModule(createdModule);
     }
 
     /**
      * When Client does HTTP-POST on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_POST_MIGRATION}, then this method
-     * is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_POST_MIGRATION}, then this
+     * method is invoked.
      * 
      * This is a special function provided in order to allow migration and retaining of old
      * ModulesIds from CNX. Once migration is complete, this method will be removed.
@@ -115,22 +115,23 @@ public class CnxAtomModuleServlet {
     public Response createNewModuleForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId) throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
-        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+        cnxConstants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));
 
         RepositoryResponse<AddModuleResult> createdModule =
                 repositoryService.addModuleForMigration(
                         RepositoryUtils.getRepositoryContext(), idWrapper.getId());
-        return handleCreationOfModule(atomPubService, createdModule);
+        return handleCreationOfModule(createdModule);
     }
 
-    private Response handleCreationOfModule(CnxAtomService atomPubService,
+    private Response handleCreationOfModule(
             RepositoryResponse<AddModuleResult> createdModule) throws CnxException {
         if (createdModule.isOk()) {
             AddModuleResult repoResult = createdModule.getResult();
             /*
              * TODO(arjuns): Repository service should return following : 1. date.
              */
-            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), IdWrapper.Type.MODULE);
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(repoResult.getModuleId(), IdWrapper.Type.MODULE);
             VersionWrapper version = CnxAtomPubUtils.DEFAULT_VERSION;
 
             Entry entry = new Entry();
@@ -143,12 +144,11 @@ public class CnxAtomModuleServlet {
 
             // TODO(arjuns) : Change URL to URI.
             VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
-            URL editUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            firstVersion);
+            URL editUrl = cnxConstants.getModuleVersionAbsPath(repoIdWrapper,
+                    firstVersion);
             entry.setOtherLinks(RepositoryUtils.getListOfLinks(null /* selfUrl */, editUrl));
 
-            URL modulePath = atomPubService.getConstants().getModuleAbsPath(repoIdWrapper);
+            URL modulePath = cnxConstants.getModuleAbsPath(repoIdWrapper);
 
             return logAndReturn(logger, Status.CREATED, entry, getURI(modulePath.toString()));
         }
@@ -158,8 +158,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-PUT on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this method
-     * is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this
+     * method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#addModuleVersion}.
      * 
@@ -179,9 +179,40 @@ public class CnxAtomModuleServlet {
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String versionString)
                     throws CnxException {
+        return handleCreateModuleVersion(req, moduleId, versionString, false /* isMigration */);
+    }
+
+    /**
+     * When Client does HTTP-PUT on
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_PUT_MIGRATION_VERSION},
+     * then this method is invoked.
+     * 
+     * This method in turn calls {@link CnxRepositoryService#addModuleVersion}.
+     * 
+     * This method is used to publish a new Version for an existing Module.
+     * 
+     * @param req HttpServletRequest.
+     * @param moduleId ModuleId for which client wants to publish a new version.
+     * @param versionString New version that client wants to publish.
+     * @return AtomEntry containing selfUri and editUri. SelfUri can be used to fetch the version
+     *         that was published with this method Invocation, whereas EditUri should be used to
+     *         publish versions in future.
+     */
+    @PUT
+    @Produces(ContentType.APPLICATION_ATOM_XML)
+    @Path(ServletUris.Module.MODULE_PUT_MIGRATION_VERSION)
+    public Response createNewModuleVersionForMigration(@Context HttpServletRequest req,
+            @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
+            @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String versionString)
+                    throws CnxException {
+        return handleCreateModuleVersion(req, moduleId, versionString, true /* isMigration */);
+    }
+
+    private Response handleCreateModuleVersion(HttpServletRequest req, String moduleId,
+            String versionString, boolean isMigration) throws CnxException, CnxBadRequestException {
         final IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
-        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+        cnxConstants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));
         Entry postedEntry = ServerUtil.getPostedEntry(logger, req);
 
         if (postedEntry == null) {
@@ -210,10 +241,18 @@ public class CnxAtomModuleServlet {
             throw new CnxBadRequestException("IOExcepiton", e);
         }
 
-        RepositoryResponse<AddModuleVersionResult> createdModule =
-                repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), versionWrapper.getVersionInt(), cnxmlDoc,
-                        resourceMappingDoc);
+        RepositoryResponse<AddModuleVersionResult> createdModule;
+        if (isMigration) {
+            createdModule =
+                    repositoryService.addModuleVersionForMigration(
+                            RepositoryUtils.getRepositoryContext(), idWrapper.getId(),
+                            versionWrapper.getVersionInt(), cnxmlDoc, resourceMappingDoc);
+        } else {
+            createdModule =
+                    repositoryService.addModuleVersion(RepositoryUtils.getRepositoryContext(),
+                            idWrapper.getId(), versionWrapper.getVersionInt(), cnxmlDoc,
+                            resourceMappingDoc);
+        }
 
         if (createdModule.isOk()) {
             /*
@@ -222,7 +261,8 @@ public class CnxAtomModuleServlet {
             AddModuleVersionResult repoResult = createdModule.getResult();
             Entry entry = new Entry();
 
-            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), IdWrapper.Type.MODULE);
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(repoResult.getModuleId(), IdWrapper.Type.MODULE);
 
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getNewVersionNumber());
             String atomPubId =
@@ -232,9 +272,8 @@ public class CnxAtomModuleServlet {
             entry.setPublished(new Date());
             entry.setOtherLinks(getListOfLinks(repoIdWrapper, repoVersion));
 
-            URL selfUrl =
-                    atomPubService.getConstants().getModuleVersionAbsPath(repoIdWrapper,
-                            repoVersion);
+            URL selfUrl = cnxConstants.getModuleVersionAbsPath(repoIdWrapper,
+                    repoVersion);
             return logAndReturn(logger, Status.CREATED, entry, getURI(selfUrl.toString()));
         }
 
@@ -243,8 +282,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this method
-     * is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_PATH}, then this
+     * method is invoked.
      * 
      * This method in turn calls {@link CnxRepositoryService#getModuleVersion}.
      * 
@@ -256,8 +295,8 @@ public class CnxAtomModuleServlet {
      * @return AtomEntry containing selfUri and editUri. SelfUri can be used to fetch the version
      *         that was published with this method Invocation, whereas EditUri should be used to
      *         publish versions in future.
-     * @throws FactoryConfigurationError 
-     * @throws XMLStreamException 
+     * @throws FactoryConfigurationError
+     * @throws XMLStreamException
      */
     @GET
     @Produces(ContentType.TEXT_XML_UTF8)
@@ -265,11 +304,11 @@ public class CnxAtomModuleServlet {
     public Response getModuleVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.MODULE_ID_PATH_PARAM) String moduleId,
             @PathParam(ServletUris.MODULE_VERSION_PATH_PARAM) String versionString)
-            throws CnxException, XMLStreamException, FactoryConfigurationError {
+                    throws CnxException, XMLStreamException, FactoryConfigurationError {
         final IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
 
-        atomPubService = new CnxAtomService(ServerUtil.computeHostUrl(req));
+        cnxConstants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));
 
         RepositoryResponse<GetModuleVersionResult> moduleVersionResult =
                 repositoryService.getModuleVersion(RepositoryUtils.getRepositoryContext(),
@@ -280,7 +319,8 @@ public class CnxAtomModuleServlet {
             String cnxmlDoc = repoResult.getCnxmlDoc();
             String resourceMappingDoc = repoResult.getResourceMapDoc();
 
-            IdWrapper repoIdWrapper = new IdWrapper(repoResult.getModuleId(), IdWrapper.Type.MODULE);
+            IdWrapper repoIdWrapper =
+                    new IdWrapper(repoResult.getModuleId(), IdWrapper.Type.MODULE);
 
             VersionWrapper repoVersion = new VersionWrapper(repoResult.getVersionNumber());
             Entry entry = new Entry();
@@ -309,8 +349,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_CNXML}, then this method
-     * is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_CNXML}, then this
+     * method is invoked.
      * 
      * This method is used to fetch CNXML.
      * 
@@ -340,8 +380,8 @@ public class CnxAtomModuleServlet {
 
     /**
      * When Client does HTTP-GET on
-     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_RESOURCE_MAPPING}, then
-     * this method is invoked.
+     * {@link org.cnx.common.repository.atompub.ServletUris.Module#MODULE_VERSION_RESOURCE_MAPPING},
+     * then this method is invoked.
      * 
      * This method is used to fetch ResourceMapping XML.
      * 
@@ -371,11 +411,10 @@ public class CnxAtomModuleServlet {
 
     private List<Link> getListOfLinks(IdWrapper id, VersionWrapper version) {
         // URL to fetch the Module which was published now.
-        URL selfUrl = atomPubService.getConstants().getModuleVersionAbsPath(id, version);
+        URL selfUrl = cnxConstants.getModuleVersionAbsPath(id, version);
 
         // URL where client should do HTTP PUT next time in order to publish new version.
-        URL editUrl =
-                atomPubService.getConstants().getModuleVersionAbsPath(id, version.getNextVersion());
+        URL editUrl = cnxConstants.getModuleVersionAbsPath(id, version.getNextVersion());
 
         List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, editUrl);
 

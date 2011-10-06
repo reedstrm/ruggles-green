@@ -77,13 +77,6 @@ public class APCForModules extends AbstractAPC {
         return module;
     }
 
-    // public ResourceInfoWrapper getModuleInformation(IdWrapper id) throws URISyntaxException,
-    // IOException, IllegalArgumentException, JDOMException, FeedException {
-    // String response = getHttpClient().get(getAPRUriForInformation(id));
-    // Entry entry = CnxAtomPubUtils.parseStringToEntry(response);
-    // return ResourceInfoWrapper.fromEntry(entry);
-    // }
-
     public ModuleWrapper createModuleVersion(URI editUri,
             String cnxml, String resourceMappingXml) throws JDOMException,
             IOException, CnxException, JAXBException, IllegalArgumentException, FeedException,
@@ -102,6 +95,14 @@ public class APCForModules extends AbstractAPC {
                 CharStreams.toString(new InputStreamReader(httpResponse.getEntity().getContent()));
         Entry entry = CnxAtomPubUtils.parseXmlToEntry(response);
         return ModuleWrapper.fromEntry(entry);
+    }
+    
+    public ModuleWrapper createModuleVersionForMigration(IdWrapper id, VersionWrapper version, 
+            String cnxml, String resourceMappingXml) throws URISyntaxException,
+            IllegalArgumentException, JDOMException, IOException, CnxException, JAXBException,
+            FeedException {
+        URI editUri = getAPRVUriForMigration(id, version);
+        return createModuleVersion(editUri, cnxml, resourceMappingXml);
     }
 
     public ModuleVersionWrapper getModuleVersion(IdWrapper id, VersionWrapper version)

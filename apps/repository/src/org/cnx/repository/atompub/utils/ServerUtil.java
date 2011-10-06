@@ -16,6 +16,8 @@
 
 package org.cnx.repository.atompub.utils;
 
+import org.cnx.common.repository.atompub.CnxAtomPubUtils;
+
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.common.base.Charsets;
 import com.sun.syndication.feed.atom.Entry;
@@ -46,26 +48,27 @@ public class ServerUtil {
      * @param httpRequest an incoming HTTP request.
      * @return host URL (e.g. "http://myserver.com" or "http://localhost:8888"
      */
-    public static String computeHostUrl(HttpServletRequest httpRequest) {
+    public static URL computeAtomPubUrl(HttpServletRequest httpRequest) {
         final String scheme = httpRequest.getScheme();
         final int port = httpRequest.getLocalPort();
-
-        final URL serverUrl;
+        final StringBuilder serverUrlBuilder = new StringBuilder();
         try {
 
             if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-                serverUrl = new URL(scheme, httpRequest.getLocalName(), port, "");
+                URL tempUrl = new URL(scheme, httpRequest.getLocalName(), port, "");
+                serverUrlBuilder.append(tempUrl.toString());
             } else {
                 String requestUrl = httpRequest.getRequestURL().toString();
                 String urlOfInterest = requestUrl.substring(0, requestUrl.indexOf(".appspot.com"));
 
-                serverUrl = new URL(urlOfInterest + ".appspot.com");
+                serverUrlBuilder.append(urlOfInterest + ".appspot.com");
             }
+            
+            serverUrlBuilder.append("/").append(CnxAtomPubUtils.ATOMPUB_URL_PREFIX);
+            return new URL(serverUrlBuilder.toString());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Could not construct host url", e);
         }
-
-        return serverUrl.toString();
     }
     
     /**

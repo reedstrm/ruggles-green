@@ -107,7 +107,8 @@ public class ModuleOperations {
             // We allow to overwrite existing entity only if it has no versions. This enables
             // retries by the migrator.
             try {
-                OrmModuleEntity entity = Services.persistence.read(OrmModuleEntity.class, forcedKey);
+                OrmModuleEntity entity =
+                        Services.persistence.read(OrmModuleEntity.class, forcedKey);
                 if (entity.getVersionCount() != 0) {
                     tx.rollback();
                     return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
@@ -115,7 +116,7 @@ public class ModuleOperations {
                 }
                 log.warning("Overwriting existing module with zero versions: " + forcedId);
                 // Fall through and override this entity
-            } catch (EntityNotFoundException e){
+            } catch (EntityNotFoundException e) {
                 // Normal case, fall through and create a new entity
             }
 
@@ -218,7 +219,7 @@ public class ModuleOperations {
         if (expectedVersionNumber != null && expectedVersionNumber < 1) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Invalid expected version number: " + expectedVersionNumber
-                    + ", should be >= 1", log);
+                            + ", should be >= 1", log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
@@ -271,15 +272,18 @@ public class ModuleOperations {
 
             // Create new version entity
             final OrmModuleVersionEntity versionEntity =
-                    new OrmModuleVersionEntity(moduleKey, transactionTime, newVersionNumber, cnxmlDoc,
+                    new OrmModuleVersionEntity(moduleKey, transactionTime, newVersionNumber,
+                            cnxmlDoc,
                             resourceMapDoc);
 
             // Sanity check that we don't overwrite an existing version. Should never be
             // triggered if the persisted data is consistent.
             if (Services.persistence.hasObjectWithKey(versionEntity.getKey())) {
                 tx.rollback();
-                return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
-                        "Server module data inconsistency. Module migration key: " + versionEntity.getKey(), log);
+                return ResponseUtil.loggedError(
+                        RepositoryStatus.SERVER_ERROR,
+                        "Server module data inconsistency. Module migration key: "
+                                + versionEntity.getKey(), log);
             }
             // Update the persistence
             Services.persistence.write(moduleEntity, versionEntity);
@@ -307,7 +311,7 @@ public class ModuleOperations {
         if (versionNumber < 1) {
             return ResponseUtil.loggedError(RepositoryStatus.BAD_REQUEST,
                     "Invalid version number: " + versionNumber
-                    + ", should be >= 1", log);
+                            + ", should be >= 1", log);
         }
 
         final Key moduleKey = OrmModuleEntity.moduleIdToKey(moduleId);
@@ -355,7 +359,8 @@ public class ModuleOperations {
             if (versionNumber < newVersionCount) {
                 tx.rollback();
                 return ResponseUtil.loggedError(RepositoryStatus.VERSION_CONFLICT,
-                        "Trying to overwrite an old module version: [" + moduleId + "/" + versionNumber + "]", log);
+                        "Trying to overwrite an old module version: [" + moduleId + "/"
+                                + versionNumber + "]", log);
             }
 
             moduleEntity.setVersionCount(newVersionCount);
@@ -426,7 +431,7 @@ public class ModuleOperations {
                 }
                 // If module has no versions than there is not latest version.
                 if (moduleEntity.getVersionCount() < 1) {
-                    ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
+                    return ResponseUtil.loggedError(RepositoryStatus.STATE_MISMATCH,
                             "Module has no versions: " + moduleId, log);
                 }
                 versionToServe = moduleEntity.getVersionCount();
@@ -444,6 +449,10 @@ public class ModuleOperations {
             checkState(versionEntity.getVersionNumber() == versionToServe,
                     "Inconsistent version in module %s, expected %s found %s", moduleId,
                     versionToServe, versionEntity.getVersionNumber());
+        } catch (EntityNotFoundException e) {
+            return ResponseUtil.loggedError(RepositoryStatus.NOT_FOUND,
+                    "Could not located module[" + moduleId + "], version[" + moduleVersion + "].",
+                    log, e);
         } catch (Throwable e) {
             return ResponseUtil.loggedError(RepositoryStatus.SERVER_ERROR,
                     "Error while looking module version " + moduleId + "/" + moduleVersion, log, e);

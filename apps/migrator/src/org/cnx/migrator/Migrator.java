@@ -15,10 +15,10 @@
  */
 package org.cnx.migrator;
 
-import org.cnx.atompubclient.CnxAtomPubClient;
-
 import java.io.File;
 import java.net.URL;
+
+import org.cnx.atompubclient2.CnxClient;
 import org.cnx.migrator.context.MigratorConfiguration;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.DataRootDirectory;
@@ -49,9 +49,7 @@ public class Migrator {
     /** Root directory of input data to migrate. */
     private final DataRootDirectory root;
 
-    /** Client for accessing the new repository via its atompub API. Thread safe. */
-    //private final CnxAtomPubClient cnxClient;
-
+    /** Migration work units to process */
     private final WorkQueue workQueue;
 
     public Migrator(MigratorConfiguration config) {
@@ -61,7 +59,7 @@ public class Migrator {
 
         try {
             final URL atomPubUrl = new URL(config.getRepositoryAtomPubUrl());
-            final CnxAtomPubClient cnxClient = new CnxAtomPubClient(atomPubUrl);
+            final CnxClient cnxClient = new CnxClient(atomPubUrl);
             this.context = new MigratorContext(config, cnxClient);
             this.root = new DataRootDirectory(new File(config.getDataRootDirectory()));
         } catch (Exception e) {

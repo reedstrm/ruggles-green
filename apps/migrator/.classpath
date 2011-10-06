@@ -6,11 +6,9 @@
 	<classpathentry kind="lib" path="build/jars/jsr305.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxclient.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/rome-propono-1.0.0.modified.jar"/>
-	<classpathentry kind="lib" path="build/jars/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/resolver.jar"/>
 	<classpathentry kind="lib" path="build/jars/serializer.jar"/>
 	<classpathentry kind="lib" path="build/jars/aopalliance.jar"/>
-	<classpathentry kind="lib" path="build/jars/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-lang3-3.0.1.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-logging-1.0.4.jar"/>
@@ -21,8 +19,6 @@
 	<classpathentry kind="lib" path="build/jars/guice-servlet-3.0.jar"/>
 	<classpathentry kind="lib" path="build/jars/javax.inject.jar"/>
 	<classpathentry kind="lib" path="build/jars/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="build/jars/jersey-core-1.8.jar"/>
-	<classpathentry kind="lib" path="build/jars/jersey-server-1.8.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.cnxml.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.common.latest.jar"/>
 	<classpathentry kind="lib" path="build/jars/org.cnx.util.latest.jar"/>
@@ -40,5 +36,9 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="build/jars/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="build/jars/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpclient-4.1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpclient-cache-4.1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpcore-4.1.2.jar"/>
+	<classpathentry kind="lib" path="build/jars/httpmime-4.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -16,16 +16,16 @@
 package org.cnx.migrator.migrators;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
+import static org.cnx.migrator.util.MigratorUtil.checkResourceId;
 
 import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
 import org.cnx.migrator.util.MigratorUtil;
 
 import com.google.common.collect.ImmutableList;
-import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * A migrator for a collection item, including all of its versions
@@ -60,7 +60,7 @@ public class CollectionMigrator extends ItemMigrator {
     @Override
     public void doWork() {
 
-        ClientEntry atompubEntry = createCollection();
+        CollectionWrapper collectionWrapper = createCollection();
 
         int nextVersionNum = 1;
 
@@ -68,7 +68,8 @@ public class CollectionMigrator extends ItemMigrator {
         // their lexicographic order preserves the numeric order using zero padding.
         final ImmutableList<Directory> versionDirectories = collectionDirectory.getSubDirectories();
         // TODO(tal): decide what we want to do with these collections, if any
-        checkArgument(versionDirectories.size() > 0, "Collection has no versions: %s", collectionDirectory);
+        checkArgument(versionDirectories.size() > 0, "Collection has no versions: %s",
+                collectionDirectory);
 
         for (Directory versionDirectory : versionDirectories) {
             final int directoryVersionNum = Integer.parseInt(versionDirectory.getName());
@@ -79,14 +80,18 @@ public class CollectionMigrator extends ItemMigrator {
                 getContext().incrementCounter("COLLECTION_VERSION_TAKEDOWNS", 1);
                 MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
                 // TODO(tal): create gaps as explicit taken down version.
-                Log.message("** Creating gap collection version: %s/%s", cnxCollectionId, nextVersionNum);
-                migrateNextCollectionVersion(atompubEntry, nextVersionNum, versionDirectory);
+                Log.message("** Creating gap collection version: %s/%s", cnxCollectionId,
+                        nextVersionNum);
+                collectionWrapper =
+                        migrateNextCollectionVersion(collectionWrapper, nextVersionNum,
+                                versionDirectory);
                 nextVersionNum++;
             }
 
             // Create the actual version
             MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
-            migrateNextCollectionVersion(atompubEntry, nextVersionNum, versionDirectory);
+            collectionWrapper =
+                    migrateNextCollectionVersion(collectionWrapper, nextVersionNum, versionDirectory);
             nextVersionNum++;
         }
     }
@@ -102,22 +107,21 @@ public class CollectionMigrator extends ItemMigrator {
     /**
      * Create the collection entity in the repository. Collection versions are migrated later.
      * 
-     * @returns the atompub entry to use to upload the first collection version.
+     * @returns the client entry to use to upload the first collection version.
      */
-    private ClientEntry createCollection() {
+    private CollectionWrapper createCollection() {
         getContext().incrementCounter("COLLECTIONS", 1);
         Log.message("Going to migrate collection: %s", cnxCollectionId);
         int attempt;
         for (attempt = 1;; attempt++) {
-            final ClientEntry atompubEntry;
             IdWrapper cnxCollectionIdWrapper =
                     new IdWrapper(cnxCollectionId, IdWrapper.Type.COLLECTION);
             try {
-                atompubEntry =
-                        getCnxClient().createNewCollectionForMigration(cnxCollectionIdWrapper);
-                checkAtombuyEntryId(cnxCollectionId, 1, atompubEntry);
-                message("Added collection: %s", atompubEntry.getId());
-                return atompubEntry;
+                final CollectionWrapper result =
+                        getCnxClient().createCollectionForMigration(cnxCollectionIdWrapper);
+                checkResourceId(cnxCollectionId, 1, result);
+                message("Added collection: %s", result);
+                return result;
             } catch (Exception e) {
                 if (attempt == 1) {
                     getContext().incrementCounter("COLLECTIONS_WITH_CREATION_RETRIES", 1);
@@ -141,14 +145,17 @@ public class CollectionMigrator extends ItemMigrator {
      * The method assumes that the collection has been created and that exactly all the version
      * prior to this version have already been migrated.
      * 
-     * @param atompubEntry the atompub entry to use for posting this collection version. Upon
-     *            return, this entry is modified so it can be used to upload the next version of
-     *            this collection.
+     * TODO(tal): confirm and mention here that collectionWrapper is not modified.
+     * 
+     * @param collectionWrapper the client entry to use for posting this collection version. this
+     *            collection.
      * @param versionNum version number (1 based) of the next version to migrate.
      * @param versionDirectory root directory of this collection version data.
+     * 
+     * @return a collection entry to use to migrate the next collection version.
      */
-    private void migrateNextCollectionVersion(ClientEntry atompubEntry, int versionNum,
-            Directory versionDirectory) {
+    private CollectionWrapper migrateNextCollectionVersion(CollectionWrapper collectionWrapper,
+            int versionNum, Directory versionDirectory) {
         getContext().incrementCounter("COLLECTION_VERSIONS", 1);
         int attempt;
         for (attempt = 1;; attempt++) {
@@ -157,12 +164,11 @@ public class CollectionMigrator extends ItemMigrator {
                 // in the xml file
                 final String colxml = versionDirectory.readXmlFile("collection.xml");
 
-                getCnxClient().createNewCollectionVersion(atompubEntry, colxml);
-                checkAtombuyEntryId(cnxCollectionId, versionNum, atompubEntry);
-                // NOTE(tal): here atompubEntry.getEditURI points to a URL to post the next version.
-
-                Log.message("Migrated collection version %s/%s", cnxCollectionId, versionNum);
-                return;
+                final CollectionWrapper result =
+                        getCnxClient().createCollectionVersion(collectionWrapper.getEditUri(), colxml);
+                checkResourceId(cnxCollectionId, versionNum, result);
+                Log.message("Migrated collection version %s", result);
+                return result;
             } catch (Exception e) {
                 if (attempt == 1) {
                     getContext().incrementCounter("COLLECTIONS_VERSIONS_WITH_UPLOAD_RETRIES", 1);

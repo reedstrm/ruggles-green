@@ -17,7 +17,7 @@ package org.cnx.migrator.migrators;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient2.CnxClient;
 import org.cnx.migrator.context.MigratorConfiguration;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.util.Log;
@@ -45,7 +45,7 @@ public abstract class ItemMigrator implements WorkItem {
         return context.getConfig();
     }
 
-    protected CnxAtomPubClient getCnxClient() {
+    protected CnxClient getCnxClient() {
         return context.getCnxClient();
     }
 

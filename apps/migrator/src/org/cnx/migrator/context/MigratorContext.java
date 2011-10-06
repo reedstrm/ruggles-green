@@ -17,7 +17,7 @@ package org.cnx.migrator.context;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.cnx.atompubclient.CnxAtomPubClient;
+import org.cnx.atompubclient2.CnxClient;
 
 /**
  * Migration session context.
@@ -29,11 +29,11 @@ import org.cnx.atompubclient.CnxAtomPubClient;
 public class MigratorContext {
 
     private final MigratorConfiguration config;
-    private final CnxAtomPubClient client;
+    private final CnxClient client;
     private final MigratorSummary summary = new MigratorSummary();
     private final CounterSet counterSet = new CounterSet();
 
-    public MigratorContext(MigratorConfiguration config, CnxAtomPubClient client) {
+    public MigratorContext(MigratorConfiguration config, CnxClient client) {
         this.config = checkNotNull(config);
         this.client = checkNotNull(client);
     }
@@ -42,7 +42,7 @@ public class MigratorContext {
         return config;
     }
 
-    public CnxAtomPubClient getCnxClient() {
+    public CnxClient getCnxClient() {
         return client;
     }
 

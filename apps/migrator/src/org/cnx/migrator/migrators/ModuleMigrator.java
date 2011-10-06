@@ -16,7 +16,7 @@
 package org.cnx.migrator.migrators;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.cnx.migrator.util.MigratorUtil.checkAtombuyEntryId;
+import static org.cnx.migrator.util.MigratorUtil.checkResourceId;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,6 +25,8 @@ import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
+import org.cnx.common.repository.atompub.VersionWrapper;
+import org.cnx.common.repository.atompub.objects.ModuleWrapper;
 import org.cnx.migrator.context.MigratorContext;
 import org.cnx.migrator.io.Directory;
 import org.cnx.migrator.util.Log;
@@ -36,7 +38,6 @@ import org.cnx.resourcemapping.Resource;
 import org.cnx.resourcemapping.Resources;
 
 import com.google.common.collect.ImmutableList;
-import com.sun.syndication.propono.atom.client.ClientEntry;
 
 /**
  * A migrator for a module item, including all of its versions
@@ -71,7 +72,7 @@ public class ModuleMigrator extends ItemMigrator {
     @Override
     public void doWork() {
 
-        ClientEntry atompubEntry = createModule();
+        createModule(cnxModuleId);
 
         int nextVersionNum = 1;
 
@@ -91,21 +92,23 @@ public class ModuleMigrator extends ItemMigrator {
                 MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
                 getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", 1);
                 // TODO(tal): create gaps as explicit taken down version.
-                Log.message("** Creating gap module version: %s/%s", cnxModuleId, nextVersionNum);
-                migrateNextModuleVersion(atompubEntry, nextVersionNum, versionDirectory);
+                Log.message("Creating gap module version: %s/%s", cnxModuleId, nextVersionNum);
+                migrateNextModuleVersion(cnxModuleId, nextVersionNum, versionDirectory);
                 nextVersionNum++;
             }
 
-            // TODO(tal): switch to this version to have actual gaps for takedowns
+            // TODO(tal): switch to this version to have actual gaps for takedowns, and force
+            // post gap version id on the module wrapper.
             // if (directoryVersionNum > nextVersionNum) {
-            //     getContext().incrementCounter("MODULE_VERSION_GAPS", 1);
-            //     getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", (directoryVersionNum - nextVersionNum));
-            //     nextVersionNum = directoryVersionNum;
+            // getContext().incrementCounter("MODULE_VERSION_GAPS", 1);
+            // getContext().incrementCounter("MODULE_VERSION_TAKEDOWNS", (directoryVersionNum -
+            // nextVersionNum));
+            // nextVersionNum = directoryVersionNum;
             // }
 
             // Add the version
             MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
-            migrateNextModuleVersion(atompubEntry, nextVersionNum, versionDirectory);
+            migrateNextModuleVersion(cnxModuleId, nextVersionNum, versionDirectory);
             nextVersionNum++;
         }
     }
@@ -121,20 +124,20 @@ public class ModuleMigrator extends ItemMigrator {
     /**
      * Create the module entity in the repository. Module versions are migrated later.
      * 
-     * @returns the atompub entry to use to upload the first module version.
+     * @returns a module wrapper to use to upload the first module version.
      */
-    private ClientEntry createModule() {
+    private void createModule(String moduleId) {
         getContext().incrementCounter("MODULES", 1);
-        Log.message("Going to migrate module: %s", cnxModuleId);
+        Log.message("Going to migrate module: %s", moduleId);
         int attempt;
         for (attempt = 1;; attempt++) {
-            final ClientEntry atompubEntry;
-            IdWrapper cnxModuleIdWrapper = new IdWrapper(cnxModuleId, IdWrapper.Type.MODULE);
+            IdWrapper cnxModuleIdWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
             try {
-                atompubEntry = getCnxClient().createNewModuleForMigration(cnxModuleIdWrapper);
-                checkAtombuyEntryId(cnxModuleId, 1, atompubEntry);
-                message("Added module: %s", atompubEntry.getId());
-                return atompubEntry;
+                ModuleWrapper moduleWrapper =
+                        getCnxClient().createModuleForMigration(cnxModuleIdWrapper);
+                checkResourceId(moduleId, 1, moduleWrapper);
+                message("Added module: %s", moduleWrapper.getId());
+                return;
             } catch (Exception e) {
                 if (attempt == 1) {
                     getContext().incrementCounter("MODULES_WITH_CREATION_RETRIES", 1);
@@ -142,10 +145,10 @@ public class ModuleMigrator extends ItemMigrator {
                 getContext().incrementCounter("MODULE_CREATION_RETRIES", 1);
                 if (attempt >= getConfig().getMaxAttempts()) {
                     throw new RuntimeException(String.format("Failed after %d attempts: %s",
-                            attempt, cnxModuleId), e);
+                            attempt, moduleId), e);
                 }
                 Log.message("**** Attempt %d failed to write module %s. Will retry", attempt,
-                        cnxModuleId);
+                        moduleId);
                 MigratorUtil.sleep(getConfig().getFailureDelayMillis());
             }
         }
@@ -159,31 +162,33 @@ public class ModuleMigrator extends ItemMigrator {
      * <p>
      * NOTE(tal): for now we also use this to create gap versions so versionNum may be higher than
      * the versionDirectory numeric value.
+     * <p>
+     * TODO(tal): confirm that moduleWrapper is not modified and mention it here.
      * 
-     * @param atompubEntry the atompub entry to use for posting this module version. Upon return,
-     *            this entry is modified so it can be used to upload the next version of this
-     *            module.
+     * @param moduleId the module id.
      * @param versionNum version number (1 based) of this new version.
      * @param versionDirectory root directory of this module version data.
      */
-    private void migrateNextModuleVersion(ClientEntry atompubEntry, int versionNum,
+    private void migrateNextModuleVersion(String moduleId, int versionNum,
             Directory versionDirectory) {
         getContext().incrementCounter("MODULE_VERSIONS", 1);
         final String resourceMapXml = readAndConstructResourceMapXML(versionDirectory);
 
+        final IdWrapper idWrapper = new IdWrapper(moduleId, IdWrapper.Type.MODULE);
+        final VersionWrapper versionWrapper = new VersionWrapper(versionNum);
+
+        // TODO(tal): *** implement module version mapping from major.minor to number
+        // in the xml file
+        final String cnxml = versionDirectory.readXmlFile("index.cnxml");
+
         int attempt;
         for (attempt = 1;; attempt++) {
             try {
-                // TODO(tal): *** implement module version mapping from major.minor to number
-                // in the xml file
-                final String cnxml = versionDirectory.readXmlFile("index.cnxml");
-
-                // TODO(tal): upload resource map from property file
-                getCnxClient().createNewModuleVersion(atompubEntry, cnxml, resourceMapXml);
-                checkAtombuyEntryId(cnxModuleId, versionNum, atompubEntry);
-                // NOTE(tal): here atompubEntry.getEditURI points to a URL to post the next version.
-
-                Log.message("Migrated module version %s/%s", cnxModuleId, versionNum);
+                final ModuleWrapper moduleWrapper =
+                        getCnxClient().createModuleVersion(idWrapper, versionWrapper, cnxml,
+                                resourceMapXml);
+                checkResourceId(moduleId, versionNum, moduleWrapper);
+                Log.message("Migrated module version %s/%s", moduleId, versionNum);
                 return;
             } catch (Exception e) {
                 if (attempt == 1) {
@@ -192,12 +197,11 @@ public class ModuleMigrator extends ItemMigrator {
                 getContext().incrementCounter("MODULE_VERSTION_UPLOAD_RETRIES", 1);
                 if (attempt >= getConfig().getMaxAttempts()) {
                     throw new RuntimeException(String.format("Failed after %d attempts: %s/%s",
-                            attempt, cnxModuleId, versionNum), e);
+                            attempt, moduleId, versionNum), e);
                 }
                 Log.message("**** Attempt %d failed to write module version %s/%s. Will retry",
-                        attempt, cnxModuleId, versionNum);
+                        attempt, moduleId, versionNum);
                 MigratorUtil.sleep(getConfig().getFailureDelayMillis());
-                // NOTE(tal): If got an exception, atompubEntry is guaranteed to not be changed.
             }
         }
     }
@@ -205,7 +209,7 @@ public class ModuleMigrator extends ItemMigrator {
     /**
      * Read and construct resource map XML doc.
      * 
-     * @param vers      ionDirectory the root data directory of this module version.
+     * @param vers ionDirectory the root data directory of this module version.
      * 
      *            TODO(tal): simplify CnxAtomPubClient.getResourceMappingFromResourceEntries() so it
      *            does not use atompub entires, etc and and share logic with this one.

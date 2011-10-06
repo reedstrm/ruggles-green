@@ -21,7 +21,7 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
-import com.sun.syndication.propono.atom.client.ClientEntry;
+import org.cnx.common.repository.atompub.objects.AtomPubResource;
 
 /**
  * Assorted util methods.
@@ -50,12 +50,14 @@ public class MigratorUtil {
         }
     }
 
-    /** Assert that an atompub entry has given base id and version number */
-    public static void checkAtombuyEntryId(String expectedBaseId, int expectedVersionNumber,
-            ClientEntry actualEntry) {
-        final String actualId = actualEntry.getId();
-        final String expectedId = String.format("%s:%d", expectedBaseId, expectedVersionNumber);
-        checkArgument(expectedId.equals(actualEntry.getId()),
+    /** Assert that an atompub resource has given base id and version number */
+    public static void checkResourceId(String expectedId, int expectedVersionNumber,
+            AtomPubResource resource) {
+        final String actualId = resource.getId().getId();
+        final int actualVersionNumber = resource.getVersion().getVersionInt();
+        checkArgument(expectedId.equals(actualId),
                 "Entry ID mismatch, Expected: %s, found: %s", expectedId, actualId);
+        checkArgument(expectedId.equals(actualId),
+                "Entry version mismatch, Expected: %d, found: %d", expectedVersionNumber, actualVersionNumber);
     }
 }

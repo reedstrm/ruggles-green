@@ -251,7 +251,7 @@
         <ant antfile="build.xml" target="clean" dir="${basedir}/${commondir}" />
         <ant antfile="build.xml"
              target="clean"
-             dir="${basedir}/${cnxclientdir}" />
+             dir="${basedir}/${cnxclient2.dir}" />
     </target>
 
     <target name="runserver"

@@ -16,16 +16,19 @@
 package org.cnx.repository.scripts;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
+import org.cnx.repository.atompub.jerseyservlets.TestingUtils;
+
 import java.io.IOException;
-import org.cnx.atompubclient.CnxAtomPubClient;
+import java.net.URISyntaxException;
+import javax.xml.bind.JAXBException;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
+import org.cnx.common.repository.atompub.objects.ModuleVersionWrapper;
+import org.cnx.common.repository.atompub.objects.ModuleWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelModuleMigrator;
 import org.junit.Before;
@@ -37,59 +40,76 @@ import org.junit.Test;
  * @author Arjun Satyapal
  */
 public class ParallelModuleMigratorTest extends CnxAtomPubBasetest {
-    private CnxAtomPubClient cnxClient;
+    private CnxClient cnxClient;
+    private VersionWrapper FIRST_VERSION = new VersionWrapper(1);
+    private VersionWrapper SECOND_VERSION = new VersionWrapper(2);
 
-    private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/m10085";
+    private final String MODULE_ID = "m10085";
+    private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/"
+            + MODULE_ID;
 
     public ParallelModuleMigratorTest() throws Exception {
         super();
     }
 
     @Before
-    public void initialize() throws ProponoException, IOException {
-        cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
+    public void initialize() throws IOException, URISyntaxException, JAXBException, CnxException {
+        cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
     @Test
-    public void testModuleMigrator() throws Exception {
-        ParallelModuleMigrator migrator =
-            new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, null /* collXmlModuleId */,
-                    null/* cnxModuleId */, null /* aerModuleId */, null /* version */);
-        Entry moduleEntry = migrator.migrateModuleVersion();
-        assertNotNull(moduleEntry);
+    public void testModuleMigrator_preserveIds() throws Exception {
+        IdWrapper moduleIdWrapper = new IdWrapper(MODULE_ID, IdWrapper.Type.MODULE);
+        MigratorUtils.cleanUp(cnxClient, moduleIdWrapper);
 
-        VersionWrapper expectedVersion = new VersionWrapper(1);
-        assertEquals(expectedVersion,
-                CnxAtomPubUtils.getVersionFromAtomPubId(moduleEntry.getId()));
-    }
+        ModuleWrapper moduleWrapper = cnxClient.createModuleForMigration(moduleIdWrapper);
 
-    @Test
-    public void testMultipleModuleVersions() throws Exception {
-        // Create first version.
-        ParallelModuleMigrator migrator =
-            new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, null/* collXmlModuleId */,
-                    null /* cnxModuleId */, null/* aerModuleId */, null /* version */);
-        Entry moduleEntry = migrator.migrateModuleVersion();
+        ParallelModuleMigrator migrator1 =
+                new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, moduleWrapper,
+                        FIRST_VERSION, true);
+        migrator1.migrateModuleVersion();
+        ModuleVersionWrapper moduleVersionWrapper =
+                cnxClient.getModuleVersion(moduleIdWrapper, CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(FIRST_VERSION, moduleVersionWrapper.getVersion());
 
-        IdWrapper aerModuleId = CnxAtomPubUtils.getIdFromAtomPubId(moduleEntry.getId());
-
-        VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
         // Now publishing second version.
         ParallelModuleMigrator migrator2 =
-            new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, null /* collXmlModuleId */,
-                    null/* cnxModuleId */, aerModuleId, firstVersion);
-
+                new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, moduleWrapper,
+                        SECOND_VERSION, true);
         migrator2.migrateModuleVersion();
+        moduleWrapper = migrator2.getModuleWrapper();
 
         // Validating version.
-        ClientEntry clientEntry =
-            cnxClient.getModuleVersionEntry(aerModuleId, CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-        VersionWrapper expectedVersion = new VersionWrapper(2);
-        VersionWrapper actualVersion =
-                CnxAtomPubUtils.getVersionFromAtomPubId(clientEntry.getId());
-
-        assertEquals(expectedVersion, actualVersion);
+        moduleVersionWrapper =
+                cnxClient.getModuleVersion(moduleIdWrapper, CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(SECOND_VERSION, moduleVersionWrapper.getVersion());
     }
-    // TODO(arjuns): Add more tests when modules are migrated in context of collection.
-    // TODO(arjuns) : Add tests for forcedId.
+
+    @Test
+    public void testModuleMigrator_newIds() throws Exception {
+        ParallelModuleMigrator migrator1 =
+                new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, null /* moduleWrapper */,
+                        null /*version*/, false);
+        migrator1.migrateModuleVersion();
+        ModuleWrapper moduleWrapper = migrator1.getModuleWrapper();
+
+        ModuleVersionWrapper moduleVersionWrapper =
+                cnxClient.getModuleVersion(moduleWrapper.getId(),
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(FIRST_VERSION, moduleVersionWrapper.getVersion());
+
+        // Now publishing second version.
+        ParallelModuleMigrator migrator2 =
+                new ParallelModuleMigrator(cnxClient, MODULE_LOCATION, moduleWrapper,
+                        SECOND_VERSION,
+                        true);
+        migrator2.migrateModuleVersion();
+        moduleWrapper = migrator2.getModuleWrapper();
+
+        // Validating version.
+        moduleVersionWrapper =
+                cnxClient.getModuleVersion(moduleWrapper.getId(),
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(SECOND_VERSION, moduleVersionWrapper.getVersion());
+    }
 }

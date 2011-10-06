@@ -15,170 +15,191 @@
  */
 package org.cnx.repository.atompub.jerseyservlets;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.logging.Logger;
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.common.exceptions.CnxConflictException;
-import org.cnx.common.exceptions.CnxInvalidUrlException;
-import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
+import java.net.URISyntaxException;
+import javax.annotation.Nullable;
+import javax.xml.bind.JAXBException;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.exceptions.CnxBadRequestException;
+import org.cnx.common.exceptions.CnxException;
+import org.cnx.common.exceptions.CnxPreconditionFailedException;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionVersionWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionWrapper;
+import org.cnx.repository.scripts.MigratorUtils;
+import org.cnx.repository.scripts.migrators.ParallelCollectionMigrator;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test for {@link CnxAtomCollectionServlet}
+ * Test for {@link CnxAtomModuleServlet}
  * 
  * @author Arjun Satyapal
  */
-@Deprecated
 public class CnxAtomCollectionServletTest extends CnxAtomPubBasetest {
-    Logger logger = Logger.getLogger(CnxAtomCollectionServletTest.class.getName());
-    private CnxAtomPubClient cnxClient;
-
-    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/";
-    private final String ORIGINAL_COLLECTION_XML_LOCATION = COLLECTION_LOCATION + "collection.xml";
+    private CnxClient cnxClient;
+    private VersionWrapper FIRST_VERSION = new VersionWrapper(1);
+    private VersionWrapper SECOND_VERSION = new VersionWrapper(2);
+    private VersionWrapper THIRD_VERSION = new VersionWrapper(3);
+    private IdWrapper COLLECTION_ID_WRAPPER = new IdWrapper("col10064", IdWrapper.Type.COLLECTION);
+    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/testdata/col10064/";
 
     public CnxAtomCollectionServletTest() throws Exception {
         super();
     }
 
     @Before
-    public void initialize() throws ProponoException, IOException {
-        cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
+    public void initialize() throws IOException, URISyntaxException, JAXBException, CnxException {
+        cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
     @Test
-    public void testCreateCollection() throws Exception {
-        File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
-        String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
-
-        ClientEntry collectionEntry = cnxClient.createNewCollection();
-        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
-
-        // TODO(arjuns) : Add a regex test here.
-        String expectedCollectionUrl =
-                cnxClient.getConstants().getAtomPubRestUrl() + "/collection/"
-                        + collectionId.getId() + "/1";
-        assertEquals(expectedCollectionUrl, CnxAtomPubLinkRelations.getEditUri(collectionEntry)
-                .getHrefResolved());
-
-        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
-
-        Link selfLink = CnxAtomPubLinkRelations.getSelfUri(collectionEntry);
-        assertEquals(expectedCollectionUrl, selfLink.getHrefResolved());
-
-        logger.info("New location for collection = \n" + expectedCollectionUrl);
-
-        ClientEntry getEntry =
-                cnxClient.getCollectionVersionEntry(collectionId,
-                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-
-        String downloadedCollXml =
-                CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(getEntry);
-
-        assertEquals(collXmlAsString, downloadedCollXml);
+    public void test_createCollection() throws Exception {
+        CollectionWrapper collection = cnxClient.createCollection();
+        doTestForCreateCollection(collection, false /* isMigaration */);
     }
 
     @Test
-    public void testCreateCollectionMultipleVersion() throws Exception {
-        File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
-        String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
-        ClientEntry collectionEntry = cnxClient.createNewCollection();
-
-        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
-        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
-
-        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
-        ClientEntry latestEntry =
-                cnxClient.getCollectionVersionEntry(collectionId,
-                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-        assertEquals(new VersionWrapper(2),
-                CnxAtomPubUtils.getVersionFromAtomPubId(latestEntry.getId()));
+    public void test_createCollectionForMigration() throws Exception {
+        MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
+        CollectionWrapper collection =
+                cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
+        doTestForCreateCollection(collection, true /* isMigaration */);
     }
+
+    private void doTestForCreateCollection(final CollectionWrapper collectionWrapper,
+            boolean isMigration)
+            throws Exception {
+        TestingUtils.validateAtomPubResource(collectionWrapper, isMigration,
+                IdWrapper.Type.COLLECTION,
+                CnxAtomPubUtils.DEFAULT_VERSION);
+
+        ParallelCollectionMigrator collectionMigrator =
+                migrateCollection(collectionWrapper, FIRST_VERSION, COLLECTION_LOCATION,
+                        isMigration);
+
+        CollectionWrapper collectionWrapper1 = collectionMigrator.getCollectionWrapper();
+
+        assertEquals(FIRST_VERSION, collectionWrapper1.getVersion());
+
+        // First downloading using version=1.
+        CollectionVersionWrapper collectionVersion_1 =
+                cnxClient.getCollectionVersion(collectionWrapper1.getId(), FIRST_VERSION);
+        assertEquals(collectionMigrator.getCollectionXml(), collectionVersion_1.getCollectionXml());
+
+        // Now downloading ModuleVersion and validating it.
+        CollectionVersionWrapper collectionVersionLatest =
+                cnxClient.getCollectionVersion(collectionWrapper1.getId(),
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(collectionMigrator.getCollectionXml(),
+                collectionVersionLatest.getCollectionXml());
+    }
+
+    private ParallelCollectionMigrator migrateCollection(CollectionWrapper collectionWrapper,
+            @Nullable VersionWrapper newVersion,
+            String moduleLocation, boolean isMigration) {
+        ParallelCollectionMigrator collectionMigrator =
+                new ParallelCollectionMigrator(cnxClient, moduleLocation, collectionWrapper,
+                        newVersion, isMigration);
+        collectionMigrator.migrateCollection();
+        return collectionMigrator;
+    }
+
+    // @Test
+    // public void test_createModuleForMigration_MultipleTimes() throws Exception {
+    // MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
+    // // When used for migration, we can create same module many times.
+    // cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
+    // cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
+    //
+    // // This should pass successfully.
+    // // TODO(arjuns) : ONce module info is implemented, update this test.
+    // }
+
+    // @Test
+    // public void test_createModuleVersion_WithGaps_ForMigration() throws Exception {
+    // MigratorUtils.cleanUp(cnxClient, COLLECTION_ID_WRAPPER);
+    //
+    // CollectionWrapper collectionWrapper =
+    // cnxClient.createCollectionForMigration(COLLECTION_ID_WRAPPER);
+    // publishVersionForModule(collectionWrapper, FIRST_VERSION);
+    //
+    // // Now publishing THIRD_VERSION
+    // publishVersionForModule(collectionWrapper, THIRD_VERSION);
+    // // Now trying to publish SECOND_VERSION. This should result in conflict.
+    // try {
+    // publishVersionForModule(collectionWrapper, SECOND_VERSION);
+    // fail("should have failed.");
+    // } catch (CnxConflictException e) {
+    // // expected.
+    // }
+    // }
 
     /*
      * Purpose of this test is to test the state after creating a moduleId but not publishing any
      * version.
      */
     @Test
-    public void testGetCollectionVersion_withoutPublishingAnyVersion() throws Exception {
-        ClientEntry collectionEntry = cnxClient.createNewCollection();
+    public void testGetModule_LatestVersion_withoutPublishingAnyVersion() throws Exception {
+        CollectionWrapper collectionWrapper = cnxClient.createCollection();
 
-        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
-
-        List<VersionWrapper> listOfInvalidVersions =
-                Lists.newArrayList(CnxAtomPubUtils.LATEST_VERSION_WRAPPER, new VersionWrapper(0),
-                        new VersionWrapper(1));
-
-        for (VersionWrapper currentVersion : listOfInvalidVersions) {
-            try {
-                cnxClient.getCollectionVersionEntry(collectionId, currentVersion);
-                fail("should have failed.");
-            } catch (CnxInvalidUrlException e) {
-                // expected.
-            }
+        try {
+            cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                    CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+            fail("should have failed.");
+        } catch (CnxPreconditionFailedException e) {
+            // expected.
         }
+
+        publishVersionForCollection(collectionWrapper, FIRST_VERSION);
+
+        // This should pass fine.
+        cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
     }
 
     @Test
     public void testGetCollectionVersion_0() throws Exception {
-        File collXml = new File(ORIGINAL_COLLECTION_XML_LOCATION);
-        String collXmlAsString = Files.toString(collXml, Charsets.UTF_8);
+        CollectionWrapper collectionWrapper = cnxClient.createCollection();
 
-        ClientEntry collectionEntry = cnxClient.createNewCollection();
-        IdWrapper collectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
-
-        cnxClient.createNewCollectionVersion(collectionEntry, collXmlAsString);
-
-        VersionWrapper version = new VersionWrapper(0);
-
+        // First without publishing any version.
         try {
-            cnxClient.getCollectionVersionEntry(collectionId, version);
+            cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                    CnxAtomPubUtils.DEFAULT_VERSION);
             fail("should have failed.");
-        } catch (CnxInvalidUrlException e) {
+        } catch (CnxBadRequestException e) {
             // expected.
         }
 
-        version = new VersionWrapper(1);
+        // Now publishing one version.
+        publishVersionForCollection(collectionWrapper, FIRST_VERSION);
+
+        // Still the output should remain same.
         try {
-            ClientEntry entry = cnxClient.getCollectionVersionEntry(collectionId, version);
-            IdWrapper downloadedId = CnxAtomPubUtils.getIdFromAtomPubId(entry.getId());
-            VersionWrapper downloadedVersion =
-                    CnxAtomPubUtils.getVersionFromAtomPubId(entry.getId());
-
-            assertEquals(collectionId, downloadedId);
-            assertEquals(version, downloadedVersion);
-        } catch (Exception e) {
-            fail("should not have failed." + Throwables.getStackTraceAsString(e));
-        }
-    }
-
-    @Test
-    public void test_cretateNewCollectionForMigration() throws Exception {
-        // TODO(arjuns) : ensure that resource does not exist earlier.Current hack.
-
-        try {
-            IdWrapper id = new IdWrapper("col0010", IdWrapper.Type.COLLECTION);
-            cnxClient.createNewCollectionForMigration(id);
-            cnxClient.createNewCollectionForMigration(id);
+            cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                    CnxAtomPubUtils.DEFAULT_VERSION);
             fail("should have failed.");
-        } catch (CnxConflictException e) {
+        } catch (CnxBadRequestException e) {
             // expected.
         }
     }
-    // TODO(arjuns) : Add test for collectionMigration for forced ids.
+
+    //
+    private CollectionWrapper publishVersionForCollection(CollectionWrapper collectionWrapper,
+            VersionWrapper version) throws Exception {
+        File collxmlFile = new File(COLLECTION_LOCATION + "/collection.xml");
+        String collxmlAsString = Files.toString(collxmlFile, Charsets.UTF_8);
+
+        // Publishing FIRST_VERSION.
+        return cnxClient.createCollectionVersion(collectionWrapper.getId(), version,
+                collxmlAsString);
+    }
 }

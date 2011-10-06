@@ -16,16 +16,19 @@
 package org.cnx.repository.scripts;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.io.IOException;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
-import org.cnx.atompubclient.CnxAtomPubClient;
+import java.net.URISyntaxException;
+import java.util.List;
+import javax.xml.bind.JAXBException;
+import org.cnx.atompubclient2.CnxClient;
+import org.cnx.common.exceptions.CnxException;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionVersionWrapper;
+import org.cnx.common.repository.atompub.objects.CollectionWrapper;
 import org.cnx.repository.atompub.jerseyservlets.CnxAtomPubBasetest;
 import org.cnx.repository.scripts.migrators.ParallelCollectionMigrator;
 import org.junit.Before;
@@ -37,63 +40,84 @@ import org.junit.Test;
  * @author Arjun Satyapal
  */
 public class ParallelCollectionMigratorTest extends CnxAtomPubBasetest {
-    private CnxAtomPubClient cnxClient;
+    private CnxClient cnxClient;
+    private VersionWrapper FIRST_VERSION = new VersionWrapper(1);
+    private VersionWrapper SECOND_VERSION = new VersionWrapper(2);
 
-    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/";
+    private final String COLLECTION_ID = "col10064";
+    private final String COLLECTION_LOCATION = "/home/arjuns/cnxmodules/testdata/col10064/";
 
     public ParallelCollectionMigratorTest() throws Exception {
         super();
     }
 
     @Before
-    public void initialize() throws ProponoException, IOException {
-        cnxClient = new CnxAtomPubClient(getCnxServerAtomPubUrl());
+    public void initialize() throws IOException, URISyntaxException, JAXBException, CnxException {
+        cnxClient = new CnxClient(getCnxServerAtomPubUrl());
     }
 
     @Test
-    public void testCreateNewCollection() throws Exception {
-        ParallelCollectionMigrator migrator =
-                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION,
-                        null /* cnxCollectionId */, null /* aerCollectionId */, null /* version */,
-                        false /* preserveIds */);
+    public void testCollectionMigrator_preserveIds() throws Exception {
+        IdWrapper collectionIdWrapper = new IdWrapper(COLLECTION_ID, IdWrapper.Type.COLLECTION);
+        MigratorUtils.cleanUp(cnxClient, collectionIdWrapper);
+        List<File> listOfModules =
+                ParallelCollectionMigrator.getListOfModulesToBeUploaded(COLLECTION_LOCATION);
+        for (File currFile : listOfModules) {
+            IdWrapper tempWrapper = new IdWrapper(currFile.getName(), IdWrapper.Type.MODULE);
+            MigratorUtils.cleanUp(cnxClient, tempWrapper);
 
-        Entry collectionEntry = migrator.migrateCollectionVersion();
-        assertNotNull(collectionEntry);
+        }
 
-        assertEquals(CnxAtomPubUtils.DEFAULT_EDIT_VERSION,
-                CnxAtomPubUtils.getVersionFromAtomPubId(collectionEntry.getId()));
-    }
+        CollectionWrapper collectionWrapper =
+                cnxClient.createCollectionForMigration(collectionIdWrapper);
 
-    @Test
-    public void testMultipleCollectionVersions() throws Exception {
-        // Create first version.
-        ParallelCollectionMigrator migrator =
-                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION,
-                        null /* cnxCollectionId */, null /* aerCollectionId */, null /* version */,
-                        false /* preserveIds */);
+        ParallelCollectionMigrator migrator1 =
+                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION, collectionWrapper,
+                        FIRST_VERSION, true);
+        migrator1.migrateCollection();
 
-        Entry collectionEntry = migrator.migrateCollectionVersion();
+        CollectionVersionWrapper collectionVersionWrapper =
+                cnxClient.getCollectionVersion(collectionIdWrapper,
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(FIRST_VERSION, collectionVersionWrapper.getVersion());
 
-        IdWrapper aerCollectionId = CnxAtomPubUtils.getIdFromAtomPubId(collectionEntry.getId());
-
-        // TODO(arjuns) : Rename to NEW_COLLECTION_DEFAULT_VERSION
-        VersionWrapper firstVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
         // Now publishing second version.
         ParallelCollectionMigrator migrator2 =
-                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION,
-                        null /* cnxCollectionId */, aerCollectionId, firstVersion, false /* preserveIds */);
-
-        migrator2.migrateCollectionVersion();
+                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION, collectionWrapper,
+                        SECOND_VERSION, true);
+        migrator2.migrateCollection();
 
         // Validating version.
-        ClientEntry clientEntry =
-                cnxClient.getCollectionVersionEntry(aerCollectionId,
+        collectionVersionWrapper =
+                cnxClient.getCollectionVersion(collectionIdWrapper,
                         CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-        VersionWrapper expectedVersion = new VersionWrapper(2);
-        VersionWrapper actualVersion = CnxAtomPubUtils.getVersionFromAtomPubId(clientEntry.getId());
-
-        assertEquals(expectedVersion, actualVersion);
+        assertEquals(SECOND_VERSION, collectionVersionWrapper.getVersion());
     }
-    // TODO(arjuns): Add more tests when modules are migrated in context of collection.
-    // TODO(arjuns) : Add tests for forcedId.
+
+    @Test
+    public void testModuleMigrator_newIds() throws Exception {
+        ParallelCollectionMigrator migrator1 =
+                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION,
+                        null /* collectionWrapper */, null /* version */, false);
+        migrator1.migrateCollection();
+        CollectionWrapper collectionWrapper = migrator1.getCollectionWrapper();
+
+        CollectionVersionWrapper moduleVersionWrapper =
+                cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(FIRST_VERSION, moduleVersionWrapper.getVersion());
+
+        // Now publishing second version.
+        ParallelCollectionMigrator migrator2 =
+                new ParallelCollectionMigrator(cnxClient, COLLECTION_LOCATION, collectionWrapper,
+                        SECOND_VERSION, true);
+        migrator2.migrateCollection();
+        collectionWrapper = migrator2.getCollectionWrapper();
+
+        // Validating version.
+        moduleVersionWrapper =
+                cnxClient.getCollectionVersion(collectionWrapper.getId(),
+                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
+        assertEquals(SECOND_VERSION, moduleVersionWrapper.getVersion());
+    }
 }

@@ -18,18 +18,15 @@
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${libcnxmldir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${xmlsdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${appscommondir}" />
-        <ant antfile="build.xml" inheritAll="false" target="all" dir="${cnxclientdir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${cnxclient2dir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${repositorydir}" />
         <ant antfile="build.xml" inheritAll="false" target="all" dir="${webviewdir}" />
-        <ant antfile="build.xml" inheritAll="false" target="all" dir="${migratordir}" />
     </target>
 
     <target name="test" description="Run tests." depends="compile-all">
         <ant antfile="build.xml" inheritall="false" target="test" dir="${libutildir}" />
         <ant antfile="build.xml" inheritall="false" target="test" dir="${libcnxmldir}" />
         <ant antfile="build.xml" inheritall="false" target="test" dir="${appscommondir}" />
-        <ant antfile="build.xml" inheritall="false" target="test" dir="${cnxclient2dir}" />
         <ant antfile="build.xml" inheritall="false" target="test" dir="${repositorydir}" />
         <ant antfile="build.xml" inheritall="false" target="test" dir="${webviewdir}" />
     </target>
@@ -40,10 +37,8 @@
         <ant antfile="build.xml" target="clean" dir="${libcnxmldir}" />
         <ant antfile="build.xml" target="clean" dir="${xmlsdir}" />
         <ant antfile="build.xml" target="clean" dir="${appscommondir}" />
-        <ant antfile="build.xml" target="clean" dir="${cnxclientdir}" />
         <ant antfile="build.xml" target="clean" dir="${cnxclient2dir}" />
         <ant antfile="build.xml" target="clean" dir="${webviewdir}" />
         <ant antfile="build.xml" target="clean" dir="${repositorydir}" />
-        <ant antfile="build.xml" target="clean" dir="${migratordir}" />
     </target>
 </project>

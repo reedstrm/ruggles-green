@@ -15,76 +15,72 @@
  */
 package org.cnx.repository.scripts.migrators;
 
-import org.cnx.common.http.HttpStatusEnum;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.cnx.common.repository.atompub.objects.ModuleVersionWrapper;
+
+import org.cnx.common.exceptions.CnxPreconditionFailedException;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import com.sun.syndication.propono.atom.client.ClientEntry;
-import com.sun.syndication.propono.utils.ProponoException;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import javax.xml.bind.JAXBException;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
-import org.cnx.atompubclient.CnxAtomPubClient;
-import org.cnx.common.exceptions.CnxRuntimeException;
-import org.cnx.common.repository.atompub.CnxAtomPubLinkRelations;
+import org.cnx.atompubclient2.CnxClient;
 import org.cnx.common.repository.atompub.CnxAtomPubUtils;
 import org.cnx.common.repository.atompub.IdWrapper;
 import org.cnx.common.repository.atompub.VersionWrapper;
-import org.jdom.JDOMException;
+import org.cnx.common.repository.atompub.objects.ModuleWrapper;
 
 /**
- * Migrator for a module.
+ * Migrator for a module. Module should be
  * 
  * @author Arjun Satyapal
  */
 public class ParallelModuleMigrator implements Runnable {
     private Logger logger = Logger.getLogger(ParallelModuleMigrator.class.getName());
 
-    private final CnxAtomPubClient cnxClient;
+    private final CnxClient cnxClient;
+    private ModuleWrapper moduleWrapper;
     private final String moduleLocation;
-    private final String collXmlModuleId;
-    private final IdWrapper cnxModuleId;
-    private final IdWrapper aerModuleId;
-    private final VersionWrapper currentVersion;
+    private final VersionWrapper newVersion;
+    @SuppressWarnings("unused")
+    private final boolean isMigration;
 
     private boolean success = false;
-    private ClientEntry moduleVersionEntry;
+
+    private String cnxml;
+    private String resourceMappingXml;
 
     /**
      * Constructor for Parallel Module Migrator.
-     * 
-     * @param cnxClient CNX Client.
-     * @param moduleLocation Location of Module on filesystem.
-     * @param collXmlModuleId ModuleId inside Collection. This is useful when module is migrated
-     *            with collection.
-     * @param cnxModuleId ModuleId on cnx.org.
-     * @param aerModuleId ModuleId on AER.
-     * @param currentVersion Current Version.
      */
-    public ParallelModuleMigrator(CnxAtomPubClient cnxClient, String moduleLocation,
-            String collXmlModuleId, IdWrapper cnxModuleId, IdWrapper aerModuleId,
-            VersionWrapper currentVersion) {
-        this.cnxClient = cnxClient;
-        this.moduleLocation = moduleLocation;
-        this.collXmlModuleId = collXmlModuleId;
-        this.cnxModuleId = cnxModuleId;
-        this.aerModuleId = aerModuleId;
-        this.currentVersion = currentVersion;
-    }
+    public ParallelModuleMigrator(CnxClient cnxClient, String moduleLocation,
+            @Nullable ModuleWrapper moduleWrapper, @Nullable VersionWrapper newVersion,
+            boolean isMigration) {
+        this.cnxClient = checkNotNull(cnxClient);
+        this.moduleLocation = checkNotNull(moduleLocation);
 
-    public String getCollXmlModuleId() {
-        return collXmlModuleId;
+        this.moduleWrapper = moduleWrapper;
+        this.newVersion = newVersion;
+
+        if (isMigration || newVersion != null) {
+            checkNotNull(moduleWrapper);
+        }
+
+        if (moduleWrapper != null) {
+            checkNotNull(newVersion);
+        }
+
+        this.isMigration = isMigration;
     }
 
     // From a given module, extract list of files that need to be uploaded to Repository.
@@ -103,7 +99,7 @@ public class ParallelModuleMigrator implements Runnable {
 
         return listOfResources;
     }
-    
+
     public static class ResourceFilter implements FilenameFilter {
         // List of File Extensions that will not be uploaded to repository.
         private Set<String> ignoreExtensions = Sets.newHashSet(".xml", ".cnxml");
@@ -122,20 +118,21 @@ public class ParallelModuleMigrator implements Runnable {
     }
 
     // TODO(arjuns) : Probably should take original version?
-    public ClientEntry migrateModuleVersion() {
+    public void migrateModuleVersion() {
         logger.info("Attempting to upload module : " + moduleLocation);
 
-        List<ClientEntry> listOfEntryForUploadedResources = Lists.newArrayList();
+        List<ParallelResourceMigrator> listOfResourceMigrators = Lists.newArrayList();
         try {
             List<File> listOfResourcesToUpload = getListOfResourcesToBeUploaded(moduleLocation);
-            List<ParallelResourceMigrator> listOfResourceMigrators = Lists.newArrayList();
+
             List<Thread> listOfThreads = Lists.newArrayList();
 
             for (File currFile : listOfResourcesToUpload) {
                 // TODO(arjuns) : Need to handle only specific exception. Else test will never die.
 
                 ParallelResourceMigrator resourceMigrator =
-                        new ParallelResourceMigrator(cnxClient, currFile.getAbsolutePath());
+                        new ParallelResourceMigrator(cnxClient, currFile,
+                                null /* resourceWrapper */, false);
                 listOfResourceMigrators.add(resourceMigrator);
 
                 Thread thread = new Thread(resourceMigrator);
@@ -146,16 +143,6 @@ public class ParallelModuleMigrator implements Runnable {
             for (Thread currThread : listOfThreads) {
                 currThread.join();
             }
-
-            for (ParallelResourceMigrator currMigrator : listOfResourceMigrators) {
-                if (currMigrator.isSuccess()) {
-                    listOfEntryForUploadedResources.add(currMigrator.getResourceEntry());
-                } else {
-                    throw new RuntimeException("Failed to upload resource : "
-                            + currMigrator.getResourceLocation());
-                }
-            }
-
         } catch (Exception e) {
             // TODO(arjuns): Auto-generated catch block
             throw new RuntimeException(e);
@@ -163,88 +150,74 @@ public class ParallelModuleMigrator implements Runnable {
 
         // Successfully uploaded all the resources. Now trying to upload the CNXML and
         // ResourceMapping XML.
+
+        Map<String, IdWrapper> mapOfPrettyNameToResourceId =
+                ParallelResourceMigrator
+                        .getMapOfPrettyNameToResourceIdFromList(listOfResourceMigrators);
+
+        try {
+            resourceMappingXml = cnxClient.getResourceMappingXml(mapOfPrettyNameToResourceId);
+        } catch (JAXBException e) {
+            // TODO(arjuns): Auto-generated catch block
+            throw new RuntimeException(e);
+        }
         for (int i = 0; i < 10; i++) {
             try {
-                String resourceMappingXml =
-                        cnxClient
-                                .getResourceMappingFromResourceEntries(listOfEntryForUploadedResources);
-
                 /*
                  * Modules will have two types of CNXML : * index.cnxml *
                  * index_auto_generated.cnxml. index.cnxml is the one that is published on cnx.
                  * whereas index_auto_generated.cnxml is one which is upgraded to 0.7 version.
                  */
-                File cnxml = new File(moduleLocation + "/index_auto_generated.cnxml");
-                String cnxmlAsString = Files.toString(cnxml, Charsets.UTF_8);
+                File cnxmlFile = new File(moduleLocation + "/index_auto_generated.cnxml");
+                cnxml = Files.toString(cnxmlFile, Charsets.UTF_8);
 
-                final ClientEntry entryToUpdate;
-
-                // TODO(arjuns) : Refactor following code.
-                if (cnxModuleId != null) {
-                    /*
-                     * This means that we are trying to migrate a cnxModule. So first validate if it
-                     * exists or not. If not, then create it.
-                     */
-                    ClientEntry existingEntry = null;
-
-                    try {
-                        existingEntry =
-                                cnxClient.getModuleVersionEntry(cnxModuleId,
-                                        CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
-                    } catch (CnxRuntimeException e) {
-                        if (e.getHttpStatus() == HttpStatusEnum.NOT_FOUND) {
-                            // Expected.
-                            logger.info(e.getLocalizedMessage());
+                VersionWrapper publishVersion = null;
+                if (moduleWrapper == null) {
+                    moduleWrapper = cnxClient.createModule();
+                    publishVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
+                } else {
+                    if (newVersion != null) {
+                        if (newVersion.equals(CnxAtomPubUtils.LATEST_VERSION_WRAPPER)) {
+                            try {
+                                ModuleVersionWrapper tempModuleWrapper =
+                                        cnxClient.getModuleVersion(moduleWrapper.getId(),
+                                                newVersion);
+                                publishVersion = tempModuleWrapper.getVersion().getNextVersion();
+                            } catch (CnxPreconditionFailedException e) {
+                                publishVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
+                            }
+                        } else if (newVersion.getVersionInt() == 0) {
+                            publishVersion = CnxAtomPubUtils.DEFAULT_EDIT_VERSION;
                         } else {
-                            throw e;
+                            publishVersion = newVersion;
                         }
                     }
-
-                    if (existingEntry != null) {
-                        entryToUpdate = existingEntry;
-                    } else {
-                        entryToUpdate = cnxClient.createNewModuleForMigration(cnxModuleId);
-                    }
-                } else if (aerModuleId == null) {
-                    entryToUpdate = cnxClient.createNewModule();
-                } else {
-                    Preconditions.checkNotNull(currentVersion);
-                    URL currentModuleUrl =
-                            cnxClient.getConstants().getModuleVersionAbsPath(aerModuleId,
-                                    currentVersion);
-                    entryToUpdate = cnxClient.getService().getEntry(currentModuleUrl.toString());
                 }
-                moduleVersionEntry =
-                        publishNewVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
+
+                // TODO(arjuns) : Modify this to return moduleVersion.
+                moduleWrapper =
+                        cnxClient.createModuleVersion(moduleWrapper.getId(), publishVersion, cnxml,
+                                resourceMappingXml);
                 success = true;
 
-                logger.info("Successfully uploaded : " + moduleLocation + " to : "
-                        + CnxAtomPubLinkRelations.getEditUri(moduleVersionEntry).getHrefResolved());
-                return moduleVersionEntry;
+                logger.info("Successfully uploaded : "
+                        + moduleWrapper.getId()
+                        + " to : " + moduleWrapper.getSelfUri());
+                return;
             } catch (Exception e) {
-                logger.severe(Throwables.getStackTraceAsString(e));
-            }
-
-            // If control reaches here, that means there was some exception on server side.
-            // Wait for some time and then retry.
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                logger.severe(Throwables.getStackTraceAsString(e));
+                e.printStackTrace();
+                // If control reaches here, that means there was some exception on server side.
+                // Wait for some time and then retry.
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e1) {
+                    logger.severe(Throwables.getStackTraceAsString(e1));
+                }
             }
         }
 
         logger.severe("Failed to upload module after 10 attempts : " + moduleLocation);
         System.exit(1);
-        return null;
-    }
-
-    private ClientEntry publishNewVersion(ClientEntry entryToUpdate, String cnxmlAsString,
-            String resourceMappingXml) throws ProponoException, JAXBException, JDOMException,
-            IOException, XMLStreamException, FactoryConfigurationError {
-        cnxClient.createNewModuleVersion(entryToUpdate, cnxmlAsString, resourceMappingXml);
-
-        return entryToUpdate;
     }
 
     @Override
@@ -256,11 +229,15 @@ public class ParallelModuleMigrator implements Runnable {
         return success;
     }
 
-    public ClientEntry getModuleVersionEntry() {
-        return moduleVersionEntry;
+    public ModuleWrapper getModuleWrapper() {
+        return moduleWrapper;
     }
 
-    public IdWrapper getCnxModuleId() {
-        return cnxModuleId;
+    public String getResourceMappingXml() {
+        return resourceMappingXml;
+    }
+
+    public String getCnxml() {
+        return cnxml;
     }
 }

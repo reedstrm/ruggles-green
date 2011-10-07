@@ -43,19 +43,6 @@ public interface CnxRepositoryService extends CnxRepositoryServiceMigrationExten
      */
     RepositoryResponse<AddResourceResult> addResource(RepositoryRequestContext context);
 
-    //    /**
-    //     * Create a new resource with enforced id.
-    //     *
-    //     * Temp method for migration. Accepts the id that should be assigned to the new resource. The id
-    //     * must be in the range of protected module ids. See
-    //     * {@link org.cnx.repository.service.impl.persistence.PersistenceMigrationUtil} for more
-    //     * details.
-    //     *
-    //     * TODO(tal): remove this method after completing the migration.
-    //     */
-    //    RepositoryResponse<CreateResourceResult> migrationCreateResourceWithId(
-    //            RepositoryRequestContext context, String forcedId, Date forcedCreationTime);
-
     /**
      * Return general information about a resource.
      * 

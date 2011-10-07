@@ -76,12 +76,6 @@ public class MigrationOperations {
                         "Forced collection id is not out of protected id range " + forcedId, log);
             }
 
-            //            if (Services.persistence.hasObjectWithKey(forcedKey)) {
-            //                tx.rollback();
-            //                return ResponseUtil.loggedError(RepositoryStatus.ALREADY_EXISTS,
-            //                        "A collection with this forced id already exists: " + forcedId, log);
-            //            }
-
             // We allow to overwrite existing entity only if it has no versions. This enables
             // retries by the migrator.
             try {
@@ -141,14 +135,6 @@ public class MigrationOperations {
             return ResponseUtil.loggedError(RepositoryStatus.OVERSIZE, "COLXML doc oversize, limit:"
                     + Services.config.getMaxColxmlDocSize() + ", found: " + colxmlDoc.length(), log);
         }
-
-        //        if (resourceMapDoc.length() > Services.config.getMaxResourceMapDocSize()) {
-        //            return ResponseUtil.loggedError(
-        //                    RepositoryStatus.OVERSIZE,
-        //                    "Module resource map doc oversize, limit:"
-        //                            + Services.config.getMaxResourceMapDocSize() + ", found: "
-        //                            + resourceMapDoc.length(), log);
-        //        }
 
         final Date transactionTime = new Date();
         final int newVersionCount;

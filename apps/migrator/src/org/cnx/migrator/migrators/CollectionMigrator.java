@@ -76,15 +76,12 @@ public class CollectionMigrator extends ItemMigrator {
             final int directoryVersionNum = Integer.parseInt(versionDirectory.getName());
             checkArgument(directoryVersionNum >= nextVersionNum, "%s", versionDirectory);
 
-            // If needed, create gap versions
-            while (directoryVersionNum > nextVersionNum) {
-                getContext().incrementCounter("COLLECTION_VERSION_TAKEDOWNS", 1);
-                MigratorUtil.sleep(getConfig().getTransactionDelayMillis());
-                // TODO(tal): create gaps as explicit taken down version.
-                Log.message("** Creating gap collection version: %s/%s", collectionId,
-                        nextVersionNum);
-                migrateNextCollectionVersion(collectionId, nextVersionNum, versionDirectory);
-                nextVersionNum++;
+            // Track version gap is needed.
+            if (directoryVersionNum > nextVersionNum) {
+                getContext().incrementCounter("COLLECTION_VERSION_GAPS", 1);
+                getContext().incrementCounter("COLLECTION_VERSION_TAKEDOWNS",
+                        (directoryVersionNum - nextVersionNum));
+                nextVersionNum = directoryVersionNum;
             }
 
             // Create the actual version
@@ -162,7 +159,7 @@ public class CollectionMigrator extends ItemMigrator {
         for (attempt = 1;; attempt++) {
             try {
                 final CollectionWrapper collectionWrapper =
-                        getCnxClient().createCollectionVersion(idWrapper, versionWrapper, colxml);
+                        getCnxClient().createCollectionVersionForMigration(idWrapper, versionWrapper, colxml);
                 checkResourceId(collectionId, versionNum, collectionWrapper);
                 Log.message("Added collection version %s/%s", collectionId, versionNum);
                 return;

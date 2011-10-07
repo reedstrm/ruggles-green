@@ -3,7 +3,6 @@
 # A temp shell script to run the migrator
 
 # TODO(tal): allow to override with command line flags
-#DATA_ROOT_DIR="/aux/cnx/fake_data"
 DATA_ROOT_DIR="/aux/cnx/data_001"
 
 #REPOSITORY_ATOMPUB_URL="http://localhost:8888/atompub"

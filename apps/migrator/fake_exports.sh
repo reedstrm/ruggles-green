@@ -34,7 +34,7 @@ function create_fake_export {
   dd if=/dev/urandom of=${export_path} bs=${unit_size} count=${unit_count} 2>&1 | sed 's/^/    /'
 }
 
-function create_entity_fake_exports {
+function create_module_version_fake_exports {
   local entity_dir="$1"
   local exports_dir="${entity_dir}/exports"
   mkdir -p ${exports_dir}
@@ -43,9 +43,18 @@ function create_entity_fake_exports {
   create_fake_export ${exports_dir}/std_zip.zip   1k  1000
 }
 
+function create_collection_version_fake_exports {
+  local entity_dir="$1"
+  local exports_dir="${entity_dir}/exports"
+  mkdir -p ${exports_dir}
+  create_fake_export ${exports_dir}/std_pdf.pdf   1k  1200
+  create_fake_export ${exports_dir}/std_epub.epub 1k  2400
+  create_fake_export ${exports_dir}/std_zip.zip   1k  2400
+}
+
 # Create fake resources for all modules and versions
 function create_modules_fake_exports {
-  local shards=`ls -d ${MODULES_ROOT}/00*`
+  local shards=`ls -d ${MODULES_ROOT}/*`
   for shard in ${shards}; do
     echo "shard: ${shard}"
     local module=`ls -d ${shard}/*`
@@ -54,7 +63,7 @@ function create_modules_fake_exports {
       local versions=`ls -d ${module}/*`
       for version in ${versions}; do
         echo "    version: ${version}"
-        create_entity_fake_exports ${version}
+        create_module_version_fake_exports ${version}
       done
     done
   done

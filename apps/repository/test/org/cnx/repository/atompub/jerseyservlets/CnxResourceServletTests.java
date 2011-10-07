@@ -46,7 +46,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class CnxResourceServletTest extends CnxAtomPubBasetest {
+public class CnxResourceServletTests extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
 
     @Before

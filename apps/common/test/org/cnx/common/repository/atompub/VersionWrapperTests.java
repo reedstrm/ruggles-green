@@ -23,7 +23,6 @@ import org.cnx.common.repository.atompub.VersionWrapper;
 
 import org.cnx.common.exceptions.CnxInvalidUrlException;
 
-
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -35,7 +34,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class VersionWrapperTest {
+public class VersionWrapperTests {
 
     @Test
     public void testVersionWrapperConstructor_long() {
@@ -74,14 +73,15 @@ public class VersionWrapperTest {
     @Test
     public void testVersionWrapper_isValidVersion() {
         List<String> listOfInvalidVersions =
-                Lists.newArrayList("asdf", "01", "0.1", "1.1", "-1", "-1.1");
+                Lists.newArrayList("asdf", "0.1", "1.1", "-1", "-1.1");
 
         confirmInvalidityOfVersion(listOfInvalidVersions);
     }
 
     private void confirmInvalidityOfVersion(List<String> listOfInvalidVersions) {
         for (String currVersion : listOfInvalidVersions) {
-            assertFalse(VersionWrapper.isValidVersion(currVersion));
+            assertFalse(currVersion + " should be invalide",
+                    VersionWrapper.isValidVersion(currVersion));
         }
     }
 
@@ -89,22 +89,29 @@ public class VersionWrapperTest {
     public void testNextVersion() {
         VersionWrapper versionWrapper = new VersionWrapper(0);
         assertEquals("1", versionWrapper.getNextVersion().toString());
-        
+
         versionWrapper = new VersionWrapper(1);
         assertEquals("2", versionWrapper.getNextVersion().toString());
-        
+
         versionWrapper = new VersionWrapper(Integer.MAX_VALUE);
         try {
             versionWrapper.getNextVersion();
         } catch (CnxInvalidUrlException e) {
             // expected.
         }
-        
+
         versionWrapper = CnxAtomPubUtils.LATEST_VERSION_WRAPPER;
         try {
             versionWrapper.getNextVersion();
         } catch (IllegalStateException e) {
             // expected.
         }
+    }
+    
+    @Test
+    public void testEquals() {
+        assertEquals(new VersionWrapper(1), new VersionWrapper("1"));
+        
+        assertEquals(CnxAtomPubUtils.LATEST_VERSION_WRAPPER, new VersionWrapper("latest"));
     }
 }

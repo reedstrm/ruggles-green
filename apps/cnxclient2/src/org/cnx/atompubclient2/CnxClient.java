@@ -475,6 +475,29 @@ public class CnxClient {
             JAXBException, FeedException, URISyntaxException {
         return apcForCollection.createCollectionVersion(editUri, collectionXml);
     }
+    
+    /**
+     * Create a Collection Version on CNX Repository for Migration.
+     * 
+     * @param id Id for Collection whose new Version needs to be published.
+     * @param newVersion Version that needs to be published.
+     * @param collectionXml CollectionXml representation for a collection..
+     * @return CollectionWrapper which wraps details for the collection.
+     * 
+     * @throws IllegalArgumentException
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws CnxException
+     * @throws JAXBException
+     * @throws JDOMException
+     * @throws FeedException
+     */
+    public CollectionWrapper createCollectionVersionForMigration(IdWrapper id, VersionWrapper newVersion,
+            String collectionXml) throws IllegalArgumentException,
+            URISyntaxException, IOException, CnxException, JAXBException,
+            JDOMException, FeedException {
+        return apcForCollection.createCollectionVersionForMigration(id, newVersion, collectionXml);
+    }
 
     /**
      * Fetch a Collection Version from CNX Repository.

@@ -22,6 +22,7 @@ import static org.cnx.repository.atompub.utils.AtomPubResponseUtils.logAndReturn
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Link;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -49,9 +50,9 @@ import org.cnx.common.repository.atompub.ServletUris;
 import org.cnx.common.repository.atompub.VersionWrapper;
 import org.cnx.repository.atompub.utils.RepositoryUtils;
 import org.cnx.repository.atompub.utils.ServerUtil;
+import org.cnx.repository.service.api.AddCollectionResult;
 import org.cnx.repository.service.api.AddCollectionVersionResult;
 import org.cnx.repository.service.api.CnxRepositoryService;
-import org.cnx.repository.service.api.AddCollectionResult;
 import org.cnx.repository.service.api.GetCollectionVersionResult;
 import org.cnx.repository.service.api.RepositoryResponse;
 import org.cnx.repository.service.impl.CnxRepositoryServiceImpl;
@@ -111,7 +112,7 @@ public class CnxAtomCollectionServlet {
     @Path(ServletUris.Collection.COLLECTION_POST_MIGRATION)
     public Response createNewCollectionForMigration(@Context HttpServletRequest req,
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId)
-                    throws CnxException {
+            throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         cnxConstants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));
 
@@ -177,7 +178,40 @@ public class CnxAtomCollectionServlet {
     public Response createNewCollectionVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String versionString)
-                    throws IOException, CnxException {
+            throws IOException, CnxException {
+        return handleCreateCollectionVersion(req, collectionId, versionString, false /* isMigration */);
+    }
+
+    /**
+     * When Client does HTTP-PUT on
+     * {@link org.cnx.common.repository.atompub.ServletUris.Collection#COLLECTION_PUT_MIGRATION_VERSION}
+     * , then this method is invoked.
+     * 
+     * This method in turn calls {@link CnxRepositoryService#addCollectionVersionForMigration}.
+     * 
+     * This method is used to publish a new Version for an existing Collection under Restricted
+     * Range.
+     * 
+     * @param req HttpServletRequest.
+     * @param collectionId CollectionId for which client wants to publish a new version.
+     * @param versionString New version that client wants to publish.
+     * @return AtomEntry containing selfUri and editUri. SelfUri can be used to fetch the version
+     *         that was published with this method Invocation, whereas EditUri should be used to
+     *         publish versions in future.
+     */
+    @PUT
+    @Produces(ContentType.APPLICATION_ATOM_XML)
+    @Path(ServletUris.Collection.COLLECTION_PUT_MIGRATION_VERSION)
+    public Response createNewCollectionVersionForMigration(@Context HttpServletRequest req,
+            @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
+            @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String versionString)
+            throws IOException, CnxException {
+        return handleCreateCollectionVersion(req, collectionId, versionString, true /* isMigration */);
+    }
+
+    private Response handleCreateCollectionVersion(HttpServletRequest req, String collectionId,
+            String versionString, boolean isMigration) throws CnxException, CnxBadRequestException,
+            UnsupportedEncodingException {
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         final VersionWrapper newVersion = new VersionWrapper(versionString);
 
@@ -191,9 +225,18 @@ public class CnxAtomCollectionServlet {
         String decodedCollXml =
                 CnxAtomPubUtils.getCollXmlDocFromAtomPubCollectionEntry(postedEntry);
 
-        RepositoryResponse<AddCollectionVersionResult> createdCollection =
-                repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
-                        idWrapper.getId(), newVersion.getVersionInt(), decodedCollXml);
+        RepositoryResponse<AddCollectionVersionResult> createdCollection;
+
+        if (isMigration) {
+            createdCollection =
+                    repositoryService.addCollectionVersionForMigration(
+                            RepositoryUtils.getRepositoryContext(),
+                            idWrapper.getId(), newVersion.getVersionInt(), decodedCollXml);
+        } else {
+            createdCollection =
+                    repositoryService.addCollectionVersion(RepositoryUtils.getRepositoryContext(),
+                            idWrapper.getId(), newVersion.getVersionInt(), decodedCollXml);
+        }
 
         if (createdCollection.isOk()) {
             /*
@@ -246,7 +289,7 @@ public class CnxAtomCollectionServlet {
     public Response getCollectionVersion(@Context HttpServletRequest req,
             @PathParam(ServletUris.COLLECTION_ID_PATH_PARAM) String collectionId,
             @PathParam(ServletUris.COLLECTION_VERSION_PATH_PARAM) String versionString)
-                    throws CnxException {
+            throws CnxException {
         final IdWrapper idWrapper = new IdWrapper(collectionId, IdWrapper.Type.COLLECTION);
         final VersionWrapper versionWrapper = new VersionWrapper(versionString);
         cnxConstants = new CnxAtomPubConstants(ServerUtil.computeAtomPubUrl(req));

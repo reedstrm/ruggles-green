@@ -75,7 +75,7 @@ import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
 
 /**
- * Servlet to Handle CNX Resources.
+ * Servlet to Handle CNX Collection and Modules under CNX Collection Context..
  * 
  * @author Arjun Satyapal
  */
@@ -443,7 +443,7 @@ public class RenderCollectionServlet {
     }
 
     private String getCollectionUri(String collectionId, VersionWrapper collectionVersion) {
-        return CommonHack.CONTENT_NAME_SPACE + ServletUris.Collection.COLLECTION_SERVLET + "/"
+        return CommonHack.WEBVIEW_URL_PREFIX + ServletUris.Collection.COLLECTION_SERVLET + "/"
                 + collectionId + "/" + collectionVersion.toString();
     }
 

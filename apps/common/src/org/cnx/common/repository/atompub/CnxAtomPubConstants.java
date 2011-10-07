@@ -44,16 +44,6 @@ public class CnxAtomPubConstants {
         return atomPubRestUrl;
     }
 
-    /** 
-     * Get URI for CategoryDocument.
-     * @deprecated use {@link #getServiceDocumentAbsPath2()}
-     */
-    // TODO(arjuns) : Rename this to getAPServiceDocumentAbsPath()
-    @Deprecated
-    public String getServiceDocumentAbsPath() {
-        return atomPubRestUrl + ServletUris.ServiceDocument.SERVICE_DOCUMENT_SERVLET;
-    }
-
     /** Get URI for CategoryDocument. */
     // TODO(arjuns) : Rename this to getAPServiceDocumentAbsPath()
     public String getServiceDocumentAbsPath2() {

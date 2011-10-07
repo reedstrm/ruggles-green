@@ -17,6 +17,8 @@ package org.cnx.atompubclient2.cnxcollections;
 
 import static org.cnx.atompubclient2.HttpClientWrapper.getHttpClient;
 
+import org.cnx.common.repository.atompub.objects.ModuleWrapper;
+
 import com.google.common.io.CharStreams;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.io.FeedException;
@@ -103,6 +105,14 @@ public class APCForCollection extends AbstractAPC {
         return CollectionWrapper.fromEntry(entry);
     }
 
+    public CollectionWrapper createCollectionVersionForMigration(IdWrapper id, VersionWrapper version, 
+            String collectionXml) throws URISyntaxException,
+            IllegalArgumentException, JDOMException, IOException, CnxException, JAXBException,
+            FeedException {
+        URI editUri = getAPRVUriForMigration(id, version);
+        return createCollectionVersion(editUri, collectionXml);
+    }
+    
     public CollectionVersionWrapper getCollectionVersion(IdWrapper id, VersionWrapper version)
             throws IllegalStateException, IOException, URISyntaxException, JDOMException,
             IllegalArgumentException, FeedException, CnxException {

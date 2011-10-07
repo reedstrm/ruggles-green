@@ -251,8 +251,6 @@ public class CnxAtomResourceServlet {
                 List<Link> listOfLinks = RepositoryUtils.getListOfLinks(selfUrl, null/* editUrl */);
                 entry.setOtherLinks(listOfLinks);
             }
-
-            System.out.println(PrettyXmlOutputter.prettyXmlOutputEntry(entry));
             return logAndReturn(logger, Status.OK, entry, null /* locationUri */);
         }
         return fromRepositoryError(logger, repoResult);

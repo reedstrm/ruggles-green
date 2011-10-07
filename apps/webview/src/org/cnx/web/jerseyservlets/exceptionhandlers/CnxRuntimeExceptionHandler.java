@@ -25,7 +25,7 @@ import org.cnx.common.exceptions.CnxInvalidUrlException;
 import org.cnx.common.exceptions.CnxRuntimeException;
 
 /**
- * Exception Handler fork CnxRuntimeExceptions for Jersey Servlets.
+ * Exception Handler fork {@link CnxRuntimeException} for Jersey Servlets.
  * 
  * @author Arjun Satyapal
  */

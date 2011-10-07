@@ -16,5 +16,5 @@
 	<classpathentry kind="lib" path="build/jars/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="build/jars/jaxb-impl.jar"/>
 	<classpathentry kind="lib" path="build/jars/jaxb1-impl.jar"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

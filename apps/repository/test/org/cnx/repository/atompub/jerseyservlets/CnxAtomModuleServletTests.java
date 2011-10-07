@@ -48,7 +48,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
+public class CnxAtomModuleServletTests extends CnxAtomPubBasetest {
     private CnxClient cnxClient;
     private VersionWrapper FIRST_VERSION = new VersionWrapper(1);
     private VersionWrapper SECOND_VERSION = new VersionWrapper(2);
@@ -57,7 +57,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     private final String MODULE_LOCATION = "/home/arjuns/cnxmodules/col10064_1.13_complete/"
             + MODULE_ID_WRAPPER.getId();
 
-    public CnxAtomModuleServletTest() throws Exception {
+    public CnxAtomModuleServletTests() throws Exception {
         super();
     }
 
@@ -129,21 +129,45 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     }
 
     @Test
-    public void test_createModuleVersion_WithGaps_ForMigration() throws Exception {
-        MigratorUtils.cleanUp(cnxClient, MODULE_ID_WRAPPER);
+    public void test_createModuleVersion_WithGaps() throws Exception {
+        ModuleWrapper moduleWrapper = cnxClient.createModule();
+        doTestFor_createModuleVersion_withGaps(moduleWrapper, false /*isMigration*/);
+    }
 
-        ModuleWrapper moduleWrapper = cnxClient.createModuleForMigration(MODULE_ID_WRAPPER);
-        publishVersionForModule(moduleWrapper, FIRST_VERSION);
+    private void doTestFor_createModuleVersion_withGaps(ModuleWrapper moduleWrapper,
+            boolean isMigration)
+            throws Exception {
+        publishVersionForModule(moduleWrapper, FIRST_VERSION, isMigration);
 
         // Now publishing THIRD_VERSION
-        publishVersionForModule(moduleWrapper, THIRD_VERSION);
+        if (isMigration) {
+            publishVersionForModule(moduleWrapper, THIRD_VERSION, isMigration);
+            // This should pass successfully for migration.
+        } else {
+            try {
+                publishVersionForModule(moduleWrapper, THIRD_VERSION, isMigration);
+                fail("should have failed");
+            } catch (CnxConflictException e) {
+                // expected.
+                return;
+            }
+        }
+        
         // Now trying to publish SECOND_VERSION. This should result in conflict.
         try {
-            publishVersionForModule(moduleWrapper, SECOND_VERSION);
+            publishVersionForModule(moduleWrapper, SECOND_VERSION, isMigration);
             fail("should have failed.");
         } catch (CnxConflictException e) {
             // expected.
         }
+    }
+
+    @Test
+    public void test_createModuleVersionForMigration_WithGaps() throws Exception {
+        MigratorUtils.cleanUp(cnxClient, MODULE_ID_WRAPPER);
+        ModuleWrapper moduleWrapper = cnxClient.createModuleForMigration(MODULE_ID_WRAPPER);
+        
+        doTestFor_createModuleVersion_withGaps(moduleWrapper, true /*isMigration*/);
     }
 
     /*
@@ -155,14 +179,14 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         ModuleWrapper moduleWrapper = cnxClient.createModule();
 
         try {
-            cnxClient.getModuleVersion(moduleWrapper.getId(), 
+            cnxClient.getModuleVersion(moduleWrapper.getId(),
                     CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
             fail("should have failed.");
         } catch (CnxPreconditionFailedException e) {
             // expected.
         }
 
-        publishVersionForModule(moduleWrapper, FIRST_VERSION);
+        publishVersionForModule(moduleWrapper, FIRST_VERSION, false /*isMigration*/);
 
         // This should pass fine.
         cnxClient.getModuleVersion(moduleWrapper.getId(), CnxAtomPubUtils.LATEST_VERSION_WRAPPER);
@@ -182,7 +206,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         }
 
         // Now publishing one version.
-        publishVersionForModule(moduleWrapper, FIRST_VERSION);
+        publishVersionForModule(moduleWrapper, FIRST_VERSION, false /*isMigration*/);
 
         // Still the output should remain same.
         try {
@@ -195,7 +219,7 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
     }
 
     private ModuleWrapper publishVersionForModule(ModuleWrapper moduleWrapper,
-            VersionWrapper version) throws Exception {
+            VersionWrapper version, boolean isMigration) throws Exception {
         Map<String, IdWrapper> map = Maps.newConcurrentMap();
         String resourceMappingXml = cnxClient.getResourceMappingXml(map);
 
@@ -203,7 +227,12 @@ public class CnxAtomModuleServletTest extends CnxAtomPubBasetest {
         String cnxmlAsString = Files.toString(cnxmlFile, Charsets.UTF_8);
 
         // Publishing FIRST_VERSION.
-        return cnxClient.createModuleVersionForMigration(moduleWrapper.getId(), version,
-                cnxmlAsString, resourceMappingXml);
+        if (isMigration) {
+            return cnxClient.createModuleVersionForMigration(moduleWrapper.getId(), version,
+                    cnxmlAsString, resourceMappingXml);
+        } else {
+            return cnxClient.createModuleVersion(moduleWrapper.getId(), version, cnxmlAsString,
+                    resourceMappingXml);
+        }
     }
 }

@@ -29,7 +29,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>home</servlet-name>
-    <servlet-class>org.cnx.web.servlets.FrontPageServlet</servlet-class>
+    <servlet-class>org.cnx.web.servlets.HomePageServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>

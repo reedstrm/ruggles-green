@@ -34,7 +34,7 @@ import org.cnx.resourcemapping.Resources;
 
 /**
  * Resolves links for Modules and Collections.
- *
+ * 
  * @author Arjun Satyapal
  */
 @Singleton
@@ -47,7 +47,7 @@ public class WebViewLinkResolver implements LinkResolver {
 
     @Inject
     public WebViewLinkResolver(Provider<Collection> collectionProvider,
-        Provider<Module> moduleProvider, WebViewConfiguration configuration) {
+            Provider<Module> moduleProvider, WebViewConfiguration configuration) {
         this.collectionProvider = collectionProvider;
         this.moduleProvider = moduleProvider;
         this.configuration = configuration;
@@ -72,7 +72,7 @@ public class WebViewLinkResolver implements LinkResolver {
             moduleVersion = CnxAtomPubUtils.LATEST_VERSION_STRING;
         }
 
-        StringBuilder uriBuilder = new StringBuilder(CommonHack.CONTENT_NAME_SPACE);
+        StringBuilder uriBuilder = new StringBuilder(CommonHack.WEBVIEW_URL_PREFIX);
         if (collection != null && collection.hasModule(moduleId)) {
             uriBuilder
                     .append(ServletUris.Collection.COLLECTION_SERVLET)
@@ -105,7 +105,8 @@ public class WebViewLinkResolver implements LinkResolver {
                             + "/resource/" + resourceId);
                 }
             }
-            logger.severe("****Returning badUrl : " + resource);
+            logger.severe("For Module[" + moduleProvider.get().getId() + "], Returning badUrl : "
+                    + resource);
             return resource;
         }
 

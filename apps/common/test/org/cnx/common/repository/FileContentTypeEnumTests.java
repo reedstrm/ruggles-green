@@ -29,7 +29,7 @@ import org.junit.Test;
  * 
  * @author Arjun Satyapal
  */
-public class FileContentTypeEnumTest {
+public class FileContentTypeEnumTests {
     @Test
     public void testUniqExtensions() {
         for (FileContentType curr : FileContentType.values()) {

@@ -1,0 +1,1 @@
+All issues related to the CNXv2 project, a collaborative effort between Google and Rice University to replace cnx.org's current content hosting system in favor of a scalable storage system with APIs built on Google App Engine.
